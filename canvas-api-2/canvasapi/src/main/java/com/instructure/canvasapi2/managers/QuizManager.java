@@ -25,6 +25,8 @@ import com.instructure.canvasapi2.models.Quiz;
 import com.instructure.canvasapi2.models.QuizQuestion;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestionResponse;
 import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.models.post_models.QuizPostBody;
+import com.instructure.canvasapi2.models.post_models.QuizPostBodyWrapper;
 import com.instructure.canvasapi2.tests.QuizManager_Test;
 
 import java.util.List;
@@ -81,7 +83,7 @@ public class QuizManager extends BaseManager {
     }
 
     public static void getQuizzes(long courseId, final boolean forceNetwork, StatusCallback<List<Quiz>> callback) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             QuizManager_Test.getQuizesQuestions(callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -95,9 +97,26 @@ public class QuizManager extends BaseManager {
         }
     }
 
-    public static void getQuiz(long courseId, long quizId, StatusCallback<Quiz> callback) {
+    public static void getQuiz(long courseId, long quizId, final boolean forceNetwork, StatusCallback<Quiz> callback) {
         if (isTesting() || mTesting) {
-            // TODO
+            QuizManager_Test.getQuiz(callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            QuizAPI.getQuiz(courseId, quizId, adapter, callback, params);
+        }
+    }
+
+
+    public static void editQuiz(long courseId, long quizId, QuizPostBody body, final StatusCallback<Quiz> callback){
+
+        if (isTesting() || mTesting) {
+            QuizManager_Test.editQuiz(body, callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
@@ -105,7 +124,25 @@ public class QuizManager extends BaseManager {
                     .withShouldIgnoreToken(false)
                     .build();
 
-            QuizAPI.getQuiz(courseId, quizId, adapter, callback, params);
+
+            QuizPostBodyWrapper bodyWrapper = new QuizPostBodyWrapper();
+            bodyWrapper.setQuiz(body);
+            QuizAPI.editQuiz(courseId, quizId, bodyWrapper, adapter, callback, params);
+        }
+    }
+
+    public static void getQuizSubmissions(long courseId, long quizId, final boolean forceNetwork, StatusCallback<QuizSubmissionResponse> callback) {
+        if(isTesting() || mTesting) {
+            QuizManager_Test.getQuizSubmissions(callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            QuizAPI.getQuizSubmissions(courseId, quizId, adapter, callback, params);
         }
     }
 }

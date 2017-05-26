@@ -23,7 +23,6 @@ import android.text.format.DateUtils;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -81,6 +80,19 @@ public class DateHelpers {
         return format.format(date.getTime());
     }
 
+    /**
+     * @param context
+     * @param date
+     * @return Month/Day/Year
+     */
+    public static String getMonthDayYearShortDateString(Context context, Date date) {
+        if(context == null) {
+            return null;
+        }
+        Format format = getMonthDayYearShortFormat(context);
+        return format.format(date.getTime());
+    }
+
     public static String getDayMonthDateStringUniversal(Context context, Date date) {
         if(context == null) {
             return null;
@@ -126,6 +138,9 @@ public class DateHelpers {
         return new SimpleDateFormat("MMM d", Locale.getDefault());
     }
 
+    public static SimpleDateFormat getMonthDayYearShortFormat(Context context) {
+        return new SimpleDateFormat("M/d/yy", Locale.getDefault());
+    }
 
     public static SimpleDateFormat getDayMonthDateFormatUniversal(Context context) {
         return new SimpleDateFormat("MMM d", Locale.getDefault());

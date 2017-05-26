@@ -37,6 +37,8 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -81,6 +83,15 @@ public class DiscussionAPI {
 
         @PUT("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}/read")
         Call<Void> markDiscussionTopicEntryRead(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId, @Path("entryId") long entryId);
+
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}")
+        Call<DiscussionTopicHeader> pinDiscussion(@Path("contextType") String contextType, @Path("contextId") long courseId, @Path("topicId") long topicId, @Query("pinned") boolean pinned, @Body String body);
+
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}")
+        Call<DiscussionTopicHeader> lockDiscussion(@Path("contextType") String contextType, @Path("contextId") long courseId, @Path("topicId") long topicId, @Query("locked") boolean locked, @Body String body);
+
+        @DELETE("{contextType}/{contextId}/discussion_topics/{topicId}")
+        Call<Void> deleteDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long courseId, @Path("topicId") long topicId);
 
         @Multipart
         @POST("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}/replies")
@@ -248,5 +259,25 @@ public class DiscussionAPI {
             @NonNull RestParams params) {
 
         callback.addCall(adapter.build(DiscussionInterface.class, params).getDetailedDiscussionAirwolf(parentId, studentId, courseId, discussionTopicId)).enqueue(callback);
+    }
+
+    public static void pinDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).pinDiscussion(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, true, "")).enqueue(callback);
+    }
+
+    public static void unpinDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).pinDiscussion(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, false, "")).enqueue(callback);
+    }
+
+    public static void lockDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).lockDiscussion(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, true, "")).enqueue(callback);
+    }
+
+    public static void unlockDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).lockDiscussion(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, false, "")).enqueue(callback);
+    }
+
+    public static void deleteDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<Void> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).deleteDiscussionTopic(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId)).enqueue(callback);
     }
 }

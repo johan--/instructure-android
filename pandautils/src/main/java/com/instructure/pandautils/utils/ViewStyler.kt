@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.AppCompatCheckBox
 import android.support.v7.widget.AppCompatEditText
+import android.support.v7.widget.AppCompatSpinner
 import android.support.v7.widget.Toolbar
 import android.text.Spannable
 import android.text.SpannableString
@@ -50,6 +51,12 @@ object ViewStyler {
         val defaultColor = ContextCompat.getColor(context, R.color.utils_editTextColor)
         editText.supportBackgroundTintList = makeColorStateList(defaultColor, brand)
         editText.highlightColor = ThemePrefs.increaseAlpha(brand)
+    }
+
+    @JvmStatic
+    fun themeSpinner(context: Context, spinner: AppCompatSpinner, @ColorInt brand: Int) {
+        val defaultColor = ContextCompat.getColor(context, R.color.utils_editTextColor)
+        spinner.supportBackgroundTintList = makeColorStateList(defaultColor, brand)
     }
 
     @JvmStatic
@@ -130,6 +137,18 @@ object ViewStyler {
             intArrayOf(-android.R.attr.state_focused, android.R.attr.state_pressed) to brand,
             intArrayOf(android.R.attr.state_checked) to brand,
             intArrayOf() to defaultColor
+    )
+
+    @JvmStatic
+    fun makeColorStateListForButton() = generateColorStateList(
+            intArrayOf() to ThemePrefs.buttonColor
+    )
+
+    @JvmStatic
+    fun makeColorStateListForRadioGroup(uncheckedColor: Int, checkedColor: Int) = generateColorStateList(
+            intArrayOf(-android.R.attr.state_checked) to uncheckedColor,
+            intArrayOf(android.R.attr.state_checked) to checkedColor,
+            intArrayOf() to uncheckedColor
     )
 
     @JvmStatic

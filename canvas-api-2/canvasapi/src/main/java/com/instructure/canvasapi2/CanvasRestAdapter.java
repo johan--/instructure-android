@@ -21,6 +21,7 @@ import android.net.http.HttpResponseCache;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.GsonBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.utils.ApiPrefs;
@@ -170,6 +171,45 @@ public abstract class CanvasRestAdapter {
                 .baseUrl(params.getDomain() + params.getAPIVersion() + apiContext)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getOkHttpClientNoRedirects()).build();
+    }
+
+    public Retrofit buildAdapterSerializeNulls(@NonNull RestParams params) {
+        if(params.getDomain() == null || params.getDomain().length() == 0) {
+            params = new RestParams.Builder(params).withDomain(ApiPrefs.getFullDomain()).build();
+        }
+
+        if(mCallback != null) {
+            mCallback.onCallbackStarted();
+        }
+
+        //Can make this check as we KNOW that the setter doesn't allow empty strings.
+        if (params.getDomain().equals("")) {
+            Logger.d("The RestAdapter hasn't been set up yet. Call setupInstance(context,token,domain)");
+            return new Retrofit.Builder().baseUrl("http://invalid.domain.com/").build();
+        }
+
+        String apiContext = "";
+        if (params.getCanvasContext() != null) {
+            if (params.getCanvasContext().getType() == CanvasContext.Type.COURSE) {
+                apiContext = "courses/";
+            } else if (params.getCanvasContext().getType() == CanvasContext.Type.GROUP) {
+                apiContext = "groups/";
+            } else if (params.getCanvasContext().getType() == CanvasContext.Type.SECTION) {
+                apiContext = "sections/";
+            } else {
+                apiContext = "users/";
+            }
+        }
+
+
+        //Adds current requested params to the config to be used with the OkHttpClient
+        ApiPrefs.setRestParams(params);
+
+        //Sets the auth token, user agent, and handles masquerading.
+        return new Retrofit.Builder()
+                .baseUrl(params.getDomain() + params.getAPIVersion() + apiContext)
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().serializeNulls().create()))
+                .client(getOkHttpClient()).build();
     }
 
     public Retrofit buildPingAdapter(@NonNull String url) {

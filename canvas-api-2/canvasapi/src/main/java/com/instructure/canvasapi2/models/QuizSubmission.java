@@ -115,6 +115,9 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
     @SerializedName("validation_token")
     private String validationToken;
 
+    @SerializedName("overdue_and_needs_submission")
+    private boolean overDueAndNeedsSubmission;
+
     @Override
     public long getId() {
         return id;
@@ -284,6 +287,14 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         this.validationToken = validationToken;
     }
 
+    public boolean isOverDueAndNeedsSubmission() {
+        return overDueAndNeedsSubmission;
+    }
+
+    public void setOverDueAndNeedsSubmission(boolean overDueAndNeedsSubmission) {
+        this.overDueAndNeedsSubmission = overDueAndNeedsSubmission;
+    }
+
     @Override
     public Date getComparisonDate() {
         return getFinishedAt();
@@ -343,6 +354,7 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         dest.writeString(this.workflowState);
         dest.writeInt(this.quizPointsPossible);
         dest.writeString(this.validationToken);
+        dest.writeByte(overDueAndNeedsSubmission ? (byte) 1 : (byte) 0);
     }
 
     public QuizSubmission() {
@@ -369,6 +381,7 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         this.workflowState = in.readString();
         this.quizPointsPossible = in.readInt();
         this.validationToken = in.readString();
+        this.overDueAndNeedsSubmission = in.readByte() != 0;
     }
 
     public static final Creator<QuizSubmission> CREATOR = new Creator<QuizSubmission>() {

@@ -37,6 +37,13 @@ public class Assignment extends CanvasModel<Assignment> {
     public enum TURN_IN_TYPE {ONLINE, ON_PAPER, NONE, DISCUSSION, QUIZ, EXTERNAL_TOOL}
     public static final SUBMISSION_TYPE[] ONLINE_SUBMISSIONS = {SUBMISSION_TYPE.ONLINE_UPLOAD, SUBMISSION_TYPE.ONLINE_URL, SUBMISSION_TYPE.ONLINE_TEXT_ENTRY, SUBMISSION_TYPE.MEDIA_RECORDING};
 
+    public static final String PASS_FAIL_TYPE = "pass_fail";
+    public static final String PERCENT_TYPE = "percent";
+    public static final String LETTER_GRADE_TYPE = "letter_grade";
+    public static final String POINTS_TYPE = "points";
+    public static final String GPA_SCALE_TYPE = "gpa_scale";
+    public static final String NOT_GRADED_TYPE = "not_graded";
+
     private long id;
     private String name;
     private String description;
@@ -440,6 +447,13 @@ public class Assignment extends CanvasModel<Assignment> {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<String> getSubmissionAPITypes() {
+        if(submissionTypes == null) {
+            return new ArrayList<>();
+        }
+        return submissionTypes;
     }
 
     public List<SUBMISSION_TYPE> getSubmissionTypes() {

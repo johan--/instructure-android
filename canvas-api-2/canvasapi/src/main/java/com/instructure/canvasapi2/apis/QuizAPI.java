@@ -26,12 +26,15 @@ import com.instructure.canvasapi2.models.Quiz;
 import com.instructure.canvasapi2.models.QuizQuestion;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestionResponse;
 import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.models.post_models.QuizPostBodyWrapper;
 
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Url;
 
@@ -61,7 +64,19 @@ public class QuizAPI {
         Call<List<Quiz>> getNextPageQuizzes(@Url String nextUrl);
 
         @GET("courses/{courseId}/quizzes/{quizId}")
-        Call<Quiz> getQuiz(@Path("courseId") Long courseId, @Path("quizId") Long quizId);
+        Call<Quiz> getQuiz(@Path("courseId") long courseId, @Path("quizId") long quizId);
+
+        @PUT("courses/{courseId}/quizzes/{quizId}")
+        Call<Quiz> editQuiz(
+                @Path("courseId") long courseId,
+                @Path("quizId") long quizId,
+                @Body QuizPostBodyWrapper body);
+
+        @GET("courses/{courseId}/quizzes/{quizId}/submissions")
+        Call<QuizSubmissionResponse> getFirstPageQuizSubmissions(@Path("courseId") Long courseId, @Path("quizId") Long quizId);
+
+        @GET
+        Call<QuizSubmissionResponse> getNextPageQuizSubmissions(@Url String nextUrl);
     }
 
     public static void getQuizQuestions(long contextId, long quizId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<QuizQuestion>> callback, @NonNull RestParams params) {
@@ -102,6 +117,18 @@ public class QuizAPI {
             callback.addCall(adapter.build(QuizInterface.class, params).getFirstPageQuizzes(contextId)).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             callback.addCall(adapter.build(QuizInterface.class, params).getNextPageQuizzes(callback.getLinkHeaders().nextUrl)).enqueue(callback);
+        }
+    }
+
+    public static void editQuiz(long courseId, long assignmentId, QuizPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Quiz> callback, RestParams params) {
+        callback.addCall(adapter.buildSerializeNulls(QuizInterface.class, params).editQuiz(courseId, assignmentId, body)).enqueue(callback);
+    }
+
+    public static void getQuizSubmissions(long contextId, long quizId, @NonNull RestBuilder adapter, @NonNull StatusCallback<QuizSubmissionResponse> callback, @NonNull RestParams params) {
+        if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
+            callback.addCall(adapter.build(QuizInterface.class, params).getFirstPageQuizSubmissions(contextId, quizId)).enqueue(callback);
+        } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
+            callback.addCall(adapter.build(QuizInterface.class, params).getNextPageQuizSubmissions(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
     }
 }

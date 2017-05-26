@@ -36,7 +36,7 @@ public class NoInternetConnectionDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.login_noInternetConnectionTitle);
         builder.setMessage(R.string.login_noInternetConnectionMessage);
-        builder.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

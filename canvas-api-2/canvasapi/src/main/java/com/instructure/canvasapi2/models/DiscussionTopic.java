@@ -100,6 +100,10 @@ public class DiscussionTopic implements Parcelable {
         return entryRatings;
     }
 
+    public boolean hasRated(long entryId) {
+        return entryRatings.containsKey(entryId) && entryRatings.get(entryId) == 1;
+    }
+
     //endregion
 
     //region Setters

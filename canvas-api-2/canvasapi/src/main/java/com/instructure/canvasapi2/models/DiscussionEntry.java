@@ -59,6 +59,7 @@ public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
     private String userName;
     @SerializedName("editor_id")
     private long editorId;
+    private boolean _hasRated;
 
     @Override
     public long getId() {
@@ -88,6 +89,8 @@ public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
         if(discussionParticipant != null){
             author = discussionParticipant;
         }
+
+        this._hasRated = topic.hasRated(parent.id);
 
         //Get whether or not the topic is unread;
         unread = topic.getUnreadEntriesMap().containsKey(this.getId());
@@ -183,7 +186,6 @@ public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
         return message;
     }
 
-
     public boolean isDeleted() {
         return deleted;
     }
@@ -218,6 +220,10 @@ public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
 
     public String getUserName() {
         return userName;
+    }
+
+    public boolean hasRated() {
+        return _hasRated;
     }
 
     //endregion
@@ -306,6 +312,10 @@ public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setHasRated(boolean hasRated) {
+        this._hasRated = hasRated;
     }
 
     //endregion

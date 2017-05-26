@@ -59,5 +59,11 @@
     <string name="quiz_scoring_policy_highest">Highest</string>
     <string name="quiz_scoring_policy_average">Average</string>
     <string name="quiz_scoring_policy_latest">Latest</string>
+    <string name="no">No</string>
+    <string name="always">Always</string>
+    <string name="graded_quiz">Graded Quiz</string>
+    <string name="practice_quiz">Practice Quiz</string>
+    <string name="graded_survey">Graded Survey</string>
+    <string name="ungraded_survey">Ungraded Survey</string>
 
 </resources>

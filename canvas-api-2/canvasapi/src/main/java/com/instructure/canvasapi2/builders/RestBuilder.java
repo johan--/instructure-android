@@ -43,6 +43,12 @@ public class RestBuilder extends CanvasRestAdapter {
         return restAdapter.create(clazz);
     }
 
+    public <T> T buildSerializeNulls(@NonNull Class<T> clazz, @NonNull RestParams params) {
+        params = new RestParams.Builder(params).withForceReadFromCache(false).build();
+        Retrofit restAdapter = buildAdapterSerializeNulls(params);
+        return restAdapter.create(clazz);
+    }
+
     public <T> T buildNoRedirects(@NonNull Class<T> clazz, @NonNull RestParams params) {
         params = new RestParams.Builder(params).withForceReadFromCache(false).build();
         Retrofit restAdapter = buildAdapterNoRedirects(params);

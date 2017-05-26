@@ -1,0 +1,42 @@
+html,body {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+
+img {
+    max-width: 100% !important;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+
+video {
+    width: 100%    !important;
+    height: auto   !important;
+    margin: 0;
+    padding: 0;
+}
+
+iframe {
+    width: 100%    !important;
+    margin: 0;
+    padding-top: 0;
+}
+
+pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+#content {
+    padding: 0px 10px 10px;
+}
+
+a {
+    word-break: break-all;
+}

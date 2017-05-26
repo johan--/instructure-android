@@ -25,7 +25,9 @@ import com.instructure.canvasapi2.utils.APIHelper;
 
 import java.util.Date;
 
-
+/**
+ * Represents the override object on an assignment
+ */
 public class AssignmentDueDate extends CanvasModel<AssignmentDueDate> {
 
     private long id;

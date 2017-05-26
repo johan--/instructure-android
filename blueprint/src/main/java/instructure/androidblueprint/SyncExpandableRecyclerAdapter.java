@@ -72,6 +72,7 @@ public abstract class SyncExpandableRecyclerAdapter<GROUP, MODEL extends CanvasC
                 notifyItemRangeChanged(position, count);
             }
         });
+        getList().setDisplayEmptyCell(showEmptyCells());
         notifyDataSetChanged();
     }
 
@@ -248,5 +249,12 @@ public abstract class SyncExpandableRecyclerAdapter<GROUP, MODEL extends CanvasC
 
     public boolean expandByDefault() {
         return true;
+    }
+
+    /*
+     * Override to allow empty cells (views) to be shown within groups
+     */
+    public boolean showEmptyCells() {
+        return false;
     }
 }

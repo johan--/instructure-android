@@ -28,7 +28,6 @@
     <string name="unknownDevice">UnknownDevice</string>
     <string name="errorOccurred">An unexpected error occurred.</string>
     <string name="pageNotFound">Page not found.</string>
-    <string name="okay">Okay</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="help">Help</string>

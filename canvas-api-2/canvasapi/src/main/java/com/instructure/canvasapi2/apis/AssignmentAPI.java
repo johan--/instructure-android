@@ -46,6 +46,11 @@ public class AssignmentAPI {
         @GET("courses/{courseId}/assignments/{assignmentId}?include[]=submission&include[]=rubric_assessment&needs_grading_count_by_section=true&all_dates=true&include[]=overrides")
         Call<Assignment> getAssignment(@Path("courseId") long courseId, @Path("assignmentId") long assignmentId);
 
+        @GET("courses/{courseId}/assignment_groups/{assignmentGroupId}")
+        Call<AssignmentGroup> getAssignmentGroup(
+                @Path("courseId") long courseId,
+                @Path("assignmentGroupId") long assignmentId);
+
         @GET("courses/{courseId}/assignment_groups?include[]=assignments&include[]=discussion_topic&include[]=submission&override_assignment_dates=true&include[]=all_dates&include[]=overrides")
         Call<List<AssignmentGroup>> getAssignmentGroupListWithAssignments(@Path("courseId") long courseId);
 
@@ -71,13 +76,13 @@ public class AssignmentAPI {
         @GET
         Call<List<GradeableStudent>> getNextPageGradeableStudents(@Url String nextUrl);
 
-        @GET("courses/{courseId}/assignments/{assignmentId}/submissions?include[]=rubric_assessment")
+        @GET("courses/{courseId}/assignments/{assignmentId}/submissions?include[]=rubric_assessment&include[]=submission_history")
         Call<List<Submission>> getFirstPageSubmissionsForAssignment(@Path("courseId") long courseId, @Path("assignmentId") long assignmentId);
 
         @GET
         Call<List<Submission>> getNextPageSubmissions(@Url String nextUrl);
 
-        @GET("courses/{courseId}/assignments?include[]=submission&include[]=rubric_assessment&needs_grading_count_by_section=true&include[]=all_dates")
+        @GET("courses/{courseId}/assignments?include[]=submission&include[]=rubric_assessment&needs_grading_count_by_section=true&override_assignment_dates=true&include[]=all_dates&include[]=overrides")
         Call<List<Assignment>> getAssignments(@Path("courseId") long courseId);
 
         @GET
@@ -94,6 +99,11 @@ public class AssignmentAPI {
 
     public static void getAssignment(long courseId, long assignmentId, @NonNull RestBuilder adapter, @NonNull StatusCallback<Assignment> callback, @NonNull RestParams params) {
         callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignment(courseId, assignmentId)).enqueue(callback);
+    }
+
+
+    public static void getAssignmentGroup(long courseId, long assignmentGroupId, RestBuilder adapter, StatusCallback<AssignmentGroup> callback, RestParams params) {
+        callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignmentGroup(courseId, assignmentGroupId)).enqueue(callback);
     }
 
     public static void getAssignmentGroupsWithAssignments(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback, @NonNull RestParams params) {
@@ -113,6 +123,10 @@ public class AssignmentAPI {
     }
 
     public static void editAssignment(long courseId, long assignmentId, AssignmentPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Assignment> callback, RestParams params){
+        callback.addCall(adapter.buildSerializeNulls(AssignmentInterface.class, params).editAssignment(courseId, assignmentId, body)).enqueue(callback);
+    }
+
+    public static void editAssignmentAllowNullValues(long courseId, long assignmentId, AssignmentPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Assignment> callback, RestParams params){
         callback.addCall(adapter.build(AssignmentInterface.class, params).editAssignment(courseId, assignmentId, body)).enqueue(callback);
     }
 

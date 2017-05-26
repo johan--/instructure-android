@@ -18,6 +18,7 @@
 package com.instructure.canvasapi2.utils;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 
@@ -167,7 +168,15 @@ public class DateHelper {
         if (DateFormat.is24HourFormat(context)) {
             return new SimpleDateFormat("HH:mm", Locale.getDefault());
         } else {
-            return new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            return new SimpleDateFormat("h:mma", Locale.getDefault());
+        }
+    }
+
+    public static SimpleDateFormat getTimeNoMinutesFormat(Context context) {
+        if (DateFormat.is24HourFormat(context)) {
+            return new SimpleDateFormat("HH", Locale.getDefault());
+        } else {
+            return new SimpleDateFormat("hha", Locale.getDefault());
         }
     }
 
@@ -277,6 +286,10 @@ public class DateHelper {
         return new SimpleDateFormat("MMM d", Locale.getDefault());
     }
 
+    public static SimpleDateFormat getMonthDayYearDateFormatUniversal() {
+        return new SimpleDateFormat("MMMM d, YYYY", Locale.getDefault());
+    }
+
     public static String getDayMonthDateStringUniversal(Date date) {
         Format format = getDayMonthDateFormatUniversal();
         return format.format(date.getTime());
@@ -310,7 +323,9 @@ public class DateHelper {
      * @param separator example "at", spacing is handled by helper
      * @return
      */
+    @Nullable
     public static String getMonthDayAtTime(Context context, Date date, String separator) {
+        if (date == null) return null;
         String dateString;
         dateString = getDayMonthDateFormatUniversal().format(date);
         dateString += " " + separator + " ";
@@ -320,5 +335,84 @@ public class DateHelper {
         return dateString;
     }
 
+    /**
+     * Simple date helper, formats date as:
+     *
+     * Month 15 separator 11:59 PM
+     * @param context
+     * @param date
+     * @param stringResSeparator String resource for separator; example "at", spacing is handled by helper
+     * @return
+     */
+    public static String getMonthDayAtTime(Context context, Date date, int stringResSeparator) {
+        String dateString;
+        String separator = context.getString(stringResSeparator);
+        dateString = getDayMonthDateFormatUniversal().format(date);
+        dateString += " " + separator + " ";
 
+        dateString += getDayAbbreviationFormat(context).format(date);
+
+        return dateString;
+    }
+
+    /**
+     * Simple date helper, examples:
+     *
+     * Sep 15, 2018 {separator} 9:02am
+     *
+     * or
+     *
+     * Sep 15 {separator} 11pm <- No year if year matches the curren year; Minutes not displayed if there are none
+     *
+     * Year is added only if it is not the current year.
+     * @param context
+     * @param date
+     * @param stringResSeparator String resource for separator; example "at", spacing is handled by helper
+     * @return If date is null, will return a null string
+     */
+    @Nullable
+    public static String getMonthDayTimeMaybeMinutesMaybeYear(Context context, @Nullable Date date, int stringResSeparator) {
+        if (date == null) {
+            return null;
+        }
+
+        StringBuilder dateString;
+        String separator = context.getString(stringResSeparator);
+        if (isThisYear(date)) {
+                dateString = new StringBuilder(getDayMonthDateFormatUniversal().format(date));
+        } else {
+            dateString = new StringBuilder(getMonthDayYearDateFormatUniversal().format(date));
+        }
+
+        dateString
+                .append(" ")
+                .append(separator)
+                .append(" ");
+
+        if (timeHasMinutes(date)) {
+            dateString.append(getDayAbbreviationFormat(context).format(date));
+        } else {
+            dateString.append(getTimeNoMinutesFormat(context).format(date));
+        }
+
+        return dateString.toString();
+    }
+
+    public static boolean timeHasMinutes(Date date) {
+        Calendar srcCal = Calendar.getInstance();
+        srcCal.setTime(date);
+
+        return srcCal.get(Calendar.MINUTE) > 0;
+    }
+
+    public static boolean isThisYear(Date date) {
+        Calendar srcCal = Calendar.getInstance();
+        srcCal.setTime(date);
+
+        Date compare = new Date();
+        Calendar compareCal = Calendar.getInstance();
+        compareCal.setTime(compare);
+
+        return srcCal.get(Calendar.YEAR) == compareCal.get(Calendar.YEAR);
+    }
 }

@@ -28,7 +28,7 @@ import com.instructure.pandautils.R;
 
 import java.util.Locale;
 
-
+@Deprecated
 public class DiscussionEntryHTMLHelper {
 
     private static final String NO_PIC = "images/dotted_pic.png";

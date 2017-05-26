@@ -21,11 +21,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.instructure.canvasapi2.StatusCallback;
-import com.instructure.canvasapi2.builders.RXRestBuilder;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Conversation;
-import com.instructure.canvasapi2.utils.LinkHeaders;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 
 public class ConversationAPI {

@@ -17,21 +17,15 @@
 
 package com.instructure.canvasapi2.managers;
 
-import com.instructure.canvasapi2.AppManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.ConversationAPI;
-import com.instructure.canvasapi2.builders.RXRestBuilder;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Conversation;
 import com.instructure.canvasapi2.tests.ConversationManager_Test;
-import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Response;
-import rx.Observable;
 
 
 public class ConversationManager extends BaseManager {

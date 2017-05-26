@@ -81,6 +81,21 @@ public class AssignmentManager extends BaseManager {
         }
     }
 
+    public static void getAssignmentGroup(long courseId, long assignmentGroupId, boolean forceNetwork, StatusCallback<AssignmentGroup> callback) {
+        if (isTesting() || mTesting) {
+            AssignmentManager_Test.getAssignmentGroup(courseId, assignmentGroupId, callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            AssignmentAPI.getAssignmentGroup(courseId, assignmentGroupId, adapter, callback, params);
+        }
+
+    }
+
     public static void deleteAssignment(long courseId, Assignment assignment, final StatusCallback<Assignment> callback){
 
         if (isTesting() || mTesting) {
@@ -111,6 +126,23 @@ public class AssignmentManager extends BaseManager {
             AssignmentPostBodyWrapper bodyWrapper = new AssignmentPostBodyWrapper();
             bodyWrapper.setAssignment(body);
             AssignmentAPI.editAssignment(courseId, assignmentId, bodyWrapper, adapter, callback, params);
+        }
+    }
+
+    public static void editAssignmentAllowNullValues(long courseId, long assignmentId, AssignmentPostBody body, final StatusCallback<Assignment> callback){
+
+        if (isTesting() || mTesting) {
+            AssignmentManager_Test.editAssignment(body, callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            AssignmentPostBodyWrapper bodyWrapper = new AssignmentPostBodyWrapper();
+            bodyWrapper.setAssignment(body);
+            AssignmentAPI.editAssignmentAllowNullValues(courseId, assignmentId, bodyWrapper, adapter, callback, params);
         }
     }
 

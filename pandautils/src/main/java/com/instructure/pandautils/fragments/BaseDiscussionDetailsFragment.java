@@ -76,7 +76,7 @@ import java.util.List;
 
 import retrofit2.Response;
 
-
+@Deprecated
 public abstract class BaseDiscussionDetailsFragment extends BaseFragment implements
         LoaderManager.LoaderCallbacks<FormatHtmlObject>{
 

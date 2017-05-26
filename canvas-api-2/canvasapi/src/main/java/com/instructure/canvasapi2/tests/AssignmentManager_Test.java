@@ -148,6 +148,22 @@ public class AssignmentManager_Test {
         callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
     }
 
+    public static void getAssignmentGroup(long courseId, long assignmentGroupId, StatusCallback<AssignmentGroup> callback) {
+        //TODO:
+        Response httpResponse = new Response.Builder()
+                .request(new Request.Builder().url("https://test.com").build())
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        AssignmentGroup assignmentGroup = new AssignmentGroup();
+        retrofit2.Response<AssignmentGroup> response = retrofit2.Response.success(assignmentGroup, httpResponse);
+        callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
+    }
+
     public static void getAllAssignments(long courseId, StatusCallback<List<Assignment>> callback) {
         //TODO:
         Response httpResponse = new Response.Builder()

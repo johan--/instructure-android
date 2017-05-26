@@ -17,6 +17,7 @@
 
 package com.instructure.canvasapi2.managers;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.instructure.canvasapi2.AppManager;
@@ -55,12 +56,13 @@ public class DiscussionManager extends BaseManager {
         }
     }
 
-    public static void getDiscussionTopicHeaders(long contextId, StatusCallback<List<DiscussionTopicHeader>> callback) {
+    public static void getDiscussionTopicHeaders(long contextId, boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
         if(isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
                     .withPerPageQueryParam(StatusCallback.isFirstPage(callback.getLinkHeaders()))
                     .build();
 
@@ -200,6 +202,76 @@ public class DiscussionManager extends BaseManager {
             RestParams params = new RestParams.Builder().build();
 
             DiscussionAPI.postToDiscussionTopicWithAttachment(adapter, canvasContext, topicId, message, attachment, callback, params);
+        }
+    }
+
+    public static void pinDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.pinDiscussion(adapter, canvasContext, topicId, callback, params);
+        }
+    }
+
+    public static void unpinDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.unpinDiscussion(adapter, canvasContext, topicId, callback, params);
+        }
+    }
+
+    public static void lockDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.lockDiscussion(adapter, canvasContext, topicId, callback, params);
+        }
+    }
+
+    public static void unlockDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.unlockDiscussion(adapter, canvasContext, topicId, callback, params);
+        }
+    }
+
+    public static void deleteDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long topicId, StatusCallback<Void> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.deleteDiscussion(adapter, canvasContext, topicId, callback, params);
         }
     }
 

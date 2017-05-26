@@ -43,6 +43,7 @@ import android.webkit.WebViewClient;
 
 import com.instructure.canvasapi.utilities.APIHelpers;
 import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.R;
 import com.instructure.pandautils.utils.Utils;
@@ -168,7 +169,7 @@ public class CanvasWebView extends WebView {
     }
 
     /**
-     * Handles back presses for the CanvasWebView and the lifecycle of the {@link com.video.ActivityContentVideoViewClient}
+     * Handles back presses for the CanvasWebView and the lifecycle of the ActivityContentVideoViewClient
      *
      * Use instead of goBack and canGoBack
      *
@@ -185,10 +186,14 @@ public class CanvasWebView extends WebView {
         return false;
     }
 
-
+    @Deprecated
     public static String getRefererDomain(Context context) {
         // Mainly for embedded content such as vimeo, youtube, video tags, iframes, etc
         return APIHelpers.loadProtocol(context) + "://" + APIHelpers.getDomain(context);
+    }
+
+    public static String getReferrer() {
+        return ApiPrefs.getDomain();
     }
 
     public static String applyWorkAroundForDoubleSlashesAsUrlSource(String html) {
@@ -364,6 +369,7 @@ public class CanvasWebView extends WebView {
      * @param title
      * @return
      */
+    @Deprecated
     public String formatHTML(String content, String title) {
         String html = APIHelper.getAssetsFile(mContext, "html_wrapper.html");
 
@@ -375,6 +381,21 @@ public class CanvasWebView extends WebView {
         this.loadDataWithBaseURL(CanvasWebView.getRefererDomain(getContext()), result, "text/html", encoding, getHtmlAsUrl(result, encoding));
 
         setupAccessibilityContentDescription(result, title);
+
+        return result;
+    }
+
+    public String loadHtml(String html, String contentDescription) {
+        String htmlWrapper = APIHelper.getAssetsFile(mContext, "html_wrapper.html");
+
+        html = CanvasWebView.applyWorkAroundForDoubleSlashesAsUrlSource(html);
+
+        String result = htmlWrapper.replace("{$CONTENT$}", html);
+
+        // BaseURL is set as Referer. Referer needed for some vimeo videos to play
+        this.loadDataWithBaseURL(CanvasWebView.getReferrer(), result, "text/html", encoding, getHtmlAsUrl(result, encoding));
+
+        setupAccessibilityContentDescription(result, contentDescription);
 
         return result;
     }

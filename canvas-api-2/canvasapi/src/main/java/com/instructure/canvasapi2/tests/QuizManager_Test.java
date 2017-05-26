@@ -24,6 +24,7 @@ import com.instructure.canvasapi2.models.QuizSubmission;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestionResponse;
 import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.models.post_models.QuizPostBody;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 
@@ -32,6 +33,7 @@ import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.Protocol;
+import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -125,8 +127,9 @@ public class QuizManager_Test {
     }
 
     public static void getQuiz(StatusCallback<Quiz> callback) {
-        //TODO:
-        Response response = new Response.Builder()
+
+        Response httpResponse = new Response.Builder()
+                .request(new Request.Builder().url("https://test.com").build())
                 .code(200)
                 .message("todo")
                 .protocol(Protocol.HTTP_1_0)
@@ -138,7 +141,45 @@ public class QuizManager_Test {
         quiz.setTitle("TEST");
         quiz.setDescription("description");
 
-        retrofit2.Response<Quiz> response1 = retrofit2.Response.success(quiz, response);
+        retrofit2.Response<Quiz> response = retrofit2.Response.success(new Quiz(), httpResponse);
+        callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
+    }
+
+    public static void editQuiz(QuizPostBody quizPostBody, StatusCallback<Quiz> callback) {
+        //TODO:
+        Response httpResponse = new Response.Builder()
+                .request(new Request.Builder().url("https://test.com").build())
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+
+        retrofit2.Response<Quiz> response = retrofit2.Response.success(new Quiz(), httpResponse);
+        callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
+    }
+
+    public static void getQuizSubmissions(StatusCallback<QuizSubmissionResponse> callback) {
+        Response response = new Response.Builder()
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        List<QuizSubmission> quizSubmissions = new ArrayList<>();
+
+        QuizSubmission quizSubmission = new QuizSubmission();
+        quizSubmission.setQuizId(456321L);
+
+        quizSubmissions.add(quizSubmission);
+
+        QuizSubmissionResponse quizSubmissionResponse = new QuizSubmissionResponse();
+        quizSubmissionResponse.setQuizSubmissions(quizSubmissions);
+        retrofit2.Response<QuizSubmissionResponse> response1 = retrofit2.Response.success(quizSubmissionResponse, response);
         callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
     }
 }
