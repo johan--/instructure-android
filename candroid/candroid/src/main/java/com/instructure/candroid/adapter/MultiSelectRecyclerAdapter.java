@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.instructure.candroid.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import com.instructure.canvasapi.model.CanvasComparable;
+import com.instructure.canvasapi2.models.CanvasComparable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

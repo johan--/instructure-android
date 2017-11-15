@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.PermissionUtils;
 import com.instructure.pandautils.views.CanvasWebView;
@@ -86,12 +86,12 @@ public class ArcWebviewFragment extends InternalWebviewFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return shouldRouteInternally && !isUnsupportedFeature && RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), false);
+                return shouldRouteInternally && !isUnsupportedFeature && RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
 
         });
@@ -164,7 +164,7 @@ public class ArcWebviewFragment extends InternalWebviewFragment {
 
     public static void loadInternalWebView(FragmentActivity activity, Navigation navigation, Bundle bundle) {
         if(activity == null || navigation == null) {
-            Utils.e("loadInternalWebView could not complete, activity or navigation null");
+            Logger.e("loadInternalWebView could not complete, activity or navigation null");
             return;
         }
 

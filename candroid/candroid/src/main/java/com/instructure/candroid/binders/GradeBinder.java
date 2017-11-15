@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,11 +25,12 @@ import com.instructure.candroid.adapter.GradesListRecyclerAdapter;
 import com.instructure.candroid.dialog.WhatIfDialogStyled;
 import com.instructure.candroid.holders.GradeViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
+import com.instructure.pandautils.utils.Const;
 
 public class GradeBinder extends BaseBinder {
 
@@ -57,13 +58,21 @@ public class GradeBinder extends BaseBinder {
         final int drawable = getAssignmentIcon(assignment);
         holder.icon.setImageDrawable(CanvasContextColor.getColoredDrawable(context, drawable, courseColor));
 
+        holder.pendingReviewIcon.setVisibility(View.GONE);
+
         if(assignment.isMuted()){
             //mute that score
             holder.points.setVisibility(View.GONE);
         } else {
-            holder.points.setVisibility(View.VISIBLE);
-            Submission submission = assignment.getLastSubmission();
-            setupGradeText(context, holder.points, assignment, submission, courseColor);
+            Submission submission = assignment.getSubmission();
+            if (submission != null && Const.PENDING_REVIEW.equals(submission.getWorkflowState())) {
+                holder.points.setVisibility(View.GONE);
+                holder.pendingReviewIcon.setVisibility(View.VISIBLE);
+                holder.pendingReviewIcon.setColorFilter(courseColor);
+            } else {
+                holder.points.setVisibility(View.VISIBLE);
+                setupGradeText(context, holder.points, assignment, submission, courseColor);
+            }
         }
 
 
@@ -86,8 +95,8 @@ public class GradeBinder extends BaseBinder {
             holder.edit.setVisibility(View.GONE);
         }
 
-        if (assignment.getDueDate() != null) {
-            holder.date.setText(DateHelpers.getDayMonthDateString(context, assignment.getDueDate()));
+        if (assignment.getDueAt() != null) {
+            holder.date.setText(DateHelper.getDayMonthDateString(context, assignment.getDueAt()));
         } else {
             holder.date.setText("");
         }

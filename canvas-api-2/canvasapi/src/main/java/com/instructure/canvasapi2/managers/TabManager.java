@@ -13,6 +13,7 @@
 *     See the License for the specific language governing permissions and
 *     limitations under the License.
 */
+
 package com.instructure.canvasapi2.managers;
 
 import com.instructure.canvasapi2.StatusCallback;
@@ -35,6 +36,7 @@ public class TabManager extends BaseManager {
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
+                    .withCanvasContext(canvasContext)
                     .withForceReadFromNetwork(forceNetwork)
                     .withShouldIgnoreToken(false)
                     .build();

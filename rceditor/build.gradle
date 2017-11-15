@@ -17,17 +17,19 @@
 
 repositories {
     jcenter()
-    maven { url 'https://jitpack.io' }
+    maven { url "https://jitpack.io" }
+    maven { url 'https://maven.google.com' }
 }
 
 buildscript {
     repositories {
         jcenter()
-        maven { url 'https://jitpack.io' }
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
         // https://bintray.com/android/android-tools/com.android.tools.build.gradle/view
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
     }
 }
 
@@ -92,6 +94,7 @@ dependencies {
     compile rootProject.ext.supportDependencies.supportLibV13
     compile rootProject.ext.supportDependencies.vector
     compile rootProject.ext.supportDependencies.supportAnnotation
+    compile rootProject.ext.supportDependencies.design
 
     compile 'jp.wasabeef:richeditor-android:1.2.2'
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import android.view.View;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.ModuleHeaderViewHolder;
 import com.instructure.candroid.util.ModuleUtility;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.ModuleObject;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ModuleObject;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.ColorUtils;

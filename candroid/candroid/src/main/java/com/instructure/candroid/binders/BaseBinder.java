@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.StringUtilities;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Submission;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Submission;
 import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.ColorUtils;
 

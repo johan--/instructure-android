@@ -92,17 +92,17 @@
                 android:scrollbarStyle="outsideOverlay"/>
 
         </android.support.v4.widget.SwipeRefreshLayout>
-        <com.instructure.androidpolling.app.view.CircleButton
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/addQuestion"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            app:cb_color="@color/polling_aqua"
-            app:cb_pressed_ring_width="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_size="normal"
+            android:layout_margin="16dp"
+            app:fab_colorNormal="@color/polling_aqua"
             android:src="@drawable/ic_action_new"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-
-            />
+            android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
 </FrameLayout>

@@ -53,7 +53,7 @@ platform :android do
   def deploy_all_apks
     return unless bitrise
     puts 'Bitrise detected. Copying APK(s) for deployment'
-    all_apks.each { |apk| deploy_apk apk }
+    all_apks.each {|apk| deploy_apk apk}
   end
 
   def last_commit_info
@@ -78,22 +78,26 @@ platform :android do
     next if SmartBuildUtils.skippable? app
     gradle(
         project_dir: app,
-        task: 'assemble',
-        build_type: 'Debug',
-        flags: '--stacktrace'
-      )
+        task:        'assemble',
+        build_type:  'Debug',
+        flags:       '--stacktrace'
+    )
     deploy_all_apks
     ui_important "Output APK not specified! The last generated APK (#{last_apk}) will be uploaded to HockeyApp" unless options.has_key?(:apk)
-    upload_apk = if options.has_key?(:apk) then all_apks.detect { |apk| apk.end_with?(options[:apk]) } else last_apk end
+    upload_apk = if options.has_key?(:apk) then
+                   all_apks.detect {|apk| apk.end_with?(options[:apk])}
+                 else
+                   last_apk
+                 end
     raise 'Missing apk' unless File.exist?(upload_apk)
     hockey(
-        api_token: ENV['HOCKEY_API_KEY'],
-        apk: upload_apk,
-        strategy: 'add',
-        notes: last_commit_info,
+        api_token:  ENV['HOCKEY_API_KEY'],
+        apk:        upload_apk,
+        strategy:   'add',
+        notes:      last_commit_info,
         notes_type: '0', # Textile
         release_type: '2' # Alpha
-      )
+    )
   end # lane
 
   # $ fastlane rc app:teacher apk:app-release.apk
@@ -105,73 +109,81 @@ platform :android do
     check_signing_credentials
     raise "HockeyApp API key not found. Please set in HOCKEY_API_KEY environment variable" unless ENV['HOCKEY_API_KEY']
     gradle(
-        project_dir: app,
-        task: 'assemble',
-        build_type: 'Release',
-        flags: [
-          '--stacktrace',
-          '-Pandroid.injected.signing.store.file="$BITRISEIO_ANDROID_KEYSTORE_PATH"',
-          '-Pandroid.injected.signing.store.password="$BITRISEIO_ANDROID_KEYSTORE_PASSWORD"',
-          '-Pandroid.injected.signing.key.alias="$BITRISEIO_ANDROID_KEYSTORE_ALIAS"',
-          '-Pandroid.injected.signing.key.password="$BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"'
-        ].join(' '),
+        project_dir:   app,
+        task:          'assemble',
+        build_type:    'Release',
+        flags:         [
+                           '--stacktrace',
+                           '-Pandroid.injected.signing.store.file="$BITRISEIO_ANDROID_KEYSTORE_PATH"',
+                           '-Pandroid.injected.signing.store.password="$BITRISEIO_ANDROID_KEYSTORE_PASSWORD"',
+                           '-Pandroid.injected.signing.key.alias="$BITRISEIO_ANDROID_KEYSTORE_ALIAS"',
+                           '-Pandroid.injected.signing.key.password="$BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"'
+                       ].join(' '),
         print_command: false
-      )
+    )
     deploy_all_apks
     ui_important "Output APK not specified! The last generated APK (#{last_apk}) will be uploaded to HockeyApp" unless options.has_key?(:apk)
-    upload_apk = if options.has_key?(:apk) then all_apks.detect { |apk| apk.end_with?(options[:apk]) } else last_apk end
+    upload_apk = if options.has_key?(:apk) then
+                   all_apks.detect {|apk| apk.end_with?(options[:apk])}
+                 else
+                   last_apk
+                 end
     raise 'Missing apk' unless File.exist?(upload_apk)
     hockey(
-        api_token: ENV['HOCKEY_API_KEY'],
-        apk: upload_apk,
-        strategy: 'add',
-        notes: last_commit_info,
+        api_token:  ENV['HOCKEY_API_KEY'],
+        apk:        upload_apk,
+        strategy:   'add',
+        notes:      last_commit_info,
         notes_type: '0', # Textile
         release_type: '0' # Beta
-      )
+    )
   end
 
   # $ fastlane deploy app:teacher package:com.instructure.teacher apk:app-release.apk
   desc 'Build and deploy to the Play Store (alpha track)'
   lane :deploy do |options|
     raise "Missing parameter(s). E.g. 'fastlane deploy app:candroid package:com.instructure.candroid'" unless [:app, :package].all? {|key| options.has_key? key}
-    app = options[:app]
+    app     = options[:app]
     package = options[:package]
     raise "Unrecognized app '#{app}'. " unless apps.include? app
     raise "Service account key not found: #{google_play_key}," unless File.exist?(google_play_key)
     check_signing_credentials
     gradle(
-        project_dir: app,
-        task: 'assemble',
-        build_type: 'Release',
-        flags: [
-          '--stacktrace',
-          '-Pandroid.injected.signing.store.file="$BITRISEIO_ANDROID_KEYSTORE_PATH"',
-          '-Pandroid.injected.signing.store.password="$BITRISEIO_ANDROID_KEYSTORE_PASSWORD"',
-          '-Pandroid.injected.signing.key.alias="$BITRISEIO_ANDROID_KEYSTORE_ALIAS"',
-          '-Pandroid.injected.signing.key.password="$BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"'
-        ].join(' '),
+        project_dir:   app,
+        task:          'assemble',
+        build_type:    'Release',
+        flags:         [
+                           '--stacktrace',
+                           '-Pandroid.injected.signing.store.file="$BITRISEIO_ANDROID_KEYSTORE_PATH"',
+                           '-Pandroid.injected.signing.store.password="$BITRISEIO_ANDROID_KEYSTORE_PASSWORD"',
+                           '-Pandroid.injected.signing.key.alias="$BITRISEIO_ANDROID_KEYSTORE_ALIAS"',
+                           '-Pandroid.injected.signing.key.password="$BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"'
+                       ].join(' '),
         print_command: false
-      )
+    )
     deploy_all_apks
     ui_important "Output APK not specified! The last generated APK (#{last_apk}) will be uploaded to Google Play" unless options.has_key?(:apk)
-    upload_apk = if options.has_key?(:apk) then all_apks.detect { |apk| apk.end_with?(options[:apk]) } else last_apk end
+    upload_apk = if options.has_key?(:apk) then
+                   all_apks.detect {|apk| apk.end_with?(options[:apk])}
+                 else
+                   last_apk
+                 end
     raise 'Missing apk' unless File.exist?(upload_apk)
     supply(
-        package_name: package,
-        apk: upload_apk,
-        track: 'alpha',
-        json_key: google_play_key,
-        skip_upload_metadata: true,
-        skip_upload_images: true,
+        package_name:            package,
+        apk:                     upload_apk,
+        track:                   'alpha',
+        json_key:                google_play_key,
+        skip_upload_metadata:    true,
+        skip_upload_images:      true,
         skip_upload_screenshots: true
-      )
+    )
   end
 
   # $ fastlane build_all_apps
   desc 'Builds all the apps'
   lane :build_all_apps do
-    apps.each { |app| build app:app }
+    apps.each {|app| build app: app}
   end # lane
 
   # connectedCheck won't work because it uninstalls the apks upon completion.
@@ -182,21 +194,21 @@ platform :android do
     app = options[:app]
     next if SmartBuildUtils.skippable? app
 
-    keys = options.keys
+    keys       = options.keys
     valid_keys = %i[app run video class method coverage]
-    abort("Invalid key. Valid keys are: #{valid_keys.join(', ')}") unless keys.all? { |e| valid_keys.include? e }
+    abort("Invalid key. Valid keys are: #{valid_keys.join(', ')}") unless keys.all? {|e| valid_keys.include? e}
 
     run = options.fetch(:run, '1')
     ui_error 'Run must be a valid integer' unless run.match(/\d+/)
     run = run.to_i
     ui_error 'Run must be >= 1' unless run > 0
 
-    video = options.fetch(:video, false)
-    coverage = options.fetch(:coverage, false)
+    video                = options.fetch(:video, false)
+    coverage             = options.fetch(:coverage, false)
     valid_coverage_flags = [true, false]
     abort("Invalid coverage key. Must specify 'true' or 'false'.") unless valid_coverage_flags.include?(coverage)
 
-    app = select_app(app)
+    app          = select_app(app)
     app.coverage = coverage
     execute_action("Running #{app} Espresso x#{run}") do
       TestButler.install_if_missing
@@ -208,13 +220,13 @@ platform :android do
         app.gradle_build_test_apk
         app.install_test_apk
 
-        Espresso.run(app: app.app,
-                     name: "Espresso #{app} #{count}",
-                     class: options[:class],
-                     method: options[:method],
+        Espresso.run(app:     app.app,
+                     name:    "Espresso #{app} #{count}",
+                     class:   options[:class],
+                     method:  options[:method],
                      package: app.ui_package,
-                     runner: app.runner,
-                     video: video)
+                     runner:  app.runner,
+                     video:   video)
       end
     end
   end
@@ -222,24 +234,41 @@ platform :android do
   desc 'Run Espresso tests on Google Cloud. Only works on Bitrise. fastlane espresso_gcloud app:teacher class:ProfilePageTest method:displaysPageObjects'
   lane :espresso_gcloud do |options|
     raise "Please Specify app name. E.g. 'fastlane espresso_gcloud app:teacher'" unless options.has_key?(:app)
-    app = select_app options[:app]
+    app          = select_app options[:app]
     app.coverage = true
     next if SmartBuildUtils.skippable? app
-    test_class = options[:class]
+    test_class  = options[:class]
     test_method = options[:method]
+    annotations = options[:annotations]
 
-    args = { app: app }
-    args[:class] = test_class if test_class
+    # Example to run all P0s and P1s
+    # fastlane espresso_gcloud app:teacher annotations:com.instructure.espresso.filters.P0,com.instructure.espresso.filters.P1
+    valid_annotations = [
+        'com.instructure.espresso.filters.P0',
+        'com.instructure.espresso.filters.P1',
+        'com.instructure.espresso.filters.P2',
+        'com.instructure.espresso.filters.P3',
+        'com.instructure.espresso.filters.P4'
+    ]
+    if annotations
+      annotations.split(',').each do |annotation|
+        raise "Unknown annotation #{annotation}" unless valid_annotations.include?(annotation)
+      end
+    end
+
+    args          = { app: app }
+    args[:class]  = test_class if test_class
     args[:method] = test_method if test_method
     SoSeedy.seed(args)
     app.gradle_clean
     app.gradle_build_app_apk
     app.gradle_build_test_apk
 
-    args = { app: app }
-    args[:coverage] = true if app == Parent
+    args                = { app: app }
+    args[:coverage]     = true
     args[:test_targets] = "class #{app.ui_package}.#{test_class}" if test_class
     args[:test_targets] += "##{test_method}" if test_class && test_method
+    args[:annotations]   = annotations if annotations
     GCloud.new(args).run_tests
   end
 
@@ -250,7 +279,7 @@ platform :android do
     Parent.gradle_build_test_apk
 
     GCloud.new(
-        app: 'parent',
+        app:          'parent',
         test_targets: 'package com.instructure.parentapp.unit'
     ).run_tests
   end
@@ -266,7 +295,7 @@ platform :android do
     app.gradle_build_robo_app_apk
     SoSeedy.robo(options)
     GCloud.new(
-        app: app.app,
+        app:  app.app,
         robo: true
     ).run_tests
   end

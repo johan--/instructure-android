@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Escolher Mídia</string>
   <string name="takeVideo">Fazer Vídeo</string>
   <string name="noCameraOnDevice">Nenhuma Câmera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Fazendo Upload para Canvas</string>
   <string name="preparingUpload">Preparando upload</string>
   <string name="loadingFilesIndeterminate">Carregando Arquivos...</string>
-  <string name="fileUploadSuccess">Upload Teve Sucesso</string>
+  <string name="fileUploadSuccess">Carregamento bem-sucedido</string>
   <string name="noNetwork">Rede não disponivel - por favor tente novamente mais tarde</string>
   <string name="uploadMessage">\"Upload em andamento. Confira notificações para estado de upload.</string>
   <string name="mediaUpload">Upload de Mídia</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Houve um erro ao obter a foto. Por favor, tente novamente.</string>
   <string name="errorTextMissing">Adicionar algum texto para enviar uma mensagem</string>
   <string name="fileUploadNotSupported">Você não pode fazer upload de arquivos para a tarefa selecionada.</string>
+  <string name="noCourseSelected">Selecione um curso</string>
   <string name="selectCourse">Selecionar um curso</string>
   <string name="selectAssignment">Selecionar uma tarefa</string>
   <string name="loadingAssignments">Carregando Tarefas..</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Não lido</string>
   <string name="discussion_reply">Responder</string>
   <string name="close">Fechar</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Como estamos indo?</string>
+  <string name="utils_rateUs">Como você avalaria a gente?</string>
+  <string name="utils_doBetter">O que podemos fazer melhor?</string>
+  <string name="utils_sendFeedback">Enviar feedback</string>
+  <string name="utils_suggestions">Sugestões para Android</string>
+  <string name="utils_domain">Domínio</string>
+  <string name="utils_versionNum">Versão:</string>
+  <string name="utils_userId">ID de Usuário</string>
+  <string name="utils_email">E-mail</string>
+  <string name="utils_dontShowAgain">Não mostra de novo</string>
+  <string name="utils_installDate">Data de Instalação:</string>
+  <string name="utils_device">Dispositivo</string>
+  <string name="utils_osVersion">Versão OS</string>
+  <string name="loading">Carregando</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -108,7 +108,9 @@ public abstract class SyncRecyclerAdapter<MODEL extends CanvasComparable, HOLDER
      * @param position The position of the item requested
      * @return A model item
      */
+    @Nullable
     public MODEL getItemAtPosition(int position) {
+        if(getList().size() == 0) return null;
         return getList().get(position);
     }
 
@@ -133,8 +135,13 @@ public abstract class SyncRecyclerAdapter<MODEL extends CanvasComparable, HOLDER
     }
 
     public void remove(MODEL item) {
-        getList().remove(item);
+        removeItem(item);
     }
+
+    public boolean removeItem(MODEL item) {
+        return getList().remove(item);
+    }
+
 
     // endregion
 

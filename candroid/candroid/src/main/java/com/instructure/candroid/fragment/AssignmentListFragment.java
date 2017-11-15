@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -41,18 +41,17 @@ import com.instructure.candroid.interfaces.AdapterToAssignmentsCallback;
 import com.instructure.candroid.interfaces.GradingPeriodsCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentGroup;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.GradingPeriod;
-import com.instructure.canvasapi.model.GradingPeriodResponse;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.AssignmentGroup;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.GradingPeriod;
+import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
-
-import retrofit.client.Response;
 
 public class AssignmentListFragment extends ParentFragment {
 
@@ -65,7 +64,7 @@ public class AssignmentListFragment extends ParentFragment {
     private TermSpinnerAdapter mTermAdapter;
     private ArrayList<GradingPeriod> mGradingPeriodsList = new ArrayList<>();
     private GradingPeriod mAllTermsGradingPeriod;
-    private CanvasCallback<GradingPeriodResponse> mGradingPeriodsCallback;
+    private StatusCallback<GradingPeriodResponse> mGradingPeriodsCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {return FRAGMENT_PLACEMENT.MASTER; }
@@ -130,11 +129,8 @@ public class AssignmentListFragment extends ParentFragment {
         };
 
         // Just load the AssignmentGroup list in the case that its a Group
-        if(getCanvasContext() instanceof Course && ((Course)getCanvasContext()).isTeacher()) {
-            mRecyclerAdapter = new AssignmentGroupListRecyclerAdapter(getContext(), getCanvasContext(), mGradingPeriodsCallback, mAdapterToAssignmentsCallback);
-        } else {
-            mRecyclerAdapter = new AssignmentDateListRecyclerAdapter(getContext(), getCanvasContext(), mGradingPeriodsCallback, mAdapterToAssignmentsCallback);
-        }
+        mRecyclerAdapter = new AssignmentDateListRecyclerAdapter(getContext(), getCanvasContext(), mGradingPeriodsCallback, mAdapterToAssignmentsCallback);
+
         configureRecyclerViewAsGrid(mRootView, mRecyclerAdapter, R.id.swipeRefreshLayout, R.id.emptyPandaView, R.id.listView);
 
         mTermSpinner = (Spinner) mRootView.findViewById(R.id.termSpinner);
@@ -167,11 +163,11 @@ public class AssignmentListFragment extends ParentFragment {
          *This code is similar to code in the GradeListFragment.
          *If you make changes here, make sure to check the same callback in the GradeListFrag.
          */
-        mGradingPeriodsCallback = new CanvasCallback<GradingPeriodResponse>(this) {
+        mGradingPeriodsCallback = new StatusCallback<GradingPeriodResponse>() {
             @Override
-            public void firstPage(GradingPeriodResponse gradingPeriodResponse, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<GradingPeriodResponse> response, LinkHeaders linkHeaders, ApiType type) {
                 mGradingPeriodsList = new ArrayList<>();
-                mGradingPeriodsList.addAll(gradingPeriodResponse.getGradingPeriodList());
+                mGradingPeriodsList.addAll(response.body().getGradingPeriodList());
                 //add "select all" option
                 mGradingPeriodsList.add(mAllTermsGradingPeriod);
                 mTermAdapter = new TermSpinnerAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, mGradingPeriodsList);
@@ -206,10 +202,6 @@ public class AssignmentListFragment extends ParentFragment {
                 }
 
                 mTermSpinnerLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void cache(GradingPeriodResponse gradingPeriodResponse, LinkHeaders linkHeaders, Response response) {
             }
         };
     }

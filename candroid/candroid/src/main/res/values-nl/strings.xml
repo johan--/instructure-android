@@ -128,8 +128,6 @@
   <string name="domain">Domein</string>
   <string name="sendFeedback">Feedback versturen</string>
   <string name="sendMail">E-mail versturen...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Bewerken</string>
   <plurals name="item_count">
     <item quantity="one">%d item</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Er heeft zich een fout voorgedaan om de cursus voor dit item te krijgen.</string>
   <string name="could_not_find_group">Er heeft zich een fout voorgedaan om de groep voor dit item te krijgen.</string>
   <string name="selectBackground">Selecteer een achtergrond</string>
-  <string name="kalturaSubmissionInProgress">Bestanden aan het indienen... Bekijk de berichtgevingenbalk voor updates.</string>
-  <string name="kalturaSubmissionSuccessful">Indienen bestand voltooid</string>
+  <string name="notoriousSubmissionInProgress">Bestanden aan het indienen... Bekijk de berichtgevingenbalk voor updates.</string>
+  <string name="notoriousSubmissionSuccessful">Indienen bestand voltooid</string>
   <string name="poll_title">Waarom ben je naar Canvas gekomen?</string>
   <string name="poll_warning">Een item is niet geselecteerd</string>
   <string name="poll_item_1">Bekijk mijn cijfers</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Delen</string>
   <string name="speedgrader">Snelheidsmeter</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super panda afbeelding</string>
   <string name="newFeatureTitle">Mobiele berichtgevingen</string>
   <string name="newFeatureMsg">Om mobiele push berichtgevingen te ontvangen ga je naar Canvas Instellingen, Berichtgevingen en selecteer \"Voor alle  apparaten\"</string>

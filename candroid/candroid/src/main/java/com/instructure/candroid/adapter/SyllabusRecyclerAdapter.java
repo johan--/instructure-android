@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package com.instructure.candroid.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -28,12 +29,14 @@ import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.holders.SyllabusItemViewHolder;
 import com.instructure.candroid.holders.SyllabusViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.apis.CalendarEventAPI;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
@@ -42,22 +45,25 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import retrofit.client.Response;
 
 public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, ScheduleItem, RecyclerView.ViewHolder> {
 
-    private boolean mAddSyllabus = true;
     private CanvasContext mCanvasContext;
+
     // region callback
-    private int mApiCallbackCount = 0;
     private long EVENTS_ID = 2222;
     private long ASSIGNMENTS_ID = 3333;
-    private CanvasCallback<ScheduleItem[]> mScheduleCallback;
-    private CanvasCallback<ScheduleItem[]> mAssignmentCallback;
-    private HashMap<Long, ScheduleItem[]> mCallbackSyncHash = new HashMap<>(); // schedule and assignment have their own ids. When both callbacks return, the items are added to the adapter.
+    private StatusCallback<List<ScheduleItem>> mScheduleCallback;
+    private StatusCallback<List<ScheduleItem>> mAssignmentCallback;
+
+    @SuppressLint("UseSparseArrays")
+    // schedule and assignment have their own ids. When both callbacks return, the items are added to the adapter.
+    private HashMap<Long, List<ScheduleItem>> mCallbackSyncHash = new HashMap<>();
+
     // endregion
+
     private AdapterToFragmentCallback<ScheduleItem> mAdapterToFragmentCallback;
     private String mPast;
     private String mNext7Days;
@@ -119,7 +125,7 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
     public void onBindChildHolder(RecyclerView.ViewHolder holder, String s, ScheduleItem scheduleItem) {
         if(scheduleItem != null) {
             final int courseColor = CanvasContextColor.getCachedColor(getContext(), mCanvasContext);
-            if (scheduleItem.getType() == ScheduleItem.Type.TYPE_SYLLABUS) {
+            if (scheduleItem.getItemType() == ScheduleItem.Type.TYPE_SYLLABUS) {
                 SyllabusBinder.bindSyllabusItem(getContext(), (SyllabusItemViewHolder) holder, courseColor, scheduleItem, mAdapterToFragmentCallback);
             } else {
                 SyllabusBinder.bind(getContext(), (SyllabusViewHolder) holder, courseColor, scheduleItem, mAdapterToFragmentCallback);
@@ -140,18 +146,17 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
     @Override
     public void refresh() {
         mCallbackSyncHash.clear();
-        mApiCallbackCount = 0;
         super.refresh();
     }
 
     @Override
     public void loadData() {
-        CalendarEventAPI.getAllCalendarEventsExhaustive(CalendarEventAPI.EVENT_TYPE.ASSIGNMENT_EVENT, getContextCodes(), mAssignmentCallback);
-        CalendarEventAPI.getAllCalendarEventsExhaustive(CalendarEventAPI.EVENT_TYPE.CALENDAR_EVENT, getContextCodes(), mScheduleCallback);
+        CalendarEventManager.getCalendarEventsExhaustive(true, CalendarEventAPI.CalendarEventType.ASSIGNMENT, null, null, getContextCodes(), mAssignmentCallback, isRefresh());
+        CalendarEventManager.getCalendarEventsExhaustive(true, CalendarEventAPI.CalendarEventType.CALENDAR, null, null, getContextCodes(), mScheduleCallback, isRefresh());
     }
 
-    private void populateAdapter(ScheduleItem[] scheduleItems) {
-        if (mAddSyllabus && mCanvasContext.getType() == CanvasContext.Type.COURSE) {
+    private void populateAdapter(List<ScheduleItem> scheduleItems) {
+        if (mCanvasContext.getType() == CanvasContext.Type.COURSE) {
             Course course = (Course)mCanvasContext;
             ScheduleItem syllabus = ScheduleItem.createSyllabus(course.getName(), course.getSyllabusBody());
             addOrUpdateItem(mSyllabus, syllabus);
@@ -173,7 +178,7 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
             if((scheduleItem.isHidden())) {
                 continue;
             }
-            Date dueDate = scheduleItem.getStartDate();
+            Date dueDate = scheduleItem.getStartAt();
 
             if(dueDate == null) {
                 addOrUpdateItem(mNoDate, scheduleItem);
@@ -187,18 +192,16 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
         }
     }
 
-    private void syncCallbacks(CanvasCallback.SOURCE source) {
+    private void syncCallbacks() {
         if (mCallbackSyncHash.keySet().size() < 2) {
             return;
         }
 
-        for (Map.Entry<Long, ScheduleItem[]> entry : mCallbackSyncHash.entrySet()) {
+        for (Map.Entry<Long, List<ScheduleItem>> entry : mCallbackSyncHash.entrySet()) {
             populateAdapter(entry.getValue());
         }
 
-        if (source.isAPI()) {
-            mAdapterToFragmentCallback.onRefreshFinished();
-        }
+        mAdapterToFragmentCallback.onRefreshFinished();
     }
 
     public void removeCallbacks() {
@@ -213,31 +216,21 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
 
     @Override
     public void setupCallbacks() {
-        mScheduleCallback = new CanvasCallback<ScheduleItem[]>(this) {
-            @Override
-            public void cache(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(EVENTS_ID, scheduleItems);
-                syncCallbacks(SOURCE.CACHE);
-            }
+        mScheduleCallback = new StatusCallback<List<ScheduleItem>>() {
 
             @Override
-            public void firstPage(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(EVENTS_ID, scheduleItems);
-                syncCallbacks(SOURCE.API);
+            public void onResponse(retrofit2.Response<List<ScheduleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCallbackSyncHash.put(EVENTS_ID, response.body());
+                syncCallbacks();
             }
         };
 
-        mAssignmentCallback = new CanvasCallback<ScheduleItem[]>(this) {
-            @Override
-            public void cache(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(ASSIGNMENTS_ID, scheduleItems);
-                syncCallbacks(SOURCE.CACHE);
-            }
+        mAssignmentCallback = new StatusCallback<List<ScheduleItem>>() {
 
             @Override
-            public void firstPage(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(ASSIGNMENTS_ID, scheduleItems);
-                syncCallbacks(SOURCE.API);
+            public void onResponse(retrofit2.Response<List<ScheduleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCallbackSyncHash.put(ASSIGNMENTS_ID, response.body());
+                syncCallbacks();
             }
         };
     }
@@ -309,10 +302,10 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
             @Override
             public boolean areContentsTheSame(ScheduleItem oldItem, ScheduleItem newItem) {
                 boolean isStartDateTheSame = true;
-                if (isNullableChanged(oldItem.getStartDate(), newItem.getStartDate())) {
+                if (isNullableChanged(oldItem.getStartAt(), newItem.getStartAt())) {
                     return false;
-                } else if (oldItem.getStartDate() != null && newItem.getStartDate() != null) {
-                    isStartDateTheSame = oldItem.getStartDate().equals(newItem.getStartDate());
+                } else if (oldItem.getStartAt() != null && newItem.getStartAt() != null) {
+                    isStartDateTheSame = oldItem.getStartAt().equals(newItem.getStartAt());
                 }
                 return isStartDateTheSame && oldItem.getTitle().equals(newItem.getTitle());
             }
@@ -329,7 +322,7 @@ public class SyllabusRecyclerAdapter extends ExpandableRecyclerAdapter<String, S
 
             @Override
             public int getChildType(String group, ScheduleItem item) {
-                if(item.getType() == ScheduleItem.Type.TYPE_SYLLABUS) {
+                if(item.getItemType() == ScheduleItem.Type.TYPE_SYLLABUS) {
                     return Types.TYPE_SYLLABUS;
                 }
                 return Types.TYPE_ITEM;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,13 +18,16 @@
 package com.instructure.canvasapi2.apis;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
+import com.instructure.canvasapi2.models.LTITool;
 import com.instructure.canvasapi2.models.RubricCriterionAssessment;
 import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.models.SubmissionSummary;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +35,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -43,7 +47,13 @@ public class SubmissionAPI {
 
     interface SubmissionInterface {
 
-        @GET("courses/{courseId}/students/submissions")
+        @GET("courses/{courseId}/assignments/{assignmentId}/submissions/{studentId}?include[]=rubric_assessment&include[]=submission_history&include[]=submission_comments&include[]=group")
+        Call<Submission> getSingleSubmission(
+                @Path("courseId") long courseId,
+                @Path("assignmentId") long assignmentId,
+                @Path("studentId") long studentId);
+
+        @GET("courses/{courseId}/students/submissions?include[]=assignment&include[]=rubric_assessment&include[]=submission_history&include[]=submission_comments&include[]=group")
         Call<List<Submission>> getStudentSubmissionsForCourse(@Path("courseId") long courseId, @Query("student_ids[]") long studentId);
 
         @GET
@@ -56,7 +66,58 @@ public class SubmissionAPI {
                 @Path("userId") long userId,
                 @QueryMap Map<String, String> rubricAssessment
         );
-        
+
+        @PUT("courses/{courseId}/assignments/{assignmentId}/submissions/{userId}")
+        Call<Submission> postSubmissionComment(
+                @Path("courseId") long courseId,
+                @Path("assignmentId") long assignmentId,
+                @Path("userId") long userId,
+                @Query("comment[text_comment]") String comment,
+                @Query("comment[group_comment]") boolean isGroupComment
+        );
+
+        @POST("{contextId}/assignments/{assignmentId}/submissions")
+        Call<Submission> postTextSubmission(
+                @Path("contextId") long contextId,
+                @Path("assignmentId") long assignmentId,
+                @Query("submission[submission_type]") String submissionType,
+                @Query("submission[body]") String text);
+
+        @POST("{contextId}/assignments/{assignmentId}/submissions")
+        Call<Submission> postUrlSubmission(
+                @Path("contextId") long contextId,
+                @Path("assignmentId") long assignmentId,
+                @Query("submission[submission_type]") String submissionType,
+                @Query("submission[url]") String url);
+
+        @PUT("{contextId}/assignments/{assignmentId}/submissions/{userId}")
+        Call<Submission> postMediaSubmissionComment(
+                @Path("contextId") long contextId,
+                @Path("assignmentId") long assignmentId,
+                @Path("userId") long userId,
+                @Query("comment[media_comment_id]") String mediaId,
+                @Query("comment[media_comment_type]") String commentType,
+                @Query("comment[group_comment]") boolean isGroupComment);
+
+        @POST("{contextId}/assignments/{assignmentId}/submissions")
+        Call<Submission> postMediaSubmission(
+                @Path("contextId") long contextId,
+                @Path("assignmentId") long assignmentId,
+                @Query("submission[submission_type]") String submissionType,
+                @Query("submission[media_comment_id]") String notoriousId,
+                @Query("submission[media_comment_type]") String mediaType);
+
+        @POST("courses/{courseId}/assignments/{assignmentId}/submissions")
+        Call<Submission> postSubmissionAttachments(
+                @Path("courseId") long courseId,
+                @Path("assignmentId") long assignmentId,
+                @Query("submission[submission_type]") String submissionType,
+                @Query("submission[file_ids][]") List<Long> attachments);
+
+        @GET
+        Call<LTITool> getLtiFromAuthenticationUrl(@Url String url);
+
+
         @PUT("courses/{contextId}/assignments/{assignmentId}/submissions/{userId}")
         Call<Submission> postSubmissionGrade(@Path("contextId") long contextId,
                                              @Path("assignmentId") long assignmentId, @Path("userId") long userId,
@@ -67,6 +128,14 @@ public class SubmissionAPI {
         Call<Submission> postSubmissionExcusedStatus(@Path("contextId") long contextId,
                                              @Path("assignmentId") long assignmentId, @Path("userId") long userId,
                                              @Query("submission[excuse]") boolean isExcused);
+
+        @GET("courses/{courseId}/assignments/{assignmentId}/submission_summary")
+        Call<SubmissionSummary> getSubmissionSummary(@Path("courseId") long courseId,
+                                                     @Path("assignmentId") long assignmentId);
+    }
+
+    public static void getSingleSubmission(long courseId, long assignmentId, long studentId,  @NonNull RestBuilder adapter, @NonNull StatusCallback<Submission> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).getSingleSubmission(courseId, assignmentId, studentId)).enqueue(callback);
     }
 
     public static void getStudentSubmissionsForCourse(long courseId, long studentId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<Submission>> callback, @NonNull RestParams params) {
@@ -77,8 +146,32 @@ public class SubmissionAPI {
         }
     }
 
+    public static void postTextSubmission(long contextId, long assignmentId, @NonNull String text, @NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull StatusCallback<Submission> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).postTextSubmission(contextId, assignmentId, "online_text_entry", text)).enqueue(callback);
+    }
+
+    public static void postUrlSubmission(long contextId, long assignmentId, @NonNull String submissionType, @NonNull String url, @NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull StatusCallback<Submission> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).postUrlSubmission(contextId, assignmentId, submissionType, url)).enqueue(callback);
+    }
+
+    public static void getLtiFromAuthenticationUrl(@NonNull String url, @NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull StatusCallback<LTITool> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).getLtiFromAuthenticationUrl(url)).enqueue(callback);
+    }
+
     public static void postSubmissionGrade(long courseId, long assignmentId, long userId, String assignmentScore, boolean isExcused, @NonNull RestBuilder adapter, @NonNull StatusCallback<Submission> callback, @NonNull RestParams params) {
         callback.addCall(adapter.build(SubmissionInterface.class, params).postSubmissionGrade(courseId, assignmentId, userId, assignmentScore, isExcused)).enqueue(callback);
+    }
+
+    public static void postSubmissionComment(long courseId, long assignmentID, long userID, String comment, boolean isGroupMessage, @NonNull RestBuilder adapter, @NonNull StatusCallback<Submission> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).postSubmissionComment(courseId, assignmentID, userID, comment, isGroupMessage)).enqueue(callback);
+    }
+
+    public static void postMediaSubmissionComment(long canvasContextId, long assignmentId, long studentId, String mediaId, String mediaType, boolean isGroupComment, RestBuilder adapter, RestParams params, StatusCallback<Submission> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).postMediaSubmissionComment(canvasContextId, assignmentId, studentId, mediaId, mediaType, isGroupComment)).enqueue(callback);
+    }
+
+    public static void postMediaSubmission(long canvasContextId, long assignmentId, String submissionType, String mediaId, String mediaType, RestBuilder adapter, RestParams params, StatusCallback<Submission> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).postMediaSubmission(canvasContextId, assignmentId, submissionType, mediaId, mediaType)).enqueue(callback);
     }
 
     public static void postSubmissionExcusedStatus(long courseId, long assignmentId, long userId, boolean isExcused, @NonNull RestBuilder adapter, @NonNull StatusCallback<Submission> callback, @NonNull RestParams params) {
@@ -88,6 +181,18 @@ public class SubmissionAPI {
     public static void updateRubricAssessment(long courseId, long assignmentId, long userId, Map<String, RubricCriterionAssessment> rubricAssessment, @NonNull RestBuilder adapter, @NonNull StatusCallback<Submission> callback, @NonNull RestParams params) {
         Map<String, String> assessmentParamMap = generateRubricAssessmentQueryMap(rubricAssessment);
         callback.addCall(adapter.build(SubmissionInterface.class, params).postSubmissionRubricAssessmentMap(courseId, assignmentId, userId, assessmentParamMap)).enqueue(callback);
+    }
+
+    public static void getSubmissionSummary(long courseId, long assignmentId, @NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull StatusCallback<SubmissionSummary> callback) {
+        callback.addCall(adapter.build(SubmissionInterface.class, params).getSubmissionSummary(courseId, assignmentId)).enqueue(callback);
+    }
+
+    public static @Nullable Submission postSubmissionAttachmentsSynchronous(long courseId, long assignmentId, List<Long> attachmentsIds, RestBuilder adapter, RestParams params) {
+        try {
+            return adapter.build(SubmissionInterface.class, params).postSubmissionAttachments(courseId, assignmentId, "online_upload", attachmentsIds).execute().body();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static final String assessmentPrefix = "rubric_assessment[";

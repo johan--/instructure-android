@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">Online URL</string>
   <string name="canvasAPI_mediaRecording">Media opname</string>
   <string name="canvasAPI_attendance">Aanwezigheid</string>
+  <string name="quiz_scoring_policy_highest">Hoogste</string>
+  <string name="quiz_scoring_policy_average">Gemiddeld</string>
+  <string name="quiz_scoring_policy_latest">Laatste</string>
+  <string name="no">Nee</string>
+  <string name="always">Altijd</string>
+  <string name="graded_quiz">Beoordeelde toets</string>
+  <string name="practice_quiz">Practicumtoets</string>
+  <string name="graded_survey">Beoordeelde enquête</string>
+  <string name="ungraded_survey">Niet-beoordeelde enquête</string>
 </resources>

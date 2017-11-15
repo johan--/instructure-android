@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -250,92 +250,6 @@
 
         <include layout="@layout/divider" />
 
-        <LinearLayout
-            android:id="@+id/masquerade"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="?android:selectableItemBackground"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/TextStyle.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/userId"
-                android:textAllCaps="true"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/masqueradeId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:hint="@string/masqueradeUserId"
-                android:imeOptions="actionGo"
-                android:singleLine="true"
-                android:text="" />
-
-            <TextView
-                style="@style/TextStyle.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/domain"
-                android:textAllCaps="true"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/masqueradeDomain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:hint="@string/domain"
-                android:imeOptions="actionGo"
-                android:singleLine="true"
-                android:text="" />
-
-            <Button
-                android:id="@+id/btn_masquerade"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:text="@string/startMasquerading" />
-
-            <Button
-                android:id="@+id/btn_masquerade_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:text="@string/tutorial_tipSwitchUsers" />
-
-            <include layout="@layout/divider" />
-
-        </LinearLayout>
-
         <!--Wrapped in a FrameLayout for RTL-->
         <FrameLayout
             android:id="@+id/legalFrameLayout"
@@ -352,52 +266,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
                 android:text="@string/legal" />
-
-        </FrameLayout>
-
-        <include layout="@layout/divider" />
-
-        <FrameLayout
-            android:id="@+id/wearNotifications"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/TextStyle.Primary.SingleLine"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
-                android:text="@string/wear_notifications" />
-
-            <CheckBox
-                android:id="@+id/wearNotificationsCB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center_vertical" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/wearReminder"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/listPreferredItemHeight"
-            android:background="?android:selectableItemBackground"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/TextStyle.Primary.SingleLine"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:text="@string/wear_reminder" />
 
         </FrameLayout>
 

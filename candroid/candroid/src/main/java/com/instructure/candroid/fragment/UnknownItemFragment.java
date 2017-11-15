@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,9 +29,9 @@ import android.widget.TextView;
 import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.StreamItem;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.StreamItem;
+import com.instructure.canvasapi2.utils.DateHelper;
 
 import java.util.Date;
 
@@ -99,7 +99,7 @@ public class UnknownItemFragment extends ParentFragment {
 
         final Date date = streamItem.getUpdatedAtDate();
         if(date != null) {
-            updatedDateTime.setText(DateHelpers.getDateTimeString(getContext(), date));
+            updatedDateTime.setText(DateHelper.getDateTimeString(getContext(), date));
         } else {
             updatedDateTime.setVisibility(View.GONE);
         }

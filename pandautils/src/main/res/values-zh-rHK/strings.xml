@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils選項</string>
   <string name="chooseMedia">選擇媒體</string>
   <string name="takeVideo">錄製視頻</string>
   <string name="noCameraOnDevice">無攝像頭</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">上傳到Canvas</string>
   <string name="preparingUpload">準備上傳</string>
   <string name="loadingFilesIndeterminate">載入文檔……</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">獲取照片時出錯。請重試。</string>
   <string name="errorTextMissing">增加文字以發送訊息</string>
   <string name="fileUploadNotSupported">您無法上傳文檔到選定的任務。</string>
+  <string name="noCourseSelected">請選定一個課程</string>
   <string name="selectCourse">選擇一個課程</string>
   <string name="selectAssignment">選擇一個任務</string>
   <string name="loadingAssignments">任務載入中……</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">未讀</string>
   <string name="discussion_reply">回覆</string>
   <string name="close">關閉</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas 教師</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader（快速評分器）</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">我們表現如何？</string>
+  <string name="utils_rateUs">您如何評價我們？</string>
+  <string name="utils_doBetter">我們有何可改進之處？</string>
+  <string name="utils_sendFeedback">發送回饋</string>
+  <string name="utils_suggestions">對 Android 版的建議</string>
+  <string name="utils_domain">網域</string>
+  <string name="utils_versionNum">版本：</string>
+  <string name="utils_userId">使用者 ID</string>
+  <string name="utils_email">電子郵件</string>
+  <string name="utils_dontShowAgain">不要再次顯示</string>
+  <string name="utils_installDate">安裝日期：</string>
+  <string name="utils_device">設備</string>
+  <string name="utils_osVersion">OS 版本</string>
+  <string name="loading">正在載入</string>
 </resources>

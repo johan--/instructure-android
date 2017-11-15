@@ -1,5 +1,3 @@
-package com.instructure.canvasapi2.models;
-
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,6 +14,7 @@ package com.instructure.canvasapi2.models;
  *     limitations under the License.
  *
  */
+package com.instructure.canvasapi2.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,7 +1,3 @@
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-apply from: 'jacoco.gradle' // ./gradlew testDevDebugUnitTestCoverage
-apply plugin: 'com.cookpad.android.licensetools'
 /*
  * Copyright (C) 2016 - present  Instructure, Inc.
  *
@@ -18,20 +14,33 @@ apply plugin: 'com.cookpad.android.licensetools'
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply from: 'jacoco.gradle' // ./gradlew testDevDebugUnitTestCoverage
+apply plugin: 'com.google.gms.oss.licenses.plugin'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 repositories {
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
+    maven { url 'https://maven.google.com' }
+    flatDir {
+        dirs "../../espresso/aars"
+    }
 }
 
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.uber:infer-plugin:0.7.4'
     }
@@ -40,15 +49,15 @@ buildscript {
 apply plugin: 'com.uber.infer.android' // ./gradlew inferDevDebug
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.instructure.parentapp"
-        minSdkVersion 17
-        targetSdkVersion 25
-        versionCode 5
-        versionName "1.2.1"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
 
         multiDexEnabled = true
         testInstrumentationRunner 'com.instructure.parentapp.ui.utils.ParentInstructureRunner'
@@ -74,7 +83,9 @@ android {
 
     productFlavors {
 
-        dev { }
+        dev {
+            buildConfigField "String", "GAMMA_DOMAIN", "\"https://airwolf-iad-gamma.inscloudgate.net\""
+        }
 
         prod { }
 
@@ -150,21 +161,31 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':canvas-api')
     compile project(':pandautils')
-    compile ('com.jakewharton.espresso:okhttp3-idling-resource:1.0.0')
-    releaseCompile project(path: ':login-api-2', configuration: 'release')
-    debugCompile project(path: ':login-api-2', configuration: 'debug')
+    compile ('com.jakewharton.espresso:okhttp3-idling-resource:1.0.0') {
+        exclude module: 'espresso-idling-resource'
+    }
+    compile project(path: ':login-api-2', configuration: 'default')
     compile project(':recyclerview')
 
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    /* Butter Knife */
+    compile 'com.jakewharton:butterknife:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
+
     compile 'com.github.rey5137:material:1.2.2'
     compile rootProject.ext.supportDependencies.design
     compile rootProject.ext.supportDependencies.percent
-    compile 'com.android.support:multidex:1.0.1'
-    compile('com.github.afollestad.material-dialogs:core:0.8.5.2@aar') {
+    compile "com.android.support:multidex:$GLOBAL_MULTI_DEX_VERSION"
+    compile "com.google.android.gms:play-services-oss-licenses:$GLOBAL_PLAY_SERVICES_VERSION"
+    compile('com.github.afollestad.material-dialogs:core:0.9.4.7') {
         transitive = true
+    }
+
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile('com.squareup.retrofit2:retrofit:2.2.0') {
+        exclude module: 'okhttp'
     }
 
     androidTestCompile 'junit:junit:4.12'
@@ -173,7 +194,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.1.4'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
         transitive = true;
     }
     //Needed for espresso test recorder
@@ -208,12 +229,5 @@ task firebaseJacoco(type: JacocoReport) {
         html.enabled true
         csv.enabled  false
         xml.enabled  false
-    }
-}
-
-/* Check licenses.yml, generate assets/licenses.html during build */
-afterEvaluate {
-    android.applicationVariants.all { variant ->
-        variant.mergeAssets.dependsOn(generateLicensePage)
     }
 }

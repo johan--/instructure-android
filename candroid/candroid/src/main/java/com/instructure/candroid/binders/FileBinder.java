@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ import android.widget.RelativeLayout;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.FileViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentLongClick;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.FileFolder;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.FileFolder;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.squareup.picasso.Picasso;
 
@@ -85,7 +85,7 @@ public class FileBinder extends  BaseBinder{
         } else {
             //folder object
             holder.fileName.setText(item.getName());
-            int itemCount = item.getFilesCount() + item.getFolders_count();
+            int itemCount = item.getFilesCount() + item.getFoldersCount();
             String text = context.getResources().getQuantityString(R.plurals.item_count, itemCount, itemCount);
             holder.fileDetails.setText(text);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import com.instructure.pandarecycler.util.Types;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public abstract class SyncExpandableRecyclerAdapter<GROUP, MODEL extends CanvasComparable, HOLDER extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<HOLDER>{
@@ -133,8 +132,28 @@ public abstract class SyncExpandableRecyclerAdapter<GROUP, MODEL extends CanvasC
         getList().addOrUpdateItem(group, item);
     }
 
+    /**
+     * Uses as last resort, if you have the group you will save a lot of looping by using [addOrUpdateItem(GROUP, MODEL)]
+     * @param item A model item
+     */
+    public void addOrUpdateItem(MODEL item) {
+        ArrayList<GROUP> groups = getGroups();
+        for (GROUP group : groups) {
+            for(MODEL model: getItems(group)) {
+                if(model.getId() == item.getId()) {
+                    addOrUpdateItem(group, item);
+                    return;
+                }
+            }
+        }
+    }
+
     public boolean removeItem(MODEL item) {
         return getList().removeItem(item);
+    }
+
+    public boolean removeItem(MODEL item, boolean removeGroupIfEmpty) {
+        return getList().removeItem(item, removeGroupIfEmpty);
     }
 
     public MODEL getItem(GROUP group, int storedPosition) {
@@ -143,6 +162,23 @@ public abstract class SyncExpandableRecyclerAdapter<GROUP, MODEL extends CanvasC
 
     public MODEL getItem(int visualPosition){
         return getList().getItem(visualPosition);
+    }
+
+    /**
+     * Uses as last resort, if you have the group you will save a lot of looping
+     * @param itemId A model itemId
+     */
+    @Nullable
+    public MODEL getItem(long itemId) {
+        ArrayList<GROUP> groups = getGroups();
+        for (GROUP group : groups) {
+            for(MODEL model: getItems(group)) {
+                if(model.getId() == itemId) {
+                    return model;
+                }
+            }
+        }
+        return null;
     }
 
     public long getChildItemId(int position){

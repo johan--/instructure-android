@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.instructure.candroid.util;
 
 import android.view.View;
 
-import com.instructure.canvasapi.model.Conversation;
+import com.instructure.canvasapi2.models.Conversation;
 
 public interface MessageDebounceClickInterface {
     void onClick(Conversation conversation, int position, View sharedElement, boolean isOpenDetail);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
   -->
 
 <resources>
-    <string name="word_space_word">%1$s %2$s</string>
+    <string name="word_space_word" translatable="false">%1$s %2$s</string>
+
+    <string name="utils_mobileSupportEmailAddress" translatable="false">mobilesupport@instructure.com</string>
+    <string name="utils_supportEmailAddress" translatable="false">support@instructure.com</string>
 
 </resources>

@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.instructure.canvasapi.api.ErrorReportAPI;
 import com.instructure.canvasapi.model.ErrorReportResult;
@@ -211,6 +212,11 @@ public class ZendeskDialogStyled extends DialogFragment {
         String comment = descriptionEditText.getText().toString();
         String subject = subjectEditText.getText().toString();
 
+        if (comment.isEmpty() || subject.isEmpty()){
+            Toast.makeText(getContext(), R.string.empty_feedback, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // if we're on the login page we need to set the cache user's email address so that support can
         // contact the user
         if(fromLogin) {
@@ -246,7 +252,7 @@ public class ZendeskDialogStyled extends DialogFragment {
                 getString(R.string.osVersion) + " " + Build.VERSION.RELEASE + "\n" +
                 getString(R.string.versionNum) + ": " + versionName + " " + versionCode + "\n" +
                 getString(R.string.zendesk_severityText) + " " + getUserSeveritySelectionTag() + "\n" +
-                getString(R.string.installDate) + " " + getInstallDateString() + "\n\n";
+                getString(R.string.utils_installDate) + " " + getInstallDateString() + "\n\n";
 
         comment = deviceInfo + comment;
         if(mUseDefaultDomain) {

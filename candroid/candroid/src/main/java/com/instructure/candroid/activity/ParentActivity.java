@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,19 +36,17 @@ import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.Toast;
 
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.activities.BaseActionBarActivity;
 import com.instructure.pandautils.utils.Const;
 
 import java.lang.reflect.Field;
 
 
-public abstract class ParentActivity extends BaseActionBarActivity implements OnTouchListener, APIStatusDelegate {
+public abstract class ParentActivity extends BaseActionBarActivity implements OnTouchListener{
 	public final static String DEBOUNCE_TAG = "debounce_tag";
 
 	private boolean hasDebounced;
@@ -56,14 +54,14 @@ public abstract class ParentActivity extends BaseActionBarActivity implements On
     private BroadcastReceiver uploadStartedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            showMessage(getString(R.string.kalturaSubmissionInProgress));
+            showMessage(getString(R.string.notoriousSubmissionInProgress));
         }
     };
 
     private BroadcastReceiver uploadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            showMessage(getString(R.string.kalturaSubmissionSuccessful));
+            showMessage(getString(R.string.notoriousSubmissionSuccessful));
         }
     };
     ///////////////////////////////////////////////////////////////////////////
@@ -87,7 +85,7 @@ public abstract class ParentActivity extends BaseActionBarActivity implements On
             }
         } catch (Exception e) {
             // Ignore
-            Utils.e("CAN IGNORE: " + e);
+            Logger.e("CAN IGNORE: " + e);
         }
 	}
 
@@ -150,23 +148,18 @@ public abstract class ParentActivity extends BaseActionBarActivity implements On
     // Required Overrides
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override
     public void onCallbackStarted() {
         if (isUIThread()) {
             showProgress();
         }
     }
 
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        if(source.isAPI() && isUIThread()) {
+    public void onCallbackFinished(ApiType type) {
+        if(type.isAPI() && isUIThread()) {
             hideProgress();
         }
     }
 
-    @Override public void onNoNetwork() { }
-
-    @Override
     public Context getContext() {
         return this;
     }

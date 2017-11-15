@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball.activities
 
 import android.app.AlarmManager
@@ -22,8 +38,7 @@ import com.instructure.androidfoosball.receivers.GoalReceiver
 import com.instructure.androidfoosball.utils.*
 import com.instructure.androidfoosball.views.WinCutThroatGameDialog
 import kotlinx.android.synthetic.tablet.activity_game_cut_throat.*
-import org.jetbrains.anko.onClick
-import org.w3c.dom.Comment
+import org.jetbrains.anko.sdk21.listeners.onClick
 
 class CutThroatGameActivity : AppCompatActivity() {
 
@@ -31,10 +46,11 @@ class CutThroatGameActivity : AppCompatActivity() {
         val EXTRA_GAME_ID = "gameId"
     }
 
-    val mGameId by lazy { intent.getStringExtra(EXTRA_GAME_ID) ?: "" }
-    val mGame by lazy { App.realm.where(CutThroatGame::class.java).equalTo("id", mGameId).findFirst()!! }
-    val mTable = Table.getSelectedTable()
+    private val mGameId by lazy { intent.getStringExtra(EXTRA_GAME_ID) ?: "" }
+    private val mGame by lazy { App.realm.where(CutThroatGame::class.java).equalTo("id", mGameId).findFirst()!! }
+    private val mTable = Table.getSelectedTable()
     val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val mGameHistory = mutableListOf<CutThroatGame>()
 
     private val goalReceiver: GoalReceiver = GoalReceiver { side ->
         when (side) {
@@ -80,7 +96,7 @@ class CutThroatGameActivity : AppCompatActivity() {
                     .content(R.string.confirm_quit_game)
                     .negativeText(android.R.string.cancel)
                     .positiveText(R.string.quit_game)
-                    .onPositive { materialDialog, dialogAction ->
+                    .onPositive { _, _ ->
                         mGame.edit { status = GameStatus.CANCELED.name }
                         updateGameStatusFree()
                         finish()
@@ -99,6 +115,7 @@ class CutThroatGameActivity : AppCompatActivity() {
         rotateAfterView.text = mGame.rotateAfter.toString()
         refreshPlayers()
         mCommentator.announceGameStart()
+        undoView.onClick { undo() }
     }
 
     private fun refreshPlayers() {
@@ -109,6 +126,8 @@ class CutThroatGameActivity : AppCompatActivity() {
     }
 
     private fun goal() {
+        mGameHistory += App.realm.copyFromRealm(mGame)
+        undoView.setVisible()
         mCommentator.announce(Commentator.Sfx.DING.name)
         mGame.edit {
             getSingle().score++
@@ -118,23 +137,36 @@ class CutThroatGameActivity : AppCompatActivity() {
         if (mGame.hasWinner()) {
             mCommentator.announce("${Commentator.Sfx.WINNING_GOAL} ${mGame.getWinner()?.name} wins the game.")
             mCommentator.queueAnnounce(mGame.getWinner()?.customVictoryPhrase ?: "")
-            WinCutThroatGameDialog(this, mGame, { endGame() }).show()
+            WinCutThroatGameDialog(this, mGame, this::endGame, this::undo).show()
         } else if (mGame.rotateAfter > 0 && mGame.pointsSinceRotation >= mGame.rotateAfter) {
-            rotate()
+            rotate(false)
         } else {
             singlesLayout.addPlayer(mGame.getSingle())
         }
 
     }
 
-    private fun rotate() {
+    private fun rotate(addToHistory: Boolean = true) {
+        if (addToHistory) {
+            mGameHistory += App.realm.copyFromRealm(mGame)
+            undoView.setVisible()
+        }
         mCommentator.queueAnnounce("${Commentator.Sfx.ROTATE_DING} Rotate.")
         mGame.edit {
             pointsSinceRotation = 0
             singleIdx = (singleIdx + 1) % players.size
         }
         refreshPlayers()
-        mCommentator.queueAnnounce(mGame.getSingle().user.name)
+        mCommentator.queueAnnounce(mGame.getSingle().user?.name.orEmpty())
+    }
+
+    private fun undo() {
+        mGameHistory.removeLast()?.let { snapshot ->
+            App.realm.inTransaction { it.copyToRealmOrUpdate(snapshot) }
+            refreshPlayers()
+            mCommentator.announce("Oops")
+        }
+        undoView.setVisible(mGameHistory.isNotEmpty())
     }
 
     private fun endGame() {
@@ -170,4 +202,10 @@ class CutThroatGameActivity : AppCompatActivity() {
         mDatabase.child("tables").child(mTable.id).child("currentGame").setValue("FREE")
 
     }
+
+    override fun onBackPressed() {
+        // Do nothing
+    }
 }
+
+private fun <E> MutableList<E>.removeLast(): E? = if (isEmpty()) null else removeAt(lastIndex)

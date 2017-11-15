@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InternalWebViewActivity;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.loginapi.login.api.zendesk.utilities.ZendeskDialogStyled;
-import com.instructure.loginapi.login.rating.RatingDialog;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.pandautils.utils.AppType;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.Utils;
 
 import java.util.Date;
 import java.util.Locale;
@@ -142,8 +142,7 @@ public class HelpDialogStyled extends DialogFragment {
             public void onClick(View v) {
                 ZendeskDialogStyled dialog = new ZendeskDialogStyled();
 
-                int colorBlack = getResources().getColor(R.color.black);
-                dialog.setArguments(ZendeskDialogStyled.createBundle(colorBlack, colorBlack, colorBlack));
+                dialog.setArguments(ZendeskDialogStyled.createBundle(false));
                 dialog.show(getActivity().getSupportFragmentManager(), ZendeskDialogStyled.TAG);
 
                 //Log to GA
@@ -168,8 +167,7 @@ public class HelpDialogStyled extends DialogFragment {
         showLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.goToAppStore(RatingDialog.APP_NAME.CANDROID, getActivity());
-
+                Utils.goToAppStore(AppType.CANDROID, getActivity());
                 //Log to GA
                 Analytics.trackButtonPressed(getActivity(), "Feedback", null);
             }
@@ -184,9 +182,9 @@ public class HelpDialogStyled extends DialogFragment {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
         if(supportFlag){
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getActivity().getString(R.string.supportEmailAddress)});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getActivity().getString(R.string.utils_supportEmailAddress)});
         }else{
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getActivity().getString(R.string.mobileSupportEmailAddress)});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getActivity().getString(R.string.utils_mobileSupportEmailAddress)});
         }
         //try to get the version number and version code
         PackageInfo pInfo = null;
@@ -202,13 +200,13 @@ public class HelpDialogStyled extends DialogFragment {
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "[" + subject + "] Issue with Canvas [Android] " + versionName);
 
-        User user = APIHelpers.getCacheUser(getActivity());
+        User user = ApiPrefs.getUser();
         //populate the email body with information about the user
         String emailBody = "";
         emailBody += title + "\n";
         emailBody += getActivity().getString(R.string.help_userId) + " " + user.getId() + "\n";
         emailBody += getActivity().getString(R.string.help_email) + " " + user.getEmail() + "\n";
-        emailBody += getActivity().getString(R.string.help_domain) + " " + APIHelpers.getDomain(getActivity()) + "\n";
+        emailBody += getActivity().getString(R.string.help_domain) + " " + ApiPrefs.getDomain() + "\n";
         emailBody += getActivity().getString(R.string.help_versionNum) + " " + versionName + " " + versionCode + "\n";
         emailBody += getActivity().getString(R.string.help_locale) + " " + Locale.getDefault() + "\n";
         emailBody += getActivity().getString(R.string.installDate) + " " + getInstallDateString() + "\n";

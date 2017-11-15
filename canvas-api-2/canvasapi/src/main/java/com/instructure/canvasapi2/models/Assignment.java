@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -28,11 +28,12 @@ import com.instructure.canvasapi2.utils.APIHelper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Assignment extends CanvasModel<Assignment> {
 
-    public enum SUBMISSION_TYPE {ONLINE_QUIZ, NONE, ON_PAPER, DISCUSSION_TOPIC, EXTERNAL_TOOL, ONLINE_UPLOAD, ONLINE_TEXT_ENTRY, ONLINE_URL, MEDIA_RECORDING, ATTENDANCE, NOT_GRADED}
+    public enum SUBMISSION_TYPE {ONLINE_QUIZ, NONE, ON_PAPER, DISCUSSION_TOPIC, EXTERNAL_TOOL, BASIC_LTI_LAUNCH, ONLINE_UPLOAD, ONLINE_TEXT_ENTRY, ONLINE_URL, MEDIA_RECORDING, ATTENDANCE, NOT_GRADED}
     public enum GRADING_TYPE {PASS_FAIL, PERCENT, LETTER_GRADE, POINTS, GPA_SCALE, NOT_GRADED}
     public enum TURN_IN_TYPE {ONLINE, ON_PAPER, NONE, DISCUSSION, QUIZ, EXTERNAL_TOOL}
     public static final SUBMISSION_TYPE[] ONLINE_SUBMISSIONS = {SUBMISSION_TYPE.ONLINE_UPLOAD, SUBMISSION_TYPE.ONLINE_URL, SUBMISSION_TYPE.ONLINE_TEXT_ENTRY, SUBMISSION_TYPE.MEDIA_RECORDING};
@@ -107,6 +108,8 @@ public class Assignment extends CanvasModel<Assignment> {
     private List<AssignmentOverride> overrides;
     @SerializedName("only_visible_to_overrides")
     private boolean isOnlyVisibleToOverrides;
+    @SerializedName("anonymous_peer_reviews")
+    private boolean anonymousPeerReviews;
 
     @Override
     public long getId() {
@@ -150,6 +153,21 @@ public class Assignment extends CanvasModel<Assignment> {
     public boolean isWithoutGradedSubmission() {
         Submission submission = getLastActualSubmission();
         return submission == null || submission.isWithoutGradedSubmission();
+    }
+
+    public boolean isOnlineSubmissionType() {
+        return  submissionTypes.contains(Assignment.SUBMISSION_TYPE.ONLINE_TEXT_ENTRY.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.ONLINE_URL.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.MEDIA_RECORDING.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.ONLINE_UPLOAD.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.ONLINE_QUIZ.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.EXTERNAL_TOOL.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.BASIC_LTI_LAUNCH.name().toLowerCase(Locale.getDefault())) ||
+                submissionTypes.contains(Assignment.SUBMISSION_TYPE.DISCUSSION_TOPIC.name().toLowerCase(Locale.getDefault()));
+    }
+
+    public TURN_IN_TYPE getTurnInType(){
+        return turnInTypeFromSubmissionType(getSubmissionTypes());
     }
 
     public static TURN_IN_TYPE stringToTurnInType(String turnInType, Context context){
@@ -266,8 +284,10 @@ public class Assignment extends CanvasModel<Assignment> {
 
     //region Helpers
 
-    private SUBMISSION_TYPE getSubmissionTypeFromAPIString(String submissionType){
-        if(submissionType.equals("online_quiz")){
+    public static SUBMISSION_TYPE getSubmissionTypeFromAPIString(String submissionType){
+        if (submissionType == null) {
+            return null;
+        } else if (submissionType.equals("online_quiz")){
             return SUBMISSION_TYPE.ONLINE_QUIZ;
         } else if(submissionType.equals("none")){
             return SUBMISSION_TYPE.NONE;
@@ -277,6 +297,8 @@ public class Assignment extends CanvasModel<Assignment> {
             return SUBMISSION_TYPE.DISCUSSION_TOPIC;
         } else if(submissionType.equals("external_tool")){
             return SUBMISSION_TYPE.EXTERNAL_TOOL;
+        } else if(submissionType.equals("basic_lti_launch")){
+            return SUBMISSION_TYPE.BASIC_LTI_LAUNCH;
         } else if(submissionType.equals("online_upload")){
             return SUBMISSION_TYPE.ONLINE_UPLOAD;
         } else if(submissionType.equals("online_text_entry")){
@@ -310,6 +332,8 @@ public class Assignment extends CanvasModel<Assignment> {
                 return "discussion_topic";
             case EXTERNAL_TOOL:
                 return "external_tool";
+            case BASIC_LTI_LAUNCH:
+                return "basic_lti_launch";
             case ONLINE_UPLOAD:
                 return "online_upload";
             case ONLINE_TEXT_ENTRY:
@@ -342,6 +366,7 @@ public class Assignment extends CanvasModel<Assignment> {
             case DISCUSSION_TOPIC:
                 return context.getString(R.string.canvasAPI_discussionTopic);
             case EXTERNAL_TOOL:
+            case BASIC_LTI_LAUNCH:
                 return context.getString(R.string.canvasAPI_externalTool);
             case ONLINE_UPLOAD:
                 return context.getString(R.string.canvasAPI_onlineUpload);
@@ -416,6 +441,10 @@ public class Assignment extends CanvasModel<Assignment> {
         }
     }
 
+    public  static String gradingTypeToPrettyPrintString(String gradingType, Context context){
+        return gradingTypeToPrettyPrintString(getGradingTypeFromAPIString(gradingType), context);
+    }
+
     public  static String gradingTypeToPrettyPrintString(GRADING_TYPE gradingType, Context context){
         if(gradingType == null){ return null;}
 
@@ -469,6 +498,7 @@ public class Assignment extends CanvasModel<Assignment> {
 
         return submissionTypeList;
     }
+
     public @Nullable Date getDueAt() {
         return APIHelper.stringToDate(dueAt);
     }
@@ -534,7 +564,7 @@ public class Assignment extends CanvasModel<Assignment> {
         return position;
     }
 
-    public boolean isPeerReviews() {
+    public boolean hasPeerReviews() {
         return peerReviews;
     }
 
@@ -607,6 +637,14 @@ public class Assignment extends CanvasModel<Assignment> {
         return isOnlyVisibleToOverrides;
     }
 
+    public boolean isPeerReviews() {
+        return peerReviews;
+    }
+
+    public boolean isAnonymousPeerReviews() {
+        return anonymousPeerReviews;
+    }
+
     //endregion
 
     //region Setters
@@ -627,6 +665,20 @@ public class Assignment extends CanvasModel<Assignment> {
         this.submissionTypes = submissionTypes;
     }
 
+    public void setSubmissionTypes(SUBMISSION_TYPE[] submissionTypes){
+        if(submissionTypes == null){
+            return;
+        }
+
+        ArrayList<String> listSubmissionTypes = new ArrayList<String>();
+
+        for(SUBMISSION_TYPE submissionType: submissionTypes){
+            listSubmissionTypes.add(submissionTypeToAPIString(submissionType));
+        }
+
+        setSubmissionTypes(listSubmissionTypes);
+    }
+
     public void setDueAt(String dueAt) {
         this.dueAt = dueAt;
     }
@@ -645,6 +697,10 @@ public class Assignment extends CanvasModel<Assignment> {
 
     public void setGradingType(String gradingType) {
         this.gradingType = gradingType;
+    }
+
+    public void setGradingType(GRADING_TYPE grading_type) {
+        this.gradingType = gradingTypeToAPIString(grading_type);
     }
 
     public void setNeedsGradingCount(long needsGradingCount) {
@@ -755,6 +811,10 @@ public class Assignment extends CanvasModel<Assignment> {
         isOnlyVisibleToOverrides = onlyVisibleToOverrides;
     }
 
+    public void setAnonymousPeerReviews(boolean anonymousPeerReviews) {
+        this.anonymousPeerReviews = anonymousPeerReviews;
+    }
+
     //endregion
 
     //region Parcelable
@@ -806,6 +866,7 @@ public class Assignment extends CanvasModel<Assignment> {
         dest.writeByte(unpublishable ? (byte) 1 : (byte) 0);
         dest.writeTypedList(this.overrides);
         dest.writeByte(this.isOnlyVisibleToOverrides ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.anonymousPeerReviews ? (byte) 1 : (byte) 0);
     }
 
     protected Assignment(Parcel in) {
@@ -846,6 +907,7 @@ public class Assignment extends CanvasModel<Assignment> {
         this.unpublishable = in.readByte() != 0;
         this.overrides = in.createTypedArrayList(AssignmentOverride.CREATOR);
         this.isOnlyVisibleToOverrides = in.readByte() != 0;
+        this.anonymousPeerReviews = in.readByte() != 0;
     }
 
     public static final Creator<Assignment> CREATOR = new Creator<Assignment>() {

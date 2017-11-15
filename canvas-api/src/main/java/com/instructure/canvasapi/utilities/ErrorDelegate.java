@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -25,17 +25,17 @@ import retrofit.RetrofitError;
 
 public interface ErrorDelegate {
     // No Network
-    public void noNetworkError(RetrofitError error, Context context);
+    void noNetworkError(RetrofitError error, Context context);
 
     // HTTP 401
-    public void notAuthorizedError(RetrofitError error,CanvasError canvasError, Context context);
+    void notAuthorizedError(RetrofitError error, CanvasError canvasError, Context context);
 
     // HTTP 400-500
-    public void invalidUrlError(RetrofitError error, Context context);
+    void invalidUrlError(RetrofitError error, Context context);
 
     // HTTP 500-600
-    public void serverError(RetrofitError error, Context context);
+    void serverError(RetrofitError error, Context context);
 
     // HTTP 200 OK but unknown error or an unexpected error in the retrofit client.
-    public void generalError(RetrofitError error, CanvasError canvasError, Context context);
+    void generalError(RetrofitError error, CanvasError canvasError, Context context);
 }

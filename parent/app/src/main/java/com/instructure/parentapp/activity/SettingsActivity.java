@@ -35,7 +35,6 @@ import android.widget.Toast;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.UserManager;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
@@ -108,8 +107,8 @@ public class SettingsActivity extends SyncActivity<Student, SettingsPresenter, S
                 switch (item.getItemId()) {
                     case R.id.add_students:
                         AnalyticUtils.trackButtonPressed(AnalyticUtils.ADD_STUDENT);
-                        startActivityForResult(DomainPickerActivity.createIntent(SettingsActivity.this, !getPresenter().isEmpty(), true, true),
-                                com.instructure.parentapp.util.Const.DOMAIN_PICKER_REQUEST_CODE);
+                        Intent intent = FindSchoolActivity.Companion.createIntent(SettingsActivity.this, true, true);
+                        startActivityForResult(intent, com.instructure.parentapp.util.Const.DOMAIN_PICKER_REQUEST_CODE);
                         return true;
                     case R.id.help:
                         AnalyticUtils.trackButtonPressed(AnalyticUtils.HELP);
@@ -177,23 +176,23 @@ public class SettingsActivity extends SyncActivity<Student, SettingsPresenter, S
 
         //this api call removes student data from the db (like alerts info).
         UserManager.removeStudentAirwolf(
-                APIHelper.getAirwolfDomain(SettingsActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 student.getParentId(),
                 student.getStudentId(),
                 new StatusCallback<ResponseBody>() {
-            @Override
-            public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
-                super.onResponse(response, linkHeaders, type);
-                dialog.dismiss();
-                Toast.makeText(SettingsActivity.this, getString(R.string.studentRemoved), Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
+                        dialog.dismiss();
+                        Toast.makeText(SettingsActivity.this, getString(R.string.studentRemoved), Toast.LENGTH_SHORT).show();
 
-                getAdapter().remove(student);
-                //Catches case for removing last student
-                if (getAdapter().size() == 0) {
-                    finish();
-                }
-            }
-        });
+                        int adapterSizeBeforeRemove = getAdapter().size();
+                        boolean removed = getAdapter().removeItem(student);
+                        if(removed && adapterSizeBeforeRemove == 1) {
+                            //Catches case for removing last student
+                            finish();
+                        }
+                    }
+                });
     }
 
     public void addStudent(final ArrayList<Student> students) {
@@ -230,7 +229,7 @@ public class SettingsActivity extends SyncActivity<Student, SettingsPresenter, S
     @NonNull
     @Override
     public String airwolfDomain() {
-        return APIHelper.getAirwolfDomain(SettingsActivity.this);
+        return ApiPrefs.getAirwolfDomain();
     }
 
     @NonNull

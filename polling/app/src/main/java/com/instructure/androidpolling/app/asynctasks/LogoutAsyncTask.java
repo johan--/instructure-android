@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,75 +17,111 @@
 
 package com.instructure.androidpolling.app.asynctasks;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import com.devspark.appmsg.AppMsg;
+import android.content.SharedPreferences;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.widget.Toast;
 
 import com.instructure.androidpolling.app.R;
-import com.instructure.androidpolling.app.activities.BaseActivity;
-import com.instructure.androidpolling.app.activities.Login;
+import com.instructure.androidpolling.app.activities.InitLoginActivity;
 import com.instructure.androidpolling.app.util.ApplicationManager;
-import com.instructure.canvasapi.utilities.FileUtilities;
+import com.instructure.canvasapi2.CanvasRestAdapter;
+import com.instructure.canvasapi2.builders.RestBuilder;
+import com.instructure.canvasapi2.managers.OAuthManager;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ContextKeeper;
+import com.instructure.canvasapi2.utils.FileUtils;
+import com.instructure.loginapi.login.tasks.LogoutTask;
 
 import java.io.File;
+import java.io.IOException;
 
-public class LogoutAsyncTask extends AsyncTask<Void, Void, Boolean> {
+import okhttp3.OkHttpClient;
 
-    private BaseActivity parentActivity;
-    private String messageToUser;
+import static com.instructure.androidpolling.app.util.ApplicationManager.PREF_FILE_NAME;
 
-
-    public LogoutAsyncTask(BaseActivity parentActivity, String messageToUser) {
-        this.parentActivity = parentActivity;
-        this.messageToUser = messageToUser;
-    }
-
+public class LogoutAsyncTask extends LogoutTask {
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-
+    protected void onLogoutFailed() {
+        Toast.makeText(ContextKeeper.getAppContext(), R.string.no_data_connection, Toast.LENGTH_SHORT).show();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-
-    protected Boolean doInBackground(Void... params) {
-        if (parentActivity == null) return false;
-
-        return ((ApplicationManager) parentActivity.getApplication()).logoutUser();
-
+    protected void clearCookies() {
+        CookieSyncManager.createInstance(ContextKeeper.getAppContext());
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeAllCookie();
     }
 
     @Override
-    protected void onPostExecute(Boolean result) {
-
-        if (parentActivity == null) return;
-
-
-        if (result) {
-            File cacheDir = new File(parentActivity.getFilesDir(), "cache");
-            File exCacheDir = ApplicationManager.getAttachmentsDirectory(parentActivity);
-            //remove the cached stuff for masqueraded user
-            File masqueradeCacheDir = new File(parentActivity.getFilesDir(), "cache_masquerade");
-            //need to delete the contents of the internal cache folder so previous user's results don't show up on incorrect user
-            FileUtilities.deleteAllFilesInDirectory(masqueradeCacheDir);
-            FileUtilities.deleteAllFilesInDirectory(cacheDir);
-            FileUtilities.deleteAllFilesInDirectory(exCacheDir);
-
-            //TODO: this MOST LIKELY won't work if there are items on the back-stack.
-            Intent intent;
-
-            intent = Login.createIntent(parentActivity);
-
-
-
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                parentActivity.startActivity(intent);
-                parentActivity.finish();
-
-        } else {
-            AppMsg.makeText(parentActivity, parentActivity.getResources().getString(R.string.noDataConnection), AppMsg.STYLE_ERROR).show();
+    protected void clearCache() {
+        OkHttpClient client = CanvasRestAdapter.getClient();
+        if(client != null) {
+            try {
+                client.cache().evictAll();
+            } catch (IOException e) {/* Do Nothing */}
         }
+
+        RestBuilder.clearCacheDirectory();
+
+        //Clear shared preferences,
+        //Get the Shared Preferences
+        SharedPreferences settings = ContextKeeper.getAppContext().getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.clear();
+        editor.apply();
+
+        //Clear all Shared Preferences.
+        ApiPrefs.clearAllData();
+
+        File cacheDir = new File(ContextKeeper.getAppContext().getFilesDir(), "cache");
+        File exCacheDir = ApplicationManager.getAttachmentsDirectory(ContextKeeper.getAppContext());
+        FileUtils.deleteAllFilesInDirectory(cacheDir);
+        FileUtils.deleteAllFilesInDirectory(exCacheDir);
+    }
+
+    @Override
+    protected void cleanupMasquerading() {
+        //remove the cached stuff for masqueraded user
+        File masqueradeCacheDir = new File(ContextKeeper.getAppContext().getFilesDir(), "cache_masquerade");
+        //need to delete the contents of the internal cache folder so previous user's results don't show up on incorrect user
+        FileUtils.deleteAllFilesInDirectory(masqueradeCacheDir);
+    }
+
+    @Override
+    protected boolean logout() {
+        //It is possible for multiple APIs to come back 'simultaneously' as HTTP401s causing a logout
+        //if this has already ran, data is already cleared causing null pointer exceptions
+        if(APIHelper.hasNetworkConnection()) {
+            String token = ApiPrefs.getToken();
+            if (!token.equals("")) {
+                OAuthManager.deleteToken();
+                return true;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void refreshWidgets() {
+        //do nothing
+    }
+
+    @Override
+    protected void clearTheme() {
+        //do nothing
+    }
+
+    @Override
+    protected void startLoginFlow() {
+        Intent intent = InitLoginActivity.createIntent(ContextKeeper.appContext);
+        ContextKeeper.appContext.startActivity(intent);
     }
 }

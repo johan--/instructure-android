@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2017 - present Instructure, Inc.
+  ~
+  ~     Licensed under the Apache License, Version 2.0 (the "License");
+  ~     you may not use this file except in compliance with the License.
+  ~     You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~     Unless required by applicable law or agreed to in writing, software
+  ~     distributed under the License is distributed on an "AS IS" BASIS,
+  ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~     See the License for the specific language governing permissions and
+  ~     limitations under the License.
+  ~
+  -->
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -9,12 +26,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:contentDescription="@string/scrollInstructions">
 
         <TextView
             android:id="@+id/subject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:labelFor="@+id/subjectEditText"
             android:text="@string/zendesk_subject"
             android:textSize="14sp"
             android:fontFamily="sans-serif-black"/>
@@ -23,6 +42,7 @@
             android:id="@+id/subjectEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_margin="4dp"
             android:background="@drawable/zendesk_rounded_corner"
             android:padding="8dp"
@@ -33,6 +53,7 @@
             android:id="@+id/emailAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:labelFor="@+id/emailAddressEditText"
             android:text="@string/zendesk_emailAddress"
             android:textSize="14sp"
             android:visibility="gone"
@@ -42,6 +63,7 @@
             android:id="@+id/emailAddressEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_margin="4dp"
             android:background="@drawable/zendesk_rounded_corner"
             android:hint="@string/zendesk_enterEmail"
@@ -55,6 +77,7 @@
             android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:labelFor="@+id/descriptionEditText"
             android:layout_marginTop="8dp"
             android:text="@string/zendesk_description"
             android:textSize="14sp"
@@ -79,6 +102,7 @@
             android:id="@+id/severityPrompt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:labelFor="@+id/severitySpinner"
             android:layout_marginTop="8dp"
             android:text="@string/zendesk_severityText"
             android:textSize="14sp"
@@ -87,7 +111,8 @@
         <Spinner
             android:id="@+id/severitySpinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:minHeight="48dp" />
 
     </LinearLayout>
 

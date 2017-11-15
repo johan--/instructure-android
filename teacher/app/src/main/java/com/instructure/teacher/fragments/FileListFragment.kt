@@ -1,0 +1,314 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+package com.instructure.teacher.fragments
+
+import android.app.Dialog
+import android.graphics.Color
+import android.os.Bundle
+import android.os.Handler
+import android.support.v4.app.FragmentManager
+import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.view.animation.AnimationUtils
+import com.instructure.canvasapi2.models.CanvasContext
+import com.instructure.canvasapi2.models.Course
+import com.instructure.canvasapi2.models.FileFolder
+import com.instructure.canvasapi2.models.RemoteFile
+import com.instructure.canvasapi2.utils.APIHelper
+import com.instructure.canvasapi2.utils.isValid
+import com.instructure.pandautils.fragments.BaseSyncFragment
+import com.instructure.pandautils.utils.*
+import com.instructure.teacher.R
+import com.instructure.teacher.adapters.FileListAdapter
+import com.instructure.teacher.dialog.CreateFolderDialog
+import com.instructure.teacher.dialog.FileUploadDialog
+import com.instructure.teacher.dialog.NoInternetConnectionDialog
+import com.instructure.teacher.events.FileFolderDeletedEvent
+import com.instructure.teacher.events.FileFolderUpdatedEvent
+import com.instructure.teacher.factory.FileListPresenterFactory
+import com.instructure.teacher.holders.FileFolderViewHolder
+import com.instructure.teacher.models.EditableFile
+import com.instructure.teacher.presenters.FileListPresenter
+import com.instructure.teacher.router.Route
+import com.instructure.teacher.router.RouteMatcher
+import com.instructure.teacher.utils.*
+import com.instructure.teacher.viewinterface.FileListView
+import kotlinx.android.synthetic.main.fragment_file_list.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+
+class FileListFragment : BaseSyncFragment<
+        FileFolder,
+        FileListPresenter,
+        FileListView,
+        FileFolderViewHolder,
+        FileListAdapter>(), FileListView {
+
+    lateinit private var mRecyclerView: RecyclerView
+    private val mCourseColor by lazy { ColorKeeper.getOrGenerateColor(mCanvasContext) }
+    private var mCanvasContext: CanvasContext by ParcelableArg(Course())
+    private var mCurrentFolder: FileFolder by ParcelableArg(FileFolder())
+    private var mFabOpen = false
+
+    // FAB animations
+    private val fabRotateForward by lazy { AnimationUtils.loadAnimation(activity, R.anim.fab_rotate_forward) }
+    private val fabRotateBackwards by lazy { AnimationUtils.loadAnimation(activity, R.anim.fab_rotate_backward) }
+    private val fabReveal by lazy { AnimationUtils.loadAnimation(activity, R.anim.fab_reveal) }
+    private val fabHide by lazy { AnimationUtils.loadAnimation(activity, R.anim.fab_hide) }
+
+    private val handleClick: (FragmentManager, () -> Unit) -> Unit = { fragmentManager, onNetwork ->
+        if (APIHelper.hasNetworkConnection()) {
+            onNetwork.invoke()
+        } else {
+            NoInternetConnectionDialog.show(fragmentManager)
+        }
+    }
+
+    private val mFileUploadDialogCallback = object : FileUploadDialog.DialogLifecycleCallback {
+        override fun onCancel(dialog: Dialog) {}
+
+        override fun onAllUploadsComplete(dialog: Dialog?, uploadedFiles: List<RemoteFile>) {
+            if (isAdded) {
+                uploadedFiles.forEach {
+                    presenter.data.add(it.mapToFileFolder())
+                    checkIfEmpty()
+                }
+            }
+        }
+    }
+
+    // Handles File/Folder Updated/Deleted events
+    // FileFolder - The modified file/folder
+    // Boolean - Whether this is a delete event
+    private val handleFileFolderUpdatedDeletedEvent: (FileFolder, Boolean) -> Unit = { fileFolder, delete ->
+        when {
+            presenter.currentFolder == fileFolder -> {
+                // We are in the folder we just edited
+
+                if (delete) {
+                    // Back out of the folder we deleted
+                    // Use of Handler prevents issue with FragmentManager being in the middle of a transaction
+                    val handler = Handler()
+                    handler.post {
+                        activity.onBackPressed()
+                    }
+                } else {
+                    // The folder we are currently in was modified, update the presenter
+                    presenter.currentFolder = fileFolder
+                }
+            }
+            presenter.data.indexOfItemById(fileFolder.id) != -2 -> {
+                // The modified file/folder is in the current directory
+                if (delete) {
+                    // A file in this folder was deleted, remove it
+                    presenter.data.remove(fileFolder)
+                    // Remove the sticky event once we've handled it in the list where this file/folder appears as an item
+                    EventBus.getDefault().removeStickyEvent(FileFolderDeletedEvent::class.java)
+                } else {
+                    // A file in this folder was modified, update it
+                    presenter.data.addOrUpdate(fileFolder)
+                    EventBus.getDefault().removeStickyEvent(FileFolderUpdatedEvent::class.java)
+                }
+            }
+        }
+    }
+
+    override fun layoutResId() = R.layout.fragment_file_list
+    override fun getList() = presenter.data
+    override fun onCreateView(view: View?) = Unit
+    override fun getPresenterFactory() = FileListPresenterFactory(mCurrentFolder, mCanvasContext)
+    override fun getRecyclerView(): RecyclerView = fileListRecyclerView
+
+    override fun onPresenterPrepared(presenter: FileListPresenter?) {
+        mRecyclerView = RecyclerViewUtils.buildRecyclerView(mRootView, context, adapter,
+                presenter, R.id.swipeRefreshLayout, R.id.fileListRecyclerView, R.id.emptyPandaView,
+                getString(R.string.no_items_to_display_short))
+    }
+
+    override fun onReadySetGo(presenter: FileListPresenter) {
+        if (recyclerView.adapter == null) {
+            mRecyclerView.adapter = adapter
+        }
+
+        // Check if we need to update after a delete
+        val fileFolderDeletedEvent = EventBus.getDefault().getStickyEvent(FileFolderDeletedEvent::class.java)
+        val fileFolderUpdatedEvent = EventBus.getDefault().getStickyEvent(FileFolderUpdatedEvent::class.java)
+
+        // Handle file/folder events, if any
+        fileFolderDeletedEvent?.let { handleFileFolderUpdatedDeletedEvent(it.deletedFileFolder, true) }
+        fileFolderUpdatedEvent?.let { handleFileFolderUpdatedDeletedEvent(it.updatedFileFolder, false) }
+        checkIfEmpty()
+
+        if (fileFolderDeletedEvent == null && fileFolderUpdatedEvent == null) {
+            // No file/folder update events, load the data like normal
+            presenter.loadData(true)
+        }
+
+        setupToolbar()
+        setupViews()
+    }
+
+    override fun getAdapter(): FileListAdapter {
+        if (mAdapter == null) {
+            mAdapter = FileListAdapter(context, mCourseColor, presenter) {
+
+                if (it.displayName.isValid()) {
+                    // This is a file
+                    val editableFile = EditableFile(it, presenter.usageRights, presenter.licenses, mCourseColor, presenter.mCanvasContext, R.drawable.vd_document)
+                    viewMedia(context, it.displayName, it.contentType, it.url, it.thumbnailUrl, it.displayName, R.drawable.vd_document, mCourseColor, editableFile)
+                } else {
+                    // This is a folder
+                    val args = FileListFragment.makeBundle(presenter.mCanvasContext, it)
+                    RouteMatcher.route(context, Route(FileListFragment::class.java, presenter.mCanvasContext, args))
+                }
+            }
+        }
+
+        return mAdapter
+    }
+
+    override fun onRefreshStarted() {
+        //this prevents two loading spinners from happening during pull to refresh
+        if (!swipeRefreshLayout.isRefreshing) {
+            emptyPandaView.visibility = View.VISIBLE
+        }
+        emptyPandaView.setLoading()
+    }
+
+    override fun onRefreshFinished() {
+        swipeRefreshLayout.isRefreshing = false
+    }
+
+    override fun checkIfEmpty() = RecyclerViewUtils.checkIfEmpty(emptyPandaView, mRecyclerView, swipeRefreshLayout, adapter, presenter.isEmpty)
+    override fun folderCreationError() = toast(R.string.folderCreationError)
+
+    private fun setupViews() {
+        ViewStyler.themeFAB(addFab, ThemePrefs.buttonColor)
+        ViewStyler.themeFAB(addFileFab, ThemePrefs.buttonColor)
+        ViewStyler.themeFAB(addFolderFab, ThemePrefs.buttonColor)
+
+        addFab.setOnClickListener { animateFabs() }
+        addFileFab.setOnClickListener {
+            animateFabs()
+            handleClick(fragmentManager) {
+                val bundle = FileUploadDialog.createCourseBundle(null, mCanvasContext as Course, presenter.currentFolder.id)
+                val mFileUploadDialog = FileUploadDialog.newInstance(activity.supportFragmentManager, bundle)
+                mFileUploadDialog.setDialogLifecycleCallback(mFileUploadDialogCallback)
+                mFileUploadDialog.show(activity.supportFragmentManager, FileUploadDialog::class.java.simpleName)
+            }
+        }
+        addFolderFab.setOnClickListener {
+            animateFabs()
+            handleClick(fragmentManager) {
+                CreateFolderDialog.show(fragmentManager) {
+                    presenter.createFolder(it)
+                }
+            }
+        }
+    }
+
+    private fun setupToolbar() {
+        fileListToolbar.setupBackButton(this)
+
+        fileListToolbar.subtitle = presenter.mCanvasContext.name
+
+        if (presenter.currentFolder.parentFolderId != 0L) {
+            // This isn't a root folder - User can edit it
+            fileListToolbar.setupMenu(R.menu.menu_edit_generic) {
+                val bundle = EditFileFolderFragment.makeBundle(presenter.currentFolder, presenter.usageRights, presenter.licenses, presenter.mCanvasContext.id)
+                RouteMatcher.route(context, Route(EditFileFolderFragment::class.java, mCanvasContext, bundle))
+            }
+
+            fileListToolbar.title = presenter.currentFolder.name
+        } else {
+            // Toolbar title is files for root, otherwise folder name
+            fileListToolbar.title = getString(R.string.sg_tab_files)
+        }
+
+        ViewStyler.themeToolbar(activity, fileListToolbar, mCourseColor, Color.WHITE)
+    }
+
+
+    private fun animateFabs() = if (mFabOpen) {
+        addFab.startAnimation(fabRotateBackwards)
+        addFolderFab.startAnimation(fabHide)
+        addFolderFab.isClickable = false
+
+        addFileFab.startAnimation(fabHide)
+        addFileFab.isClickable = false
+
+        // Needed for accessibility
+        addFileFab.setInvisible()
+        addFolderFab.setInvisible()
+        mFabOpen = false
+    } else {
+        addFab.startAnimation(fabRotateForward)
+        addFolderFab.apply {
+            startAnimation(fabReveal)
+            isClickable = true
+        }
+
+        addFileFab.apply {
+            startAnimation(fabReveal)
+            isClickable = true
+        }
+
+        // Needed for accessibility
+        addFileFab.setVisible()
+        addFolderFab.setVisible()
+
+        mFabOpen = true
+    }
+
+    @Suppress("unused")
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun fileFolderDeleted(event: FileFolderDeletedEvent) {
+        if (presenter.currentFolder == event.deletedFileFolder) {
+            // We just deleted this folder, go back
+            activity.onBackPressed()
+        } else if (presenter.data.indexOfItemById(event.deletedFileFolder.id) != -2) {
+            // A file in this folder was deleted, remove it
+            presenter.data.remove(event.deletedFileFolder)
+        }
+    }
+
+    companion object {
+        const val CANVAS_CONTEXT = "canvasContext"
+        const val CURRENT_FOLDER = "currentFolder"
+
+        @JvmStatic
+        fun newInstance(args: Bundle) = FileListFragment().apply {
+            if (args.containsKey(CANVAS_CONTEXT)) {
+                mCanvasContext = args.getParcelable(CANVAS_CONTEXT)
+            }
+            if (args.containsKey(CURRENT_FOLDER)) {
+                mCurrentFolder = args.getParcelable(CURRENT_FOLDER)
+            }
+        }
+
+        @JvmStatic
+        fun makeBundle(canvasContext: CanvasContext, currentFolder: FileFolder? = null): Bundle {
+            val args = Bundle()
+            val folder = currentFolder ?: FileFolder().apply { id = -1L; name = "" }
+            args.putParcelable(CANVAS_CONTEXT, canvasContext)
+            args.putParcelable(CURRENT_FOLDER, folder)
+            return args
+        }
+    }
+
+}

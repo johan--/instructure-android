@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,21 +36,22 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.instructure.candroid.R;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.UserAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.apis.UserAPI;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class AskInstructorDialogStyled extends DialogFragment {
 
@@ -79,9 +79,9 @@ public class AskInstructorDialogStyled extends DialogFragment {
     private boolean foundTeachers = false;
 
     //Callbacks
-    CanvasCallback<Course[]> getFavoriteCoursesCallback;
-    CanvasCallback<User[]> getPeopleCallback;
-    CanvasCallback<Response> sendMessageCanvasCallback;
+    StatusCallback<List<User>> getPeopleCallback;
+    StatusCallback<List<Course>> getFavoriteCoursesCallback;
+    StatusCallback<List<Conversation>> sendMessageCanvasCallback;
 
     private boolean canClickSend = false;
 
@@ -162,7 +162,7 @@ public class AskInstructorDialogStyled extends DialogFragment {
 
         //Set up the callbacks.
         setUpCallbacks();
-        CourseAPI.getAllFavoriteCourses(getFavoriteCoursesCallback);
+        CourseManager.getAllFavoriteCourses(true, getFavoriteCoursesCallback);
     }
 
     private void loadTeacherData(){
@@ -175,10 +175,10 @@ public class AskInstructorDialogStyled extends DialogFragment {
         }
 
         if(!hasLoadedFirstPage){
-            UserAPI.getFirstPagePeople(course, enrollmentType, getPeopleCallback);
+            UserManager.getFirstPagePeopleList(course, enrollmentType, true, getPeopleCallback);
         }
         else{
-            UserAPI.getNextPagePeople(nextURL, getPeopleCallback);
+            UserManager.getNextPagePeopleList(true, nextURL, getPeopleCallback);
         }
     }
 
@@ -245,12 +245,12 @@ public class AskInstructorDialogStyled extends DialogFragment {
     // Callbacks
     ///////////////////////////////////////////////////////////////////////////
     public void setUpCallbacks(){
-        getFavoriteCoursesCallback = new CanvasCallback<Course[]>(APIHelpers.statusDelegateWithContext(getActivity())) {
+        getFavoriteCoursesCallback = new StatusCallback<List<Course>>() {
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
                 //only add courses in which the user isn't a teacher
                 if(!isAdded()){return;}
-                for(Course course : courses) {
+                for(Course course : response.body()) {
                     if(!course.isTeacher())  {
                         //for duplicate prevention
                         if(!courseList.contains(course)){
@@ -275,22 +275,14 @@ public class AskInstructorDialogStyled extends DialogFragment {
             }
         };
 
-
-        getPeopleCallback = new CanvasCallback<User[]>(APIHelpers.statusDelegateWithContext(getActivity())) {
-
+        getPeopleCallback = new StatusCallback<List<User>>() {
             @Override
-            public void cache(User[] users, LinkHeaders linkHeaders, Response response) {
-
-            }
-
-            @Override
-            public void firstPage(User[] users, LinkHeaders linkHeaders, Response response) {
-
-                nextURL = linkHeaders.nextURL;
+            public void onResponse(retrofit2.Response<List<User>> response, LinkHeaders linkHeaders, ApiType type) {
+                nextURL = linkHeaders.nextUrl;
                 hasLoadedFirstPage = true;
-
+                List<User> users = response.body();
                 if(users != null) {
-                    emailList.addAll(Arrays.asList(users));
+                    emailList.addAll(users);
                 }
 
                 //only get the next group if we haven't found all the groups and we've found all the members of the current group
@@ -325,29 +317,21 @@ public class AskInstructorDialogStyled extends DialogFragment {
                         ids.add(Long.toString(user.getId()));
                     }
 
-                    ConversationAPI.createConversation(sendMessageCanvasCallback, ids, messageText, true, course.getContextId());
+                    ConversationManager.createConversation(ids, messageText, "", course.getContextId(), null, true, sendMessageCanvasCallback);
                 }
-
             }
 
             @Override
-            public void failure(RetrofitError retrofitError) {
+            public void onFail(Call<List<User>> response, Throwable error) {
                 hasLoadedFirstPage = false;
                 progressDialog.dismiss();
-                super.failure(retrofitError);
             }
-
         };
 
-        sendMessageCanvasCallback = new CanvasCallback<Response>(APIHelpers.statusDelegateWithContext(getActivity())) {
+        sendMessageCanvasCallback = new StatusCallback<List<Conversation>>() {
 
             @Override
-            public void cache(Response response, LinkHeaders linkHeaders, Response response2) {
-
-            }
-
-            @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
+            public void onResponse(retrofit2.Response<List<Conversation>> response, LinkHeaders linkHeaders, ApiType type) {
                 //close progress dialog
                 progressDialog.dismiss();
                 //close this dialog
@@ -355,7 +339,7 @@ public class AskInstructorDialogStyled extends DialogFragment {
             }
 
             @Override
-            public void failure(RetrofitError retrofitError){
+            public void onFail(Call<List<Conversation>> response, Throwable error) {
                 //Croutons are shown in the background, which makes them hard to see. Use a dialog instead
                 FatalErrorDialogStyled fatalErrorDialog = FatalErrorDialogStyled.newInstance(R.string.error, R.string.errorSendingMessage, R.drawable.ic_cv_alert, true);
                 if(getActivity() == null) {

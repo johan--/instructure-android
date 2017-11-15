@@ -2,7 +2,6 @@ package com.instructure.parentapp.util;
 
 import android.content.Context;
 
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Prefs;
 import com.instructure.parentapp.BuildConfig;
@@ -20,7 +19,7 @@ class RoboTesting {
         ApiPrefs.setToken(BuildConfig.ROBO_TEST_API_KEY);
 
         //Set domain to gamma
-        APIHelper.setAirwolfDomain(context, BuildConfig.GAMMA_DOMAIN);
+        ApiPrefs.setAirwolfDomain(BuildConfig.GAMMA_DOMAIN);
     }
 
 }

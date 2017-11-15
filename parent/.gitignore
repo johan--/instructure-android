@@ -57,5 +57,6 @@ gradle.properties
 # Infer
 infer-out/
 
-# Generated Licenses HTML
-app/src/main/assets/licenses.html
+# OSS License data
+app/src/main/res/raw/third_party_license_metadata
+app/src/main/res/raw/third_party_licenses

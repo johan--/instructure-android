@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,11 +26,12 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InternalWebViewActivity;
 import com.instructure.pandautils.utils.CanvasContextColor;
-import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
 
 public class LegalDialogStyled extends DialogFragment {
 
@@ -94,7 +95,7 @@ public class LegalDialogStyled extends DialogFragment {
         openSource.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new EasyLicensesDialog(getActivity()).show();
+                startActivity(new Intent(getContext(), OssLicensesMenuActivity.class));
                 dialog.dismiss();
             }
         });

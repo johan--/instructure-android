@@ -130,9 +130,6 @@
   <string name="domain">Domena</string>
   <string name="sendFeedback">Wyślij informację zwrotną</string>
   <string name="sendMail">Wyślij e-mail...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com
-</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Edytuj</string>
   <plurals name="item_count">
     <item quantity="one">%d element</item>
@@ -448,8 +445,8 @@
   <string name="could_not_find_course">Wystąpił błąd podczas pobierania kursu dla tej pozycji.</string>
   <string name="could_not_find_group">Wystąpił błąd podczas pobierania grupy dla tej pozycji.</string>
   <string name="selectBackground">Wybierz tło</string>
-  <string name="kalturaSubmissionInProgress">Zgłaszanie plików...Sprawdź pasek powiadomień w sprawie aktualizacji.</string>
-  <string name="kalturaSubmissionSuccessful">Koniec zgłaszania pliku</string>
+  <string name="notoriousSubmissionInProgress">Zgłaszanie plików...Sprawdź pasek powiadomień w sprawie aktualizacji.</string>
+  <string name="notoriousSubmissionSuccessful">Koniec zgłaszania pliku</string>
   <string name="poll_title">Co chcesz zrobić w systemie Canvas?</string>
   <string name="poll_warning">Nie wybrano pozycji.</string>
   <string name="poll_item_1">Sprawdź moje oceny</string>
@@ -486,6 +483,7 @@
   <string name="pandaAvatarsFolderName">AwatarPanda</string>
   <string name="share">Udostępnij</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Obraz super pandy</string>
   <string name="newFeatureTitle">Powiadomienia mobilne</string>
   <string name="newFeatureMsg">Aby otrzymać powiadomienia push, przejdź do Ustawień &amp;gt systemu Canvas; Powiadomienia &amp;gt; i wybierz "Dla wszystkich urządzeń"</string>

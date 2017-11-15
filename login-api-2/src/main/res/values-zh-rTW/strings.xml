@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
   -->
 
 <resources>
-  <string name="app_name">登入API</string>
-  <string name="hello_world">你好世界！</string>
+    <string name="hello_world">你好世界！</string>
   <string name="action_settings">設置</string>
   <string name="mobileVerifyGeneral">該app未獲得使用授權</string>
   <string name="mobileVerifyDomainUnauthorized">您輸入的服務器未獲得使用該app的授權。</string>
@@ -27,7 +26,6 @@
   <string name="unknownDevice">未知服務器</string>
   <string name="errorOccurred">發生未知錯誤</string>
   <string name="pageNotFound">未找到頁面</string>
-  <string name="okay">好的</string>
   <string name="confirm">確認</string>
   <string name="cancel">撤銷</string>
   <string name="help">幫助</string>
@@ -62,20 +60,10 @@
   <string name="loginCanvasHelpWithUser">輸入學校URL或按一下此處尋求幫助。</string>
   <string name="loginHint">查找您的學校或學區</string>
   <!--Rating Dialog-->
-  <string name="howAreWeDoing">我們表現如何？</string>
-  <string name="rateUs">您如何評價我們？</string>
-  <string name="doBetter">我們需要改進的地方？</string>
-  <string name="sendFeedback">發送反饋</string>
-  <string name="suggestions">對Android版的建議</string>
-  <string name="domain">域名</string>
+    <string name="domain">域名</string>
   <string name="versionNum">版本：</string>
   <string name="userId">使用者ID</string>
-  <string name="email">電郵地址</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">不要再次顯示</string>
-  <string name="installDate">安裝日期：</string>
-  <!--Zendesk Dialog-->
+    <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">報告問題</string>
   <string name="zendesk_subject">主題</string>
   <string name="zendesk_description">描述</string>

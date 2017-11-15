@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import android.os.Handler;
 import android.view.View;
 
 import com.instructure.candroid.fragment.MessageListFragment;
-import com.instructure.canvasapi.model.Conversation;
+import com.instructure.canvasapi2.models.Conversation;
 
 public abstract class DebounceMessageToAdapterListener implements MessageDebounceClickInterface, MessageListFragment.MessageAdapterToFragmentCallback<Conversation>{
 

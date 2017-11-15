@@ -48,7 +48,7 @@ class SoSeedy
           @git = Git.open(repo)
 
           if on_master? && nothing_to_commit?
-            execute_action('Pull latest SoSeedy changes') { @git.pull }
+            execute_action('Pull latest SoSeedy changes') {@git.pull}
           else
             # TODO: check if automatic rebase is possible
             warning = 'Attention!!!'
@@ -58,7 +58,7 @@ class SoSeedy
           end
         else
           execute_action('Cloning SoSeedy') do
-            with_retry { @git = Git.clone(git_url, repo) }
+            with_retry {@git = Git.clone(git_url, repo)}
           end
         end
 
@@ -76,7 +76,7 @@ class SoSeedy
     end
 
     def nothing_to_commit?
-      %i[changed added deleted untracked].all? { |method| @git.status.send(method).empty? }
+      %i[changed added deleted untracked].all? {|method| @git.status.send(method).empty?}
     end
 
     def on_master?

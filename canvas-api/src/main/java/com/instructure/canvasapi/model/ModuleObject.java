@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -148,9 +148,8 @@ public class ModuleObject extends CanvasModel<ModuleObject> {
 
         ModuleObject that = (ModuleObject) o;
 
-        if (id != that.id) return false;
+        return id == that.id;
 
-        return true;
     }
 
     @Override

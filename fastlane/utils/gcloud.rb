@@ -21,6 +21,7 @@ class GCloud
     @app_name     = opts.fetch :app
     @test_targets = opts[:test_targets] || ''
     @robo         = opts[:robo]
+    @annotations  = opts[:annotations]
 
     unless @test_targets.empty?
       raise 'Do not supply test_targets when running Robo tests' if @robo
@@ -88,12 +89,11 @@ class GCloud
     @api_level  = 25
 
     if @robo
-      type          = '--type robo'
+      type = '--type robo'
     else
-      type          = '--type instrumentation'
-      test_apk      = %Q(--test "#{ENV['TEST_APK']}")
-      env_variables = '--environment-variables coverage=true,coverageFile=/sdcard/coverage.ec' if @opts[:coverage]
-      sd_card_path  = '--directories-to-pull=/sdcard'
+      type         = '--type instrumentation'
+      test_apk     = %Q(--test "#{ENV['TEST_APK']}")
+      sd_card_path = '--directories-to-pull=/sdcard'
     end
 
     flags = [
@@ -106,12 +106,21 @@ class GCloud
         '--locales en',
         '--orientations portrait',
         '--timeout 25m',
-        env_variables,
         sd_card_path
     ].reject &:nil?
 
     flags << %Q(--test-targets "#{@test_targets}") unless @test_targets.empty?
-    flags.map! { |flag| "  #{flag}" }
+
+    # must use custom env separator or gcloud CLI will get confused on comma separated annotations
+    if @opts[:coverage] || @annotations
+      env_vars      = []
+      env_vars      += ['coverage=true', 'coverageFile=/sdcard/coverage.ec'] if @opts[:coverage]
+      env_vars      += ["annotation=#{@annotations}"] if @annotations
+      env_separator = ':'
+      flags << "--environment-variables ^#{env_separator}^#{env_vars.join(env_separator)}"
+    end
+
+    flags.map! {|flag| "  #{flag}"}
 
     command = [
         'unbuffer',

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,11 +32,8 @@ import butterknife.ButterKnife;
 public class QuestionRowFactory {
 
     static class ViewHolder {
-        @BindView(R.id.title)
-        TextView txtTitle;
-
-        @BindView(R.id.isPublished)
-        ImageView selected;
+        @BindView(R.id.title) TextView txtTitle;
+        @BindView(R.id.isPublished) ImageView selected;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
@@ -44,8 +41,7 @@ public class QuestionRowFactory {
     }
 
     static class GroupViewHolder {
-        @BindView(R.id.groupText)
-        TextView groupText;
+        @BindView(R.id.groupText) TextView groupText;
 
         public GroupViewHolder(View view) {
             ButterKnife.bind(this, view);
@@ -61,8 +57,7 @@ public class QuestionRowFactory {
             holder = new ViewHolder(convertView);
 
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder)convertView.getTag();
         }
 
@@ -70,8 +65,7 @@ public class QuestionRowFactory {
         if(hasActiveSession) {
             holder.selected.setVisibility(View.VISIBLE);
             holder.selected.getDrawable().setColorFilter(context.getResources().getColor(R.color.canvaspollingtheme_color), PorterDuff.Mode.SRC_IN);
-        }
-        else {
+        } else {
             holder.selected.setVisibility(View.INVISIBLE);
         }
 
@@ -84,8 +78,7 @@ public class QuestionRowFactory {
             convertView = inflater.inflate(R.layout.listview_group_questions, null);
             holder = new GroupViewHolder(convertView);
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (GroupViewHolder) convertView.getTag();
         }
 

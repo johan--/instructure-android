@@ -1,24 +1,42 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+/*
+ * Copyright (C) 2017 - present  Instructure, Inc.
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 buildscript {
-    ext.kotlin_version = '1.1.2'
+    /* Global constants */
+    apply from: '../gradle/global.gradle'
 
+    /* Merge Private Data */
     apply from: '../private-data/merge-private-data.gradle'
     mergePrivateData "polling", false
 
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
-        classpath 'com.cookpad.android.licensetools:license-tools-plugin:0.21.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$GLOBAL_KOTLIN_VERSION"
     }
 }
 
 plugins {
-    id "org.standardout.versioneye" version "1.4.0"
+    id 'com.gradle.build-scan' version '1.9'
+    id 'org.standardout.versioneye' version '1.4.0'
 }
 
 versioneye {
@@ -29,6 +47,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
 }
 
@@ -37,28 +56,28 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 25
-    buildToolsVersion = "25.0.2"
+    compileSdkVersion = GLOBAL_COMPILE_SDK
+    buildToolsVersion = GLOBAL_BUILD_TOOLS_VERSION
 
-    targetSdkVersion = 25
-    minSdkVersion = 17
+    targetSdkVersion = GLOBAL_TARGET_SDK
+    minSdkVersion = GLOBAL_MIN_SDK
 
-    versionCode = 1
-    versionName = '1.0d'
+    versionCode = 6
+    versionName = '1.1.1'
 
-    supportLibraryVersion = '25.2.0'
-    googlePlayServicesVersion = '10.0.1'
+    supportLibraryVersion = GLOBAL_SUPPORT_LIBRARY_VERSION
+    googlePlayServicesVersion = GLOBAL_PLAY_SERVICES_VERSION
 
     supportDependencies = [
-            design : "com.android.support:design:${supportLibraryVersion}",
-            recyclerView : "com.android.support:recyclerview-v7:${supportLibraryVersion}",
-            appCompat : "com.android.support:appcompat-v7:${supportLibraryVersion}",
-            supportAnnotation: "com.android.support:support-annotations:${supportLibraryVersion}",
-            cardView: "com.android.support:cardview-v7:${supportLibraryVersion}",
-            gpsWearable: "com.google.android.gms:play-services-wearable:${googlePlayServicesVersion}",
-            supportLibV13: "com.android.support:support-v13:${supportLibraryVersion}",
-            percentLayout: "com.android.support:percent:${supportLibraryVersion}",
-            vector: "com.android.support:support-vector-drawable:${supportLibraryVersion}",
-            v4: "com.android.support:support-v4:${supportLibraryVersion}"
+            design : "com.android.support:design:$supportLibraryVersion",
+            recyclerView : "com.android.support:recyclerview-v7:$supportLibraryVersion",
+            appCompat : "com.android.support:appcompat-v7:$supportLibraryVersion",
+            supportAnnotation: "com.android.support:support-annotations:$supportLibraryVersion",
+            cardView: "com.android.support:cardview-v7:$supportLibraryVersion",
+            gpsWearable: "com.google.android.gms:play-services-wearable:$googlePlayServicesVersion",
+            supportLibV13: "com.android.support:support-v13:$supportLibraryVersion",
+            percentLayout: "com.android.support:percent:$supportLibraryVersion",
+            vector: "com.android.support:support-vector-drawable:$supportLibraryVersion",
+            v4: "com.android.support:support-v4:$supportLibraryVersion"
     ]
 }

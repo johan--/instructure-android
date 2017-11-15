@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">LoginAPI</string>
   <string name="hello_world">Bonjou tout moun!</string>
   <string name="action_settings">Reglaj</string>
   <string name="mobileVerifyGeneral">App sa a pa gen ototrizasyon pou li itilize</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">UnknownDevice</string>
   <string name="errorOccurred">Yon erè fèt sanzatann.</string>
   <string name="pageNotFound">Paj entwouvab.</string>
-  <string name="okay">OK</string>
   <string name="confirm">Konfime</string>
   <string name="cancel">Anile</string>
   <string name="help">Èd</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">W ap eseye konekte sou Canvas Network?</string>
   <string name="remove">Elimine</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">Degizman</string>
+  <string name="userId">Non Itilizatè</string>
+  <string name="domain">Domèn</string>
+  <string name="masqueradingUserId">Non Itilizatè pou Degize</string>
+  <string name="masqueradingUserDomain">Degize Domèn</string>
+  <string name="masqueradingBegin">Kòmanse Degizman</string>
+  <string name="masqueradingStop">Kanpe Degizman</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Elimine itilizatè sa a?</string>
   <string name="removedForever">W ap konekte sou itilizatè sa a ankò pou gen aksè a kontni yo.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Ou pa wè lekòl ou a? Antre URL lekòl la oswa tale la pou jwenn èd.</string>
   <string name="loginCanvasHelpWithUser">Antre URL lekòl la oswa tale la pou jwenn èd.</string>
   <string name="loginHint">Jwenn lekòl oswa distri ou a</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Kisa w ap fè la a?</string>
-  <string name="rateUs">Kisa ou ka di de nou?</string>
-  <string name="doBetter">Kisa nou ka amelyore?</string>
-  <string name="sendFeedback">Voye Kòmantè</string>
-  <string name="suggestions">Sijesyon pou Android</string>
-  <string name="domain">Domèn</string>
-  <string name="versionNum">Vèsyon:</string>
-  <string name="userId">Non Itilizatè</string>
-  <string name="email">Imèl</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Pa afiche ankò</string>
-  <string name="installDate">Dat Enstalasyon:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Rapòte yon Pwoblèm</string>
   <string name="zendesk_subject">Sijè</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Aparèy</string>
   <string name="osVersion">Vèsyon OS</string>
+  <string name="previousLoginTitle">Ansyen Koneksyon</string>
+  <string name="canvasNetworks">Rezo Canvas</string>
+  <string name="findMySchool">Jwenn lekòl mwen an</string>
+  <string name="appTypeTeacher">Pwofesè</string>
+  <string name="appTypeStudent">Elèv</string>
+  <string name="appTypeParent">Paran</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">Kijan lekòl ou a rele?</string>
+  <string name="next">Pwochen</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Elimine Ansyen Itilizatè</string>
+  <string name="accountDomainFooter">Ou paka jwenn lekòl ou a? Eseye tape tout URL lekòl la</string>
+  <string name="accountDomainFooterLink">Tape la pou èd.</string>
+  <string name="login_noInternetConnectionTitle">Pa gen Koneksyon Internet</string>
+  <string name="login_noInternetConnectionMessage">Pou aksyon sa a ou bezwen konekte sou entènèt.</string>
+  <string name="empty_feedback">Ou dwe gen yon sijè ak yon deskripsyon pou soumèt kòmantè sa a.</string>
+  <string name="versionNum">Nimewo Vèsyon</string>
+  <string name="scrollInstructions">Desann pou wè tout detay yo</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -42,15 +42,15 @@ import com.instructure.androidpolling.app.activities.PublishPollActivity;
 import com.instructure.androidpolling.app.model.AnswerValue;
 import com.instructure.androidpolling.app.util.Constants;
 import com.instructure.androidpolling.app.util.SwipeDismissTouchListener;
-import com.instructure.canvasapi.api.PollAPI;
-import com.instructure.canvasapi.api.PollChoiceAPI;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollChoice;
-import com.instructure.canvasapi.model.PollChoiceResponse;
-import com.instructure.canvasapi.model.PollResponse;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.models.PollChoice;
+import com.instructure.canvasapi2.models.PollChoiceResponse;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollResponse;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,50 +58,36 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class AddQuestionFragment extends ParentFragment {
 
-    @BindView(R.id.edit_question)
-    EditText editQuestion;
-
-    @BindView(R.id.scrollViewAnswers)
-    ScrollView scrollView;
-
-    @BindView(R.id.answerContainer)
-    LinearLayout answerContainer;
-
-    @BindView(R.id.publishPoll)
-    Button publishPoll;
-
-    @BindView(R.id.savePoll)
-    Button savePoll;
+    @BindView(R.id.edit_question) EditText editQuestion;
+    @BindView(R.id.scrollViewAnswers) ScrollView scrollView;
+    @BindView(R.id.answerContainer) LinearLayout answerContainer;
+    @BindView(R.id.publishPoll) Button publishPoll;
+    @BindView(R.id.savePoll) Button savePoll;
 
     private Button addAnswerBtn;
 
-    private CanvasCallback<PollResponse> pollCallback;
-    private CanvasCallback<PollChoiceResponse> pollChoiceCallback;
-    private CanvasCallback<Response> responseCanvasCallback;
+    private StatusCallback<PollResponse> pollCallback;
+    private StatusCallback<PollChoiceResponse> pollChoiceCallback;
 
     private SwipeDismissTouchListener touchListener;
-    public static final String TAG = "AddQuestionFragment";
 
     private boolean editPoll = false; //set when we're editing a poll that has already be created
     private boolean shouldPublish = false;
     private Poll poll;
 
-    private HashMap<View, AnswerValue> answerMap = new HashMap<View, AnswerValue>();
-    private ArrayList<Long> idDeleteList = new ArrayList<Long>();
+    private HashMap<View, AnswerValue> answerMap = new HashMap<>();
+    private ArrayList<Long> idDeleteList = new ArrayList<>();
 
     //num polls created
     private int pollChoicesCreated = 0;
     private boolean submittingPoll = false;
     private LayoutInflater inflater;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -148,7 +134,7 @@ public class AddQuestionFragment extends ParentFragment {
                 bundle.putParcelable(Constants.POLL_SESSION, session);
                 pollResultsFragment.setArguments(bundle);
                 ((FragmentManagerActivity)getActivity()).removeFragment(this);
-                ((FragmentManagerActivity)getActivity()).swapFragments(pollResultsFragment, PollResultsFragment.TAG);
+                ((FragmentManagerActivity)getActivity()).swapFragments(pollResultsFragment, PollResultsFragment.class.getSimpleName());
 
                 return;
             }
@@ -161,25 +147,21 @@ public class AddQuestionFragment extends ParentFragment {
             bundle.putParcelable(Constants.POLL_DATA, poll);
             pollSessionListFragment.setArguments(bundle);
             ((FragmentManagerActivity)getActivity()).removeFragment(this);
-            ((FragmentManagerActivity)getActivity()).swapFragments(pollSessionListFragment, PollResultsFragment.TAG);
+            ((FragmentManagerActivity)getActivity()).swapFragments(pollSessionListFragment, PollResultsFragment.class.getSimpleName());
 
         }
     }
 
     private void updatePollInfo() {
         poll.setQuestion(editQuestion.getText().toString());
-        PollAPI.updatePoll(poll.getId(), editQuestion.getText().toString(), pollCallback);
+        PollsManager.updatePoll(poll.getId(), editQuestion.getText().toString(), pollCallback, true);
 
         //delete the ids of the removed choices
         for(Long id :idDeleteList) {
-            PollChoiceAPI.deletePollChoice(poll.getId(), id, responseCanvasCallback);
+
+            PollsManager.deletePollChoice(poll.getId(), id, new StatusCallback<ResponseBody>() {}, true);
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
-
     private void setupViews() {
         addAnswerBtn = new Button(getActivity());
         addAnswerBtn.setText(getString(R.string.addAnswer));
@@ -214,8 +196,12 @@ public class AddQuestionFragment extends ParentFragment {
                     if (editPoll) {
                         updatePollInfo();
                     } else {
-                        //API call to create poll
-                        PollAPI.createPoll(editQuestion.getText().toString(), pollCallback);
+                        PollsManager.createPoll(editQuestion.getText().toString(), new StatusCallback<PollResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Response<PollResponse> response, LinkHeaders linkHeaders, ApiType type) {
+
+                            }
+                        }, true);
                     }
                 }
             }
@@ -239,15 +225,12 @@ public class AddQuestionFragment extends ParentFragment {
                         updatePollInfo();
                     } else {
                         //API call to create poll
-                        PollAPI.createPoll(editQuestion.getText().toString(), pollCallback);
+                        PollsManager.createPoll(editQuestion.getText().toString(), pollCallback, true);
                     }
-
                 }
             }
         });
-
     }
-
 
     private boolean checkForAnswers() {
         int validEntries = 0;
@@ -276,10 +259,8 @@ public class AddQuestionFragment extends ParentFragment {
 
     private void addAnswer(String answer, boolean isCorrect) {
         addAnswer(answer, isCorrect, 0);
-
-
-
     }
+
     private void addAnswer(final String answer, boolean isCorrect, long pollChoiceId) {
         final AnswerValue value = new AnswerValue();
         value.setValue(answer);
@@ -334,21 +315,16 @@ public class AddQuestionFragment extends ParentFragment {
         //add a text watcher to the edit text so we save the values as the user types
         TextWatcher watcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
                 value.setValue(charSequence.toString());
                 answerMap.put(answerView, value);
-
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
         };
 
         answerEditText.addTextChangedListener(watcher);
@@ -411,8 +387,10 @@ public class AddQuestionFragment extends ParentFragment {
                 editQuestion.setText(poll.getQuestion());
 
                 ArrayList<PollChoice> pollChoices = bundle.getParcelableArrayList(Constants.POLL_CHOICES);
-                for(PollChoice pollChoice : pollChoices) {
-                    addAnswer(pollChoice.getText(), pollChoice.is_correct(), pollChoice.getId());
+                if(pollChoices != null) {
+                    for (PollChoice pollChoice : pollChoices) {
+                        addAnswer(pollChoice.getText(), pollChoice.is_correct(), pollChoice.getId());
+                    }
                 }
 
                 //update the actionbar
@@ -432,22 +410,15 @@ public class AddQuestionFragment extends ParentFragment {
 
         return validEntries;
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // Callbacks
-    ///////////////////////////////////////////////////////////////////////////
-
 
     private void setupCallbacks() {
-        pollCallback = new CanvasCallback<PollResponse>(this) {
-            @Override
-            public void cache(PollResponse pollResponse) {
 
-            }
-
+        pollCallback = new StatusCallback<PollResponse>() {
             @Override
-            public void firstPage(PollResponse pollResponse, LinkHeaders linkHeaders, Response response) {
-                if(getActivity() == null) return;
-                List<Poll> pollList = pollResponse.getPolls();
+            public void onResponse(Response<PollResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
+
+                List<Poll> pollList = response.body().getPolls();
                 if(pollList == null) {
                     return;
                 }
@@ -456,41 +427,32 @@ public class AddQuestionFragment extends ParentFragment {
                 //now create the poll choices if we're not in edit mode
                 if(!editPoll) {
                     for (AnswerValue answerValue : answerMap.values()) {
-                        PollChoiceAPI.createPollChoice(pollList.get(0).getId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback);
+                        PollsManager.createPollChoice(pollList.get(0).getId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback, true);
                     }
                 }
                 else {
                     for (AnswerValue answerValue : answerMap.values()) {
                         //if they added some answers we won't have a pollChoiceId
                         if(answerValue.getPollChoiceId() == 0) {
-                            PollChoiceAPI.createPollChoice(pollList.get(0).getId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback);
-                        }
-                        else {
-                            PollChoiceAPI.updatePollChoice(pollList.get(0).getId(), answerValue.getPollChoiceId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback);
+                            PollsManager.createPollChoice(pollList.get(0).getId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback, true);
+                        } else {
+                            PollsManager.updatePollChoice(pollList.get(0).getId(), answerValue.getPollChoiceId(), answerValue.getValue(), answerValue.isSelected(), answerValue.getPosition(), pollChoiceCallback, true);
                         }
                     }
                 }
-
-                onCallbackFinished(SOURCE.API);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<PollResponse> response, Throwable error) {
                 submittingPoll = false;
                 getActivity().invalidateOptionsMenu();
-                return super.onFailure(retrofitError);
             }
         };
 
-        pollChoiceCallback = new CanvasCallback<PollChoiceResponse>(this) {
+        pollChoiceCallback = new StatusCallback<PollChoiceResponse>() {
             @Override
-            public void cache(PollChoiceResponse pollChoiceResponse) {
-
-            }
-
-            @Override
-            public void firstPage(PollChoiceResponse pollChoiceResponse, LinkHeaders linkHeaders, Response response) {
-                if(getActivity() == null) return;
+            public void onResponse(Response<PollChoiceResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
                 pollChoicesCreated++;
 
@@ -505,51 +467,22 @@ public class AddQuestionFragment extends ParentFragment {
                         else {
                             //we just came from the PollSessionsFragment
                             //removing the fragment will make it reload it's data
-                            ((BaseActivity) getActivity()).removeFragment(QuestionListFragment.TAG);
+                            ((BaseActivity) getActivity()).removeFragment(QuestionListFragment.class.getSimpleName());
                         }
                     }
                     else {
                         //now create the poll choices
                         //removing the fragment will make it reload it's data
-                        ((BaseActivity) getActivity()).removeFragment(QuestionListFragment.TAG);
+                        ((BaseActivity) getActivity()).removeFragment(QuestionListFragment.class.getSimpleName());
                     }
                 }
-
-
-                onCallbackFinished(SOURCE.API);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<PollChoiceResponse> response, Throwable error) {
                 submittingPoll = false;
                 getActivity().invalidateOptionsMenu();
-                return super.onFailure(retrofitError);
             }
         };
-
-        responseCanvasCallback = new CanvasCallback<Response>(this) {
-            @Override
-            public void cache(Response response) {
-
-            }
-
-            @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                //204 means success
-                if(response.getStatus() == 204) {
-
-                }
-            }
-
-            @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                return super.onFailure(retrofitError);
-            }
-        };
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
     }
 }

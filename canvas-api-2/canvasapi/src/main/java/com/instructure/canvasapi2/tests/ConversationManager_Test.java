@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -53,9 +53,31 @@ public class ConversationManager_Test {
                 .addHeader("content-type", "application/json")
                 .build();
 
-        List<Conversation> courses = new ArrayList<>();
+        List<Conversation> conversations = new ArrayList<>();
 
-        retrofit2.Response<List<Conversation>> response1 = retrofit2.Response.success(courses, response);
+        retrofit2.Response<List<Conversation>> response1 = retrofit2.Response.success(conversations, response);
+        callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
+    }
+
+    public static void getConversationsFiltered(
+            @NonNull ConversationAPI.ConversationScope scope,
+            @NonNull String canvasContextFilter,
+            @NonNull RestBuilder adapter,
+            @NonNull StatusCallback<List<Conversation>> callback,
+            @NonNull RestParams params) {
+
+        //TODO:
+        Response response = new Response.Builder()
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        List<Conversation> conversations = new ArrayList<>();
+
+        retrofit2.Response<List<Conversation>> response1 = retrofit2.Response.success(conversations, response);
         callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
     }
 
@@ -75,7 +97,7 @@ public class ConversationManager_Test {
         callback.onResponse(retrofitResponse, new LinkHeaders(), ApiType.CACHE);
     }
 
-    public static void updateConversation(long conversationId, ConversationAPI.WorkflowState workflowState, Boolean starred, StatusCallback<Conversation> callback) {
+    public static void updateConversation(long conversationId, Conversation.WorkflowState workflowState, Boolean starred, StatusCallback<Conversation> callback) {
         // TODO:
         Response rawResponse = new Response.Builder()
                 .code(200)
@@ -125,8 +147,7 @@ public class ConversationManager_Test {
         callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
     }
 
-    public static void createConversation(RestBuilder adapter, RestParams params, ArrayList<String> userIDs, String message, String subject, String contextId, boolean isGroup, StatusCallback<List<Conversation>> callback) {
-        // TODO:
+    public static void createConversation(RestBuilder adapter, RestParams params, ArrayList<String> userIDs, String message, String subject, String contextId, boolean isBulk, StatusCallback<List<Conversation>> callback) {
         Response rawResponse = new Response.Builder()
                 .code(200)
                 .message("todo")
@@ -154,6 +175,20 @@ public class ConversationManager_Test {
         Conversation conversation = new Conversation();
 
         retrofit2.Response<Conversation> response = retrofit2.Response.success(conversation, rawResponse);
+        callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
+    }
+
+    public static void markConversationAsRead(long conversationId, String conversationEvent, StatusCallback<Void> callback) {
+        Response rawResponse = new Response.Builder()
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        // We don't care about the response
+        retrofit2.Response<Void> response = retrofit2.Response.success(null, rawResponse);
         callback.onResponse(response, new LinkHeaders(), ApiType.CACHE);
     }
 }

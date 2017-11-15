@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,12 +19,10 @@ package com.instructure.candroid.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -32,7 +30,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
@@ -62,33 +59,32 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.DownloadMedia;
 import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.NoNetworkErrorDelegate;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.api.KalturaAPI;
-import com.instructure.canvasapi.api.SubmissionAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.Author;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.DiscussionTopic;
-import com.instructure.canvasapi.model.KalturaConfig;
-import com.instructure.canvasapi.model.LTITool;
-import com.instructure.canvasapi.model.MediaComment;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.model.SubmissionComment;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.FileUtilities;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.ProfileUtils;
-import com.instructure.loginapi.login.util.Utils;
-import com.instructure.pandautils.activities.KalturaMediaUploadPicker;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AssignmentManager;
+import com.instructure.canvasapi2.managers.NotoriousManager;
+import com.instructure.canvasapi2.managers.SubmissionManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.Author;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.DiscussionTopic;
+import com.instructure.canvasapi2.models.LTITool;
+import com.instructure.canvasapi2.models.MediaComment;
+import com.instructure.canvasapi2.models.NotoriousConfig;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.models.SubmissionComment;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.FileUtils;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.pandautils.activities.NotoriousMediaUploadPicker;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.PermissionUtils;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.instructure.pandautils.utils.RequestCodes;
 
 import java.lang.ref.WeakReference;
@@ -99,8 +95,7 @@ import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 
 public class SubmissionDetailsFragment extends ParentFragment {
@@ -162,11 +157,11 @@ public class SubmissionDetailsFragment extends ParentFragment {
     private SubmissionDetailsFragmentCallback submissionDetailsFragmentCallback;
 
     // callbacks
-    private CanvasCallback<Submission> canvasCallbackSubmission;
-    private CanvasCallback<Submission> canvasCallbackMessage;
-    private CanvasCallback<LTITool> canvasCallbackLTITool;
-    private CanvasCallback<Assignment> canvasCallbackAssignment;
-    private CanvasCallback<KalturaConfig> kalturaConfigCallback;
+    private StatusCallback<Submission> canvasCallbackSubmission;
+    private StatusCallback<Submission> canvasCallbackMessage;
+    private StatusCallback<LTITool> canvasCallbackLTITool;
+    private StatusCallback<Assignment> canvasCallbackAssignment;
+    private StatusCallback<NotoriousConfig> notoriousConfigCallback;
 
     private BroadcastReceiver submissionCommentReceiver = new BroadcastReceiver() {
         @Override
@@ -255,7 +250,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
     public void onDestroy() {
         super.onDestroy();
         // helps GC and memory management
-        kalturaConfigCallback = null;
+        notoriousConfigCallback = null;
         canvasCallbackAssignment = null;
         canvasCallbackLTITool = null;
         canvasCallbackMessage = null;
@@ -270,7 +265,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
         inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        myUserId = APIHelpers.getCacheUser(getContext()).getId();
+        myUserId = ApiPrefs.getUser().getId();
 
         am = ((ApplicationManager)getActivity().getApplication());
 
@@ -289,8 +284,8 @@ public class SubmissionDetailsFragment extends ParentFragment {
         isMediaRecording = false;
 
         setupCallbacks();
-        if(kalturaConfigCallback!=null){
-            KalturaAPI.getKalturaConfiguration(kalturaConfigCallback);
+        if (notoriousConfigCallback != null) {
+            NotoriousManager.getConfiguration(notoriousConfigCallback);
         }
     }
 
@@ -367,7 +362,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
             //set the submission button label. It could be "Go to Quiz" or "Go to Discussion" if the assignment
             //is that type
             Date currentDate = new Date();
-            if(assignment.getlockAtDate() != null && currentDate.after(assignment.getlockAtDate())){
+            if(assignment.getLockAt() != null && currentDate.after(assignment.getLockAt())){
                 addSubmission.setEnabled(false);
                 addSubmission.setText(getString(R.string.pastDueDate));
             } else if (assignment.getDiscussionTopicHeader() != null && assignment.getDiscussionTopicHeader().getId() > 0 && assignment.getCourseId() > 0) { //Allow the user to go to the discussion.
@@ -388,54 +383,6 @@ public class SubmissionDetailsFragment extends ParentFragment {
         }
     }
 
-    private void populateAssignmentTeacherDetails(final Assignment assignment, Course course) {
-        //if the user is a teacher we don't want them to be able to submit anything or comment
-        if(course != null && (course.isTeacher() || course.isTA())) {
-            addSubmission.setVisibility(View.GONE);
-            addComment.setVisibility(View.GONE);
-            composeHeaderView.setVisibility(View.GONE);
-
-            RelativeLayout relativeLayout = (RelativeLayout)getView().findViewById(R.id.activity_root);
-            relativeLayout.removeAllViews();
-            final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
-            relativeLayout.setPadding(padding, padding, padding, padding);
-
-            Button button = new Button(getActivity());
-            button.setText(getString(R.string.launchSpeedgrader));
-            button.setTextSize(18);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            button.setLayoutParams(layoutParams);
-            button.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (Utils.isSpeedGraderInstalled(getContext())) {
-                        PackageManager packageManager = getActivity().getPackageManager();
-                        Intent intent = packageManager.getLaunchIntentForPackage(Const.SPEEDGRADER_PACKAGE);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        Bundle bundle = new Bundle();
-//                        bundle.putParcelable(com.instructure.loginapi.login.util.Const.ROUTING_CANVAS_CONEXT, getCanvasContext());
-//                        bundle.putParcelable(com.instructure.loginapi.login.util.Const.ROUTING_ASSINGMENT, assignment);
-//                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else {
-                        //For devices without play services
-                        try {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse(Const.SPEEDGRADER_PLAYSTORE));
-                            startActivity(intent);
-                        } catch (ActivityNotFoundException e) {
-                            //the device might not have the play store installed, open it in a webview
-                            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-                            goToMarket.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + Const.SPEEDGRADER_PACKAGE));
-                            startActivity(goToMarket);
-                        }
-                    }
-                }
-            });
-
-            relativeLayout.addView(button);
-        }
-    }
 
     /**
      * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
@@ -443,7 +390,6 @@ public class SubmissionDetailsFragment extends ParentFragment {
     private void populateViews(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
         if (assignment == null) return;
         populateAssignmentDetails(assignment, course);
-        populateAssignmentTeacherDetails(assignment, course);
         loadData(assignment.getId(), isWithinAnotherCallback, isCached);
 
         //at this point the button says something based on if there is a submission or not.
@@ -462,11 +408,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
      * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
      */
     public void loadData(long assignmentId, boolean isWithinAnotherCallback, boolean isCached) {
-        if (isWithinAnotherCallback) {
-            SubmissionAPI.getSubmissionWithCommentsAndHistoryChained(course, assignmentId, myUserId, canvasCallbackSubmission, isCached);
-        } else {
-            SubmissionAPI.getSubmissionWithCommentsAndHistory(course, assignmentId, myUserId, canvasCallbackSubmission);
-        }
+        SubmissionManager.getSingleSubmission(course.getId(), assignmentId, myUserId, canvasCallbackSubmission, true);
     }
 
     private void checkSubmissionTypes(Assignment assignment) {
@@ -526,14 +468,14 @@ public class SubmissionDetailsFragment extends ParentFragment {
                     // TODO  Open Submission view, "Go To Discussion" or "Go To Quiz"
                     if (assignment.getDiscussionTopicHeader() != null && assignment.getDiscussionTopicHeader().getId() > 0 && assignment.getCourseId() > 0) //Allow the user to go to the discussion.
                     {
-                        String url = DiscussionTopic.getDiscussionURL(APIHelpers.loadProtocol(getContext()), APIHelpers.getDomain(getContext()), assignment.getCourseId(), assignment.getDiscussionTopicHeader().getId());
-                        if(!RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true)) {
+                        String url = DiscussionTopic.getDiscussionURL(ApiPrefs.getProtocol(), ApiPrefs.getDomain(), assignment.getCourseId(), assignment.getDiscussionTopicHeader().getId());
+                        if(!RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true)) {
                             Intent intent = new Intent(getActivity(), InternalWebViewActivity.class);
                             getActivity().startActivity(intent);
                         }
                     } else if (assignment.getQuizId() > 0) {
                         String url = getQuizURL(getActivity(), assignment.getCourseId(), assignment.getQuizId());
-                        if(!RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true)) {
+                        if(!RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true)) {
                             Intent intent = new Intent(getActivity(), InternalWebViewActivity.class);
                             getActivity().startActivity(intent);
                         }
@@ -542,13 +484,13 @@ public class SubmissionDetailsFragment extends ParentFragment {
                         String authenticationURL = assignment.getUrl();
                         if (authenticationURL == null || authenticationURL.equalsIgnoreCase("null")) {
                             //get the assignment
-                            AssignmentAPI.getAssignment(course.getId(), assignment.getId(), canvasCallbackAssignment);
+                            AssignmentManager.getAssignment(assignment.getId(), course.getId(), true, canvasCallbackAssignment);
                             return;
                         } else {
-                            SubmissionAPI.getLTIFromAuthenticationURL(APIHelpers.removeDomainFromUrl(assignment.getUrl()), canvasCallbackLTITool);
+                            SubmissionManager.getLtiFromAuthenticationUrl(assignment.getUrl(), canvasCallbackLTITool, true);
                         }
                     } else {
-                        if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                        if(!APIHelper.hasNetworkConnection()) {
                             Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -572,7 +514,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
                 @Override
                 public void onClick(View v) {
                     //try to submit the comment
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -582,8 +524,8 @@ public class SubmissionDetailsFragment extends ParentFragment {
             mediaComment.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = KalturaMediaUploadPicker.createIntentForSubmissionComment(getContext(), assignment);
-                    assignmentFragment.get().startActivityForResult(intent, RequestCodes.KALTURA_REQUEST);
+                    Intent intent = NotoriousMediaUploadPicker.createIntentForSubmissionComment(getContext(), assignment);
+                    assignmentFragment.get().startActivityForResult(intent, RequestCodes.NOTORIOUS_REQUEST);
                 }
             });
         }
@@ -619,15 +561,19 @@ public class SubmissionDetailsFragment extends ParentFragment {
                     Submission submission = (Submission)adapter.getAdapter().getItem(position);
                     //if there are no comments it means this is a submission history, which means
                     //it has the details that we need
-                    if(submission.getComments().size() == 0) {
+                    if(submission.getSubmissionComments().size() == 0) {
                         if(submission.getSubmissionType().equals("online_upload") || submission.getSubmissionType().equals("media_recording")) {
                             if(submission.getAttachments().size() == 1) {
                                 //makes more sense to open the file since they should already have it on their device
-                                openMedia(submission.getAttachments().get(0).getMimeType(), submission.getAttachments().get(0).getUrl(), submission.getAttachments().get(0).getFilename());
+                                if(submission.getAttachments().get(0).getContentType().contains("pdf")) {
+                                    openMedia(true, submission.getAttachments().get(0).getContentType(), submission.getAttachments().get(0).getUrl(), submission.getAttachments().get(0).getFilename());
+                                } else {
+                                    openMedia(submission.getAttachments().get(0).getContentType(), submission.getAttachments().get(0).getUrl(), submission.getAttachments().get(0).getFilename());
+                                }
 
                             } else if (submission.getMediaComment() != null){
                                 MediaComment mediaComment = submission.getMediaComment();
-                                openMedia(mediaComment.getMimeType(), mediaComment.getUrl(), mediaComment.getFileName());
+                                openMedia(mediaComment.getContentType(), mediaComment.getUrl(), mediaComment.get_fileName());
                             }
                             else {
                                 //show a list dialog of the files to download.
@@ -667,7 +613,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
         addComment.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -686,7 +632,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
     public static String getQuizURL(Context context, long courseid, long quizId) {
         //https://mobiledev.instructure.com/api/v1/courses/24219/quizzes/1129998/
         ApplicationManager AM = (ApplicationManager) context.getApplicationContext();
-        return APIHelpers.loadProtocol(context) + "://" + APIHelpers.getDomain(context) + "/courses/" + courseid + "/quizzes/" + quizId;
+        return ApiPrefs.getProtocol() + "://" + ApiPrefs.getDomain() + "/courses/" + courseid + "/quizzes/" + quizId;
     }
 
     /**
@@ -716,7 +662,13 @@ public class SubmissionDetailsFragment extends ParentFragment {
                                     long id) {
                 Attachment attachment = (Attachment)adapter.getAdapter().getItem(position);
 
-                openMedia(attachment.getMimeType(), attachment.getUrl(), attachment.getFilename());
+                // If this is a pdf, we want to make sure we disable annotations/etc
+                if(attachment.getContentType().contains("pdf")) {
+                    openMedia(true, attachment.getContentType(), attachment.getUrl(), attachment.getFilename());
+                } else {
+                    openMedia(attachment.getContentType(), attachment.getUrl(), attachment.getFilename());
+                }
+
             }
         });
         dlg.show();
@@ -735,7 +687,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
             //disable the comment button so the user can't submit the same comment multiple times.
             //It gets enabled after the api call is made
             submitComment.setEnabled(false);
-            SubmissionAPI.postSubmissionComment(course, assignmentId, APIHelpers.getCacheUser(getContext()).getId(), currentMessage, false, canvasCallbackMessage);
+            SubmissionManager.postSubmissionComment(course.getId(), assignmentId, ApiPrefs.getUser().getId(), currentMessage, false, canvasCallbackMessage);
         }
     }
 
@@ -752,7 +704,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
 
         if(comment.getCreatedAt()!=null)
-            date.setText(DateHelpers.getDateTimeString(getContext(), comment.getCreatedAt()));
+            date.setText(DateHelper.getDateTimeString(getContext(), comment.getCreatedAt()));
 
         message.setText(comment.getComment());
 
@@ -767,7 +719,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
         extras.removeAllViews();
 
         //If there is a media comment, add it.
-        final MediaComment mc = message.getMedia_comment();
+        final MediaComment mc = message.getMediaComment();
         if(mc != null)
         {
             populateMediaComments(extras, message, mc);
@@ -846,7 +798,11 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
         //the text should be the display name
         TextView content = (TextView) extra.findViewById(R.id.content);
-        content.setText(mediaComment.getDisplayName(message.getCreatedAt()));
+        String displayName = mediaComment.getDisplayName();
+        if (displayName == null || "null".equals(displayName)) {
+            displayName = mediaComment.get_fileName();
+        }
+        content.setText(displayName);
 
         //Underline the text view.
         content.setPaintFlags(content.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -868,10 +824,10 @@ public class SubmissionDetailsFragment extends ParentFragment {
         divider.setBackgroundColor(getResources().getColor(R.color.gray));
 
         //Set hidden mimetype url display name. filename. id
-        extra.findViewById(R.id.mime).setTag(mediaComment.getMimeType());
+        extra.findViewById(R.id.mime).setTag(mediaComment.getContentType());
         extra.findViewById(R.id.url).setTag(mediaComment.getUrl());
-        extra.findViewById(R.id.file).setTag(mediaComment.getMediaId() + "." + FileUtilities.getFileExtensionFromMimetype(mediaComment.getMimeType()));
-        extra.findViewById(R.id.display).setTag(mediaComment.getDisplayName(message.getCreatedAt()));
+        extra.findViewById(R.id.file).setTag(mediaComment.getMediaId() + "." + FileUtils.getFileExtensionFromMimetype(mediaComment.getContentType()));
+        extra.findViewById(R.id.display).setTag(displayName);
 
         //allow long presses to show context menu
         registerForContextMenu(extra);
@@ -880,7 +836,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
             @Override
             public void onClick(View v) {
-                openMedia(mediaComment.getMimeType(), mediaComment.getUrl(), mediaComment.getMediaId() + "." + FileUtilities.getFileExtensionFromMimetype(mediaComment.getMimeType()));
+                openMedia(mediaComment.getContentType(), mediaComment.getUrl(), mediaComment.getMediaId() + "." + FileUtils.getFileExtensionFromMimetype(mediaComment.getContentType()));
             }});
 
         //Add the view
@@ -939,7 +895,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
                 @Override
                 public void onClick(View v) {
-                    openMedia(atts.get(j).getMimeType(),atts.get(j).getUrl(), atts.get(j).getFilename());
+                    openMedia(atts.get(j).getContentType(),atts.get(j).getUrl(), atts.get(j).getFilename());
                 }});
 
             //allows context menu to appear on long press
@@ -967,26 +923,26 @@ public class SubmissionDetailsFragment extends ParentFragment {
         }
 
         //update the parent assignment with the new submission
-        if (result.getSubmitDate() != null) {
+        if (result.getSubmittedAt() != null) {
             //"xml" should hold the latest submission
             if (submissionDetailsFragmentCallback != null) {
-                submissionDetailsFragmentCallback.updateSubmissionDate(result.getSubmitDate());
+                submissionDetailsFragmentCallback.updateSubmissionDate(result.getSubmittedAt());
             }
         }
 
         adapter.subList.clear();
         //now see if there are any submission history
         //a submission history is just a submission
-        for(int i = 0; i < result.getSubmissionHistory().size(); i++) {
+        for (Submission submission : result.getSubmissionHistory()) {
             //we don't want to include submissions that aren't actually submitted.  For instance, when a comment
             //is made there is a submission created, even though the submission is basically empty
 
             //also, we don't want to include an assignment if there is no submission date or type.
             //Canvas creates a dummy submission to show the grade, but if there isn't a type or a date, it's pointless to show it in the list as there is nothing to show.
-            boolean hasNoSubmission = result.getSubmissionHistory().get(i).getSubmitDate() == null || result.getSubmissionHistory().get(i).getSubmissionType() == null;
+            boolean hasNoSubmission = submission == null || submission.getSubmittedAt() == null || submission.getSubmissionType() == null;
 
-            if(!result.getSubmissionHistory().get(i).getWorkflowState().equals("unsubmitted") && !hasNoSubmission) {
-                adapter.subList.add(result.getSubmissionHistory().get(i));
+            if (!hasNoSubmission && !"unsubmitted".equals(submission.getWorkflowState())) {
+                adapter.subList.add(submission);
             }
         }
 
@@ -994,12 +950,12 @@ public class SubmissionDetailsFragment extends ParentFragment {
         //and set the comment as its comment. We're using the subList as the list backing the adapter, and
         //we need to sort them by date, and this is a fairly straightforward way of doing it
 
-        for(int i = 0; i < result.getComments().size(); i++) {
+        for(int i = 0; i < result.getSubmissionComments().size(); i++) {
             Submission newSub = new Submission();
             ArrayList<SubmissionComment> comments = new ArrayList<SubmissionComment>();
-            comments.add(result.getComments().get(i));
-            newSub.setSubmitDate(DateHelpers.getDateTimeString(getContext(), result.getComments().get(i).getCreatedAt()));
-            newSub.setComments(comments);
+            comments.add(result.getSubmissionComments().get(i));
+            newSub.setSubmittedAt(result.getSubmissionComments().get(i).getCreatedAt());
+            newSub.setSubmissionComments(comments);
             adapter.subList.add(newSub);
         }
 
@@ -1007,13 +963,13 @@ public class SubmissionDetailsFragment extends ParentFragment {
         Collections.sort(adapter.subList, new Comparator<Submission>() {
             @Override
             public int compare(Submission lhs, Submission rhs) {
-                if (lhs.getSubmitDate() == null && rhs.getSubmitDate() == null)
+                if (lhs.getSubmittedAt() == null && rhs.getSubmittedAt() == null)
                     return 0;
-                if (lhs.getSubmitDate() == null && rhs.getSubmitDate() != null)
+                if (lhs.getSubmittedAt() == null && rhs.getSubmittedAt() != null)
                     return -1;
-                if (lhs.getSubmitDate() != null && rhs.getSubmitDate() == null)
+                if (lhs.getSubmittedAt() != null && rhs.getSubmittedAt() == null)
                     return 1;
-                return rhs.getSubmitDate().compareTo(lhs.getSubmitDate());
+                return rhs.getSubmittedAt().compareTo(lhs.getSubmittedAt());
             }
         });
         adapter.notifyDataSetChanged();
@@ -1082,12 +1038,12 @@ public class SubmissionDetailsFragment extends ParentFragment {
         public int getItemViewType(int position) {
             // determine which layout to use
             //if there are no comments show the submission history view
-            if(subList.get(position).getComments().size() == 0) {
+            if(subList.get(position).getSubmissionComments().size() == 0) {
                 return 0;
             }
             else {
                 //is the comment author the current user?
-                if(subList.get(position).getComments().get(0).getAuthorID() == myUserId) {
+                if(subList.get(position).getSubmissionComments().get(0).getAuthorId() == myUserId) {
                     return 2;
                 }
                 return 1;
@@ -1191,12 +1147,12 @@ public class SubmissionDetailsFragment extends ParentFragment {
                         }
 
                     }
-                    if(submission.getSubmitDate() != null) {
+                    if(submission.getSubmittedAt() != null) {
                         if(submission.getAttachments().size() > 0) {
-                            holder.title.setText(DateHelpers.getDateTimeString(context, submission.getSubmitDate()));
+                            holder.title.setText(DateHelper.getDateTimeString(context, submission.getSubmittedAt()));
                         }
                         else {
-                            holder.title.setText(DateHelpers.getDateTimeString(context, submission.getSubmitDate()));
+                            holder.title.setText(DateHelper.getDateTimeString(context, submission.getSubmittedAt()));
                         }
                     }
                 }
@@ -1215,14 +1171,14 @@ public class SubmissionDetailsFragment extends ParentFragment {
                     holder.date.setText("");
                     holder.message.setText("");
 
-                    ProfileUtils.configureAvatarView(context, submission.getComments().get(0).getAuthor().getDisplayName(), submission.getComments().get(0).getAuthor().getAvatarImageUrl(), (CircleImageView) holder.image, false);
+                    ProfileUtils.configureAvatarView(context, submission.getSubmissionComments().get(0).getAuthor().getDisplayName(), submission.getSubmissionComments().get(0).getAuthor().getAvatarImageUrl(), (CircleImageView) holder.image, false);
 
                     //if it's the current user, color the bubble the course color
                     if(getItemViewType(position) == 2) {
                         holder.chatBubble.setBackgroundDrawable(CanvasContextColor.getColoredDrawable(context, R.drawable.chat_transparent_right, color));
                     }
 
-                    populateMessage(submission.getComments().get(0), submission.getComments().get(0).getAuthor(), holder.extras, holder.title, holder.image, holder.date, holder.message);
+                    populateMessage(submission.getSubmissionComments().get(0), submission.getSubmissionComments().get(0).getAuthor(), holder.extras, holder.title, holder.image, holder.date, holder.message);
                 }
             }
 
@@ -1260,18 +1216,14 @@ public class SubmissionDetailsFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
     public void setupCallbacks() {
 
-        kalturaConfigCallback = new CanvasCallback<KalturaConfig>(this) {
+        notoriousConfigCallback = new StatusCallback<NotoriousConfig>() {
             @Override
-            public void cache(KalturaConfig kalturaConfig) {
-                return;
-            }
-
-            @Override
-            public void firstPage(KalturaConfig kalturaConfig, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<NotoriousConfig> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
-                if(kalturaConfig.isEnabled()){
+                NotoriousConfig notoriousConfig = response.body();
+                if (notoriousConfig.isEnabled()) {
                     mediaComment.setEnabled(true);
                 }
             }
@@ -1279,50 +1231,35 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
         // We use a NoNetworkErrorDelegate because sometimes old submissions are deleted.
         // We don't want to display unnecessary croutons.
-        canvasCallbackSubmission = new CanvasCallback<Submission>(this, new NoNetworkErrorDelegate()) {
+        canvasCallbackSubmission = new StatusCallback<Submission>() {
             @Override
-            public void firstPage(Submission submission, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<Submission> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
-                if (submission != null) {
-                    populateAdapter(submission);
+                if (response.body() != null) {
+                    populateAdapter(response.body());
                 }
             }
-
-            //Submission API stuff sometimes hit 404 errors.
-            //We should hide the progress dialog when that happens.
-            @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                //getting the submission fails for a teacher, so don't show the crouton
-                if (!course.isTeacher()) {
-                    return false;
-                }
-                return true;
-            }
-
         };
 
-        canvasCallbackMessage = new CanvasCallback<Submission>(this) {
-            @Override
-            public void cache(Submission submission) {
-
-            }
+        canvasCallbackMessage = new StatusCallback<Submission>() {
 
             @Override
-            public void firstPage(Submission submission, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<Submission> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
-                //See if it was successful.
-                if(submission != null) {
-                    SubmissionComment comment = submission.getComments().get(submission.getComments().size()-1);
-                    //our list is a list of Submission, so add the comment to a SubmissionGrade object
+                // See if it was successful.
+                Submission submission = response.body();
+                if (submission != null) {
+                    SubmissionComment comment = submission.getSubmissionComments().get(submission.getSubmissionComments().size() - 1);
+                    // Our list is a list of Submission, so add the comment to a SubmissionGrade object
                     Submission newSub = new Submission();
-                    ArrayList<SubmissionComment> comments = new ArrayList<SubmissionComment>();
+                    ArrayList<SubmissionComment> comments = new ArrayList<>();
                     comments.add(comment);
-                    newSub.setSubmitDate(DateHelpers.getDateTimeString(getContext(), comment.getCreatedAt()));
-                    newSub.setComments(comments);
+                    newSub.setSubmittedAt(comment.getCreatedAt());
+                    newSub.setSubmissionComments(comments);
                     adapter.subList.add(0, newSub);
 
                     message.setText("");
@@ -1332,57 +1269,56 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
                 adapter.notifyDataSetChanged();
 
-                //close the keyboard
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                // Close the keyboard
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
 
-                //enable the send message button again
+                // Enable the send message button again
                 submitComment.setEnabled(true);
-                return;
+            }
 
-            };
-
-            public boolean onFailure(RetrofitError retrofitError) {
-                //enable the send message button again if there was an Error
+            @Override
+            public void onFail(Call<Submission> callResponse, Throwable error, retrofit2.Response response) {
+                // Enable the send message button again if there was an Error
                 submitComment.setEnabled(true);
-                return false;
             }
         };
 
 
-        canvasCallbackLTITool = new CanvasCallback<LTITool>(this) {
+        canvasCallbackLTITool = new StatusCallback<LTITool>() {
             @Override
-            public void firstPage(LTITool ltiTool, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<LTITool> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
+                LTITool ltiTool = response.body();
                 String url = ltiTool.getUrl();
-                //append platform for quizzes 2 lti tool
-                Uri uri =  Uri.parse(url).buildUpon()
+                // Append platform for quizzes 2 lti tool
+                Uri uri = Uri.parse(url).buildUpon()
                         .appendQueryParameter("platform", "android")
                         .build();
 
-                //do NOT authenticate or the LTI tool won't load.
-                InternalWebviewFragment.loadInternalWebView(getActivity(), ((Navigation)getActivity()), InternalWebviewFragment.createBundle(getCanvasContext(), uri.toString(), ltiTool.getName(), false));
+                // Do NOT authenticate or the LTI tool won't load.
+                InternalWebviewFragment.loadInternalWebView(getActivity(), ((Navigation) getActivity()), InternalWebviewFragment.createBundle(getCanvasContext(), uri.toString(), ltiTool.getName(), false));
             }
 
-            //We want to handle the Error case specially in one case. It return html, but not valid json.
-            public boolean onFailure(RetrofitError retrofitError) {
-                //If it wasn't a network Error, then the LTI tool must be expired or invalid.
-                if(!retrofitError.isNetworkError() && retrofitError.getResponse() != null && retrofitError.getResponse().getStatus() != 504){
+            @Override
+            public void onFail(Call<LTITool> response, Throwable error, int code) {
+                // If it wasn't a network Error, then the LTI tool must be expired or invalid.
+                if (APIHelper.hasNetworkConnection() && code != 504) {
                     showToast(R.string.invalidExternal);
-                    return true;
                 }
-                return false;
             }
         };
 
-        canvasCallbackAssignment = new CanvasCallback<Assignment>(this) {
+        canvasCallbackAssignment = new StatusCallback<Assignment>() {
+
             @Override
-            public void firstPage(Assignment newAssignment, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<Assignment> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
+                Assignment newAssignment = response.body();
                 String authenticationURL;
                 if(newAssignment == null) {
                     authenticationURL = null;
@@ -1390,10 +1326,9 @@ public class SubmissionDetailsFragment extends ParentFragment {
                     authenticationURL = newAssignment.getUrl();
                 }
 
-                //now get the LTITool
-                //This API call handles url being null
-
-                SubmissionAPI.getLTIFromAuthenticationURLChained(APIHelpers.removeDomainFromUrl(authenticationURL), canvasCallbackLTITool, APIHelpers.isCachedResponse(response));
+                // Now get the LTITool
+                // This API call handles url being null
+                SubmissionManager.getLtiFromAuthenticationUrl(authenticationURL, canvasCallbackLTITool, true);
             }
 
         };

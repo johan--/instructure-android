@@ -45,5 +45,5 @@
     <dimen name="margin_large">16dp</dimen>
     <dimen name="tablet_margin">0dp</dimen>
     <dimen name="login_margin">32dp</dimen>
-
+    <dimen name="login_logoMargins">32dp</dimen>
 </resources>

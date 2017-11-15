@@ -361,10 +361,10 @@ public class OAuthWebLogin extends AppCompatActivity {
                     }
 
                     web.loadUrl(authenticationURL);
-			}
-			else{
-				//Error message
-				int errorId;
+                }
+                else{
+                    //Error message
+                    int errorId;
 
                     if( domainVerificationResult.getResult() == DomainVerificationResult.DomainVerificationCode.GeneralError){
                         errorId = R.string.mobileVerifyGeneral;
@@ -391,8 +391,8 @@ public class OAuthWebLogin extends AppCompatActivity {
         };
 
         getToken = new CanvasCallback<OAuthToken>(APIHelpers.statusDelegateWithContext(OAuthWebLogin.this)) {
-            @Override public void cache(OAuthToken oAuthToken) {
-            }
+            @Override
+            public void cache(OAuthToken oAuthToken, LinkHeaders linkHeaders, Response response) {}
 
             @Override
             public void firstPage(OAuthToken oAuthToken, LinkHeaders linkHeaders, Response response) {

@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">URL Ipurangi</string>
   <string name="canvasAPI_mediaRecording">Hopu pāpāho</string>
   <string name="canvasAPI_attendance">te haereraa i</string>
+  <string name="quiz_scoring_policy_highest">teitei</string>
+  <string name="quiz_scoring_policy_average">toharite</string>
+  <string name="quiz_scoring_policy_latest">hou</string>
+  <string name="no">Kāo</string>
+  <string name="always">tonu</string>
+  <string name="graded_quiz">Quiz kua mākahia</string>
+  <string name="practice_quiz">Mahi Quiz</string>
+  <string name="graded_survey">Rangahau kua mākahia</string>
+  <string name="ungraded_survey">Rangahau kāore anō i mākahia</string>
 </resources>

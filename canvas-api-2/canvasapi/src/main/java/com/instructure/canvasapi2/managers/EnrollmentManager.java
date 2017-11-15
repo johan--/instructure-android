@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,11 +18,14 @@
 package com.instructure.canvasapi2.managers;
 
 
+import android.support.annotation.NonNull;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.EnrollmentAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.util.List;
 
@@ -32,7 +35,7 @@ public class EnrollmentManager extends BaseManager {
 
     public static void getEnrollmentsForCourse(long courseId, String enrollmentType, boolean forceNetwork, StatusCallback<List<Enrollment>> callback) {
         if (isTesting() || mTesting) {
-           //TODO
+            //TODO
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
@@ -44,4 +47,45 @@ public class EnrollmentManager extends BaseManager {
         }
     }
 
+    public static void getAllEnrollmentsForCourse(final long courseId, final String enrollmentType, final boolean forceNetwork, StatusCallback<List<Enrollment>> callback) {
+        if (isTesting() || mTesting) {
+            //TODO
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            StatusCallback<List<Enrollment>> depaginatedCallback = new ExhaustiveListCallback<Enrollment>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Enrollment>> callback, @NonNull String nextUrl, boolean isCached) {
+                    EnrollmentAPI.getNextPageEnrollments(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            EnrollmentAPI.getFirstPageEnrollmentsForCourse(adapter, params, courseId, enrollmentType, depaginatedCallback);
+        }
+    }
+
+    public static void getAllEnrollmentsForUserInCourse(final long courseId, final long userId, final boolean forceNetwork, StatusCallback<List<Enrollment>> callback) {
+        if (isTesting() || mTesting) {
+            //TODO
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            StatusCallback<List<Enrollment>> depaginatedCallback = new ExhaustiveListCallback<Enrollment>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Enrollment>> callback, @NonNull String nextUrl, boolean isCached) {
+                    EnrollmentAPI.getNextPageEnrollments(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            EnrollmentAPI.getFirstPageEnrollmentsForUserInCourse(adapter, params, courseId, userId, depaginatedCallback);
+        }
+    }
 }

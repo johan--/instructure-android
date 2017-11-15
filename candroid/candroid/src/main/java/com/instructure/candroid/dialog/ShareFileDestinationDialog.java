@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -49,19 +49,18 @@ import com.instructure.candroid.adapter.FileUploadAssignmentsAdapter;
 import com.instructure.candroid.adapter.FileUploadCoursesAdapter;
 import com.instructure.candroid.util.AnimationHelpers;
 import com.instructure.candroid.util.UploadCheckboxManager;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AssignmentManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import retrofit.client.Response;
+import java.util.List;
 
 public class ShareFileDestinationDialog extends DialogFragment implements UploadCheckboxManager.OnOptionCheckedListener{
 
@@ -86,18 +85,14 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
 
     private Spinner studentCoursesSpinner;
     private Spinner assignmentSpinner;
-    private Spinner teacherCoursesSpinner;
 
     private Uri uri;
-    private boolean isTeacher;
-    private boolean isStudent;
     private ArrayList<Course> courses = new ArrayList<>();
 
     private User user;
-    private CanvasCallback<Assignment[]> canvasCallbackAssignments;
+    private StatusCallback<List<Assignment>> canvasCallbackAssignments;
     private Assignment selectedAssignment;
 
-    private FileUploadCoursesAdapter teacherEnrollmentsAdapter;
     private FileUploadCoursesAdapter studentEnrollmentsAdapter;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -208,14 +203,8 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
         //make sure the user has selected a course and an assignment
         FileUploadDialog.FileUploadType uploadType = checkboxManager.getSelectedType();
 
-        // Make sure a course was selected
-        if (uploadType == FileUploadDialog.FileUploadType.COURSE
-                    && (teacherCoursesSpinner.getSelectedItem() == null || ((Course)teacherCoursesSpinner.getSelectedItem()).getId() == Long.MIN_VALUE)){
-
-            return getString(R.string.noCourseSelected);
-        }
         // Make sure an assignment & course was selected if FileUploadType.Assignment
-        else if (uploadType == FileUploadDialog.FileUploadType.ASSIGNMENT){
+        if (uploadType == FileUploadDialog.FileUploadType.ASSIGNMENT){
             if(studentCoursesSpinner.getSelectedItem() == null){
                 return  getString(R.string.noCourseSelected);
             }
@@ -233,9 +222,6 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
             case R.id.myFilesCheckBox:
                 bundle = FileUploadDialog.createFilesBundle(uri, null);
                 break;
-            case R.id.courseFilesCheckBox:
-                bundle = FileUploadDialog.createCourseBundle(uri, (Course)teacherCoursesSpinner.getSelectedItem(), null);
-                break;
             case R.id.assignmentCheckBox:
                 bundle = FileUploadDialog.createAssignmentBundle(uri, (Course)studentCoursesSpinner.getSelectedItem(), (Assignment)assignmentSpinner.getSelectedItem());
                 break;
@@ -252,7 +238,6 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
         contentView = rootView.findViewById(R.id.dialogContents);
 
         studentCoursesSpinner = (Spinner) rootView.findViewById(R.id.studentCourseSpinner);
-        teacherCoursesSpinner = (Spinner) rootView.findViewById(R.id.teacherCourseSpinner);
         assignmentSpinner = (Spinner) rootView.findViewById(R.id.assignmentSpinner);
 
         // animated header views
@@ -264,26 +249,19 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
         initCheckBoxes(rootView);
         setRevealContentsListener();
 
-        if(isStudent){
-            rootView.findViewById(R.id.assignmentContainer).setVisibility(View.VISIBLE);
-        }
-        if(isTeacher){
-            rootView.findViewById(R.id.courseFilesContainer).setVisibility(View.VISIBLE);
-        }
+        rootView.findViewById(R.id.assignmentContainer).setVisibility(View.VISIBLE);
 
         return rootView;
     }
 
     private void initCheckBoxes(View view){
         CheckedTextView assignmentCheckBox = (CheckedTextView) view.findViewById(R.id.assignmentCheckBox);
-        CheckedTextView courseFilesCheckBox = (CheckedTextView) view.findViewById(R.id.courseFilesCheckBox);
         CheckedTextView myFilesCheckBox = (CheckedTextView) view.findViewById(R.id.myFilesCheckBox);
         CardView selectionIndicator = (CardView) view.findViewById(R.id.selectionIndicator);
 
         checkboxManager = new UploadCheckboxManager(this, selectionIndicator);
         checkboxManager.add(myFilesCheckBox);
         checkboxManager.add(assignmentCheckBox);
-        checkboxManager.add(courseFilesCheckBox);
     }
 
     private void setAssignmentsSpinnerToLoading(){
@@ -295,19 +273,21 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
         assignmentSpinner.setAdapter(new FileUploadAssignmentsAdapter(getActivity(), courseAssignments));
     }
 
-    private void setupCallbacks(){
-        canvasCallbackAssignments = new CanvasCallback<Assignment[]>(APIHelpers.statusDelegateWithContext(getActivity())) {
+    private void setupCallbacks() {
+        canvasCallbackAssignments = new StatusCallback<List<Assignment>>() {
             @Override
-            public void firstPage(Assignment[] assignments, LinkHeaders linkHeaders, Response response) {
-                if(!isAdded()){
+            public void onResponse(retrofit2.Response<List<Assignment>> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!isAdded()) {
                     return;
                 }
 
-                if(assignments.length > 0 && courseSelectionChanged(assignments[0].getCourseId())){
+                List<Assignment> assignments = response.body();
+
+                if (assignments.size() > 0 && courseSelectionChanged(assignments.get(0).getCourseId())) {
                     return;
                 }
 
-                ArrayList<Assignment> courseAssignments = FileUploadAssignmentsAdapter.getOnlineUploadAssignmentsList(getContext(),new ArrayList<>(Arrays.asList(assignments)));
+                ArrayList<Assignment> courseAssignments = FileUploadAssignmentsAdapter.getOnlineUploadAssignmentsList(getContext(), assignments);
                 // init student spinner
                 final FileUploadAssignmentsAdapter adapter = new FileUploadAssignmentsAdapter(getActivity(), courseAssignments);
                 assignmentSpinner.setAdapter(adapter);
@@ -340,41 +320,30 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
     }
 
     private void setupCourseSpinners() {
-        // teacher spinner
-        if(isTeacher){
-            if(teacherEnrollmentsAdapter == null){
-                teacherEnrollmentsAdapter = new FileUploadCoursesAdapter(getActivity(), getActivity().getLayoutInflater(), FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.TEACHER));
-                teacherCoursesSpinner.setAdapter(teacherEnrollmentsAdapter);
-            }else{
-                teacherEnrollmentsAdapter.setCourses(FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.TEACHER));
-            }
+
+        if(studentEnrollmentsAdapter == null){
+            studentEnrollmentsAdapter = new FileUploadCoursesAdapter(getActivity(), getActivity().getLayoutInflater(), FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.STUDENT));
+            studentCoursesSpinner.setAdapter(studentEnrollmentsAdapter);
+        }else{
+            studentEnrollmentsAdapter.setCourses(FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.STUDENT));
         }
 
-        // student spinners
-        if(isStudent){
-            if(studentEnrollmentsAdapter == null){
-                studentEnrollmentsAdapter = new FileUploadCoursesAdapter(getActivity(), getActivity().getLayoutInflater(), FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.STUDENT));
-                studentCoursesSpinner.setAdapter(studentEnrollmentsAdapter);
-            }else{
-                studentEnrollmentsAdapter.setCourses(FileUploadCoursesAdapter.getFilteredCourseList(courses, FileUploadCoursesAdapter.Type.STUDENT));
-            }
-
-            studentCoursesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    //make the allowed extensions disappear
-                    Course course = (Course) parent.getAdapter().getItem(position);
-                    //if the user is a teacher, let them know and don't let them select an assignment
-                    if(course.getId() > 0) {
-                        setAssignmentsSpinnerToLoading();
-                        AssignmentAPI.getAllAssignmentsExhaustive(course.getId(), canvasCallbackAssignments);
-                    }
+        studentCoursesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //make the allowed extensions disappear
+                Course course = (Course) parent.getAdapter().getItem(position);
+                //if the user is a teacher, let them know and don't let them select an assignment
+                if(course.getId() > 0) {
+                    setAssignmentsSpinnerToLoading();
+                    AssignmentManager.getAllAssignments(course.getId(), false, canvasCallbackAssignments);
                 }
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
-        }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
     }
 
     private boolean courseSelectionChanged(long newCourseId){
@@ -433,28 +402,22 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
         studentCoursesSpinner.setEnabled(isEnabled);
     }
 
-    private void enableTeacherSpinners(boolean isEnabled){
-        teacherCoursesSpinner.setEnabled(isEnabled);
-    }
     ///////////////////////////////////////////////////////////////////////////
     // UploadCheckboxManager overrides
     ///////////////////////////////////////////////////////////////////////////
     @Override
     public void onUserFilesSelected() {
         enableStudentSpinners(false);
-        enableTeacherSpinners(false);
     }
 
     @Override
     public void onCourseFilesSelected() {
         enableStudentSpinners(false);
-        enableTeacherSpinners(true);
     }
 
     @Override
     public void onAssignmentFilesSelected() {
         enableStudentSpinners(true);
-        enableTeacherSpinners(false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -463,17 +426,13 @@ public class ShareFileDestinationDialog extends DialogFragment implements Upload
     private void loadBundleData(){
         Bundle bundle = getArguments();
         courses   = bundle.getParcelableArrayList(Const.COURSES);
-        isTeacher = bundle.getBoolean(Const.IS_TEACHER);
-        isStudent = bundle.getBoolean(Const.IS_STUDENT);
-        user      = APIHelpers.getCacheUser(getActivity());
+        user      = ApiPrefs.getUser();
         uri       = bundle.getParcelable(Const.URI);
     }
 
-    public static Bundle createBundle(Uri uri, ArrayList<Course> courses, boolean isTeacher, boolean isStudent){
+    public static Bundle createBundle(Uri uri, ArrayList<Course> courses){
         Bundle bundle = new Bundle();
         bundle.putParcelable(Const.URI, uri);
-        bundle.putBoolean(Const.IS_STUDENT, isStudent);
-        bundle.putBoolean(Const.IS_TEACHER, isTeacher);
         bundle.putParcelableArrayList(Const.COURSES, courses);
         return bundle;
     }

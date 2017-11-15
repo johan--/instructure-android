@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,13 +17,15 @@
 
 package com.instructure.canvasapi2.managers;
 
-import com.instructure.canvasapi2.AppManager;
+import android.support.annotation.NonNull;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.RecipientAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Recipient;
 import com.instructure.canvasapi2.tests.RecipientManager_Test;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.util.List;
 
@@ -46,7 +48,47 @@ public class RecipientManager extends BaseManager {
                     .withPerPageQueryParam(true)
                     .withShouldIgnoreToken(false)
                     .build();
-            RecipientAPI.getFirstPageRecipients(searchQuery, context, callback, adapter, params);
+            RecipientAPI.getRecipients(searchQuery, context, callback, adapter, params);
+        }
+    }
+
+    public static void searchAllRecipients(final boolean forceNetwork, String searchQuery, String context, StatusCallback<List<Recipient>> callback) {
+        if (isTesting() || mTesting) {
+            // TODO...
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            StatusCallback<List<Recipient>> depaginatedCallback = new ExhaustiveListCallback<Recipient>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Recipient>> callback, @NonNull String nextUrl, boolean isCached) {
+                    RecipientAPI.getNextPageRecipients(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            RecipientAPI.getFirstPageRecipients(forceNetwork, searchQuery, context, adapter, depaginatedCallback);
+        }
+    }
+
+    /**
+     * Synthetic contexts == sections and groups, so this will return only actual users, not groups or sections
+     *
+     * @param forceNetwork
+     * @param searchQuery
+     * @param context
+     * @param callback
+     */
+    public static void searchAllRecipientsNoSyntheticContexts(final boolean forceNetwork, String searchQuery, String context, StatusCallback<List<Recipient>> callback) {
+        if (isTesting() || mTesting) {
+            // TODO...
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            StatusCallback<List<Recipient>> depaginatedCallback = new ExhaustiveListCallback<Recipient>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Recipient>> callback, @NonNull String nextUrl, boolean isCached) {
+                    RecipientAPI.getNextPageRecipients(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            RecipientAPI.getFirstPageRecipientsNoSyntheticContexts(forceNetwork, searchQuery, context, adapter, depaginatedCallback);
         }
     }
 

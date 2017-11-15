@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ public class RequestCodes {
     public final static int CHOOSE_RECIPIENTS = 2002;
     public final static int CHOOSE_RECIPIENTS_SELECT_CONTEXT = 2003;
 
-    //Kaltura Request
-    public final static int KALTURA_REQUEST = 3000;
+    // Notorious Request
+    public final static int NOTORIOUS_REQUEST = 3000;
     public final static int SELECT_MEDIA = 3001;
     public final static int TAKE_VIDEO = 3002;
 
@@ -40,6 +40,7 @@ public class RequestCodes {
     public final static int CAMERA_PIC_REQUEST = 4000;
     public final static int PICK_IMAGE_GALLERY = 4001;
     public final static int PROFILE_SETTINGS = 4002;
+    public final static int CROP_IMAGE = 4003;
 
     public final static int SIGNED_IN = 5000;
 

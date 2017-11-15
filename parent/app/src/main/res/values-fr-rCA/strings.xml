@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Dites-nous quelles fonctions de l\'application vous plaisent le plus</string>
     <string name="sendFeedback">Envoyer un avis</string>
     <string name="sendMail">Envoyer un courriel&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domaine :</string>
     <string name="help_versionNum">Version :</string>
     <string name="help_userId">Identifiant de l\'utilisateur :</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Seuls les observateurs Canvas peuvent s\'identifier dans Canvas Parent.</string>
     <string name="open_source">Logiciel libre</string>
     <string name="open_source_details">Afficher les licences de logiciel libre</string>
+
+    <string name="unitedStates">États-Unis d\'Amérique</string>
+    <string name="theUnitedStates">Les États-Unis d\'Amérique</string>
+    <string name="canada">Canada</string>
+    <string name="ireland">Irlande</string>
+    <string name="australia">Australie</string>
+    <string name="germany">Allemagne</string>
+    <string name="singapore">Singapour</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Choisissez la région de l\'étudiant</string>
+    <string name="selectRegion">Sélecteur de région</string>
+    <string name="unauthorizedRegion">Région non autorisée</string>
+    <string name="mismatchedRegionMessage">Cet établissement est situé à l\'extérieur de votre région sélectionnée. Pour ajouter un étudiant à cet établissement, veuillez utiliser le « sélecteur de région » sur la page de connexion pour créer un compte dans la région de %1$s.</string>
 </resources>

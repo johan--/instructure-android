@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.instructure.androidpolling.app.R;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.utils.DateHelper;
 
 import java.util.Date;
 
@@ -32,27 +32,15 @@ import butterknife.ButterKnife;
 
 public class PollRowFactory {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // View Holder
-    ///////////////////////////////////////////////////////////////////////////
-
-
-
     static class ViewHolder {
-        @BindView(R.id.title)
-        TextView title;
-
-        @BindView(R.id.sectionName)
-        TextView sectionName;
-
-        @BindView(R.id.createdDate)
-        TextView createdDate;
+        @BindView(R.id.title) TextView title;
+        @BindView(R.id.sectionName) TextView sectionName;
+        @BindView(R.id.createdDate) TextView createdDate;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }
-
 
     static class GroupViewHolder {
         @BindView(R.id.groupText)
@@ -69,14 +57,13 @@ public class PollRowFactory {
             convertView = inflater.inflate(R.layout.listview_item_poll_session_student, null);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         holder.title.setText(question);
         holder.sectionName.setText(sectionName);
-        holder.createdDate.setText(APIHelpers.dateToDayMonthYearString(context, createdAt));
+        holder.createdDate.setText(DateHelper.dateToDayMonthYearString(context, createdAt));
 
         return convertView;
     }
@@ -88,8 +75,7 @@ public class PollRowFactory {
             convertView = inflater.inflate(R.layout.listview_group_open_polls, null);
             holder = new GroupViewHolder(convertView);
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (GroupViewHolder) convertView.getTag();
         }
 

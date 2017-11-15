@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">告訴我們本程式最讓您滿意之處</string>
     <string name="sendFeedback">發送回饋</string>
     <string name="sendMail">發送電子郵件&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">域名：</string>
     <string name="help_versionNum">版本：</string>
     <string name="help_userId">使用者 ID：</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">只有 Canvas 監督人才能在 Canvas Parent 進行驗證。</string>
     <string name="open_source">開源</string>
     <string name="open_source_details">查看開源許可證</string>
+
+    <string name="unitedStates">美國</string>
+    <string name="theUnitedStates">美國</string>
+    <string name="canada">加拿大</string>
+    <string name="ireland">愛爾蘭</string>
+    <string name="australia">澳大利亞</string>
+    <string name="germany">德國</string>
+    <string name="singapore">新加坡</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">選擇學生地區</string>
+    <string name="selectRegion">地區選擇器</string>
+    <string name="unauthorizedRegion">未經授權的地區</string>
+    <string name="mismatchedRegionMessage">該機構位於您選擇的地區以外。要在此機構添加一名學生，請使用登入頁面上的「地區選擇器」選項在 %1$s 地區創建一個帳戶。</string>
 </resources>

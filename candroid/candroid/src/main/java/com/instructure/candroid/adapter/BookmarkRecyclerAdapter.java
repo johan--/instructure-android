@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,19 +23,20 @@ import android.view.View;
 import com.instructure.candroid.binders.BookmarkBinder;
 import com.instructure.candroid.holders.BookmarkViewHolder;
 import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
-import com.instructure.canvasapi.api.BookmarkAPI;
-import com.instructure.canvasapi.model.Bookmark;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.BookmarkManager;
+import com.instructure.canvasapi2.models.Bookmark;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import java.util.List;
+
+import retrofit2.Call;
 
 public class BookmarkRecyclerAdapter extends BaseListRecyclerAdapter<Bookmark, BookmarkViewHolder> {
 
-    private CanvasCallback<Bookmark[]> bookmarksCallback;
+    private StatusCallback<List<Bookmark>> bookmarksCallback;
     private BookmarkAdapterToFragmentCallback<Bookmark> mAdapterToFragmentCallback;
     private boolean mIsShortcutActivity = false;
 
@@ -79,34 +80,32 @@ public class BookmarkRecyclerAdapter extends BaseListRecyclerAdapter<Bookmark, B
     }
 
     @Override
-    public void contextReady() {
-
-    }
-
-    @Override
     public void setupCallbacks() {
-        bookmarksCallback = new CanvasCallback<Bookmark[]>(this) {
+        bookmarksCallback = new StatusCallback<List<Bookmark>>() {
+
             @Override
-            public void firstPage(Bookmark[] bookmarks, LinkHeaders linkHeaders, Response response) {
-
-                addAll(bookmarks);
-                setNextUrl(linkHeaders.nextURL);
-
+            public void onResponse(retrofit2.Response<List<Bookmark>> response, LinkHeaders linkHeaders, ApiType type) {
+                addAll(response.body());
+                setNextUrl(linkHeaders.nextUrl);
                 mAdapterToFragmentCallback.onRefreshFinished();
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                if (retrofitError.getResponse() != null && !APIHelpers.isCachedResponse(retrofitError.getResponse()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            public void onFail(Call<List<Bookmark>> callResponse, Throwable error, retrofit2.Response response) {
+                if (response != null && !APIHelper.isCachedResponse(response) || !APIHelper.hasNetworkConnection()) {
                     getAdapterToRecyclerViewCallback().setIsEmpty(true);
                 }
-                return super.onFailure(retrofitError);
+            }
+
+            @Override
+            public void onFinished(ApiType type) {
+                BookmarkRecyclerAdapter.this.onCallbackFinished();
             }
         };
     }
 
     @Override
     public void loadData() {
-        BookmarkAPI.getBookmarks(bookmarksCallback);
+        BookmarkManager.getBookmarks(bookmarksCallback, isRefresh());
     }
 }

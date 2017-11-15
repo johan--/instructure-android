@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -57,11 +57,10 @@ import com.instructure.candroid.fragment.SettingsFragment;
 import com.instructure.candroid.fragment.SyllabusFragment;
 import com.instructure.candroid.fragment.UnSupportedFeatureFragment;
 import com.instructure.candroid.fragment.UnSupportedTabFragment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.loginapi.login.interfaces.AnalyticsEventHandling;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.ArrayList;
@@ -169,7 +168,7 @@ public class RouterUtils {
         sRoutes.add(new Route(courseOrGroup("/:course_id/calendar_events/:event_id"), CalendarListViewFragment.class));
 
         // Syllabus
-        sRoutes.add(new Route(courseOrGroup("/:course_id/assignments/syllabus"), ScheduleListFragment.class, SyllabusFragment.class, Tab.SYLLABUS_ID));
+        sRoutes.add(new Route(courseOrGroup("/:course_id/assignments/syllabus"), ScheduleListFragment.class, ScheduleListFragment.class, Tab.SYLLABUS_ID));
 
         // Assignments
         sRoutes.add(new Route(courseOrGroup("/:course_id/assignments"), AssignmentListFragment.class, Tab.ASSIGNMENTS_ID));
@@ -261,7 +260,7 @@ public class RouterUtils {
             return null;
         }
 
-        String domain = APIHelpers.getFullDomain(context);
+        String domain = ApiPrefs.getFullDomain();
         Route urlRoute = getInternalRoute(masterCls, detailCls);
         if (urlRoute != null) {
             String path = urlRoute.createUrl(replacementParams);
@@ -326,7 +325,7 @@ public class RouterUtils {
         }
         boolean isReceivedFromOutsideOfApp = !(activity instanceof BaseRouterActivity);
 
-        UrlValidity urlValidity = new UrlValidity(url, APIHelpers.getDomain(activity));
+        UrlValidity urlValidity = new UrlValidity(url, ApiPrefs.getDomain());
 
         if (!urlValidity.isValid()) {
             routeToLandingPage(activity, isReceivedFromOutsideOfApp);
@@ -353,7 +352,7 @@ public class RouterUtils {
                 activity.startActivity(intent);
             } else {
 
-                final Route route = getInternalRoute(url, APIHelpers.getDomain(activity));
+                final Route route = getInternalRoute(url, ApiPrefs.getDomain());
                 if (route != null) {
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -425,7 +424,7 @@ public class RouterUtils {
     }
 
     private static void routeToLandingPage(Context context, boolean isReceivedFromOutsideOfApp) {
-        Utils.d("routeToLandingPage()");
+        Logger.d("routeToLandingPage()");
         Intent intent = new Intent(context, NavigationActivity.getStartActivityClass());
         if(isReceivedFromOutsideOfApp) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -435,7 +434,7 @@ public class RouterUtils {
 
 
     private static void openInInternalWebViewFragment(Context context, String url, final boolean isReceivedFromOutsideOfApp) {
-        Utils.d("couldNotParseUrl()");
+        Logger.d("couldNotParseUrl()");
         // TODO test if this works
         Bundle bundle = InternalWebviewFragment.createBundle(url, null, false, null);
 

@@ -132,8 +132,6 @@
   <string name="domain">المجال</string>
   <string name="sendFeedback">إرسال تعليقات</string>
   <string name="sendMail">إرسال بريد إلكتروني...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">تحرير</string>
   <plurals name="item_count">
     <item quantity="zero">%d عناصر</item>
@@ -451,8 +449,8 @@
   <string name="could_not_find_course">حدث خطأ أثناء الحصول على دورة هذا العنصر.</string>
   <string name="could_not_find_group">حدث خطأ أثناء الحصول على مجموعة هذا العنصر.</string>
   <string name="selectBackground">تحديد خلفية</string>
-  <string name="kalturaSubmissionInProgress">جارٍ إرسال الملفات... تحقق من التحديثات من خلال شريط الإخطارات.</string>
-  <string name="kalturaSubmissionSuccessful">انتهى إرسال الملف</string>
+  <string name="notoriousSubmissionInProgress">جارٍ إرسال الملفات... تحقق من التحديثات من خلال شريط الإخطارات.</string>
+  <string name="notoriousSubmissionSuccessful">انتهى إرسال الملف</string>
   <string name="poll_title">لماذا أتيت إلى Canvas؟</string>
   <string name="poll_warning">لم يتم تحديد عنصر ما.</string>
   <string name="poll_item_1">التحقق من درجاتي</string>
@@ -489,6 +487,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">مشاركة</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">صورة الباندا الخارق</string>
   <string name="newFeatureTitle">إخطارات الأجهزة المحمولة</string>
   <string name="newFeatureMsg">لاستلام الإخطارات اللحظية على الأجهزة المحمولة، انتقل إلى إعدادات Canvas ثم الإخطارات وقم بتحديد \"لجميع الأجهزة\"</string>

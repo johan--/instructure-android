@@ -1,4 +1,3 @@
-package com.instructure.pandautils.views;
 /*
  * The MIT License (MIT)
  *
@@ -23,6 +22,7 @@ package com.instructure.pandautils.views;
  * THE SOFTWARE.
  */
 
+package com.instructure.pandautils.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -36,7 +36,6 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.animation.Animation;
@@ -45,7 +44,6 @@ import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 
 import com.instructure.pandautils.R;
-import com.instructure.pandautils.utils.Utils;
 
 
 /**

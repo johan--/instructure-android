@@ -19,10 +19,10 @@
 
 package com.instructure.androidfoosball.models
 
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-@PaperParcel
+@Parcelize
 class User(
         var id: String = "",
         var name: String = "",
@@ -30,8 +30,4 @@ class User(
         var avatar: String = "",
         var wins: Int = 0,
         var losses: Int = 0
-) : PaperParcelable {
-    companion object {
-        @JvmField val CREATOR = PaperParcelUser.CREATOR
-    }
-}
+) : Parcelable

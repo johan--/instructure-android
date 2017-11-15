@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -40,18 +40,15 @@ public class StudentPollRowFactory {
             holder = new ViewHolder(convertView);
 
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder)convertView.getTag();
         }
 
         holder.answerText.setText(answerValue.getValue());
 
-
         if(answerValue.isSelected()) {
             holder.selected.setChecked(true);
-        }
-        else {
+        } else {
             holder.selected.setChecked(false);
         }
 
@@ -63,24 +60,16 @@ public class StudentPollRowFactory {
             if(!answerValue.isSelected()) {
                 holder.answerText.setTextColor(context.getResources().getColor(R.color.gray));
             }
-        }
-        else {
+        } else {
             holder.selected.setEnabled(true);
         }
         return convertView;
-
     }
 
     static class ViewHolder {
-
-        @BindView(R.id.add_answer_container)
-        LinearLayout containerLayout;
-
-        @BindView(R.id.correctAnswer)
-        RadioButton selected;
-
-        @BindView(R.id.answer_text)
-        TextView answerText;
+        @BindView(R.id.add_answer_container) LinearLayout containerLayout;
+        @BindView(R.id.correctAnswer) RadioButton selected;
+        @BindView(R.id.answer_text) TextView answerText;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

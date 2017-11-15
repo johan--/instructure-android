@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -31,11 +31,14 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.activity.LoginActivity;
 import com.instructure.candroid.util.ApplicationManager;
 
+import java.util.List;
+
 public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.RemoteViewsFactory{
 
+    public final static String WIDGET_ERROR = "Canvas-Widget";
     protected Context mContext;
     protected boolean mIsLoggedIn;
-    private I[] mData;
+    private List<I> mData;
 
     @Override
     public void onCreate() {}
@@ -71,15 +74,15 @@ public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.R
             return;
         }
 
-        I[] apiResponse = makeApiCalls();
+        List<I> apiResponse = makeApiCalls();
 
         if(apiResponse == null){
-            Log.w(CanvasWidgetService.WIDGET_ERROR, "data is null");
+            Log.w(WIDGET_ERROR, "data is null");
             return;
         }
 
-        if(apiResponse.length == 0){
-            Log.w(CanvasWidgetService.WIDGET_ERROR, "data is empty");
+        if(apiResponse.size() == 0){
+            Log.w(WIDGET_ERROR, "data is empty");
         }
 
         mData = apiResponse;
@@ -92,10 +95,10 @@ public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.R
         } else  if(mData == null){
             return  0;
 
-        } else if(mData.length == 0){
+        } else if(mData.size() == 0){
             return 1;
         } else {
-            return mData.length;
+            return mData.size();
         }
     }
     @Override
@@ -107,13 +110,13 @@ public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.R
         }
 
         if(mData != null) {
-            if (mData.length == 0) {
+            if (mData.size() == 0) {
                 setEmptyViewText(row, R.string.noItemsToDisplayShort);
                 return row;
             }
 
-            if (mData[position] != null) {
-                setViewData(mData[position], row);
+            if (mData.get(position) != null) {
+                setViewData(mData.get(position), row);
             }
         }
 
@@ -137,8 +140,8 @@ public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.R
 
             setEmptyViewText(row, R.string.notLoggedIn);
             //create log in intent
-            Intent intent = LoginActivity.createIntent(mContext);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, CanvasWidgetService.cycleBit++, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent intent = LoginActivity.Companion.createIntent(mContext);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, CanvasWidgetProvider.cycleBit++, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             row.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
             return true;
         } else {
@@ -154,7 +157,7 @@ public abstract class CanvasWidgetRowFactory <I> implements RemoteViewsService.R
         row.setTextViewText(R.id.is_not_logged_in, mContext.getString(textResId));
     }
 
-    protected abstract I[] makeApiCalls();
+    protected abstract List<I> makeApiCalls();
     protected abstract int getLayoutId();
     protected abstract void setViewData(I objectAtPosition, RemoteViews row);
     protected abstract Intent createIntent(I objectAtPosition);

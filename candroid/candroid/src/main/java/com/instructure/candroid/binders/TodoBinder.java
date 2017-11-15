@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.TodoListRecyclerAdapter;
 import com.instructure.candroid.holders.TodoViewHolder;
 import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.ToDo;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ToDo;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class TodoBinder extends BaseBinder {
@@ -92,7 +92,7 @@ public class TodoBinder extends BaseBinder {
             case UPCOMING_ASSIGNMENT:
                 // upcoming assignments can be either grading or submitting and we don't know, so they have no prefix;
                 holder.title.setText(titlePrefix + item.getTitle());
-                todoDetails = DateHelpers.createPrefixedDateTimeString(context, R.string.dueAt, item.getComparisonDate());
+                todoDetails = DateHelper.createPrefixedDateTimeString(context, R.string.dueAt, item.getComparisonDate());
 
                 break;
             case GRADING:

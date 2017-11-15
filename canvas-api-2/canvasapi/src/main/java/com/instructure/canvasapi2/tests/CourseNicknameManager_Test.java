@@ -1,5 +1,3 @@
-package com.instructure.canvasapi2.tests;
-
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,6 +14,7 @@ package com.instructure.canvasapi2.tests;
  *     limitations under the License.
  *
  */
+package com.instructure.canvasapi2.tests;
 
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.models.CourseNickname;

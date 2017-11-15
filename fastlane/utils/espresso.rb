@@ -28,7 +28,7 @@ class Espresso
     # @option args [String] :video   OPTIONAL Record video
     def run(args = {})
       valid_apps = [Parent.app, Teacher.app]
-      app = args.fetch(:app)
+      app        = args.fetch(:app)
       ui_error "Unknown app #{app}. Must be one of: #{valid_apps.join(', ')}" unless valid_apps.include?(app)
 
       command_name  = args.fetch(:name, :espresso)
@@ -65,7 +65,7 @@ class Espresso
       logcat_file = 'fastlane_logcat.txt'
       FileUtils.rm_rf File.join(cmd_dir, logcat_file) # ensure we don't keep stale logs around.
       logcat_clear_cmd = 'adb logcat -c'
-      logcat_save_cmd = %Q(adb logcat -v long -d > "#{logcat_file}")
+      logcat_save_cmd  = %Q(adb logcat -v long -d > "#{logcat_file}")
 
       # Video recording only works on physical devices.
       # For video recordings on simulators, run the tests on Firebase Test Lab.
@@ -80,8 +80,8 @@ class Espresso
       if record_video
         remove_screen_record_cmd = %Q(adb shell rm #{mp4_path})
         _spawn_child(remove_screen_record_cmd)
-        screen_record_cmd = %Q(adb shell screenrecord #{mp4_path})
-        record_process_pid = _spawn_async(screen_record_cmd)
+        screen_record_cmd      = %Q(adb shell screenrecord #{mp4_path})
+        record_process_pid     = _spawn_async(screen_record_cmd)
         screen_record_pull_cmd = %Q(adb pull #{mp4_path} .)
       end
 
@@ -92,22 +92,22 @@ class Espresso
         # adb shell am instrument will always return exit code 0. Even on failures.
         # Manually parse the output to determine success.
         case output
-          when /FAILURES!!!/, /shortMsg=Process crashed/
-            _execute(logcat_save_cmd)
+        when /FAILURES!!!/, /shortMsg=Process crashed/
+          _execute(logcat_save_cmd)
 
-            if record_video
-              # send Ctrl+C to end recording if the process is still alive.
-              Process.kill('INT', record_process_pid) rescue nil
-              Process::waitpid(record_process_pid)
-              # screen record generates corrupt videos unless we wait a few seconds.
-              # the sleep cost is only ever paid once, on failure.
-              sleep 2
-              _execute(screen_record_pull_cmd)
-            end
+          if record_video
+            # send Ctrl+C to end recording if the process is still alive.
+            Process.kill('INT', record_process_pid) rescue nil
+            Process::waitpid(record_process_pid)
+            # screen record generates corrupt videos unless we wait a few seconds.
+            # the sleep cost is only ever paid once, on failure.
+            sleep 2
+            _execute(screen_record_pull_cmd)
+          end
 
-            File.write(instrument_file, output)
+          File.write(instrument_file, output)
 
-            ui_error('Error running the tests - see the log above')
+          ui_error('Error running the tests - see the log above')
         end
       end # execute_action
     end # def run

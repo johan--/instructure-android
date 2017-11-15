@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,56 +38,46 @@ import com.devspark.appmsg.AppMsg;
 import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.util.ApplicationManager;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.api.PollSessionAPI;
-import com.instructure.canvasapi.api.SectionAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.model.PollSessionResponse;
-import com.instructure.canvasapi.model.Section;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.managers.SectionManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.models.PollSessionResponse;
+import com.instructure.canvasapi2.models.Section;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
-public class PublishPollActivity extends FragmentActivity implements APIStatusDelegate{
+public class PublishPollActivity extends AppCompatActivity {
 
-    @BindView(R.id.courses_spinner)
-    Spinner coursesSpinner;
-
-    @BindView(R.id.section_list_view)
-    ListView sectionListView;
-
-    @BindView(R.id.publishPoll)
-    Button publishPoll;
-
-    @BindView(R.id.sectionLabel)
-    TextView sectionLabel;
+    @BindView(R.id.courses_spinner) Spinner coursesSpinner;
+    @BindView(R.id.section_list_view) ListView sectionListView;
+    @BindView(R.id.publishPoll) Button publishPoll;
+    @BindView(R.id.sectionLabel) TextView sectionLabel;
 
     private long pollID;
     private Course currentCourse;
-    //adapters
+
     private CourseSpinnerAdapter courseAdapter;
     private SectionListAdapter sectionAdapter;
-    //callbacks
-    private CanvasCallback<Section[]> sectionCallback;
-    private CanvasCallback<PollSessionResponse> pollSessionCallback;
-    private CanvasCallback<Response> publishPollCallback;
-    private CanvasCallback<PollSessionResponse> openPollSessionCallback;
+
+    private StatusCallback<PollSessionResponse> openPollSessionCallback;
 
     private int sessionCount = 0;
     private int sessionCreatedCount = 0;
 
-    private ArrayList<PollSession> openPollSessions = new ArrayList<PollSession>();
+    private ArrayList<PollSession> openPollSessions = new ArrayList<>();
 
     private PollSession singlePollSession;
     @Override
@@ -101,7 +91,7 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         setupClickListeners();
         setupCallbacks();
 
-        PollSessionAPI.getFirstPagePollSessions(pollID, openPollSessionCallback);
+        PollsManager.getFirstPagePollSessions(pollID, openPollSessionCallback, true);
 
         setupCourseSpinner(ApplicationManager.getCourseList(PublishPollActivity.this));
     }
@@ -109,11 +99,7 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
     ///////////////////////////////////////////////////////////////////////////
-    private void setupCourseSpinner(Course[] courses) {
-        //Can't call .add() on a List. It has to be an arraylist.
-        ArrayList<Course> courseList = new ArrayList<Course>();
-        courseList.addAll(Arrays.asList(courses));
-
+    private void setupCourseSpinner(List<Course> courseList) {
         //We only want courses we're a teacher for if we're trying to publish a poll
 
         Iterator<Course> iterator = courseList.iterator();
@@ -155,7 +141,14 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
                     sectionListView.setItemChecked(i, false);
                 }
 
-                SectionAPI.getFirstPageSectionsList(course, sectionCallback);
+                SectionManager.getAllSectionsForCourse(course.getId(), new StatusCallback<List<Section>>() {
+                    @Override
+                    public void onResponse(retrofit2.Response<List<Section>> response, com.instructure.canvasapi2.utils.LinkHeaders linkHeaders, ApiType type) {
+                        setupSectionAdapter(response.body());
+                        ApplicationManager.saveSections(PublishPollActivity.this, response.body(), ((Course)coursesSpinner.getSelectedItem()).getId());
+
+                    }
+                }, true);
             }
 
             @Override
@@ -165,15 +158,12 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         });
     }
 
-    private void setupSectionAdapter(Section[] sections) {
+    private void setupSectionAdapter(List<Section> sectionList) {
         sectionLabel.setVisibility(View.VISIBLE);
-        //Can't call .add() on a List. It has to be an arraylist.
-        final ArrayList<Section> sectionList = new ArrayList<Section>();
-        sectionList.addAll(Arrays.asList(sections));
 
         sectionAdapter = new SectionListAdapter(this, android.R.layout.simple_spinner_dropdown_item, sectionList);
 
-        if(openPollSessions.size() < sections.length && sectionList.size() > 1 && !sectionList.get(0).getName().equals(getString(R.string.entireCourse))) {
+        if(openPollSessions.size() < sectionList.size() && sectionList.size() > 1 && !sectionList.get(0).getName().equals(getString(R.string.entireCourse))) {
             Section section = new Section();
             section.setId(Long.MIN_VALUE);
             section.setName(getString(R.string.entireCourse));
@@ -267,7 +257,45 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
                     //don't want to let the user submit multiple times
                     publishPoll.setEnabled(false);
                     for(int i = 0; i < sessionCreatedCount; i++) {
-                        PollSessionAPI.createPollSession(pollID, course.getId(), sections.get(i).getId(), pollSessionCallback);
+                        PollsManager.createPollSession(pollID, course.getId(), sections.get(i).getId(), new StatusCallback<PollSessionResponse>(){
+                            @Override
+                            public void onResponse(retrofit2.Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                                List<PollSession> pollSession = response.body().getPollSessions();
+                                if(pollSession.size() > 0) {
+                                    singlePollSession = pollSession.get(0);
+                                    //publish all the sessions
+                                    PollsManager.openPollSession(pollID, pollSession.get(0).getId(), new StatusCallback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
+                                            sessionCount++;
+                                            //publish all the sessions
+                                            if(sessionCount == sessionCreatedCount) {
+
+                                                //if only one session was created we want to send the user to the results screen.
+                                                if(sessionCount == 1) {
+                                                    if(singlePollSession != null) {
+                                                        Intent intent = getIntent();
+                                                        intent.putExtra(Constants.POLL_SESSION, (Parcelable) singlePollSession);
+                                                        intent.putExtra(Constants.POLL_ID, pollID);
+                                                        setResult(Constants.PUBLISH_POLL_SUCCESS, intent);
+                                                    }
+                                                }
+                                                else {
+                                                    //then close this screen
+                                                    setResult(Constants.PUBLISH_POLL_SUCCESS_MULTIPLE);
+                                                }
+                                                finish();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFail(Call<ResponseBody> response, Throwable error) {
+                                            publishPoll.setEnabled(true);
+                                        }
+                                    }, true);
+                                }
+                            }
+                        }, true);
                     }
                 }
                 else {
@@ -310,20 +338,13 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         }
         if(courseSessionCount < sectionCount) {
             return true;
-        }
-        else {
-            return false;
-        }
-
+        } else { return false; }
     }
 
     private boolean isCourseTermActive(Course course) {
         if(course.getTerm() != null && course.getTerm().getEndAt() != null && course.getTerm().getEndAt().before(new Date())) {
             return false;
-        }
-        else {
-            return true;
-        }
+        } else { return true; }
     }
     ///////////////////////////////////////////////////////////////////////////
     // Adapters
@@ -331,10 +352,9 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
 
     public class CourseSpinnerAdapter extends ArrayAdapter<Course> {
 
-        private List<Course> courses = new ArrayList<Course>();
+        private List<Course> courses = new ArrayList<>();
 
-        public CourseSpinnerAdapter(Context context, int textViewResourceId,
-                                    List<Course> courses) {
+        public CourseSpinnerAdapter(Context context, int textViewResourceId, List<Course> courses) {
             super(context, textViewResourceId, courses);
             this.courses = courses;
         }
@@ -344,21 +364,16 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         }
 
         @Override
-        public View getDropDownView(int position, View convertView,
-                                    ViewGroup parent) {
-
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
             return getCustomView(position, convertView, parent);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             return getCustomView(position, convertView, parent);
         }
 
         public View getCustomView(int position, View convertView, ViewGroup parent) {
-
-
             CourseViewHolder holder = null;
 
             if ( convertView == null )  {
@@ -391,7 +406,7 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
 
     public class SectionListAdapter extends ArrayAdapter<Section> {
 
-        private List<Section> sections = new ArrayList<Section>();
+        private List<Section> sections = new ArrayList<>();
 
         public SectionListAdapter(Context context, int textViewResourceId,
                                   List<Section> sections) {
@@ -404,15 +419,12 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         }
 
         @Override
-        public View getDropDownView(int position, View convertView,
-                                    ViewGroup parent) {
-
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
             return getCustomView(position, convertView, parent);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             return getCustomView(position, convertView, parent);
         }
 
@@ -422,7 +434,6 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
         }
 
         public View getCustomView(int position, View convertView, ViewGroup parent) {
-
 
             SectionViewHolder holder = null;
 
@@ -455,98 +466,19 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
             return convertView;
         }
     }
+
     private static class SectionViewHolder {
         CheckedTextView sectionName;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Callbacks
-    ///////////////////////////////////////////////////////////////////////////
-
-
     private void setupCallbacks() {
 
-        sectionCallback = new CanvasCallback<Section[]>(this) {
+        openPollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(Section[] sections) {
+            public void onResponse(retrofit2.Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(Section[] sections, LinkHeaders linkHeaders, Response response) {
-                setupSectionAdapter(sections);
-                ApplicationManager.saveSections(PublishPollActivity.this, sections, ((Course)coursesSpinner.getSelectedItem()).getId());
-            }
-        };
-
-        pollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
-            @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
-
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSession = pollSessionResponse.getPollSessions();
-                singlePollSession = pollSession.get(0);
-                //publish all the sessions
-                PollSessionAPI.openPollSession(pollID, pollSession.get(0).getId(), publishPollCallback);
-            }
-
-            @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                //re-enable the publish button since there was an error
-                publishPoll.setEnabled(true);
-                return super.onFailure(retrofitError);
-            }
-        };
-
-        publishPollCallback = new CanvasCallback<Response>(this) {
-            @Override
-            public void cache(Response response) {
-
-            }
-
-            @Override
-            public void firstPage(Response response1, LinkHeaders linkHeaders, Response response) {
-                sessionCount++;
-                //publish all the sessions
-                if(sessionCount == sessionCreatedCount) {
-
-                    //if only one session was created we want to send the user to the results screen.
-                    if(sessionCount == 1) {
-                        if(singlePollSession != null) {
-                            Intent intent = getIntent();
-                            intent.putExtra(Constants.POLL_SESSION, (Parcelable) singlePollSession);
-                            intent.putExtra(Constants.POLL_ID, pollID);
-                            setResult(Constants.PUBLISH_POLL_SUCCESS, intent);
-                        }
-                    }
-                    else {
-                        //then close this screen
-                        setResult(Constants.PUBLISH_POLL_SUCCESS_MULTIPLE);
-                    }
-                    finish();
-                }
-            }
-
-            @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                //re-enable the publish button since there was an error
-                publishPoll.setEnabled(true);
-                return super.onFailure(retrofitError);
-            }
-        };
-
-        openPollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
-            @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
-
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 if(pollSessions != null) {
                     for(PollSession pollSession : pollSessions) {
                         if(pollSession.is_published()) {
@@ -555,40 +487,12 @@ public class PublishPollActivity extends FragmentActivity implements APIStatusDe
                     }
                 }
 
-                if(linkHeaders.nextURL != null) {
-                    PollSessionAPI.getNextPagePollSessions(linkHeaders.nextURL, openPollSessionCallback);
+                if(StatusCallback.moreCallsExist(linkHeaders)) {
+                    PollsManager.getNextPagePollSessions(linkHeaders.nextUrl, this, true);
                 }
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // APIStatusDelegate Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
-    }
-
-    @Override
-    public void onNoNetwork() {
-
-    }
-
-    @Override
-    public Context getContext() {
-        return this;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Intent
-    ///////////////////////////////////////////////////////////////////////////
 
     public static Intent createIntent(Context context, long pollId) {
         Intent intent = new Intent(context, PublishPollActivity.class);

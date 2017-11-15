@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public class CourseAPI extends BuildInterfaceAPI {
         void getCourseWithSyllabus(@Path("courseid") long courseId, CanvasCallback<Course> callback);
 
         // I don't see why we wouldn't want to always get the grades
-        @GET("/courses?include[]=term&include[]=total_scores&include[]=license&include[]=is_public&include[]=needs_grading_count&include[]=permissions&include[]=favorites&include[]=current_grading_period_scores")
+        @GET("/courses?include[]=term&include[]=total_scores&include[]=license&include[]=is_public&include[]=needs_grading_count&include[]=permissions&include[]=favorites&include[]=current_grading_period_scores&enrollment_state=active")
         void getFirstPageCourses(CanvasCallback<Course[]> callback);
 
         @GET("/{next}?&include[]=needs_grading_count&include[]=permissions&include[]=favorites")

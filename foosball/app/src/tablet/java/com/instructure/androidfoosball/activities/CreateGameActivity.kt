@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball.activities
 
 import android.graphics.Color
@@ -9,21 +25,18 @@ import com.google.firebase.database.*
 import com.instructure.androidfoosball.App
 import com.instructure.androidfoosball.R
 import com.instructure.androidfoosball.ktmodels.*
-import com.instructure.androidfoosball.adapters.UserAdapter
-import com.instructure.androidfoosball.utils.copyToRealmOrUpdate
-import com.instructure.androidfoosball.utils.edit
-import com.instructure.androidfoosball.utils.mCommentator
-import com.instructure.androidfoosball.utils.setVisible
+import com.instructure.androidfoosball.utils.*
 import com.instructure.androidfoosball.views.ConfirmPinDialog
 import com.instructure.androidfoosball.views.TeamLayout
 import kotlinx.android.synthetic.tablet.activity_create_game.*
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.sdk21.listeners.onClick
 import org.jetbrains.anko.startActivity
 
 class CreateGameActivity : AppCompatActivity() {
 
     private val mTable = Table.getSelectedTable()
     private val mIncomingNfcRef = FirebaseDatabase.getInstance().reference.child("incoming").child(mTable.id)
+    private val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     private val BEST_OF_DEFAULT = 3
     private val POINTS_DEFAULT = 5
@@ -32,17 +45,19 @@ class CreateGameActivity : AppCompatActivity() {
         set(value) {
             field = value
             bestOfButton.text = value.toString()
+            updateDurationRange()
         }
 
     private var points = 0
         set(value) {
             field = value
             pointButton.text = value.toString()
+            updateDurationRange()
         }
 
     private val nfcListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            val nfc = dataSnapshot.getValue(NfcAssignment::class.java)
+            val nfc = dataSnapshot.getValue(NfcAssignment::class.java) ?: return
             if (nfc.sideOne.isBlank() && nfc.sideTwo.isBlank()) return
             fun getUserById(userId: String): User? = App.realm.where(User::class.java).equalTo("id", userId).findFirst()
             when {
@@ -76,6 +91,10 @@ class CreateGameActivity : AppCompatActivity() {
         teamOneLayout.onAddPlayerClicked = { selectPlayer(teamOneLayout) }
         teamTwoLayout.onAddPlayerClicked = { selectPlayer(teamTwoLayout) }
 
+        // Player selection listeners
+        teamOneLayout.onAddTeamClicked = { selectTeam(teamOneLayout) }
+        teamTwoLayout.onAddTeamClicked = { selectTeam(teamTwoLayout) }
+
         // Team changed listeners
         teamOneLayout.onTeamChanged = { onTeamChanged(TableSide.SIDE_1) }
         teamTwoLayout.onTeamChanged = { onTeamChanged(TableSide.SIDE_2) }
@@ -86,7 +105,7 @@ class CreateGameActivity : AppCompatActivity() {
             val options = (1..9 step 2).toList()
             MaterialDialog.Builder(this)
                     .items(options)
-                    .itemsCallback { materialDialog, view, i, charSequence -> bestOf = options[i] }
+                    .itemsCallback { _, _, i, _ -> bestOf = options[i] }
                     .show()
         }
 
@@ -96,7 +115,7 @@ class CreateGameActivity : AppCompatActivity() {
             val options = (3..15).toList()
             MaterialDialog.Builder(this)
                     .items(options)
-                    .itemsCallback { materialDialog, view, i, charSequence -> points = options[i] }
+                    .itemsCallback { _, _, i, _ -> points = options[i] }
                     .show()
         }
 
@@ -107,13 +126,19 @@ class CreateGameActivity : AppCompatActivity() {
                         .title(R.string.uneven_teams)
                         .content(R.string.uneven_teams_content)
                         .positiveText(android.R.string.yes)
-                        .onPositive { materialDialog, dialogAction -> createGame() }
+                        .onPositive { _, _ -> createGame() }
                         .negativeText(android.R.string.no)
                         .show()
             } else {
                 createGame()
             }
         }
+    }
+
+    private fun updateDurationRange() {
+        val minGoals = points * (bestOf / 2 + 1)
+        val maxGoals = bestOf * (points * 2 - 1)
+        durationView.text = getString(R.string.durationRange, minGoals, maxGoals)
     }
 
     private fun onTeamChanged(side: TableSide) {
@@ -123,12 +148,10 @@ class CreateGameActivity : AppCompatActivity() {
 
         if (side == TableSide.SIDE_1) {
             // Update team one custom name
-            val customNameTeamOne = App.realm.where(CustomTeamName::class.java).equalTo("teamHash", teamOneLayout.team.getTeamHash()).findFirst()
-            teamOneNameView.setText(if (customNameTeamOne != null) customNameTeamOne.name else mTable.sideOneName)
+            teamOneNameView.setText(teamOneLayout.team.teamName.elseIfBlank(mTable.sideOneName))
         } else {
             // Update team two custom name
-            val customNameTeamTwo = App.realm.where(CustomTeamName::class.java).equalTo("teamHash", teamTwoLayout.team.getTeamHash()).findFirst()
-            teamTwoNameView.setText(if (customNameTeamTwo != null) customNameTeamTwo.name else mTable.sideTwoName)
+            teamTwoNameView.setText(teamTwoLayout.team.teamName.elseIfBlank(mTable.sideTwoName))
         }
 
 
@@ -139,15 +162,19 @@ class CreateGameActivity : AppCompatActivity() {
     }
 
     private fun selectPlayer(teamLayout: TeamLayout) {
-        val users: List<User> = App.realm.where(User::class.java).findAllSorted("name").toList()
-        MaterialDialog.Builder(this)
-                .title(R.string.pick_a_user)
-                .adapter(UserAdapter(this, users)) { dialog, itemView, which, text ->
-                    dialog.dismiss()
-                    ConfirmPinDialog(this, users[which]) { user ->
-                        addUser(user, teamLayout)
-                    }.show()
-                }.show()
+        showUserPicker(this) {
+            ConfirmPinDialog(this, it) { confirmedUser ->
+                addUser(confirmedUser, teamLayout)
+            }.show()
+        }
+    }
+
+    private fun selectTeam(teamLayout: TeamLayout) {
+        showTeamPicker(this) {
+            ConfirmPinDialog(this, it) { confirmedUser ->
+                addUser(confirmedUser, teamLayout)
+            }.show()
+        }
     }
 
     private fun addUser(user: User, teamLayout: TeamLayout) {
@@ -163,20 +190,18 @@ class CreateGameActivity : AppCompatActivity() {
     private fun createGame() {
 
         // Set/update team one custom name
-        val teamOne = teamOneLayout.team
+        val teamOne = teamOneLayout.team as Team
         teamOneNameView.text.toString().apply {
             if (isNotBlank() && this != mTable.sideOneName) {
-                teamOne.customName = this
-                CustomTeamName(teamOne.getTeamHash(), this).edit { it.copyToRealmOrUpdate(this) }
+                saveOrUpdateTeam(this, teamOne.users.map(User::id))
             }
         }
 
         // Set/update team two custom name
-        val teamTwo = teamTwoLayout.team
+        val teamTwo = teamTwoLayout.team as Team
         teamTwoNameView.text.toString().apply {
             if (isNotBlank() && this != mTable.sideTwoName) {
-                teamTwo.customName = this
-                CustomTeamName(teamTwo.getTeamHash(), this).edit { it.copyToRealmOrUpdate(this) }
+                saveOrUpdateTeam(this, teamTwo.users.map(User::id))
             }
         }
 
@@ -201,6 +226,24 @@ class CreateGameActivity : AppCompatActivity() {
         startActivity<GameActivity>(GameActivity.EXTRA_GAME_ID to game.id)
         finish()
 
+    }
+
+    private fun saveOrUpdateTeam(teamName: String, userIds: List<String>) {
+        val teamHash = userIds.getTeamHash()
+        val team = App.realm.where(RealmTeam::class.java).equalTo("id", teamHash).findFirst()
+        when {
+        // Create new team if it doesn't exist
+            team == null -> {
+                val newTeam = CustomTeam(teamHash, teamName, 0L, 0L, userIds)
+                App.realm.inTransaction { copyToRealmOrUpdate(newTeam.toRealmTeam()) }
+                mDatabase.child("customTeams").child(teamHash).setValue(newTeam)
+            }
+        // Update team name if it has changed
+            teamName != team.teamName -> {
+                team.edit { this.teamName = teamName }
+                mDatabase.child("customTeams").child(teamHash).child("teamName").setValue(team.teamName)
+            }
+        }
     }
 
     override fun onDestroy() {

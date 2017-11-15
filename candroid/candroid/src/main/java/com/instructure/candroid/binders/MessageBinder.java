@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,16 +24,17 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
+
 import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.MessageListRecyclerAdapter;
 import com.instructure.candroid.holders.MessageViewHolder;
 import com.instructure.candroid.util.Const;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
+import com.instructure.pandautils.utils.ProfileUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -52,7 +53,7 @@ public class MessageBinder extends BaseBinder{
 
         String messageTitle = item.getMessageTitle(context, myUserID, context.getString(R.string.monologue));
 
-        ProfileUtils.configureAvatarView(context, messageTitle, item.getAvatarURL(), holder.userAvatar, isGroupMessage(item.getAllParticipants()));
+        ProfileUtils.configureAvatarView(context, messageTitle, item.getAvatarUrl(), holder.userAvatar, isGroupMessage(item.getParticipants()));
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.userAvatar.setTransitionName(Const.MESSAGE +String.valueOf(item.getId()));
         }
@@ -130,7 +131,7 @@ public class MessageBinder extends BaseBinder{
     }
 
     private static String getParsedDate(Context context, String messageDate){
-        Date date = APIHelpers.stringToDate(messageDate);
-        return DateHelpers.getDayMonthDateString(context, date);
+        Date date = APIHelper.stringToDate(messageDate);
+        return DateHelper.getDayMonthDateString(context, date);
     }
 }

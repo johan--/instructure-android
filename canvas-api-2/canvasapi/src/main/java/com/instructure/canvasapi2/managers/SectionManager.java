@@ -17,12 +17,14 @@
 
 package com.instructure.canvasapi2.managers;
 
+import android.support.annotation.NonNull;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.SectionAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Section;
-import com.instructure.canvasapi2.utils.DepaginatedCallback;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.util.List;
 
@@ -41,14 +43,29 @@ public class SectionManager extends BaseManager {
                     .withShouldIgnoreToken(false)
                     .build();
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<Section>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<Section>() {
+            StatusCallback<List<Section>> depaginatedCallback = new ExhaustiveListCallback<Section>(callback) {
                 @Override
-                public void getNextPage(DepaginatedCallback<Section> callback, String nextUrl, boolean isCached) {
+                public void getNextPage(@NonNull StatusCallback<List<Section>> callback, @NonNull String nextUrl, boolean isCached) {
                     SectionAPI.getNextPageSections(nextUrl, adapter, callback, params);
                 }
-            });
+            };
             adapter.setStatusCallback(depaginatedCallback);
             SectionAPI.getFirstSectionsForCourse(courseId, adapter, depaginatedCallback, params);
+        }
+    }
+
+    public static void getSection(long courseId, long sectionId, StatusCallback<Section> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            SectionAPI.getSection(courseId, sectionId, adapter, callback, params);
         }
     }
 }

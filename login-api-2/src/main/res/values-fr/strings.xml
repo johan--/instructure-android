@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">LoginAPI</string>
   <string name="hello_world">Bonjour à tous !</string>
   <string name="action_settings">Paramètres</string>
   <string name="mobileVerifyGeneral">Cette application n\'est pas autorisée à l\'utilisation</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">UnknownDevice</string>
   <string name="errorOccurred">Une erreur inattendue est survenue.</string>
   <string name="pageNotFound">Page non trouvée</string>
-  <string name="okay">D\'accord</string>
   <string name="confirm">Confirmer</string>
   <string name="cancel">Annuler</string>
   <string name="help">Aide</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">Vous essayez de vous connecter au Canvas Network ? </string>
   <string name="remove">Supprimer</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">Identification fictive</string>
+  <string name="userId">ID d\'utilisateur</string>
+  <string name="domain">Domaine</string>
+  <string name="masqueradingUserId">Personnifier l\'identifiant d\'utilisateur</string>
+  <string name="masqueradingUserDomain">Domaine de personnification</string>
+  <string name="masqueradingBegin">Commencer à personnifier...</string>
+  <string name="masqueradingStop">Cesser de personnifier</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Supprimer cet utilisateur ? </string>
   <string name="removedForever">Vous devrez à nouveau vous connecter à cet utilisateur pour accéder à son contenu.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Vous ne voyez pas votre école ? Saisissez l\'URL de l\'école ou tapez ici pour obtenir de l\'aide. </string>
   <string name="loginCanvasHelpWithUser">Saisir l\'URL de l\'école ou taper ici pour obtenir de l\'aide. </string>
   <string name="loginHint">Trouver votre école ou votre district</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Comment nous débrouillons-nous ?</string>
-  <string name="rateUs">Comment nous évalueriez vous ?</string>
-  <string name="doBetter">Que pourrions-nous faire de mieux ?</string>
-  <string name="sendFeedback">Envoyer un avis</string>
-  <string name="suggestions">Suggestions pour Android</string>
-  <string name="domain">Domaine</string>
-  <string name="versionNum">Version : </string>
-  <string name="userId">ID d\'utilisateur</string>
-  <string name="email">Courriel</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Ne plus montrer à nouveau</string>
-  <string name="installDate">Date d\'installation : </string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Signaler un problème</string>
   <string name="zendesk_subject">Sujet</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Appareil</string>
   <string name="osVersion">Version de l\'OS</string>
+  <string name="previousLoginTitle">Identifiants précédents</string>
+  <string name="canvasNetworks">Réseaux Canvas</string>
+  <string name="findMySchool">Trouver mon école</string>
+  <string name="appTypeTeacher">Enseignant</string>
+  <string name="appTypeStudent">Élève</string>
+  <string name="appTypeParent">Parent</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">Comment s\'appelle votre école ?</string>
+  <string name="next">Suivant</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Supprimer utilisateur précédent</string>
+  <string name="accountDomainFooter">Vous ne trouvez pas votre école ? Essayez d’entrer l’URL complète de l’école</string>
+  <string name="accountDomainFooterLink">Appuyez ici pour obtenir de l’aide.</string>
+  <string name="login_noInternetConnectionTitle">Aucune connexion internet</string>
+  <string name="login_noInternetConnectionMessage">Cette action nécessite une connexion Internet.</string>
+  <string name="empty_feedback">Vous devez entrer un sujet et une description pour envoyer un retour.</string>
+  <string name="versionNum">Numéro de version</string>
+  <string name="scrollInstructions">Faire défiler pour voir tous les détails</string>
 </resources>

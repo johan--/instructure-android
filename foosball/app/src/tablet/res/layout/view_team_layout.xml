@@ -69,6 +69,31 @@
         tools:ignore="ContentDescription,UnusedAttribute" />
 
     <FrameLayout
+        android:id="@+id/addTeamButton"
+        android:layout_width="@dimen/avatar_size_large"
+        android:layout_height="@dimen/avatar_size_large"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/circle_outline_medium_white"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-4dp"
+            android:drawablePadding="-4dp"
+            android:drawableTop="@drawable/vd_group_add_white_48dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:text="@string/add_team"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"/>
+
+    </FrameLayout>
+
+    <FrameLayout
         android:id="@+id/addPlayerButton"
         android:layout_width="@dimen/avatar_size_large"
         android:layout_height="@dimen/avatar_size_large"

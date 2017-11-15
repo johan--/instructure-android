@@ -20,7 +20,6 @@ import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;
-import com.instructure.canvasapi2.utils.RetrofitCounter;
 import com.instructure.loginapi.login.model.DomainVerificationResult;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -42,11 +40,6 @@ public class MobileVerifyAPI {
     private static Retrofit getAuthenticationRetrofit() {
 
         final String userAgent = ApiPrefs.getUserAgent();
-
-        RetrofitCounter.increment();
-
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
@@ -63,7 +56,6 @@ public class MobileVerifyAPI {
                         }
                     }
                 })
-                .addInterceptor(loggingInterceptor)
                 .build();
 
         return new Retrofit.Builder()

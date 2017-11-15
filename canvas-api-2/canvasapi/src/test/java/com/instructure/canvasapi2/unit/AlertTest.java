@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import com.instructure.canvasapi2.models.Alert;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class AlertTest {
@@ -114,14 +115,14 @@ public class AlertTest {
 
     @Test
     public void alertTypeToAPIString_all() {
-        for (Alert.ALERT_TYPE type: Alert.ALERT_TYPE.values()){
+        for (Alert.ALERT_TYPE type : Alert.ALERT_TYPE.values()) {
             assertNotEquals("Expected non-null API string value for ALERT_TYPE." + type.name(), null, Alert.alertTypeToAPIString(type));
         }
     }
 
     @Test
     public void getAlertTypeFromString_all() {
-        for (Alert.ALERT_TYPE type: Alert.ALERT_TYPE.values()){
+        for (Alert.ALERT_TYPE type : Alert.ALERT_TYPE.values()) {
             String apiString = Alert.alertTypeToAPIString(type);
             assertEquals("Expected ALERT_TYPE." + type.name() + " for apiString '" + apiString + "'", type, Alert.getAlertTypeFromString(apiString));
         }

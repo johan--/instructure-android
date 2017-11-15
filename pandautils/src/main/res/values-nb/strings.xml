@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">Panda-utnyttelse</string>
   <string name="chooseMedia">Velg media</string>
   <string name="takeVideo">Ta video</string>
   <string name="noCameraOnDevice">Ingen kamera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Laster opp til Canvas</string>
   <string name="preparingUpload">Forbereder opplasting</string>
   <string name="loadingFilesIndeterminate">Laster filer:</string>
@@ -32,7 +31,7 @@
   <string name="addItem">Legg til element</string>
   <string name="assignment">Oppgave</string>
   <string name="attachedFiles">Vedlagte filer</string>
-  <string name="turnIn">Leggetid</string>
+  <string name="turnIn">Send inn</string>
   <string name="course">Emne</string>
   <string name="sending">Sender ...</string>
   <!--rating dialog-->
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Det var en feil med å få tak i bildet. Vennligst forsøk igjen.</string>
   <string name="errorTextMissing">Legg til litt tekst for å sende en melding</string>
   <string name="fileUploadNotSupported">Du kan laste opp filene til den valgte oppgaven.</string>
+  <string name="noCourseSelected">Velg et emne</string>
   <string name="selectCourse">Velg et emne</string>
   <string name="selectAssignment">Velg en oppgave</string>
   <string name="loadingAssignments">Laster oppgaver...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Ulest</string>
   <string name="discussion_reply">Svar</string>
   <string name="close">Lukk</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas lærer</string>
+  <string name="utils_canvasParent">Canvas forelder</string>
+  <string name="utils_polls">Canvas avstemninger</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Hvordan klarer vi oss?</string>
+  <string name="utils_rateUs">Hvordan ville du vurdert oss?</string>
+  <string name="utils_doBetter">Hva kan vi gjøre bedre?</string>
+  <string name="utils_sendFeedback">Send tilbakemelding</string>
+  <string name="utils_suggestions">Forslag for Android</string>
+  <string name="utils_domain">Domene</string>
+  <string name="utils_versionNum">Versjon:</string>
+  <string name="utils_userId">Bruker-ID</string>
+  <string name="utils_email">E-post</string>
+  <string name="utils_dontShowAgain">Ikke vis igjen</string>
+  <string name="utils_installDate">Installasjonsdato:</string>
+  <string name="utils_device">Enhet</string>
+  <string name="utils_osVersion">OS-versjon</string>
+  <string name="loading">Laster</string>
 </resources>

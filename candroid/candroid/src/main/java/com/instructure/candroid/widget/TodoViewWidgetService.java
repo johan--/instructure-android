@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -27,21 +27,20 @@ import android.widget.RemoteViews;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InterwebsToApplication;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.ToDoAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.ToDo;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.ToDoManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.ToDo;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -75,41 +74,36 @@ public class TodoViewWidgetService extends BaseRemoteViewsService implements Ser
         }
 
         @Override
-		public ToDo[] makeApiCalls() {
+		public List<ToDo> makeApiCalls() {
 
             // get courses, data and to do items
-            Course[] courses = CourseAPI.getAllCoursesSynchronous(mContext);
-            Group[] groups = GroupAPI.getAllGroupsSynchronous(mContext);
+            List<Course> courses = CourseManager.getCoursesSynchronous(true);
+            List<Group> groups = GroupManager.getGroupsSynchronous(true);
 
             CanvasContext userContext = CanvasContext.emptyUserContext();
-            ToDo[] todos = ToDoAPI.getTodosSynchronous(getApplicationContext(), userContext);
-            ScheduleItem[] scheduleItems = CalendarEventAPI.getUpcomingEventsSynchronous(getApplicationContext());
+            List<ToDo> todos = ToDoManager.getTodosSynchronous(userContext, true);
+            List<ScheduleItem> items = CalendarEventManager.getUpcomingEventsSynchronous(true);
 
-            if(courses == null || groups == null || todos == null || scheduleItems == null){
+            if(courses == null || groups == null || todos == null || items == null){
                 return null;
             }
 
-            Map<Long, Course> courseMap = CourseAPI.createCourseMap(courses);
-            Map<Long, Group> groupMap = GroupAPI.createGroupMap(groups);
-            ArrayList<ToDo> todosList = new ArrayList<ToDo>(Arrays.asList(todos));
+            Map<Long, Course> courseMap = CourseManager.createCourseMap(courses);
+            Map<Long, Group> groupMap = GroupManager.createGroupMap(groups);
 
             ArrayList<ToDo> upcomingList = new ArrayList<ToDo>();
-            List<ScheduleItem> items = Arrays.asList (scheduleItems);
             for(ScheduleItem scheduleItem : items) {
                 //As a user
                 upcomingList.add(ToDo.toDoWithScheduleItem(scheduleItem));
             }
 
-            ArrayList<ToDo> eventArrayList = ToDoAPI.mergeToDoUpcoming(todosList,upcomingList);
-           ToDo[] events = new ToDo[eventArrayList.size()];
-            events = eventArrayList.toArray(events);
+            List<ToDo> eventArrayList = ToDoManager.mergeToDoUpcoming(todos,upcomingList);
 
-
-            for(ToDo todo : events){
+            for(ToDo todo : eventArrayList){
                 ToDo.setContextInfo(todo, courseMap, groupMap);
             }
 
-            return events;
+            return eventArrayList;
         }
 
         @Override
@@ -152,7 +146,7 @@ public class TodoViewWidgetService extends BaseRemoteViewsService implements Ser
 
             if(shouldHideDetails(getApplicationContext(), appWidgetId)) {
                 if(event.getDueDate() != null) {
-                    String formattedDueDate = DateHelpers.getDateTimeString(mContext, event.getDueDate());
+                    String formattedDueDate = DateHelper.getDateTimeString(mContext, event.getDueDate());
                     row.setTextViewText(R.id.message, formattedDueDate);
                     row.setViewVisibility(R.id.message, View.VISIBLE);
                 } else {
@@ -169,7 +163,7 @@ public class TodoViewWidgetService extends BaseRemoteViewsService implements Ser
 
                 Date dueDate = event.getDueDate();
                 if (dueDate != null) {
-                    String  formattedDueDate = DateHelpers.getDateTimeString(mContext, event.getDueDate());
+                    String  formattedDueDate = DateHelper.getDateTimeString(mContext, event.getDueDate());
                     row.setTextViewText(R.id.course_and_date, formattedDueDate);
                     row.setViewVisibility(R.id.course_and_date, View.VISIBLE);
                 } else {

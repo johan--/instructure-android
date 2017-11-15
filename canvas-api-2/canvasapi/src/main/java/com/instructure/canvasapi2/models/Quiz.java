@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import retrofit2.http.HEAD;
-
 
 public class Quiz extends CanvasModel<Quiz> {
 
@@ -78,7 +76,7 @@ public class Quiz extends CanvasModel<Quiz> {
     @SerializedName("due_at")
     private String dueAt;
     @SerializedName("time_limit")
-    private String timeLimit;
+    private int timeLimit;
     @SerializedName("shuffle_answers")
     private boolean shuffleAnswers;
     @SerializedName("show_correct_answers")
@@ -148,6 +146,14 @@ public class Quiz extends CanvasModel<Quiz> {
         this.title = title;
     }
 
+    public String getUrl() {
+
+        if (mobileUrl != null && !mobileUrl.equals("")) {
+            return mobileUrl;
+        }
+        return htmlUrl;
+    }
+
     public String getMobileUrl() {
         return mobileUrl;
     }
@@ -165,7 +171,7 @@ public class Quiz extends CanvasModel<Quiz> {
     }
 
     public String getDescription() {
-        return description;
+        return description != null ? description : "";
     }
 
     public void setDescription(String description) {
@@ -231,11 +237,11 @@ public class Quiz extends CanvasModel<Quiz> {
     }
 
     @Nullable
-    public String getTimeLimit() {
+    public int getTimeLimit() {
         return timeLimit;
     }
 
-    public void setTimeLimit(@Nullable String timeLimit) {
+    public void setTimeLimit(@Nullable int timeLimit) {
         this.timeLimit = timeLimit;
     }
 
@@ -272,10 +278,25 @@ public class Quiz extends CanvasModel<Quiz> {
         this.lockExplanation = lockExplanation;
     }
 
-    public int getHideResults() {
+    public HIDE_RESULTS_TYPE getHideResults() {
+        if(hideResults == null || hideResults.equals("null")) {
+            return HIDE_RESULTS_TYPE.NULL;
+        } else if(hideResults.equals("always")) {
+            return HIDE_RESULTS_TYPE.ALWAYS;
+        } else if(hideResults.equals("until_after_last_attempt")) {
+            return HIDE_RESULTS_TYPE.AFTER_LAST_ATTEMPT;
+        }
+        return HIDE_RESULTS_TYPE.NULL;
+    }
+
+    public int getHideResultsStringResource() {
         if ("always".equals(hideResults))
             return R.string.no;
         return R.string.always;
+    }
+
+    public boolean getIsGradeable() {
+        return TYPE_ASSIGNMENT.equals(this.quizType) || TYPE_GRADED_SURVEY.equals(this.quizType);
     }
 
     public void setHideResults(String hideResults) {
@@ -310,6 +331,21 @@ public class Quiz extends CanvasModel<Quiz> {
 
     public List<String> getQuestionTypes() {
         return questionTypes;
+    }
+
+    public ArrayList<QuizQuestion.QUESTION_TYPE> getParsedQuestionTypes() {
+        return parseQuestionTypes(questionTypes);
+    }
+
+    private ArrayList<QuizQuestion.QUESTION_TYPE> parseQuestionTypes(List<String> question_types) {
+        ArrayList<QuizQuestion.QUESTION_TYPE> questionTypesList = new ArrayList<>();
+        for(String question_type : question_types) {
+            if(question_type != null) {
+                questionTypesList.add(QuizQuestion.parseQuestionType(question_type));
+            }
+        }
+
+        return questionTypesList;
     }
 
     public void setQuestionTypes(List<String> questionTypes) {
@@ -527,7 +563,7 @@ public class Quiz extends CanvasModel<Quiz> {
         dest.writeString(this.pointsPossible);
         dest.writeByte(this.lockQuestionsAfterAnswering ? (byte) 1 : (byte) 0);
         dest.writeString(this.dueAt);
-        dest.writeString(this.timeLimit);
+        dest.writeInt(this.timeLimit);
         dest.writeByte(this.shuffleAnswers ? (byte) 1 : (byte) 0);
         dest.writeByte(this.showCorrectAnswers ? (byte) 1 : (byte) 0);
         dest.writeString(this.scoringPolicy);
@@ -576,7 +612,7 @@ public class Quiz extends CanvasModel<Quiz> {
         this.pointsPossible = in.readString();
         this.lockQuestionsAfterAnswering = in.readByte() != 0;
         this.dueAt = in.readString();
-        this.timeLimit = in.readString();
+        this.timeLimit = in.readInt();
         this.shuffleAnswers = in.readByte() != 0;
         this.showCorrectAnswers = in.readByte() != 0;
         this.scoringPolicy = in.readString();

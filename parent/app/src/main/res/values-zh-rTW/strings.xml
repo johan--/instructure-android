@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">告訴我們本程式最讓您滿意之處</string>
     <string name="sendFeedback">發送回饋</string>
     <string name="sendMail">發送電子郵件&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">域名：</string>
     <string name="help_versionNum">版本：</string>
     <string name="help_userId">使用者 ID：</string>

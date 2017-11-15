@@ -105,7 +105,7 @@ public class AlertFragment extends BaseSyncFragment<Alert, AlertPresenter, Alert
     @NonNull
     @Override
     public String airwolfDomain() {
-        return APIHelper.getAirwolfDomain(getContext());
+        return ApiPrefs.getAirwolfDomain();
     }
 
     @NonNull
@@ -183,15 +183,24 @@ public class AlertFragment extends BaseSyncFragment<Alert, AlertPresenter, Alert
 
     @Override
     public void markPositionAsRead(int position) {
-        getAdapter().getItemAtPosition(position).setMarkedRead(true);
-        getAdapter().notifyItemChanged(position);
-        int unreadCount = 0;
-        for (int i = 0; i < getAdapter().getItemCount(); i++) {
-            if (!getAdapter().getItemAtPosition(i).isMarkedRead()) {
-                unreadCount++;
+        final int itemCount = getAdapter().getItemCount();
+
+        if (position < itemCount) {
+            Alert alert = getAdapter().getItemAtPosition(position);
+            if (alert != null) {
+                alert.setMarkedRead(true);
+                getAdapter().notifyItemChanged(position);
             }
         }
-        onUpdateUnreadCount(unreadCount);
+
+        int unreadCount = 0;
+        for (int i = 0; i < itemCount; i++) {
+            Alert innerAlert = getAdapter().getItemAtPosition(i);
+            if (innerAlert != null && !innerAlert.isMarkedRead()) {
+                unreadCount++;
+            }
+            onUpdateUnreadCount(unreadCount);
+        }
     }
 
     private AdapterToFragmentBadgeCallback<Alert> mAdapterToFragmentCallback = new AdapterToFragmentBadgeCallback<Alert>() {
@@ -205,7 +214,7 @@ public class AlertFragment extends BaseSyncFragment<Alert, AlertPresenter, Alert
                     //note: student is only utilized for assignment routes
                     Student student = ((StudentViewActivity) getActivity()).getCurrentStudent();
                     //We want to provide the airwolf domain here because alerts will always come from airwolf
-                    RouterUtils.routeUrl(getActivity(), alert.getAssetUrl(), student, APIHelper.getAirwolfDomain(getContext()), true);
+                    RouterUtils.routeUrl(getActivity(), alert.getAssetUrl(), student, ApiPrefs.getAirwolfDomain(), true);
                 }
             }
             //the student should be set in the adapter
@@ -233,7 +242,8 @@ public class AlertFragment extends BaseSyncFragment<Alert, AlertPresenter, Alert
     public void updateUnreadCount() {
         int unreadCount = 0;
         for(int i = 0; i < getAdapter().getItemCount(); i++) {
-            if(!getAdapter().getItemAtPosition(i).isMarkedRead()) {
+            Alert alert = getAdapter().getItemAtPosition(i);
+            if(alert != null && !alert.isMarkedRead()) {
                 unreadCount++;
             }
         }

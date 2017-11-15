@@ -31,8 +31,8 @@ import retrofit2.http.Path;
 public class TabAPI {
 
     interface TabsInterface {
-        @GET("courses/{context_id}/tabs")
-        Call<List<Tab>> getTabs(@Path("context_id") long context_id);
+        @GET("{contextId}/tabs")
+        Call<List<Tab>> getTabs(@Path("contextId") long contextId);
     }
 
     public static void getTabs(

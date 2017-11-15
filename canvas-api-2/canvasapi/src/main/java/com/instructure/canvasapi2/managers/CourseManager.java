@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,15 +17,21 @@
 
 package com.instructure.canvasapi2.managers;
 
+import android.support.annotation.NonNull;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.CourseAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
+import com.instructure.canvasapi2.models.CanvasContextPermission;
 import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
 import com.instructure.canvasapi2.models.Favorite;
 import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.models.Group;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.tests.CourseManager_Test;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +44,7 @@ public class CourseManager extends BaseManager {
 
     public static void getFavoriteCourses(StatusCallback<List<Course>> callback, boolean forceNetwork) {
 
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             CourseManager_Test.getFavoriteCourses(callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -52,18 +58,50 @@ public class CourseManager extends BaseManager {
         }
     }
 
-    public static void getCourses(StatusCallback<List<Course>> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+    public static void getAllFavoriteCourses(final boolean forceNetwork, StatusCallback<List<Course>> callback) {
+        if (isTesting() || mTesting) {
             CourseManager_Test.getCourses(callback);
         } else {
-            RestBuilder adapter = new RestBuilder(callback);
+            final RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
                     .withPerPageQueryParam(true)
                     .withShouldIgnoreToken(false)
                     .withForceReadFromNetwork(forceNetwork)
                     .build();
 
-            CourseAPI.getCourses(adapter, callback, params);
+            StatusCallback<List<Course>> depaginatedCallback = new ExhaustiveListCallback<Course>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Course>> callback, @NonNull String nextUrl, boolean isCached) {
+                    CourseAPI.getNextPageFavoriteCourses(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            CourseAPI.getFirstPageFavoriteCourses(adapter, depaginatedCallback, params);
+        }
+    }
+
+
+    public static void getCourses(final boolean forceNetwork, StatusCallback<List<Course>> callback) {
+        if (isTesting() || mTesting) {
+            CourseManager_Test.getCourses(callback);
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            StatusCallback<List<Course>> depaginatedCallback = new ExhaustiveListCallback<Course>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Course>> callback, @NonNull String nextUrl, boolean isCached) {
+                    CourseAPI.getNextPageCourses(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            CourseAPI.getFirstPageCourses(adapter, depaginatedCallback, params);
         }
     }
 
@@ -82,7 +120,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void getCourse(long courseId, StatusCallback<Course> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             CourseManager_Test.getCourse(courseId, callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -96,8 +134,23 @@ public class CourseManager extends BaseManager {
         }
     }
 
+    public static void getCourseWithSyllabus(long courseId, StatusCallback<Course> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            CourseManager_Test.getCourse(courseId, callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            CourseAPI.getCourseWithSyllabus(courseId, adapter, callback, params);
+        }
+    }
+
     public static void getCourseWithGrade(long courseId, StatusCallback<Course> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -126,6 +179,30 @@ public class CourseManager extends BaseManager {
         }
     }
 
+
+    public static void getAllCourseStudents(final boolean forceNetwork, long courseId, StatusCallback<List<User>> callback) {
+        if (isTesting() || mTesting) {
+            // TODO...
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            StatusCallback<List<User>> depaginatedCallback = new ExhaustiveListCallback<User>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<User>> callback, @NonNull String nextUrl, boolean isCached) {
+                    CourseAPI.getNextPageCourseStudents(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            CourseAPI.getFirstPageCourseStudents(courseId, adapter, depaginatedCallback, params);
+        }
+    }
+
     public static void getCourseStudent(long courseId, long studentId, StatusCallback<User> callback, boolean forceNetwork) {
         if (isTesting() || mTesting) {
             CourseManager_Test.getCourseStudent(courseId, studentId, callback);
@@ -142,7 +219,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void addCourseToFavorites(long courseId, StatusCallback<Favorite> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             CourseManager_Test.addCourseToFavorites(courseId, callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -157,7 +234,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void removeCourseFromFavorites(long courseId, StatusCallback<Favorite> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             CourseManager_Test.removeCourseFromFavorites(courseId, callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -172,7 +249,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void editCourseName(long courseId, String newCourseName, StatusCallback<Course> callback, boolean forceNetwork) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             // TODO:
             // CourseManager_Test.editCourseName(courseId, callback);
         } else {
@@ -191,7 +268,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void editCourseHomePage(long courseId, String newHomePage, boolean forceNetwork, StatusCallback<Course> callback) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             // TODO:
             // CourseManager_Test.editCourseName(courseId, callback);
         } else {
@@ -223,9 +300,91 @@ public class CourseManager extends BaseManager {
         }
     }
 
+    public static void getGroupsForCourse(long courseId, StatusCallback<List<Group>> callback, final boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+            final RestBuilder adapter = new RestBuilder(callback);
+            StatusCallback<List<Group>> exhaustiveCallback = new ExhaustiveListCallback<Group>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<Group>> callback, @NonNull String nextUrl, boolean isCached) {
+                    CourseAPI.getNextPageGroups(nextUrl, adapter, callback, params);
+                }
+            };
+            adapter.setStatusCallback(exhaustiveCallback);
+            CourseAPI.getFirstPageGroups(courseId, adapter, exhaustiveCallback, params);
+        }
+    }
+
+    public static void getCoursePermissions(long courseId, List<String> requestedPermissions, StatusCallback<CanvasContextPermission> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            CourseAPI.getCoursePermissions(courseId, requestedPermissions, adapter, callback, params);
+        }
+    }
+
+    public static List<Course> getCoursesSynchronous(final boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            //TODO
+            return null;
+        } else {
+            final RestBuilder adapter = new RestBuilder();
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+
+            return CourseAPI.getAllCoursesSynchronous(adapter, params);
+        }
+    }
+
+    public static List<Course> getFavoriteCoursesSynchronous(final boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            //TODO
+            return null;
+        } else {
+            final RestBuilder adapter = new RestBuilder();
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+
+            return CourseAPI.getFavCoursesSynchronous(adapter, params);
+        }
+    }
+
+    public static void getEnrollmentsForGradingPeriod(long courseId, long gradingPeriodId, StatusCallback<List<Enrollment>> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            //TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+
+            CourseAPI.getEnrollmentsForGradingPeriod(courseId, gradingPeriodId, adapter, params, callback);
+        }
+    }
+
     //region Airwolf
     public static void getCourseWithGradeAirwolf(String airwolfDomain, String parentId, String studentId, long courseId, StatusCallback<Course> callback) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -241,7 +400,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void getCourseWithSyllabusAirwolf(String airwolfDomain, String parentId, String studentId, long courseId, StatusCallback<Course> callback) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -257,7 +416,7 @@ public class CourseManager extends BaseManager {
     }
 
     public static void getCoursesForUserAirwolf(String airwolfDomain, String parentId, String studentId, boolean forceNetwork, StatusCallback<List<Course>> callback) {
-        if(isTesting() || mTesting) {
+        if (isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
@@ -273,4 +432,16 @@ public class CourseManager extends BaseManager {
         }
     }
     //endregion
+
+
+    public static Map<Long, Course> createCourseMap(List<Course> courses) {
+        Map<Long, Course> courseMap = new HashMap<Long, Course>();
+        if (courses == null) {
+            return courseMap;
+        }
+        for (Course course : courses) {
+            courseMap.put(course.getId(), course);
+        }
+        return courseMap;
+    }
 }

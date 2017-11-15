@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -25,11 +25,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/rubric_criterion_rating_points"
         android:layout_toStartOf="@+id/rubric_criterion_rating_points"
-        android:drawableLeft="@drawable/ic_cv_chat"
         android:drawableStart="@drawable/ic_cv_chat"
-        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
         android:gravity="start|center_vertical"
         style="@style/TextStyle.Primary"/>
 
@@ -38,7 +36,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
         android:gravity="end|center_vertical"
-        style="@style/TextStyle.Primary.SingleLine.Bold"/>
+        style="@style/TextStyle.Primary.SingleLine"/>
 </RelativeLayout>

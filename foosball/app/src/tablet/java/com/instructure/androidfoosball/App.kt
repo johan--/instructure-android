@@ -1,26 +1,39 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.support.multidex.MultiDex
-import android.support.multidex.MultiDexApplication
 import com.instructure.androidfoosball.services.FoosballSyncService
 import com.instructure.androidfoosball.utils.Commentator
-import io.realm.DynamicRealm
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmMigration
 
-class App : MultiDexApplication() {
+class App : Application() {
 
     companion object {
 
         lateinit var context: Context
 
         val realm: Realm by lazy {
-            val realmConfig = RealmConfiguration.Builder(context)
+            val realmConfig = RealmConfiguration.Builder()
                     .schemaVersion(1)
-                    .migration(FoosMigration())
+                    .deleteRealmIfMigrationNeeded()
                     .build()
             Realm.getInstance(realmConfig)
         }
@@ -33,30 +46,7 @@ class App : MultiDexApplication() {
         context = this
         startService(Intent(this, FoosballSyncService::class.java))
         commentator.initialize(this)
-    }
-
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        MultiDex.install(base)
-    }
-}
-
-class FoosMigration() : RealmMigration {
-
-    override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
-
-        // Migrate to version 1:
-        // - User:
-        //    - Add 'guest' boolean
-        //    - Add 'foosRanking' integer
-        //    - Fix typo in 'customVictoryPhrase' field name
-        if (oldVersion < 1L) {
-            realm.schema.get("User")
-                    .addField("guest", Boolean::class.java)
-                    .addField("foosRanking", Int::class.java)
-                    .renameField("customVistoryPhrase", "customVictoryPhrase")
-        }
-
+        Realm.init(this)
     }
 
 }

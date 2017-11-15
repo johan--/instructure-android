@@ -26,8 +26,8 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.FileUtils;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.parentapp.R;
@@ -149,7 +149,7 @@ public class InternalWebviewFragment extends ParentFragment {
     public void loadHtml(String html) {
         // BaseURL is set as Referer. Referer needed for some vimeo videos to play
         mCanvasWebView.loadDataWithBaseURL(ApiPrefs.getFullDomain(),
-                APIHelper.getAssetsFile(getContext(), "html_wrapper.html").replace("{$CONTENT$}", html), "text/mHtml", "UTF-8", null);
+                FileUtils.getAssetsFile(getContext(), "html_wrapper.html").replace("{$CONTENT$}", html), "text/mHtml", "UTF-8", null);
     }
 
     public void handleIntentExtras(Bundle extras) {

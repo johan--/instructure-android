@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 
 package com.instructure.candroid.util;
 
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
 
 
 public class MGPUtils {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,19 +33,17 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.instructure.candroid.R;
-import com.instructure.canvasapi.api.DiscussionAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.DiscussionTopicHeader;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.DiscussionManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
-
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class ComposeNewDiscussionFragment extends ParentFragment {
 
@@ -58,7 +56,7 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
 
     private DiscussionTopicHeader discussionTopicHeader;    //will be null if we're creating a new discussionTopic
 
-    CanvasCallback<DiscussionTopicHeader> discussionTopicHeaderCanvasCallback;
+    StatusCallback<DiscussionTopicHeader> discussionTopicHeaderCanvasCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -170,14 +168,13 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
     }
 
     public void setUpCallback(){
-        discussionTopicHeaderCanvasCallback = new CanvasCallback<DiscussionTopicHeader>(this) {
+        discussionTopicHeaderCanvasCallback = new StatusCallback<DiscussionTopicHeader>() {
             @Override
-            public void firstPage(final DiscussionTopicHeader discussionTopicHeaderResult, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<DiscussionTopicHeader> response, LinkHeaders linkHeaders, ApiType type) {
+                if(!apiCheck()) {
                     return;
                 }
-
-                if (discussionTopicHeaderResult.unauthorized) {
+                if (response.body().unauthorized) {
                     String message;
                     if (isAnnouncement) {
                         message = getResources().getString(R.string.notAuthorizedAnnouncement);
@@ -195,7 +192,7 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
                     } else {
                         if(discussionTopicHeader == null) {
                             //this is a new discussion, check if it's published
-                            if(discussionTopicHeaderResult.isPublished()) {
+                            if(response.body().isPublished()) {
                                 message = getResources().getString(R.string.postDiscussionSuccess);
                             } else {
                                 message = getResources().getString(R.string.draftDiscussionSuccess);
@@ -225,7 +222,7 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<DiscussionTopicHeader> response, Throwable error) {
                 String message;
                 if(isAnnouncement){
                     message = getResources().getString(R.string.errorPostingAnnouncement);
@@ -234,7 +231,6 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
                 }
 
                 showToast(message);
-                return true;
             }
         };
     }
@@ -258,7 +254,7 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.menu_post_announcement || item.getItemId() == R.id.menu_post_discussion) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -272,20 +268,21 @@ public class ComposeNewDiscussionFragment extends ParentFragment {
             } else {
                 if(isEditing && !isAnnouncement) {
                     //Is a discussion and we are editing it
-                    DiscussionAPI.updateDiscussionTopic(getCanvasContext(), discussionTopicHeader.getId(), cleanedTitle, cleanedMessage, threaded.isChecked(), publish.isChecked(), discussionTopicHeaderCanvasCallback);
+                    DiscussionManager.updateDiscussionTopic(getCanvasContext(), discussionTopicHeader.getId(), cleanedTitle, cleanedMessage, threaded.isChecked(), publish.isChecked(), discussionTopicHeaderCanvasCallback);
                 } else {
                     if (discussionTopicHeader == null) {
                         //announcements auto publish
                         if (isAnnouncement) {
-                            DiscussionAPI.postNewDiscussion(getCanvasContext(), cleanedTitle, cleanedMessage, threaded.isChecked(), isAnnouncement, discussionTopicHeaderCanvasCallback);
-
+                            // FIXME: MIGRATION Consider updating to createCourseDiscussion
+                            DiscussionManager.createDiscussion(getCanvasContext(), cleanedTitle, cleanedMessage, threaded.isChecked(), isAnnouncement, true, discussionTopicHeaderCanvasCallback);
                         } else {
                             //we haven't created this topic yet, so do it now
-                            DiscussionAPI.postNewDiscussionAndPublish(getCanvasContext(), cleanedTitle, cleanedMessage, threaded.isChecked(), isAnnouncement, publish.isChecked(), discussionTopicHeaderCanvasCallback);
+                            // FIXME: MIGRATION Consider updating to createCourseDiscussion
+                            DiscussionManager.createDiscussion(getCanvasContext(), cleanedTitle, cleanedMessage, threaded.isChecked(), isAnnouncement, publish.isChecked(), discussionTopicHeaderCanvasCallback);
                         }
                     } else {
                         //we're editing this unpublished discussion/announcement, so just update it
-                        DiscussionAPI.updateDiscussionTopic(getCanvasContext(), discussionTopicHeader.getId(), cleanedTitle, cleanedMessage, threaded.isChecked(), publish.isChecked(), discussionTopicHeaderCanvasCallback);
+                        DiscussionManager.updateDiscussionTopic(getCanvasContext(), discussionTopicHeader.getId(), cleanedTitle, cleanedMessage, threaded.isChecked(), publish.isChecked(), discussionTopicHeaderCanvasCallback);
                     }
                 }
             }

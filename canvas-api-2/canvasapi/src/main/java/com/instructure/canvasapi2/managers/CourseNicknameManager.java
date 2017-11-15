@@ -1,5 +1,3 @@
-package com.instructure.canvasapi2.managers;
-
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,6 +14,8 @@ package com.instructure.canvasapi2.managers;
  *     limitations under the License.
  *
  */
+
+package com.instructure.canvasapi2.managers;
 
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.CourseNicknameAPI;
@@ -72,7 +72,11 @@ public class CourseNicknameManager extends BaseManager {
                     .withForceReadFromNetwork(true)
                     .build();
 
-            CourseNicknameAPI.setNickname(courseId, nickname, adapter, callback, params);
+            if (nickname.isEmpty()) {
+                CourseNicknameAPI.deleteNickname(courseId, adapter, callback, params);
+            } else {
+                CourseNicknameAPI.setNickname(courseId, nickname, adapter, callback, params);
+            }
         }
     }
 

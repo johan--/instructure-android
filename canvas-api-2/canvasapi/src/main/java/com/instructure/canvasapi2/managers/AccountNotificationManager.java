@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,14 +17,20 @@
 
 package com.instructure.canvasapi2.managers;
 
-import com.instructure.canvasapi2.AppManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.AccountNotificationAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.AccountNotification;
 import com.instructure.canvasapi2.tests.AccountNotificationManager_Test;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
+import java.util.List;
+
+
+/**
+ * Manager for working with account notifications (aka global announcements)
+ */
 public class AccountNotificationManager extends BaseManager {
 
     private static boolean mTesting = false;
@@ -42,6 +48,52 @@ public class AccountNotificationManager extends BaseManager {
                     .build();
 
             AccountNotificationAPI.getAccountNotificationForStudentById(adapter, params, parentId, studentId, accountNotificationId, callback);
+        }
+    }
+
+    public static void getAccountNotifications(StatusCallback<List<AccountNotification>> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            AccountNotificationAPI.getAccountNotifications(adapter, params, callback);
+        }
+    }
+
+    public static void getAllAccountNotifications(StatusCallback<List<AccountNotification>> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            StatusCallback<List<AccountNotification>> depaginatedCallback = new ExhaustiveListCallback<AccountNotification>(callback) {
+                @Override
+                public void getNextPage(StatusCallback<List<AccountNotification>> callback, String nextUrl, boolean isCached) {
+                    AccountNotificationAPI.getAccountNotifications(adapter, params, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            AccountNotificationAPI.getAccountNotifications(adapter, params, depaginatedCallback);
+        }
+    }
+
+    public static void deleteAccountNotification(long notificationId, StatusCallback<AccountNotification> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder().build();
+            AccountNotificationAPI.deleteAccountNotification(notificationId, adapter, params, callback);
         }
     }
 

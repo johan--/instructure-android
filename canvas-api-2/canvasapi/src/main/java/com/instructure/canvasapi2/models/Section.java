@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 import com.instructure.canvasapi2.utils.APIHelper;
-import com.instructure.canvasapi2.utils.DateHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +40,8 @@ public class Section extends CanvasContext implements Comparable<CanvasContext> 
     @SerializedName("end_at")
     private String endAt;
     private List<User> students = new ArrayList<>();
+    @SerializedName("total_students")
+    private int totalStudents;
 
     @Override
     public long getId() {
@@ -88,6 +89,10 @@ public class Section extends CanvasContext implements Comparable<CanvasContext> 
         return students;
     }
 
+    public int getTotalStudents() {
+        return totalStudents;
+    }
+
     //endregion
 
     //region Setters
@@ -116,6 +121,10 @@ public class Section extends CanvasContext implements Comparable<CanvasContext> 
         this.students = students;
     }
 
+    public void setTotalStudents(int totalStudents) {
+        this.totalStudents = totalStudents;
+    }
+
     //endregion
 
     //region Parcelable
@@ -133,6 +142,7 @@ public class Section extends CanvasContext implements Comparable<CanvasContext> 
         dest.writeString(this.startAt);
         dest.writeString(this.endAt);
         dest.writeTypedList(students);
+        dest.writeInt(this.totalStudents);
     }
 
     public Section() {
@@ -145,6 +155,7 @@ public class Section extends CanvasContext implements Comparable<CanvasContext> 
         this.startAt = in.readString();
         this.endAt = in.readString();
         this.students = in.createTypedArrayList(User.CREATOR);
+        this.totalStudents = in.readInt();
     }
 
     public static final Creator<Section> CREATOR = new Creator<Section>() {

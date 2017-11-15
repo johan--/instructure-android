@@ -128,8 +128,6 @@
   <string name="domain">Domain</string>
   <string name="sendFeedback">Feedback abschicken</string>
   <string name="sendMail">E-Mail senden...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Bearbeiten</string>
   <plurals name="item_count">
     <item quantity="one">%d Element</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Beim Abrufen des Kurses für dieses Element ist ein Fehler aufgetreten.</string>
   <string name="could_not_find_group">Beim Abrufen der Gruppe für dieses Element ist ein Fehler aufgetreten.</string>
   <string name="selectBackground">Einen Backdrop auswählen</string>
-  <string name="kalturaSubmissionInProgress">Dateien werden abgeschickt.... Prüfen Sie den Benachrichtigungsbalken auf Aktualisierungen.</string>
-  <string name="kalturaSubmissionSuccessful">Abschicken der Datei abgeschlossen</string>
+  <string name="notoriousSubmissionInProgress">Dateien werden abgeschickt.... Prüfen Sie den Benachrichtigungsbalken auf Aktualisierungen.</string>
+  <string name="notoriousSubmissionSuccessful">Abschicken der Datei abgeschlossen</string>
   <string name="poll_title">Was wollten Sie auf Canvas machen?</string>
   <string name="poll_warning">Ein Element wurde nicht gewählt.</string>
   <string name="poll_item_1">Meine Noten prüfen</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Teilen</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super Panda-Bild</string>
   <string name="newFeatureTitle">Mobile Benachrichtigungen</string>
   <string name="newFeatureMsg">Um mobile Push-Benachrichtigungen zu erhalten, gehen Sie zu Canvas Einstellungen &gt; Benachrichtigungen &gt; und wählen \"Für alle Geräte\"</string>

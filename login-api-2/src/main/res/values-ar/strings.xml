@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">LoginAPI</string>
   <string name="hello_world">أهلا بالعالم!</string>
   <string name="action_settings">الإعدادات</string>
   <string name="mobileVerifyGeneral">استخدام هذا التطبيق غيرمسموح به</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">UnknownDevice</string>
   <string name="errorOccurred">حدث خطأ غير متوقع.</string>
   <string name="pageNotFound">لم يتم العثور على الصفحة.</string>
-  <string name="okay">موافق</string>
   <string name="confirm">تأكيد</string>
   <string name="cancel">إلغاء</string>
   <string name="help">المساعدة</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">هل تحاول تسجيل الدخول إلى Canvas Network؟</string>
   <string name="remove">إزالة</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">إخفاء الاسم</string>
+  <string name="userId">معرف المستخدم</string>
+  <string name="domain">المجال</string>
+  <string name="masqueradingUserId">إخفاء معرف المستخدم</string>
+  <string name="masqueradingUserDomain">إخفاء المجال</string>
+  <string name="masqueradingBegin">بدأ الإخفاء</string>
+  <string name="masqueradingStop">إيقاف إخفاء الأسماء</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">حذف هذا المستخدم؟</string>
   <string name="removedForever">يتعين عليك تسجيل الدخول من جديد باستعمال هذا المستخدم للوصول إلى محتوياته.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">لا ترى مؤسستك التعليمية؟ أدخل عنوان URL التابع للمؤسسة التعليمية أو اضغط هنا لطلب المساعدة.</string>
   <string name="loginCanvasHelpWithUser">أدخل عنوان URL التابع للمؤسسة التعليمية أو اضغط هنا لطلب المساعدة.</string>
   <string name="loginHint">البحث عن مؤسستك أو منطقتك التعليمية</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">كيف هو أداؤنا؟</string>
-  <string name="rateUs">كيف ستقيمنا؟</string>
-  <string name="doBetter">كيف يمكن أن يكون أداؤنا أفضل؟</string>
-  <string name="sendFeedback">إرسال تعليقات</string>
-  <string name="suggestions">إقتراحات لـ Android</string>
-  <string name="domain">المجال</string>
-  <string name="versionNum">الإصدار:</string>
-  <string name="userId">معرف المستخدم</string>
-  <string name="email">البريد الإلكتروني</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">عدم العرض من جديد</string>
-  <string name="installDate">تارخ التثبيت:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">الإبلاغ عن مشكلة</string>
   <string name="zendesk_subject">الموضوع</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">الجهاز</string>
   <string name="osVersion">إصدار نظام التشغيل</string>
+  <string name="previousLoginTitle">عمليات تسجيل الدخول السابقة</string>
+  <string name="canvasNetworks">Canvas Networks</string>
+  <string name="findMySchool">ابحث عن مدرستي</string>
+  <string name="appTypeTeacher">المعلم</string>
+  <string name="appTypeStudent">الطالب</string>
+  <string name="appTypeParent">ولي الأمر</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">ما اسم مدرستك؟</string>
+  <string name="next">التالي</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">حذف المستخدم السابق</string>
+  <string name="accountDomainFooter">ألا تستطيع العثور على مدرستك؟ حاول كتابة رابط URL الكامل للمدرسة.</string>
+  <string name="accountDomainFooterLink">اضغط هنا للحصول على المساعدة.</string>
+  <string name="login_noInternetConnectionTitle">لا يوجد اتصال بالإنترنت</string>
+  <string name="login_noInternetConnectionMessage">يتطلب هذا الإجراء اتصالاً بالإنترنت.</string>
+  <string name="empty_feedback">يلزم وجود موضوع ووصف لإرسال الملاحظات والآراء.</string>
+  <string name="versionNum">رقم الإصدار</string>
+  <string name="scrollInstructions">قم بالتمرير لرؤية كافة التفاصيل</string>
 </resources>

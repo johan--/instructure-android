@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,15 +29,15 @@ import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.activities.PublishPollActivity;
 import com.instructure.androidpolling.app.rowfactories.PollResultsRowFactory;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.api.PollChoiceAPI;
-import com.instructure.canvasapi.api.PollSessionAPI;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollChoice;
-import com.instructure.canvasapi.model.PollChoiceResponse;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.model.PollSessionResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollChoice;
+import com.instructure.canvasapi2.models.PollChoiceResponse;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.models.PollSessionResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -48,26 +48,16 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
 public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
 
-    @BindView(R.id.question)
-    TextView question;
-
-    @BindView(R.id.publishPoll)
-    Button publishPollBtn;
-
-    @BindView(R.id.shareResults)
-    Button shareResultsBtn;
-
-    @BindView(R.id.timer)
-    TextView timer;
-
-    @BindView(R.id.sessionStatus)
-    TextView sessionStatus;
-
-    public static final String TAG = "PollResultsFragment";
+    @BindView(R.id.question) TextView question;
+    @BindView(R.id.publishPoll) Button publishPollBtn;
+    @BindView(R.id.shareResults) Button shareResultsBtn;
+    @BindView(R.id.timer) TextView timer;
+    @BindView(R.id.sessionStatus) TextView sessionStatus;
 
     private Poll poll;
     private PollSession pollSession;
@@ -84,14 +74,10 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
     private NumberFormat numberFormat;
 
     private OnUpdatePollListener callback;
-    private CanvasCallback<PollChoiceResponse> pollChoiceCallback;
-    private CanvasCallback<Response> closePollCallback;
-    private CanvasCallback<PollSessionResponse> updatePollSessionCallback;
-    private CanvasCallback<PollSessionResponse> pollSessionCallback;
-    ///////////////////////////////////////////////////////////////////////////
-    // Lifecycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
+    private StatusCallback<PollChoiceResponse> pollChoiceCallback;
+    private StatusCallback<ResponseBody> closePollCallback;
+    private StatusCallback<PollSessionResponse> updatePollSessionCallback;
+    private StatusCallback<PollSessionResponse> pollSessionCallback;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -118,7 +104,6 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
                 updateViews();
 
                 reloadData();
-                return;
             }
         }
         //if we just published multiple polls from this location, go back to the poll session list
@@ -131,7 +116,7 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
     public void updatePoll(Poll poll) {
         //set the current poll to be the one passed in
         this.poll = poll;
-        PollChoiceAPI.getFirstPagePollChoices(poll.getId(), pollChoiceCallback);
+        PollsManager.getFirstPagePollChoices(poll.getId(), pollChoiceCallback, true);
     }
 
     @Override
@@ -159,10 +144,6 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
         }
 
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
 
     private void setupViews(Poll poll, ArrayList<PollChoice> pollChoices) {
         clearAdapter();
@@ -210,7 +191,6 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
             sessionStatus.setTextColor(getResources().getColor(R.color.canvasRed));
             timer.setVisibility(View.INVISIBLE);
         }
-
     }
 
     private void setTime() {
@@ -231,7 +211,7 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
             public void onClick(View view) {
                 if(pollSession.is_published()) {
                     //close the poll session
-                    PollSessionAPI.closePollSession(poll.getId(), pollSession.getId(), closePollCallback);
+                    PollsManager.closePollSession(poll.getId(), pollSession.getId(), closePollCallback, true);
                 }
                 else {
                     //go to the publish screen to let the teacher select which courses and sections to use
@@ -245,18 +225,15 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
             public void onClick(View view) {
                 //if we don't have public results, share them
                 if(!pollSession.has_public_results()) {
-                    PollSessionAPI.updatePollSession(poll.getId(), pollSession.getId(), pollSession.getCourse_id(), pollSession.getCourse_section_id(), true, updatePollSessionCallback);
-                }
-                else {
+                    PollsManager.updatePollSession(poll.getId(), pollSession.getId(), pollSession.getCourse_id(), pollSession.getCourse_section_id(), true, updatePollSessionCallback, true);
+                } else {
                     //otherwise, turn them off
-                    PollSessionAPI.updatePollSession(poll.getId(), pollSession.getId(), pollSession.getCourse_id(), pollSession.getCourse_section_id(), false, updatePollSessionCallback);
+                    PollsManager.updatePollSession(poll.getId(), pollSession.getId(), pollSession.getCourse_id(), pollSession.getCourse_section_id(), false, updatePollSessionCallback, true);
                 }
             }
         });
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // PaginatedListFragment Overrides
-    ///////////////////////////////////////////////////////////////////////////
+
     @Override
     public int getRootLayoutCode() {
         return R.layout.fragment_poll_results;
@@ -266,13 +243,14 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
     public void configureViews(View rootView) {
         ButterKnife.bind(this, rootView);
         setupClickListeners();
+        setupCallbacks();
 
         //get the poll passed in by tapping the poll on the poll list page. But we also get a poll in the updatePoll
         //function and we don't want to overwrite it with the poll from the bundle
         if(getArguments() != null && poll == null) {
             poll = getArguments().getParcelable(Constants.POLL_DATA);
             if(poll != null) {
-                PollChoiceAPI.getFirstPagePollChoices(poll.getId(), pollChoiceCallback);
+                PollsManager.getFirstPagePollSessions(poll.getId(), pollSessionCallback, true);
             }
             pollSession = getArguments().getParcelable(Constants.POLL_SESSION);
         }
@@ -290,7 +268,7 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
                 result = (float)(sessionResults.get(item.getId())) / totalSubmissions;
             }
         }
-        return PollResultsRowFactory.buildRowView(getLayoutInflater(), getActivity(), item.getText(), (int)(result*100), item.is_correct(), convertView, position);
+        return PollResultsRowFactory.buildRowView(layoutInflater(), getActivity(), item.getText(), (int)(result*100), item.is_correct(), convertView, position);
     }
 
     @Override
@@ -315,9 +293,8 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
 
     @Override
     public void loadFirstPage() {
-
-        PollChoiceAPI.getFirstPagePollChoices(poll.getId(), pollChoiceCallback);
-        PollSessionAPI.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback);
+        PollsManager.getFirstPagePollChoices(poll.getId(), pollChoiceCallback, true);
+        PollsManager.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback, true);
     }
 
     @Override
@@ -343,17 +320,12 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
 
     @Override
     public void setupCallbacks() {
-        pollChoiceCallback = new CanvasCallback<PollChoiceResponse>(this) {
+        pollChoiceCallback = new StatusCallback<PollChoiceResponse>() {
             @Override
-            public void cache(PollChoiceResponse pollChoiceResponse) {
+            public void onResponse(Response<PollChoiceResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollChoiceResponse pollChoiceResponse, LinkHeaders linkHeaders, Response response) {
-                if(getActivity() == null) return;
-
-                List<PollChoice> pollChoices = pollChoiceResponse.getPollChoices();
+                List<PollChoice> pollChoices = response.body().getPollChoices();
                 if(pollChoices != null) {
                     for (PollChoice pollChoice : pollChoices) {
                         addItem(pollChoice);
@@ -364,34 +336,41 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
                     updateViews();
                 }
             }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
         };
 
-        closePollCallback = new CanvasCallback<Response>(this) {
+        closePollCallback = new StatusCallback<ResponseBody>() {
             @Override
-            public void cache(Response response) {
+            public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                //200 == success
-                if(response.getStatus() == 200) {
+                if(response.code() == 200) {
                     AppMsg.makeText(getActivity(), getString(R.string.successfullyClosed), AppMsg.STYLE_SUCCESS).show();
                     pollSession.setIs_published(false);
                     updateViews();
                 }
             }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
         };
 
-        updatePollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
+        updatePollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
+            public void onResponse(Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 if(pollSessions != null) {
                     pollSession = pollSessions.get(0);
                 }
@@ -399,15 +378,12 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
             }
         };
 
-        pollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
+        pollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
+            public void onResponse(Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 if(pollSessions != null) {
                     sessionResults = pollSessions.get(0).getResults();
                     pollSession = pollSessions.get(0);
@@ -418,6 +394,13 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
                     notifyDataSetChanged();
                 }
             }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
         };
     }
     @Override
@@ -425,9 +408,4 @@ public class PollResultsFragment extends PaginatedListFragment<PollChoice>  {
 
     @Override
     public int getDividerColor(){ return android.R.color.transparent;}
-
-    @Override
-    public void onCallbackStarted() {
-
-    }
 }

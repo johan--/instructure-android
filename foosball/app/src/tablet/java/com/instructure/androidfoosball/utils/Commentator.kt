@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball.utils
 
 import android.content.Context
@@ -22,7 +38,13 @@ class Commentator {
         DOUBLE_KILL(R.raw.doublekill),
         MULTI_KILL(R.raw.multikill),
         KILLING_SPREE(R.raw.killingspree),
-        UNSTOPPABLE(R.raw.unstoppable)
+        UNSTOPPABLE(R.raw.unstoppable),
+        LEEROY_JENKINS(R.raw.leeroy_jenkins),
+        MOTIVATION(R.raw.motivation),
+        ILLUMINATI_CONFIRMED(R.raw.illuminati_confirmed),
+        MLG_HORN(R.raw.mlg_horn),
+        LEGITNESS(R.raw.legitness),
+        PROFAMITY(R.raw.profamity)
     }
 
     private val mSfxNames = Sfx.values().map { it.name }
@@ -85,6 +107,8 @@ class Commentator {
     fun queueAnnounce(text: String) = announce(text, false)
 
     fun announceBadTouch() = speak(rotate( 12347,
+            Sfx.MLG_HORN.name,
+            "You have to start a game first. ${Sfx.MOTIVATION}",
             "Don't touch that",
             "I can't even.",
             Sfx.MURCA.name,
@@ -152,6 +176,8 @@ class Commentator {
     }
 
     fun announceGameStart(text: String = rotate( 832,
+            Sfx.LEEROY_JENKINS.name,
+            Sfx.MLG_HORN.name,
             "Let's get this party started",
             "Let's make this a clean fight",
             "Go go go! Move move move move!",
@@ -161,13 +187,14 @@ class Commentator {
             "Let's make this fast. I totally didn't place any bets. Totally.",
             "If you don't finish this in 5 minutes, I will self destruct.",
             "This again? Do you people never learn?",
-            "3. 2. 1. Stop. Go. Wait. Yeah, go. Go now. For reals."
+            "3. 2. 1. Stop. Go. Wait. Yeah, go. Go now. For reals.",
+            "Just do it! Don't let your dreams be dreams!"
     )) = speak("${Sfx.DING.name} $text")
 
     fun announceGoal(scoringSide: TableSide, round: Round, table: Table) {
         val (scoringTeam, opposingTeam) = when (scoringSide) {
-            TableSide.SIDE_1 -> round.sideOneTeam to round.sideTwoTeam
-            TableSide.SIDE_2 -> round.sideTwoTeam to round.sideOneTeam
+            TableSide.SIDE_1 -> round.sideOneTeam!! to round.sideTwoTeam!!
+            TableSide.SIDE_2 -> round.sideTwoTeam!! to round.sideOneTeam!!
         }
         announceGoal(round.getTeamName(scoringTeam, table), round.getTeamName(opposingTeam, table), round.getScore(scoringTeam), round.getScore(opposingTeam))
     }
@@ -178,6 +205,7 @@ class Commentator {
 
     private fun announceUndoGoal(shameTeamName: String, opponentTeamName: String, scoringTeamScore: Int, opponentTeamScore: Int) {
         speak(Sfx.REVERSE_DING.name + rotate(3321,
+                "One less point for $shameTeamName. ${Sfx.PROFAMITY}",
                 "Shame on you $shameTeamName. You should feel bad. One less point for you.",
                 "Maybe we'll take the point away from $shameTeamName and give it to $opponentTeamName",
                 "Look at how far you got $shameTeamName. A whole $scoringTeamScore points. Then you went and threw it all away.",
@@ -188,7 +216,7 @@ class Commentator {
         ))
     }
 
-    private fun announceGoal(scoringTeamName: String, opponentTeamName: String, scoringTeamScore: Int, opponentTeamScore: Int) {
+    fun announceGoal(scoringTeamName: String, opponentTeamName: String, scoringTeamScore: Int, opponentTeamScore: Int) {
         speak((if (scoringTeamScore >= 5) Sfx.WINNING_GOAL.name else Sfx.DING.name) + when {
 
         /* Random chance to spawn patriotism */
@@ -198,7 +226,8 @@ class Commentator {
             scoringTeamScore >= 5 -> when (opponentTeamScore) {
 
             /* BAGEL! */
-                0 -> rotate(1, 
+                0 -> rotate(1,
+                        "${Sfx.LEGITNESS} Absolutely beautiful. I couldn't have done it better myself.",
                         "Give me a B. Give me an A. Give me a G. Give me an E. Give me an L. B. A. G. E. L. What does it spell? ${Sfx.MASSACRE}",
                         "Get the cream cheese ready because this bagel is hot hot hot.",
                         "Roll out the bagel carpet because $opponentTeamName is about to take the walk of shame.",
@@ -256,7 +285,8 @@ class Commentator {
                         "If $scoringTeamName scores and $opponentTeamName isn't there to watch it, does it still count?",
                         "Huh."
                 )
-                3 -> rotate(7, 
+                3 -> rotate(7,
+                        "Three to zero, illuminati confirmed ${Sfx.ILLUMINATI_CONFIRMED}",
                         Sfx.MULTI_KILL.name,
                         "I'm seeing a trend here",
                         "I see where this is going",
@@ -327,6 +357,7 @@ class Commentator {
                 )
 
                 2 -> rotate(16,
+                        "$opponentTeamName just needs some motivation. ${Sfx.MOTIVATION}",
                         "$scoringTeamName is on a roll",
                         "$opponentTeamName is lagging behind.",
                         "I'm pretty sure $scoringTeamName just cheated",

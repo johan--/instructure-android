@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">URL an Liy</string>
   <string name="canvasAPI_mediaRecording">Anrejistreman Medya</string>
   <string name="canvasAPI_attendance">Prezans</string>
+  <string name="quiz_scoring_policy_highest">Pi Wo</string>
+  <string name="quiz_scoring_policy_average">Mwayèn</string>
+  <string name="quiz_scoring_policy_latest">Dènye</string>
+  <string name="no">Non</string>
+  <string name="always">Toujou</string>
+  <string name="graded_quiz">Quiz Klase</string>
+  <string name="practice_quiz">Pratike Quiz</string>
+  <string name="graded_survey">Ankèt Klase</string>
+  <string name="ungraded_survey">Ankèt san Klase</string>
 </resources>

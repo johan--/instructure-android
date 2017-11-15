@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.LockInfo;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.LockInfo;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.video.ActivityContentVideoViewClient;
 import com.instructure.pandautils.views.CanvasWebView;
@@ -95,8 +95,8 @@ public class AssignmentBasicFragment extends ParentFragment {
         mAssignmentWebView = (CanvasWebView) rootView.findViewById(R.id.assignmentWebView);
         mDueDateWrapper = (RelativeLayout) rootView.findViewById(R.id.dueDateWrapper);
 
-        if(mAssignment.getDueDate() != null) {
-            mDueDate.setText(getString(R.string.dueAt) + " " + DateHelpers.getDateTimeString(getActivity(), mAssignment.getDueDate()));
+        if(mAssignment.getDueAt() != null) {
+            mDueDate.setText(getString(R.string.dueAt) + " " + DateHelper.getDateTimeString(getActivity(), mAssignment.getDueAt()));
         } else {
             mDueDateWrapper.setVisibility(View.GONE);
         }
@@ -156,12 +156,12 @@ public class AssignmentBasicFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
 
         });
@@ -170,10 +170,10 @@ public class AssignmentBasicFragment extends ParentFragment {
         String description;
         if (mAssignment.isLocked()) {
             description = getLockedInfoHTML(mAssignment.getLockInfo(), getActivity(), R.string.lockedAssignmentDesc, R.string.lockedAssignmentDescLine2);
-        } else if(mAssignment.getlockAtDate() != null && mAssignment.getlockAtDate().before(Calendar.getInstance(Locale.getDefault()).getTime())) {
+        } else if(mAssignment.getLockAt() != null && mAssignment.getLockAt().before(Calendar.getInstance(Locale.getDefault()).getTime())) {
             //if an assignment has an available from and until field and it has expired (the current date is after "until" it will have a lock explanation,
             //but no lock info because it isn't locked as part of a module
-            description = mAssignment.getLock_explanation();
+            description = mAssignment.getLockExplanation();
         } else {
             description = mAssignment.getDescription();
         }
@@ -207,10 +207,10 @@ public class AssignmentBasicFragment extends ParentFragment {
         }
 
         //check to see if there is an unlocked date
-        if(lockInfo.getUnlockedAt() != null && lockInfo.getUnlockedAt().after(new Date())) {
-            String unlocked = DateHelpers.getDateTimeString(context, lockInfo.getUnlockedAt());
+        if(lockInfo.getUnlockAt() != null && lockInfo.getUnlockAt().after(new Date())) {
+            String unlocked = DateHelper.getDateTimeString(context, lockInfo.getUnlockAt());
             //If there is an unlock date but no module then the assignment is locked
-            if(lockInfo.getContext_module() == null){
+            if(lockInfo.getContextModule() == null){
                 lockedMessage = "<p>" + context.getString(R.string.lockedAssignmentNotModule) + "</p>";
             }
             lockedMessage += context.getString(R.string.unlockedAt) + "<ul><li>" + unlocked + "</li></ul>";

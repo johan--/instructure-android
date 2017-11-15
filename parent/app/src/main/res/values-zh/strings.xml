@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">告诉我们您最喜欢应用程序的部分</string>
     <string name="sendFeedback">发送反馈</string>
     <string name="sendMail">发送电邮&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">域名：</string>
     <string name="help_versionNum">版本：</string>
     <string name="help_userId">用户 ID：</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">只有 Canvas 观察员可以在 Canvas 父对象中执行身份验证。</string>
     <string name="open_source">开放源</string>
     <string name="open_source_details">查看开放源许可证</string>
+
+    <string name="unitedStates">美国</string>
+    <string name="theUnitedStates">美国</string>
+    <string name="canada">加拿大</string>
+    <string name="ireland">爱尔兰</string>
+    <string name="australia">澳大利亚</string>
+    <string name="germany">德国</string>
+    <string name="singapore">新加坡</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">选择学生所在的区域</string>
+    <string name="selectRegion">区域选择器</string>
+    <string name="unauthorizedRegion">未获授权的区域</string>
+    <string name="mismatchedRegionMessage">此机构不在您选择的区域内。若要添加此机构的学生，请使用登录页的“区域选择器”选项在%1$s区域内创建帐户。</string>
 </resources>

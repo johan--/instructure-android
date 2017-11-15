@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import android.view.View;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.PageViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Page;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.Page;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class PageBinder extends BaseBinder {
@@ -44,7 +44,7 @@ public class PageBinder extends BaseBinder {
             holder.icon.setImageDrawable(CanvasContextColor.getColoredDrawable(context, R.drawable.ic_cv_document_fill, courseColor));
         }
 
-        holder.modifiedDate.setText(DateHelpers.getFormattedDate(context, page.getUpdated_at()));
+        holder.modifiedDate.setText(DateHelper.getFormattedDate(context, page.getUpdatedAt()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

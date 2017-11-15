@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -78,6 +78,8 @@ public class FileFolder extends CanvasModel<FileFolder> {
     private String filesUrl;
     @SerializedName("full_name")
     private String fullName;
+    @SerializedName("usage_rights")
+    private UsageRights usageRights;
 
     //region Getters
 
@@ -304,6 +306,15 @@ public class FileFolder extends CanvasModel<FileFolder> {
         this.lockAt = APIHelper.dateToString(lock_at);
     }
 
+    public UsageRights getUsageRights() {
+        return usageRights;
+    }
+
+    public void setUsageRights(UsageRights usageRights) {
+        this.usageRights = usageRights;
+    }
+
+
     @Override
     public Date getComparisonDate() { return null;}
     @Override
@@ -364,6 +375,7 @@ public class FileFolder extends CanvasModel<FileFolder> {
         dest.writeString(this.foldersUrl);
         dest.writeString(this.filesUrl);
         dest.writeString(this.fullName);
+        dest.writeParcelable(this.usageRights, flags);
     }
 
     public FileFolder() {
@@ -396,6 +408,7 @@ public class FileFolder extends CanvasModel<FileFolder> {
         this.foldersUrl = in.readString();
         this.filesUrl = in.readString();
         this.fullName = in.readString();
+        this.usageRights = in.readParcelable(UsageRights.class.getClassLoader());
     }
 
     public static final Creator<FileFolder> CREATOR = new Creator<FileFolder>() {

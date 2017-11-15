@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.loginapi.login.api.zendesk.utilities;
 
 import android.app.Dialog;
@@ -17,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ErrorReportManager;
@@ -97,12 +114,7 @@ public class ZendeskDialogStyled extends DialogFragment {
 
         builder.setTitle(R.string.zendesk_reportAProblem);
 
-        builder.setPositiveButton(R.string.zendesk_send, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                saveZendeskTicket();
-            }
-        });
+        builder.setPositiveButton(R.string.zendesk_send, null);
 
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -111,7 +123,20 @@ public class ZendeskDialogStyled extends DialogFragment {
             }
         });
 
-        AlertDialog dialog = builder.create();
+        final AlertDialog dialog = builder.create();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveZendeskTicket();
+                    }
+                });
+            }
+        });
+
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         return dialog;
@@ -186,6 +211,11 @@ public class ZendeskDialogStyled extends DialogFragment {
         String comment = descriptionEditText.getText().toString();
         String subject = subjectEditText.getText().toString();
 
+        if (comment.isEmpty() || subject.isEmpty()){
+            Toast.makeText(getContext(), R.string.empty_feedback, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // if we're on the login page we need to set the cache user's email address so that support can
         // contact the user
         if (fromLogin) {
@@ -223,7 +253,7 @@ public class ZendeskDialogStyled extends DialogFragment {
                 getString(R.string.osVersion) + " " + Build.VERSION.RELEASE + "\n" +
                 getString(R.string.versionNum) + ": " + versionName + " " + versionCode + "\n" +
                 getString(R.string.zendesk_severityText) + " " + getUserSeveritySelectionTag() + "\n" +
-                getString(R.string.installDate) + " " + getInstallDateString() + "\n\n";
+                getString(R.string.utils_installDate) + " " + getInstallDateString() + "\n\n";
 
         comment = deviceInfo + comment;
         if (mUseDefaultDomain) {

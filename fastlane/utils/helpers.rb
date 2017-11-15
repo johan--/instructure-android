@@ -20,10 +20,10 @@ end
 fastlane_require 'posix-spawn'
 
 def _execute args={}
-  args = {command: args} if args.is_a?(String)
+  args           = { command: args } if args.is_a?(String)
   args[:command] = "set -o pipefail && #{args[:command]}" if args[:command].include? '|'
 
-  args[:print_all] = args.fetch(:print_all, true)
+  args[:print_all]     = args.fetch(:print_all, true)
   args[:print_command] = args.fetch(:print_command, true)
 
   # 'fastlane' is the default cwd. change to parent dir.
@@ -40,9 +40,9 @@ if bitrise
   # pipefail doesn't work on dash so default to bash
   system 'sudo ln -sf bash /bin/sh'
 
-  src = join(gradle_home, 'gradle.properties')
+  src        = join(gradle_home, 'gradle.properties')
   dst_parent = join(Dir.home, '.gradle')
-  dst = join(dst_parent, 'gradle.properties')
+  dst        = join(dst_parent, 'gradle.properties')
   raise "source gradle properties doesn't exist: #{src}'" unless File.exist? src
   FileUtils.mkdir_p dst_parent
   FileUtils.copy src, dst

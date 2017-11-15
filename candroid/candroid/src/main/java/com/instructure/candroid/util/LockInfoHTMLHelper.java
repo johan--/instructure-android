@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@ package com.instructure.candroid.util;
 
 import android.content.Context;
 
-
 import com.instructure.candroid.R;
-import com.instructure.canvasapi.model.LockInfo;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.LockInfo;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 
 import java.util.Date;
 
@@ -52,10 +51,10 @@ public class LockInfoHTMLHelper {
         }
 
         //check to see if there is an unlocked date
-        if(lockInfo.getUnlockedAt() != null && lockInfo.getUnlockedAt().after(new Date())) {
-            String unlocked = DateHelpers.getDateTimeString(context, lockInfo.getUnlockedAt());
+        if(lockInfo.getUnlockAt() != null && lockInfo.getUnlockAt().after(new Date())) {
+            String unlocked = DateHelper.getDateTimeString(context, lockInfo.getUnlockAt());
             //If there is an unlock date but no module then the assignment is locked
-            if(lockInfo.getContext_module() == null){
+            if(lockInfo.getContextModule() == null){
                 lockedMessage = "<p>" + context.getString(R.string.lockedAssignmentNotModule) + "</p>";
             }
             lockedMessage += context.getString(R.string.unlockedAt) + "<ul><li>" + unlocked + "</li></ul>";
@@ -64,9 +63,9 @@ public class LockInfoHTMLHelper {
         //lockedMessage += "<p>" + context.getResources().getString(explanationSecondLine) + "</p>";
         //make sure we know what the protocol is (http or https)
 
-        if (lockInfo.getContext_module() != null) {
+        if (lockInfo.getContextModule() != null) {
             //create the url to modules for this course
-            String url = APIHelpers.loadProtocol(context) + "://" + APIHelpers.getDomain(context) + "/courses/" + lockInfo.getContext_module().getContext_id() + "/modules";
+            String url = ApiPrefs.getProtocol() + "://" + ApiPrefs.getDomain() + "/courses/" + lockInfo.getContextModule().getContextId() + "/modules";
             //create the button and link it to modules
             String linkToModules = "<center>" + String.format(buttonTemplate, url, context.getResources().getString(R.string.goToModules)) + "</center>";
 

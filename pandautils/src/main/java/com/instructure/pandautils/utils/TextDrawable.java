@@ -26,6 +26,7 @@ public class TextDrawable extends ShapeDrawable {
     private static final float SHADE_FACTOR = 0.9f;
     private final String text;
     private final int color;
+    private final int borderColor;
     private final RectShape shape;
     private final int height;
     private final int width;
@@ -45,6 +46,7 @@ public class TextDrawable extends ShapeDrawable {
         // text and color
         text = builder.toUpperCase ? builder.text.toUpperCase() : builder.text;
         color = builder.color;
+        borderColor = builder.borderColor;
 
         // text paint settings
         fontSize = builder.fontSize;
@@ -60,7 +62,7 @@ public class TextDrawable extends ShapeDrawable {
         // border paint settings
         borderThickness = builder.borderThickness;
         borderPaint = new Paint();
-        borderPaint.setColor(getDarkerShade(color));
+        borderPaint.setColor(borderColor);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(borderThickness);
 
@@ -149,7 +151,7 @@ public class TextDrawable extends ShapeDrawable {
 
         private String text;
 
-        private int color;
+        private int color, borderColor;
 
         private int borderThickness;
 
@@ -174,6 +176,7 @@ public class TextDrawable extends ShapeDrawable {
         private Builder() {
             text = "";
             color = Color.GRAY;
+            borderColor = Color.LTGRAY;
             textColor = Color.WHITE;
             borderThickness = 0;
             width = -1;
@@ -202,6 +205,12 @@ public class TextDrawable extends ShapeDrawable {
 
         public IConfigBuilder withBorder(int thickness) {
             this.borderThickness = thickness;
+            return this;
+        }
+
+        @Override
+        public IConfigBuilder withBorderColor(int color) {
+            this.borderColor = color;
             return this;
         }
 
@@ -282,44 +291,46 @@ public class TextDrawable extends ShapeDrawable {
     }
 
     public interface IConfigBuilder {
-        public IConfigBuilder width(int width);
+        IConfigBuilder width(int width);
 
-        public IConfigBuilder height(int height);
+        IConfigBuilder height(int height);
 
-        public IConfigBuilder textColor(int color);
+        IConfigBuilder textColor(int color);
 
-        public IConfigBuilder withBorder(int thickness);
+        IConfigBuilder withBorder(int thickness);
 
-        public IConfigBuilder useFont(Typeface font);
+        IConfigBuilder withBorderColor(int color);
 
-        public IConfigBuilder fontSize(int size);
+        IConfigBuilder useFont(Typeface font);
 
-        public IConfigBuilder bold();
+        IConfigBuilder fontSize(int size);
 
-        public IConfigBuilder toUpperCase();
+        IConfigBuilder bold();
 
-        public IShapeBuilder endConfig();
+        IConfigBuilder toUpperCase();
+
+        IShapeBuilder endConfig();
     }
 
-    public static interface IBuilder {
+    public interface IBuilder {
 
-        public TextDrawable build(String text, int color);
+        TextDrawable build(String text, int color);
     }
 
-    public static interface IShapeBuilder {
+    public interface IShapeBuilder {
 
-        public IConfigBuilder beginConfig();
+        IConfigBuilder beginConfig();
 
-        public IBuilder rect();
+        IBuilder rect();
 
-        public IBuilder round();
+        IBuilder round();
 
-        public IBuilder roundRect(int radius);
+        IBuilder roundRect(int radius);
 
-        public TextDrawable buildRect(String text, int color);
+        TextDrawable buildRect(String text, int color);
 
-        public TextDrawable buildRoundRect(String text, int color, int radius);
+        TextDrawable buildRoundRect(String text, int color, int radius);
 
-        public TextDrawable buildRound(String text, int color);
+        TextDrawable buildRound(String text, int color);
     }
 }

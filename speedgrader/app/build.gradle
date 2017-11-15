@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
         classpath 'com.google.gms:google-services:1.5.0-beta2'
         classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -121,7 +121,7 @@ dependencies {
     compile rootProject.ext.supportDependencies.analytics
     compile 'com.android.support:multidex:1.0.1'
     compile project(':recyclerview')
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
         transitive = true;
     }
     compile('com.github.afollestad.material-dialogs:core:0.8.5.6@aar') {

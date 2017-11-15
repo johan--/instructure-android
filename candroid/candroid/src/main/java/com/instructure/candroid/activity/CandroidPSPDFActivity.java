@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,20 +23,18 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import com.instructure.candroid.R;
-import com.pspdfkit.datastructures.Range;
-import com.pspdfkit.document.PSPDFDocument;
-import com.pspdfkit.document.processor.PSPDFProcessorTask;
+import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.document.sharing.DefaultDocumentSharingController;
 import com.pspdfkit.document.sharing.DocumentSharingIntentHelper;
 import com.pspdfkit.document.sharing.DocumentSharingManager;
 import com.pspdfkit.document.sharing.SharingOptions;
-import com.pspdfkit.ui.PSPDFActivity;
-
-import java.util.List;
+import com.pspdfkit.ui.PdfActivity;
 
 
-public class CandroidPSPDFActivity extends PSPDFActivity {
+public class CandroidPSPDFActivity extends PdfActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
@@ -59,12 +57,12 @@ public class CandroidPSPDFActivity extends PSPDFActivity {
     }
 
     private void uploadDocumentToCanvas(){
-        final PSPDFDocument document = getDocument();
+        final PdfDocument document = getDocument();
         if(document != null) {
             DocumentSharingManager.shareDocument(
                     new CandroidDocumentSharingController(this),
                     document,
-                    new SharingOptions(PSPDFProcessorTask.AnnotationProcessingMode.FLATTEN));
+                    new SharingOptions(PdfProcessorTask.AnnotationProcessingMode.FLATTEN));
         }
     }
 

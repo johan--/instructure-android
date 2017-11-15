@@ -10,7 +10,6 @@
   <string name="unknownDevice">UnknownDevice</string>
   <string name="errorOccurred">An unexpected error occurred.</string>
   <string name="pageNotFound">Page not found.</string>
-  <string name="okay">Okay</string>
   <string name="confirm">Confirm</string>
   <string name="cancel">Cancel</string>
   <string name="help">Help</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">Trying to sign into Canvas Network?</string>
   <string name="remove">Remove</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">User ID</string>
+  <string name="domain">Domain</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Remove this user?</string>
   <string name="removedForever">To access this user\'s content, you will have to sign into this user again.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">Don\'t see your school? Enter the school URL or tap here for help.</string>
   <string name="loginCanvasHelpWithUser">Enter the school URL or tap here for help.</string>
   <string name="loginHint">Find your school or district</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">How are we doing?</string>
-  <string name="rateUs">How would you rate us?</string>
-  <string name="doBetter">What can we do better?</string>
-  <string name="sendFeedback">Send feedback</string>
-  <string name="suggestions">Suggestions for Android</string>
-  <string name="domain">Domain</string>
-  <string name="versionNum">Version:</string>
-  <string name="userId">User ID</string>
-  <string name="email">Email</string>
-  <string name="mobileSupportEmailAddress">obilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Don\'t show again</string>
-  <string name="installDate">Install date:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Report a problem</string>
   <string name="zendesk_subject">Subject</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">Device</string>
   <string name="osVersion">OS version</string>
+  <string name="empty_feedback">A subject and description are required to submit feedback.</string>
 </resources>

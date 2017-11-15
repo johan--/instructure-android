@@ -128,8 +128,6 @@
   <string name="domain">Domínio</string>
   <string name="sendFeedback">Enviar Comentários</string>
   <string name="sendMail">Enviar Email...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Editar</string>
   <plurals name="item_count">
     <item quantity="one">%d item</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Ocorreu um erro ao recuperar a disciplina para este íten.</string>
   <string name="could_not_find_group">Ocorreu um erro ao recuperar o grupo para este íten.</string>
   <string name="selectBackground">Selecionar uma cópia</string>
-  <string name="kalturaSubmissionInProgress">A Entregar ficheiros... Verifique a barra de notificação para atualizações.</string>
-  <string name="kalturaSubmissionSuccessful">Terminou a entrega do ficheiro</string>
+  <string name="notoriousSubmissionInProgress">A Entregar ficheiros... Verifique a barra de notificação para atualizações.</string>
+  <string name="notoriousSubmissionSuccessful">Terminou a entrega do ficheiro</string>
   <string name="poll_title">O que veio fazer ao Canvas?</string>
   <string name="poll_warning">Não foi selecionado um íten.</string>
   <string name="poll_item_1">Verificar as minhas notas</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">AvataresPanda</string>
   <string name="share">Partilhar</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Imagem Super Panda</string>
   <string name="newFeatureTitle">Notificações Móveis</string>
   <string name="newFeatureMsg">Para receber notificações para a Definições &gt; Notificações &gt; Canvas E selecione \"Para Todos os Dispositivos\"</string>

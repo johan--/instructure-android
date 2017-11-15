@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Chwazi Medya</string>
   <string name="takeVideo">Anrejistre Videyo</string>
   <string name="noCameraOnDevice">Pa gen Kamera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Transfere nan Canvas</string>
   <string name="preparingUpload">Preparasyon Transfè</string>
   <string name="loadingFilesIndeterminate">Chajman fichye...</string>
-  <string name="fileUploadSuccess"> Transfè Reyisi</string>
+  <string name="fileUploadSuccess">Transfè Reyisi</string>
   <string name="noNetwork">Pa gen koneksyon entènèt - tanpri eseye ankò pita</string>
   <string name="uploadMessage">\"Transfè a ap fèt. Tcheke notifikasyon yo pou wè ki kote transfè a ye.</string>
   <string name="mediaUpload">Transfè Mesya</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Gen yon erè ki fèt nan resepsyon foto a. Tanpri eseye ankò.</string>
   <string name="errorTextMissing">ajoute kèk tèks pou kas voye yon mesaj</string>
   <string name="fileUploadNotSupported">Ou pa kapab transfere fichye a sesyon ou chwazi a..</string>
+  <string name="noCourseSelected">Tanpri chwazi yon kou</string>
   <string name="selectCourse">Tanpri chwazi yon kou</string>
   <string name="selectAssignment">Chwazi yon sesyon</string>
   <string name="loadingAssignments">Chajman Sesyon...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Poko li</string>
   <string name="discussion_reply">Reponn</string>
   <string name="close">Fèmen</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Pwofesè Canvas</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Gwoup Canvas</string>
+  <string name="utils_speedgrader">SpeedGrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Kisa w ap fè la a?</string>
+  <string name="utils_rateUs">Kisa ou ka di de nou?</string>
+  <string name="utils_doBetter">Kisa nou ka amelyore?</string>
+  <string name="utils_sendFeedback">Voye Kòmantè</string>
+  <string name="utils_suggestions">Sijesyon pou Android</string>
+  <string name="utils_domain">Domèn</string>
+  <string name="utils_versionNum">Vèsyon:</string>
+  <string name="utils_userId">ID Itilizatè</string>
+  <string name="utils_email">Imèl</string>
+  <string name="utils_dontShowAgain">Pa afiche ankò</string>
+  <string name="utils_installDate">Dat Enstalasyon:</string>
+  <string name="utils_device">Aparèy</string>
+  <string name="utils_osVersion">Vèsyon OS</string>
+  <string name="loading">Chajman</string>
 </resources>

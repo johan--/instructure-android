@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,10 +28,11 @@ import com.instructure.candroid.holders.ModuleSubHeaderViewHolder;
 import com.instructure.candroid.holders.ModuleViewHolder;
 import com.instructure.candroid.interfaces.ModuleAdapterToFragmentCallback;
 import com.instructure.candroid.util.ModuleUtility;
-import com.instructure.canvasapi.model.ModuleContentDetails;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleObject;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.ModuleContentDetails;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleObject;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class ModuleBinder extends BaseBinder {
@@ -157,7 +158,7 @@ public class ModuleBinder extends BaseBinder {
         ModuleContentDetails details = moduleItem.getModuleDetails();
         if(details != null) {
             if (details.getDueDate() != null) {
-                holder.date.setText(DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, details.getDueDate()));
+                holder.date.setText(DateHelper.createPrefixedDateTimeString(context, R.string.toDoDue, details.getDueDate()));
                 setVisible(holder.date);
             } else {
                 holder.date.setText("");
@@ -166,7 +167,7 @@ public class ModuleBinder extends BaseBinder {
 
             String points = details.getPointsPossible();
             if(!TextUtils.isEmpty(points)) {
-                setGrade(null, Double.parseDouble(points), holder.points, context);
+                holder.points.setText(context.getString(R.string.totalPoints, com.instructure.canvasapi2.utils.NumberHelper.formatDecimal(Double.parseDouble(points), 2, true)));
                 setVisible(holder.points);
             } else {
                 holder.points.setText("");

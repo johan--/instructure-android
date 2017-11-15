@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -14,13 +14,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package com.instructure.androidpolling.app.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -28,16 +27,11 @@ import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.asynctasks.LogoutAsyncTask;
 import com.instructure.androidpolling.app.fragments.ParentFragment;
 import com.instructure.androidpolling.app.util.ApplicationManager;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.User;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.User;
 
-public class BaseActivity extends FragmentActivity implements ParentFragment.OnUpdatePollListener{
-
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
+public abstract class BaseActivity extends AppCompatActivity implements ParentFragment.OnUpdatePollListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +48,8 @@ public class BaseActivity extends FragmentActivity implements ParentFragment.OnU
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.action_logout:
-                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask(this, null);
+                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask();
                 logoutAsyncTask.execute();
                 break;
         }
@@ -94,13 +87,9 @@ public class BaseActivity extends FragmentActivity implements ParentFragment.OnU
         getSupportFragmentManager().popBackStack();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers Used in FragmentManager and PollList
-    ///////////////////////////////////////////////////////////////////////////
     //we need to know if the user is a teacher in any course
     public void checkEnrollments(User user) {
         if(user == null || user.getEnrollments() == null) {
-
             return;
         }
         for(Enrollment enrollment: user.getEnrollments()) {
@@ -113,16 +102,11 @@ public class BaseActivity extends FragmentActivity implements ParentFragment.OnU
             }
         }
         invalidateOptionsMenu();
-
     }
 
     public void setActionBarTitle(String title) {
-        getActionBar().setTitle(title);
+        getSupportActionBar().setTitle(title);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Methods that can be overwritten
-    ///////////////////////////////////////////////////////////////////////////
 
     public void loadData(){
         if(getSupportFragmentManager().findFragmentById(R.id.fragment_container) != null) {
@@ -135,6 +119,4 @@ public class BaseActivity extends FragmentActivity implements ParentFragment.OnU
         ParentFragment fragment = (ParentFragment)getSupportFragmentManager().findFragmentByTag(fragmentTag);
         fragment.updatePoll(poll);
     }
-
-
 }

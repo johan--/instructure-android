@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public abstract class BaseRecyclerAdapter<T extends RecyclerView.ViewHolder> ext
     public abstract int size();
     public abstract void clear();
     public abstract void setSelectedItemId(long itemId);
-    public void contextReady(){};
+    public void contextReady(){}
 
     protected Context mContext;
     protected int mSelectedPosition = -1;
@@ -64,6 +64,7 @@ public abstract class BaseRecyclerAdapter<T extends RecyclerView.ViewHolder> ext
         mAdapterToRecyclerViewCallback.refresh();
     }
 
+    public void cancel() {}
 
     // region selectedPosition
     public void setSelectedPosition(int position){

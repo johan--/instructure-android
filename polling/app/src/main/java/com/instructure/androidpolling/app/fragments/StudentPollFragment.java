@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,48 +35,39 @@ import android.widget.TextView;
 
 import com.devspark.appmsg.AppMsg;
 import com.instructure.androidpolling.app.R;
+import com.instructure.androidpolling.app.activities.BaseActivity;
 import com.instructure.androidpolling.app.model.AnswerValue;
 import com.instructure.androidpolling.app.rowfactories.StudentPollResultsRowFactory;
 import com.instructure.androidpolling.app.rowfactories.StudentPollRowFactory;
 import com.instructure.androidpolling.app.util.ApplicationManager;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.api.PollChoiceAPI;
-import com.instructure.canvasapi.api.PollSessionAPI;
-import com.instructure.canvasapi.api.PollSubmissionAPI;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollChoice;
-import com.instructure.canvasapi.model.PollChoiceResponse;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.model.PollSessionResponse;
-import com.instructure.canvasapi.model.PollSubmission;
-import com.instructure.canvasapi.model.PollSubmissionResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollChoice;
+import com.instructure.canvasapi2.models.PollChoiceResponse;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.models.PollSessionResponse;
+import com.instructure.canvasapi2.models.PollSubmission;
+import com.instructure.canvasapi2.models.PollSubmissionResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.List;
 import java.util.TreeSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class StudentPollFragment extends ParentFragment {
 
-    @BindView(R.id.poll_question)
-    TextView pollQuestion;
-
-    @BindView(R.id.listView)
-    ListView listView;
-
-    @BindView(R.id.submit_poll)
-    Button submitPoll;
-
-    @BindView(R.id.rootView)
-    RelativeLayout rootLayout;
-
-    @BindView(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.poll_question) TextView pollQuestion;
+    @BindView(R.id.listView) ListView listView;
+    @BindView(R.id.submit_poll) Button submitPoll;
+    @BindView(R.id.rootView) RelativeLayout rootLayout;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
 
     private Poll poll;
     private PollSession pollSession;
@@ -92,16 +83,9 @@ public class StudentPollFragment extends ParentFragment {
     private PollSubmission pollSubmission;
     private int totalResults = 0;
 
-    //callbacks
-    private CanvasCallback<PollChoiceResponse> pollChoiceCallback;
-    private CanvasCallback<PollSubmissionResponse> pollSubmissionCallback;
-    private CanvasCallback<PollSessionResponse> pollSessionCallback;
-
-    public static final String TAG = "StudentPollFragment";
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
+    private StatusCallback<PollChoiceResponse> pollChoiceCallback;
+    private StatusCallback<PollSubmissionResponse> pollSubmissionCallback;
+    private StatusCallback<PollSessionResponse> pollSessionCallback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -109,8 +93,6 @@ public class StudentPollFragment extends ParentFragment {
         View rootView = inflater.inflate(R.layout.fragment_student_poll, container, false);
         ButterKnife.bind(this, rootView);
         setupViews();
-
-
         setupCallbacks();
         return rootView;
     }
@@ -122,8 +104,7 @@ public class StudentPollFragment extends ParentFragment {
 
         if(poll != null) {
             updateViews(poll);
-            PollChoiceAPI.getFirstPagePollChoices(poll.getId(), pollChoiceCallback);
-
+            PollsManager.getFirstPagePollChoices(poll.getId(), pollChoiceCallback, true);
         }
         if(pollSession != null) {
             showResults = pollSession.has_public_results();
@@ -141,25 +122,26 @@ public class StudentPollFragment extends ParentFragment {
         listView.setLayoutAnimation(controller);
         setupListeners();
 
+        if(getActivity() instanceof BaseActivity) {
+            ((BaseActivity)getActivity()).setTitle(R.string.poll);
+        }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
-
     private void setupViews() {
-
-        answers = new TreeSet<AnswerValue>();
+        answers = new TreeSet<>();
         answerAdapter = new AnswerAdapter(getActivity(), answers);
         listView.setAdapter(answerAdapter);
-//        swipeRefreshLayout.setColorScheme(R.color.polling_aqua, R.color.polling_green, R.color.polling_purple, R.color.canvaspollingtheme_color);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.polling_aqua,
+                R.color.polling_green,
+                R.color.polling_purple,
+                R.color.canvaspollingtheme_color);
     }
 
     private void setupListeners() {
         submitPoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 //make sure the user has something selected and get which item the user selected
                 boolean hasSelected = false;
                 pollSubmission = new PollSubmission();
@@ -168,17 +150,14 @@ public class StudentPollFragment extends ParentFragment {
                     if(answerValue.isSelected()) {
                         hasSelected = true;
                         //API call to submit poll
-                        PollSubmissionAPI.createPollSubmission(poll.getId(), pollSession.getId(), answerValue.getPollChoiceId(), pollSubmissionCallback);
+                        PollsManager.createPollSubmission(poll.getId(), pollSession.getId(), answerValue.getPollChoiceId(), pollSubmissionCallback, true);
                         break;
                     }
                 }
 
                 if(!hasSelected) {
                     AppMsg.makeText(getActivity(), getString(R.string.mustSelect), AppMsg.STYLE_WARNING).show();
-                    return;
                 }
-
-
             }
         });
 
@@ -207,8 +186,8 @@ public class StudentPollFragment extends ParentFragment {
 
                 totalResults = 0;
                 //API call to check if we can show results
-                PollSessionAPI.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback);
-                PollChoiceAPI.getFirstPagePollChoices(poll.getId(), pollChoiceCallback);
+                PollsManager.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback, true);
+                PollsManager.getFirstPagePollChoices(poll.getId(), pollChoiceCallback, true);
                 swipeRefreshLayout.setRefreshing(false);
 
             }
@@ -223,14 +202,11 @@ public class StudentPollFragment extends ParentFragment {
         else if(!showResults && hasSubmitted) {
             //make all items not selected disabled
             listView.setOnItemClickListener(null);
-
             answerAdapter.notifyDataSetChanged();
-
         }
     }
 
     private void updateViews(Poll poll) {
-
         pollQuestion.setText(poll.getQuestion());
     }
 
@@ -275,9 +251,6 @@ public class StudentPollFragment extends ParentFragment {
             answerAdapter.notifyDataSetChanged();
         }
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // Adapter
-    ///////////////////////////////////////////////////////////////////////////
 
     private class AnswerAdapter extends BaseAdapter {
         private Context context;
@@ -367,20 +340,13 @@ public class StudentPollFragment extends ParentFragment {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Callbacks
-    ///////////////////////////////////////////////////////////////////////////
-
     private void setupCallbacks() {
-        pollChoiceCallback = new CanvasCallback<PollChoiceResponse>(this) {
+        pollChoiceCallback = new StatusCallback<PollChoiceResponse>() {
             @Override
-            public void cache(PollChoiceResponse pollChoiceResponse) {
+            public void onResponse(retrofit2.Response<PollChoiceResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollChoiceResponse pollChoiceResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollChoice> pollChoices = pollChoiceResponse.getPollChoices();
+                List<PollChoice> pollChoices = response.body().getPollChoices();
                 if(pollChoices != null) {
                     for (PollChoice pollChoice : pollChoices) {
                         addAnswer(pollChoice.getText(), pollChoice.getId(), pollChoice.is_correct(), pollChoice.getPosition());
@@ -402,51 +368,57 @@ public class StudentPollFragment extends ParentFragment {
                         }
                     }
                 }
-                if(linkHeaders.nextURL != null) {
-                    PollChoiceAPI.getNextPagePollChoices(linkHeaders.nextURL, pollChoiceCallback);
+                if(StatusCallback.moreCallsExist(linkHeaders)) {
+                    PollsManager.getNextPagePollChoices(linkHeaders.nextUrl, pollChoiceCallback, true);
+                }
+            }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         };
 
-        pollSubmissionCallback = new CanvasCallback<PollSubmissionResponse>(this) {
+        pollSubmissionCallback = new StatusCallback<PollSubmissionResponse>() {
             @Override
-            public void cache(PollSubmissionResponse pollSubmissionResponse) {
+            public void onResponse(Response<PollSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollSubmissionResponse pollSubmissionResponse, LinkHeaders linkHeaders, Response response) {
                 //successful submission, let the user know
                 AppMsg.makeText(getActivity(), getString(R.string.successfullySubmitted), AppMsg.STYLE_SUCCESS).show();
 
                 //save the actual poll submission so we know which id they selected.
-                ApplicationManager.savePollSubmission(getActivity(), pollSession.getId(), pollSubmissionResponse.getPollSubmissions().get(0).getPoll_choice_id());
+                ApplicationManager.savePollSubmission(getActivity(), pollSession.getId(), response.body().getPollSubmissions().get(0).getPoll_choice_id());
 
                 hasSubmitted = true;
                 updateViewsSubmitted();
 
                 //We need to update the session so that we know how many users have submitted and their answers if the teacher has chosen to share results
-                PollSessionAPI.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback);
-
+                PollsManager.getSinglePollSession(poll.getId(), pollSession.getId(), pollSessionCallback, true);
                 getActivity().setResult(Constants.SUBMIT_POLL_SUCCESS);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<PollSubmissionResponse> response, Throwable error) {
                 AppMsg.makeText(getActivity(), getString(R.string.errorSubmittingPoll), AppMsg.STYLE_ERROR).show();
-                return super.onFailure(retrofitError);
+            }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         };
 
-        pollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
+        pollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
+            public void onResponse(Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 if(pollSessions != null) {
                     showResults = pollSessions.get(0).has_public_results();
                     pollSession = pollSessions.get(0);
@@ -457,17 +429,15 @@ public class StudentPollFragment extends ParentFragment {
                     answerAdapter.notifyDataSetChanged();
                 }
             }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
         };
     }
-
-    @Override
-    public void onCallbackStarted() {
-
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Bundle
-    ///////////////////////////////////////////////////////////////////////////
 
     private void handleArguments(Bundle bundle) {
         if(bundle != null) {
@@ -476,5 +446,4 @@ public class StudentPollFragment extends ParentFragment {
             hasSubmitted = bundle.getBoolean(Constants.HAS_SUBMITTED);
         }
     }
-
 }

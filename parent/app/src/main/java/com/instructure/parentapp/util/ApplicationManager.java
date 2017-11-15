@@ -25,7 +25,6 @@ import android.webkit.WebView;
 
 import com.crashlytics.android.Crashlytics;
 import com.instructure.canvasapi2.AppManager;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.Prefs;
@@ -80,7 +79,7 @@ public class ApplicationManager extends AppManager {
      */
     public boolean logoutUser() {
 
-        final String airwolfDomain = APIHelper.getAirwolfDomain(getApplicationContext());
+        final String airwolfDomain = ApiPrefs.getAirwolfDomain();
 
         //Get the Shared Preferences
         SharedPreferences settings = getSharedPreferences(ApplicationManager.PREF_NAME, MODE_PRIVATE);
@@ -93,7 +92,7 @@ public class ApplicationManager extends AppManager {
         //Clear all Shared Preferences.
         ApiPrefs.clearAllData();
 
-        APIHelper.setAirwolfDomain(getApplicationContext(), BuildConfig.IS_TESTING ? BuildConfig.GAMMA_DOMAIN : airwolfDomain);
+        ApiPrefs.setAirwolfDomain(BuildConfig.IS_TESTING ? BuildConfig.GAMMA_DOMAIN : airwolfDomain);
 
         return true;
     }

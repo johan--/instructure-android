@@ -130,8 +130,6 @@
   <string name="domain">Домейн</string>
   <string name="sendFeedback">Отправить отзыв</string>
   <string name="sendMail">Отправить Email...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Редактировать</string>
   <plurals name="item_count">
     <item quantity="one">%d элемент</item>
@@ -447,8 +445,8 @@
   <string name="could_not_find_course">Возникла ошибка при получении курса для этого элемента.</string>
   <string name="could_not_find_group">Возникла ошибка при получении группы для этого элемента.</string>
   <string name="selectBackground">Выбрать изображение заставки</string>
-  <string name="kalturaSubmissionInProgress">Отправка файлов ... Проверьте панель уведомлений на наличие обновлений.</string>
-  <string name="kalturaSubmissionSuccessful">Отправка файлов выполнена</string>
+  <string name="notoriousSubmissionInProgress">Отправка файлов ... Проверьте панель уведомлений на наличие обновлений.</string>
+  <string name="notoriousSubmissionSuccessful">Отправка файлов выполнена</string>
   <string name="poll_title">Для чего вы зашли на Canvas?</string>
   <string name="poll_warning">Элемент не был выбран.</string>
   <string name="poll_item_1">Проверить свои оценки</string>
@@ -485,6 +483,7 @@
   <string name="pandaAvatarsFolderName">Аватары Панды</string>
   <string name="share">Поделиться</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Супер изображение панды</string>
   <string name="newFeatureTitle">Мобильные Уведомления</string>
   <string name="newFeatureMsg">Чтобы получить мобильные всплывающие уведомления перейдите в Настройки Canvas &gt; Уведомления &gt; и выберите \"Для всех устройств\"</string>

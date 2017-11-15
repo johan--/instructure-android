@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball.activities
 
 import android.app.AlertDialog
@@ -9,30 +25,20 @@ import android.text.Html
 import android.view.View
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
-import com.instructure.androidfoosball.App
 import com.instructure.androidfoosball.R
-import com.instructure.androidfoosball.adapters.UserAdapter
-import com.instructure.androidfoosball.ktmodels.CutThroatGame
-import com.instructure.androidfoosball.ktmodels.Game
-import com.instructure.androidfoosball.ktmodels.User
+import com.instructure.androidfoosball.ktmodels.*
 import com.instructure.androidfoosball.receivers.GoalReceiver
-import com.instructure.androidfoosball.utils.Const
-import com.instructure.androidfoosball.utils.Prefs
-import com.instructure.androidfoosball.utils.mCommentator
-import com.instructure.androidfoosball.utils.shortToast
+import com.instructure.androidfoosball.utils.*
 import com.instructure.androidfoosball.views.ConfirmPinDialog
 import kotlinx.android.synthetic.tablet.activity_main.*
-import org.jetbrains.anko.onClick
-import java.util.*
-
-import com.instructure.androidfoosball.ktmodels.Table
+import org.jetbrains.anko.sdk21.listeners.onClick
 import org.jetbrains.anko.startActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    val dateFormat = SimpleDateFormat("MMM d 'at' h:mm aa", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("MMM d 'at' h:mm aa", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +77,12 @@ class MainActivity : AppCompatActivity() {
         // Cut-throat game
         cutthroatGameButton.onClick { startActivity<CreateCutThroatGameActivity>() }
 
+        // King of the Table game
+        tableKingGameButton.onClick { startActivity<CreateTableKingGameActivity>() }
+
+        // Team Twister game
+        teamTwisterGameButton.onClick { startActivity<CreateTeamTwisterGameActivity>() }
+
         // Create new user
         addUserButton.onClick { startActivity<CreatePlayerActivity>() }
 
@@ -84,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         tableNameView.setOnClickListener {
             AlertDialog.Builder(this)
                     .setMessage("Assign this tablet to a different foosball table?")
-                    .setPositiveButton(android.R.string.yes) { dialog, which ->
+                    .setPositiveButton(android.R.string.yes) { _, _ ->
                         Prefs.tableId = ""
                         finish()
                         startActivity<SyncActivity>()
@@ -94,19 +106,15 @@ class MainActivity : AppCompatActivity() {
 
         // Edit Player
         editPlayerButton.setOnClickListener {
-            val users = App.realm.where(User::class.java).equalTo("guest", false).findAllSorted("name").toList()
-            MaterialDialog.Builder(this@MainActivity)
-                    .title(R.string.pick_a_user)
-                    .adapter(UserAdapter(this@MainActivity, users)) { dialog, itemView, which, text ->
-                        dialog.dismiss()
-                        if (users[which].guest) {
-                            shortToast(R.string.cannot_edit_guests)
-                        } else {
-                            ConfirmPinDialog(this@MainActivity, users[which]) { user ->
-                                startActivity<EditUserActivity>(Const.USER_ID to users[which].id)
-                            }.show()
-                        }
+            showUserPicker(this) {
+                if (it.guest) {
+                    shortToast(R.string.cannot_edit_guests)
+                } else {
+                    ConfirmPinDialog(this@MainActivity, it) {
+                        startActivity<EditUserActivity>(Const.USER_ID to it.id)
                     }.show()
+                }
+            }
         }
 
         // Resume game
@@ -117,21 +125,31 @@ class MainActivity : AppCompatActivity() {
                         when (game) {
                             is Game -> {
                                 val dateString = dateFormat.format(Calendar.getInstance().apply { timeInMillis = game.startTime }.time)
-                                "Game started $dateString with players ${(game.teamOne.users + game.teamTwo.users).joinToString { it.name }}"
+                                "Game started $dateString with players ${(game.teamOne!!.users + game.teamTwo!!.users).joinToString { it.name }}"
                             }
                             is CutThroatGame -> {
                                 val dateString = dateFormat.format(Calendar.getInstance().apply { timeInMillis = game.startTime }.time)
-                                "Cut-Throat Game started $dateString with players ${game.players.joinToString { it.user.name }}"
+                                "Cut-Throat Game started $dateString with players ${game.players.joinToString { it.user?.name.orEmpty() }}"
+                            }
+                            is TableKingGame -> {
+                                val dateString = dateFormat.format(Calendar.getInstance().apply { timeInMillis = game.startTime }.time)
+                                "King of the Table started $dateString with players ${game.teams.flatMap { it.users }.distinct().joinToString { it?.name.orEmpty() }}"
+                            }
+                            is TeamTwisterGame -> {
+                                val dateString = dateFormat.format(Calendar.getInstance().apply { timeInMillis = game.startTime }.time)
+                                "Team Twister Game started $dateString with players ${game.teams.flatMap { it.users }.distinct().joinToString { it?.name.orEmpty() }}"
                             }
                             else -> "Unknown game"
                         }
 
                     })
-                    .itemsCallback { materialDialog, view, i, charSequence ->
+                    .itemsCallback { _, _, i, _ ->
                         val game = games[i]
                         when (game) {
                             is Game -> startActivity<GameActivity>(GameActivity.EXTRA_GAME_ID to game.id)
                             is CutThroatGame -> startActivity<CutThroatGameActivity>(CutThroatGameActivity.EXTRA_GAME_ID to game.id)
+                            is TableKingGame -> startActivity<TableKingGameActivity>(TableKingGameActivity.EXTRA_GAME_ID to game.id)
+                            is TeamTwisterGame -> startActivity<TeamTwisterGameActivity>(TeamTwisterGameActivity.EXTRA_GAME_ID to game.id)
                         }
                     }
                     .show()

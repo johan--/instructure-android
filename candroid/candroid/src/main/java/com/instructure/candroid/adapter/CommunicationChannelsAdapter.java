@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.canvasapi.model.CommunicationChannel;
+import com.instructure.canvasapi2.models.CommunicationChannel;
 import com.instructure.pandautils.utils.TutorialUtils;
 
 public class CommunicationChannelsAdapter extends ArrayAdapter<CommunicationChannel> {

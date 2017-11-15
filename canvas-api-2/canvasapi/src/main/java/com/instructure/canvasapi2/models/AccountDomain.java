@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 
 package com.instructure.canvasapi2.models;
 
-import android.os.Build;
 import android.os.Parcel;
+import android.support.annotation.Nullable;
+
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
@@ -27,7 +29,9 @@ public class AccountDomain extends CanvasModel<AccountDomain> {
 
     private String domain;
     private String name;
-    private Double distance;
+    private double distance;
+    @SerializedName("authentication_provider")
+    private String authenticationProvider;
 
     public String getDomain() {
         return domain;
@@ -49,8 +53,13 @@ public class AccountDomain extends CanvasModel<AccountDomain> {
         this.name = name;
     }
 
-    public void setDistance(Double distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
+    }
+
+    @Nullable
+    public String getAuthenticationProvider() {
+        return authenticationProvider;
     }
 
     @Override
@@ -78,15 +87,21 @@ public class AccountDomain extends CanvasModel<AccountDomain> {
         dest.writeString(this.domain);
         dest.writeString(this.name);
         dest.writeDouble(this.distance);
+        dest.writeString(this.authenticationProvider);
     }
 
     public AccountDomain() {
+    }
+
+    public AccountDomain(String domain) {
+        this.domain = domain;
     }
 
     private AccountDomain(Parcel in) {
         this.domain = in.readString();
         this.name = in.readString();
         this.distance = in.readDouble();
+        this.authenticationProvider = in.readString();
     }
 
     public static final Creator<AccountDomain> CREATOR = new Creator<AccountDomain>() {

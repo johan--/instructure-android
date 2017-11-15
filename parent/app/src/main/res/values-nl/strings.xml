@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Vertel ons over je favoriete onderdelen van de app</string>
     <string name="sendFeedback">Feedback versturen</string>
     <string name="sendMail">E-mail&#8230; versturen</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domein</string>
     <string name="help_versionNum">Versie:</string>
     <string name="help_userId">Gebruikers ID</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Alleen Canvas-observeerders kunnen een Canvas Parent verifiëren.</string>
     <string name="open_source">Open bron</string>
     <string name="open_source_details">Licenties voor open bronnen weergeven</string>
+
+    <string name="unitedStates">Verenigde Staten</string>
+    <string name="theUnitedStates">de Verenigde Staten</string>
+    <string name="canada">Canada</string>
+    <string name="ireland">Ierland</string>
+    <string name="australia">Australië</string>
+    <string name="germany">Duitsland</string>
+    <string name="singapore">Singapore</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Kies de regio van de student</string>
+    <string name="selectRegion">Regio selecteren</string>
+    <string name="unauthorizedRegion">Niet-geautoriseerde regio</string>
+    <string name="mismatchedRegionMessage">Deze instelling bevindt zich buiten uw geselecteerde regio Als u een cursist van deze instelling wilt toevoegen, gebruikt u de optie “Regio selecteren” op de aanmeldingspagina om een account te maken in de regio %1$s.</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -14,13 +14,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package com.instructure.candroid.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -36,29 +34,28 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.instructure.candroid.R;
 import com.instructure.candroid.interfaces.OnEventUpdatedCallback;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
-import com.sleepbot.datetimepicker.time.RadialPickerLayout;
-import com.sleepbot.datetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import retrofit.client.Response;
-
-public class CreateCalendarEventFragment extends ParentFragment implements DatePickerDialog.OnDateSetListener{
+public class CreateCalendarEventFragment extends ParentFragment implements
+        TimePickerFragment.TimePickerCancelListener,
+        DatePickerFragment.DatePickerFragmentListener,
+        DatePickerFragment.DatePickerCancelListener {
 
     public static final String DATEPICKER_TAG = "datepicker";
     public static final String TIMEPICKER_TAG_START = "timepicker_start";
@@ -72,15 +69,15 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
     private TextView mEventStartTimeText;
     private TextView mEventEndTimeText;
 
-    private DatePickerDialog mDatePickerDialog;
-    private TimePickerDialog mTimeStartPickerDialog;
-    private TimePickerDialog mTimeEndPickerDialog;
+    private DatePickerFragment mDatePicker;
+    private TimePickerFragment mTimeStartPicker;
+    private TimePickerFragment mTimeEndPicker;
 
     private GregorianCalendar mStartCalendar;
     private GregorianCalendar mEndCalendar;
     private Calendar mDateCalendar;
 
-    private CanvasCallback<ScheduleItem> mCanvasCallback;
+    private StatusCallback<ScheduleItem> mCanvasCallback;
 
     private OnEventUpdatedCallback mOnEventUpdatedCallback;
 
@@ -154,27 +151,6 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        //we need to dismiss/show the dialogs so the get recreated in their proper orientation
-        if(mDatePickerDialog != null && mDatePickerDialog.isAdded()) {
-            mDatePickerDialog.dismiss();
-            mDatePickerDialog.show(getActivity().getSupportFragmentManager(), DATEPICKER_TAG);
-        }
-
-        if(mTimeStartPickerDialog != null && mTimeStartPickerDialog.isAdded()) {
-            mTimeStartPickerDialog.dismiss();
-            mTimeStartPickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_START);
-        }
-
-        if(mTimeEndPickerDialog != null && mTimeEndPickerDialog.isAdded()) {
-            mTimeEndPickerDialog.dismiss();
-            mTimeEndPickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_END);
-        }
-
-    }
-
-    @Override
     public void createOptionsMenu(Menu menu, MenuInflater inflater) {
         super.createOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_save_generic, menu);
@@ -212,55 +188,48 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
         //Set the date to the current day
         mEventDateText.setText(getFullDateString(mDateCalendar.getTime()));
         mEventStartTimeText = (TextView)rootView.findViewById(R.id.eventStartTimeText);
-        mEventStartTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mDateCalendar.getTime()));
+        mEventStartTimeText.setText(DateHelper.getDayHourDateString(getContext(), mDateCalendar.getTime()));
         mEventEndTimeText = (TextView)rootView.findViewById(R.id.eventEndTimeText);
-        mEventEndTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mDateCalendar.getTime()));
-
-        //Initialize the date picker, Time pickers are initialized upon first use
-        mDatePickerDialog = DatePickerDialog.newInstance(this, mDateCalendar.get(Calendar.YEAR), mDateCalendar.get(Calendar.MONTH), mDateCalendar.get(Calendar.DAY_OF_MONTH), false);
+        mEventEndTimeText.setText(DateHelper.getDayHourDateString(getContext(), mDateCalendar.getTime()));
     }
 
     private void setUpListeners(){
         mEventDateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDatePickerDialog.setYearRange(1985, 2028);
-                mDatePickerDialog.setCloseOnSingleTapDay(true);
-                mDatePickerDialog.show(getActivity().getSupportFragmentManager(), DATEPICKER_TAG);
+                mDatePicker = DatePickerFragment.Companion.newInstance(CreateCalendarEventFragment.this, CreateCalendarEventFragment.this);
+                mDatePicker.show(getActivity().getFragmentManager(), DATEPICKER_TAG);
             }
         });
 
         mEventStartTimeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTimeStartPickerDialog = TimePickerDialog.newInstance(mOnStartTimeListener, mStartCalendar.get(Calendar.HOUR_OF_DAY), mStartCalendar.get(Calendar.MINUTE), false, false);
-                mTimeStartPickerDialog.setCloseOnSingleTapMinute(false);
-                mTimeStartPickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_START);
+                mTimeStartPicker = TimePickerFragment.Companion.newInstance(mOnStartListener, mStartCalendar.get(Calendar.HOUR_OF_DAY), mStartCalendar.get(Calendar.MINUTE), CreateCalendarEventFragment.this);
+                mTimeStartPicker.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_START);
             }
         });
 
         mEventEndTimeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTimeEndPickerDialog = TimePickerDialog.newInstance(mOnEndTimeListener, mEndCalendar.get(Calendar.HOUR_OF_DAY), mEndCalendar.get(Calendar.MINUTE), false, false);
-                mTimeEndPickerDialog.setCloseOnSingleTapMinute(false);
-                mTimeEndPickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_END);
+                mTimeEndPicker = TimePickerFragment.Companion.newInstance(mOnEndListener, mEndCalendar.get(Calendar.HOUR_OF_DAY), mEndCalendar.get(Calendar.MINUTE), CreateCalendarEventFragment.this);
+                mTimeEndPicker.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG_END);
             }
         });
     }
 
-    private void setUpCanvasCallback(){
-        mCanvasCallback = new CanvasCallback<ScheduleItem>(this) {
+    private void setUpCanvasCallback() {
+        mCanvasCallback = new StatusCallback<ScheduleItem>() {
             @Override
-            public void firstPage(ScheduleItem scheduleItem, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<ScheduleItem> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
-
                 showToast(R.string.eventSuccessfulCreation);
                 //Refresh Calendar
-                if(mOnEventUpdatedCallback != null && scheduleItem != null){
-                    mOnEventUpdatedCallback.onEventSaved(scheduleItem, false);
+                if (mOnEventUpdatedCallback != null && response.body() != null) {
+                    mOnEventUpdatedCallback.onEventSaved(response.body(), false);
                 }
                 getActivity().onBackPressed();
             }
@@ -272,13 +241,6 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
         super.onFragmentActionbarSetupComplete(placement);
         setupTitle(getActionbarTitle());
     }
-
-    @Override
-    public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-        mDateCalendar.set(year, month, day);
-        mEventDateText.setText(getFullDateString(mDateCalendar.getTime()));
-    }
-
     //endregion
 
     //region Helpers
@@ -291,7 +253,7 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
         String endTime = "";
         String locationName = "";
 
-        contextCode = APIHelpers.getCacheUser(getContext()).getContextId();
+        contextCode = ApiPrefs.getUser().getContextId();
 
         if(!TextUtils.isEmpty(mEventTitleEditText.getText().toString())){
             title = mEventTitleEditText.getText().toString();
@@ -302,10 +264,10 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
         if(!TextUtils.isEmpty(mEventLocationEditText.getText().toString())){
             locationName = mEventLocationEditText.getText().toString();
         }
-        startTime = APIHelpers.dateToString(getStartDate());
-        endTime = APIHelpers.dateToString(getEndDate());
+        startTime = APIHelper.dateToString(getStartDate());
+        endTime = APIHelper.dateToString(getEndDate());
 
-        CalendarEventAPI.createCalendarEvent(contextCode, title, note, startTime, endTime, locationName, mCanvasCallback);
+        CalendarEventManager.createCalendarEvent(contextCode, title, note, startTime, endTime, locationName, mCanvasCallback);
     }
 
     private Date getStartDate(){
@@ -333,9 +295,9 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
         return dayOfWeek + " " + dateString;
     }
 
-    private TimePickerDialog.OnTimeSetListener mOnStartTimeListener = new TimePickerDialog.OnTimeSetListener() {
+    private TimePickerFragment.TimePickerFragmentListener mOnStartListener = new TimePickerFragment.TimePickerFragmentListener() {
         @Override
-        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+        public void onTimeSet(int hourOfDay, int minute) {
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
@@ -343,18 +305,19 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
             calendar.set(Calendar.MILLISECOND, 0);
 
             mStartCalendar.setTimeInMillis(calendar.getTimeInMillis());
-            mEventStartTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mStartCalendar.getTime()));
+            mEventStartTimeText.setText(DateHelper.getDayHourDateString(getContext(), mStartCalendar.getTime()));
             if(mStartCalendar.after(mEndCalendar)){
                 //calendar is either equal or after, set end time = to start time.
                 mEndCalendar.setTimeInMillis(mStartCalendar.getTimeInMillis());
-                mEventEndTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mEndCalendar.getTime()));
+                mEventEndTimeText.setText(DateHelper.getDayHourDateString(getContext(), mEndCalendar.getTime()));
             }
         }
     };
 
-    private TimePickerDialog.OnTimeSetListener mOnEndTimeListener = new TimePickerDialog.OnTimeSetListener() {
+
+    private TimePickerFragment.TimePickerFragmentListener mOnEndListener = new TimePickerFragment.TimePickerFragmentListener() {
         @Override
-        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+        public void onTimeSet(int hourOfDay, int minute) {
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
@@ -362,13 +325,12 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
             calendar.set(Calendar.MILLISECOND, 0);
 
             mEndCalendar.setTimeInMillis(calendar.getTimeInMillis());
-            mEventEndTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mEndCalendar.getTime()));
+            mEventEndTimeText.setText(DateHelper.getDayHourDateString(getContext(), mEndCalendar.getTime()));
             if(mEndCalendar.before(mStartCalendar)){
                 //Calendar is either equal or before start time, set start time = to end time
                 mStartCalendar.setTimeInMillis(mEndCalendar.getTimeInMillis());
-                mEventStartTimeText.setText(DateHelpers.getDayHourDateString(getContext(), mStartCalendar.getTime()));
+                mEventStartTimeText.setText(DateHelper.getDayHourDateString(getContext(), mStartCalendar.getTime()));
             }
-
         }
     };
 
@@ -390,6 +352,15 @@ public class CreateCalendarEventFragment extends ParentFragment implements DateP
             mDateCalendar.set(Calendar.MILLISECOND, 0);
         }
     }
+
+    @Override
+    public void onDateSet(int year, int month, int day) {
+        mDateCalendar.set(year, month, day);
+        mEventDateText.setText(getFullDateString(mDateCalendar.getTime()));
+    }
+
+    @Override
+    public void onCancel() {}
 
     //endregion
 

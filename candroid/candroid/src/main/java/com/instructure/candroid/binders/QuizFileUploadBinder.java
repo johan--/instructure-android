@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import com.instructure.candroid.holders.QuizFileUploadViewHolder;
 import com.instructure.candroid.interfaces.QuizFileRemovedListener;
 import com.instructure.candroid.interfaces.QuizFileUploadListener;
 import com.instructure.candroid.interfaces.QuizToggleFlagState;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.QuizSubmissionQuestion;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.views.CanvasWebView;
 
@@ -73,7 +73,7 @@ public class QuizFileUploadBinder extends BaseBinder{
                     quizFileRemovedListener.quizFileUploadRemoved(quizSubmissionQuestion.getId(), position);
                 }
             });
-            if(attachment.getMimeType().contains("image")){
+            if(attachment.getContentType().contains("image")){
                 holder.fileIcon.setImageDrawable(CanvasContextColor.getColoredDrawable(context, R.drawable.ic_cv_image, canvasContext));
             }else{
                 holder.fileIcon.setImageDrawable(CanvasContextColor.getColoredDrawable(context, R.drawable.ic_cv_document, canvasContext));

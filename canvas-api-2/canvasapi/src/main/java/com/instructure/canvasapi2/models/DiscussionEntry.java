@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -32,21 +32,22 @@ import java.util.List;
 
 public class DiscussionEntry extends CanvasModel<DiscussionEntry> {
 
-    private long id;                      //Entry id.
+    // TODO: Prepend underscore to local-only fields
+    private long id;                      // Entry id.
     private boolean unread = false;
     @SerializedName("updated_at")
     private String updatedAt;
     @SerializedName("created_at")
     private String createdAt;
-    private DiscussionEntry parent;         //Parent of the entry;
+    private DiscussionEntry parent;       // Parent of the entry;
     private DiscussionParticipant author;
-    private String description;             //HTML formatted string used for an edge case. Converting header to entry
+    private String description;           // HTML formatted string used for an edge case. Converting header to entry
     @SerializedName("user_id")
-    private long userId;                   //Id of the user that posted it.
+    private long userId;                  // Id of the user that posted it.
     @SerializedName("parent_id")
-    private long parentId = -1;            //Parent id. -1 if there isn't one.
-    private String message;                 //HTML message.
-    private boolean deleted;                //Whether the author deleted the message. If true, the message will be null.
+    private long parentId = -1;           // Parent id. -1 if there isn't one.
+    private String message;               // HTML message.
+    private boolean deleted;              // Whether the author deleted the message. If true, the message will be null.
     private int totalChildren = 0;
     private int unreadChildren = 0;
     private List<DiscussionEntry> replies = new ArrayList<>();

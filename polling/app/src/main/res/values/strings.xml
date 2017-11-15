@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2017 - present  Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 
 <resources>
 
-    <string name="app_name">Polls</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Polls for Canvas</string>
+
     <string name="action_settings">Settings</string>
     <string name="title_activity_poll_list">PollListActivity</string>
     <string name="polls">Polls</string>
+    <string name="poll">Poll</string>
     <string name="no_poll_text_student">You don\'t have any polls. Guess nobody is looking to hear your opinion at this time.</string>
     <string name="no_poll_text_teacher">Create a poll</string>
     <string name="tap_here">tap here</string>
 
     <string name="current_polls">Current</string>
     <string name="closed_polls">Closed</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading&#8230;</string>
     <string name="noItemsToDisplayShort">No items to display</string>
     <string name="coursesTitle">Courses</string>
     <string name="addQuestion">Add Question</string>
@@ -71,7 +72,7 @@
     <string name="uploadCSV">Upload CSV</string>
     <string name="generatedCSVFolderName">canvas_polling_csv</string>
     <string name="errorGeneratingCSV">There was an error generating the csv file</string>
-    <string name="shareCSV">Share CSV to...</string>
+    <string name="shareCSV">Share CSV to&#8230;</string>
 
     <string name="errorDeletingPoll">There was an error deleting the poll</string>
     <string name="emptyViewPublishPoll">You haven\'t published a poll yet. Tap the button below to start!</string>
@@ -113,5 +114,7 @@
 
     <string name="courseTermInactive">This course\'s term has ended.</string>
     <!-- Content Descriptions -->
+
+    <string name="no_data_connection">Please check your data connection and try again.</string>
 
 </resources>

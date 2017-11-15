@@ -18,8 +18,10 @@
 package com.instructure.parentapp.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,21 +29,21 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.instructure.canvasapi.utilities.APIHelpers;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.UserManager;
 import com.instructure.canvasapi2.models.BlockedStudentResponse;
+import com.instructure.canvasapi2.models.MismatchedRegionResponse;
 import com.instructure.canvasapi2.models.RevokedTokenResponse;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.activities.BaseActivity;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.Prefs;
 import com.instructure.parentapp.R;
+import com.instructure.parentapp.asynctask.LogoutAsyncTask;
 
-import java.io.IOException;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -73,7 +75,7 @@ public class BaseParentActivity extends BaseActivity {
                 Prefs prefs = new Prefs(this, getString(R.string.app_name_parent));
                 String parentId = prefs.load(Const.ID, "");
                 //We want to refresh cache so the main activity can load quickly with accurate information
-                UserManager.getStudentsForParentAirwolf(APIHelper.getAirwolfDomain(this), parentId, new StatusCallback<List<Student>>() {
+                UserManager.getStudentsForParentAirwolf(ApiPrefs.getAirwolfDomain(), parentId, new StatusCallback<List<Student>>() {
                     @Override
                     public void onResponse(Response<List<Student>> response, LinkHeaders linkHeaders, ApiType type) {
                         if (response.body() != null && !response.body().isEmpty()) {
@@ -84,13 +86,22 @@ public class BaseParentActivity extends BaseActivity {
 
                         } else {
                             //Take the parent to the add user page.
-                            startActivity(DomainPickerActivity.createIntent(BaseParentActivity.this, false, false, true));
-                            overridePendingTransition(0, 0);
+                            FindSchoolActivity.Companion.createIntent(BaseParentActivity.this, true);
                             finish();
                         }
                     }
                 });
             }
+        }
+
+        if (code == 451) {
+            // Parse the message from the response body
+            Gson gson = new Gson();
+            JsonParser parser = new JsonParser();
+            JsonElement mJson = parser.parse(error);
+
+            MismatchedRegionResponse mismatchedRegionResponse = gson.fromJson(mJson, MismatchedRegionResponse.class);
+            showMismatchedRegionDialog(mismatchedRegionResponse.getStudentRegion(), this);
         }
     }
 
@@ -102,11 +113,41 @@ public class BaseParentActivity extends BaseActivity {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        removeStudent(APIHelpers.getAirwolfDomain(context), response.parentId, response.studentId, context);
+                        removeStudent(ApiPrefs.getAirwolfDomain(), response.parentId, response.studentId, context);
                     }
                 })
                 .canceledOnTouchOutside(false)
                 .cancelable(false)
+                .show();
+    }
+
+    private void showMismatchedRegionDialog(final String regionString, final Context context) {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.unauthorizedRegion)
+                .setMessage(getString(R.string.mismatchedRegionMessage, getReadableRegion(this, regionString)))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Prefs prefs = new Prefs(BaseParentActivity.this, getString(R.string.app_name_parent));
+                        String parentId = prefs.load(Const.ID, "");
+                        UserManager.getStudentsForParentAirwolf(ApiPrefs.getAirwolfDomain(), parentId, new StatusCallback<List<Student>>() {
+                            @Override
+                            public void onResponse(Response<List<Student>> response, LinkHeaders linkHeaders, ApiType type) {
+                                if (response.body() != null && !response.body().isEmpty()) {
+                                    // They have students that they are observing, take them to that activity
+                                    startActivity(StudentViewActivity.createIntent(BaseParentActivity.this, response.body()));
+                                    overridePendingTransition(0, 0);
+                                    finish();
+
+                                } else {
+                                    // Log the user out
+                                    new LogoutAsyncTask(BaseParentActivity.this, "").execute();
+                                }
+                            }
+                        });
+                    }
+                })
+                .setCancelable(false)
                 .show();
     }
 
@@ -131,14 +172,32 @@ public class BaseParentActivity extends BaseActivity {
 
                         } else {
                             //Take the parent to the add user page.
-                            startActivity(DomainPickerActivity.createIntent(BaseParentActivity.this, false, false, true));
-                            overridePendingTransition(0, 0);
+                            FindSchoolActivity.Companion.createIntent(BaseParentActivity.this, true);
                             finish();
                         }
                     }
                 });
             }
         });
+    }
+
+    public static String getReadableRegion(Context context, String regionCode) {
+        switch(regionCode) {
+            case ("ca-central-1"):
+                return context.getString(R.string.canada);
+            case ("eu-central-1"):
+                return context.getString(R.string.ireland);
+            case ("eu-west-1"):
+                return context.getString(R.string.germany);
+            case ("ap-southeast-1"):
+                return context.getString(R.string.singapore);
+            case ("ap-southeast-2"):
+                return context.getString(R.string.australia);
+            case ("us-east-1"):
+                return context.getString(R.string.theUnitedStates);
+            default:
+                return context.getString(R.string.theUnitedStates);
+        }
     }
 
     @Override

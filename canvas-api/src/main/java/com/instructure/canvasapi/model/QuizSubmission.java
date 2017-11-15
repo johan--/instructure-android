@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
 
     //Points possible for the quiz
     @SerializedName("quiz_points_possible")
-    private int quizPointsPossible;
+    private double quizPointsPossible;
 
     //Token used to validate quiz answers when posting
     @SerializedName("validation_token")
@@ -267,11 +267,11 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         this.workflowState = workflowState;
     }
 
-    public int getQuizPointsPossible() {
+    public double getQuizPointsPossible() {
         return quizPointsPossible;
     }
 
-    public void setQuizPointsPossible(int quizPointsPossible) {
+    public void setQuizPointsPossible(double quizPointsPossible) {
         this.quizPointsPossible = quizPointsPossible;
     }
 
@@ -340,7 +340,7 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         dest.writeDouble(this.fudgePoints);
         dest.writeByte(hasSeenResults ? (byte) 1 : (byte) 0);
         dest.writeString(this.workflowState);
-        dest.writeInt(this.quizPointsPossible);
+        dest.writeDouble(this.quizPointsPossible);
         dest.writeString(this.validationToken);
     }
 
@@ -366,7 +366,7 @@ public class QuizSubmission extends CanvasModel<QuizSubmission> {
         this.fudgePoints = in.readDouble();
         this.hasSeenResults = in.readByte() != 0;
         this.workflowState = in.readString();
-        this.quizPointsPossible = in.readInt();
+        this.quizPointsPossible = in.readDouble();
         this.validationToken = in.readString();
     }
 

@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -16,17 +17,16 @@
   -->
 
 <resources>
-    <string name="app_name">PandaUtils</string>
     <string name="chooseMedia">Choose Media</string>
     <string name="takeVideo">Take Video</string>
     <string name="noCameraOnDevice">No Camera</string>
 
-    <!-- KalturaPicker/uploadService -->
+    <!-- NotoriousPicker/uploadService -->
     <string name="notificationTitle">Uploading to Canvas</string>
     <string name="preparingUpload">Preparing upload</string>
     <string name="loadingFilesIndeterminate">Loading Files&#8230;</string>
-    <string name="fileUploadSuccess"> Upload Successful</string>
-    <string name="noNetwork">Network not available - please try again later</string>
+    <string name="fileUploadSuccess">Upload Successful</string>
+    <string name="noNetwork">Network not available - please try again later.</string>
     <string name="uploadMessage">"Upload in progress. Check notifications for upload status.</string>
     <string name="mediaUpload">Media Upload</string>
     <string name="uploadingFile">Uploading file&#8230;</string>
@@ -35,6 +35,11 @@
     <string name="uploadFiles">Upload File(s)</string>
     <string name="upload">Upload</string>
     <string name="errorSendingMessage">An error occurred sending your message. Please try again.</string>
+
+    <string name="notificationChannelNameFileUploadsName">File Upload Notifications</string>
+    <string name="notificationChannelNameFileUploadsDescription">Canvas notifications for ongoing file uploads.</string>
+
+
     <!-- Turn in Files -->
     <string name="chooseFileSource">Choose File From&#8230;</string>
     <string name="addFile">Add File</string>
@@ -186,6 +191,11 @@
     <string name="discussion_reply">Reply</string>
     <string name="close">Close</string>
 
+    <string name="noInternetConnectionTitle">No Internet Connection</string>
+    <string name="noInternetConnectionMessage">This action requires an internet connection.</string>
+    <string name="content_description_avatar">Avatar</string>
+    <string name="formattedAvatarAction">View user details for %s.</string>
+
     <!-- App Names -->
     <string name="utils_canvas">Canvas</string>
     <string name="utils_canvasTeacher">Canvas Teacher</string>
@@ -203,11 +213,12 @@
     <string name="utils_versionNum">Version:</string>
     <string name="utils_userId">User ID</string>
     <string name="utils_email">Email</string>
-    <string name="utils_mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="utils_supportEmailAddress">support@instructure.com</string>
     <string name="utils_dontShowAgain">Don\'t show again</string>
     <string name="utils_installDate">Install Date:</string>
     <string name="utils_device">Device</string>
     <string name="utils_osVersion">OS Version</string>
+    <string name="loading">Loading</string>
+    <string name="save">Save</string>
+    <string name="cropInstructions">Pinch and drag to adjust the image.</string>
 
 </resources>

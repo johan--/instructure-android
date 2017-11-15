@@ -22,8 +22,9 @@ import android.support.annotation.RestrictTo;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public abstract class RCEAnimationListener implements Animator.AnimatorListener {
 
-    public void onAnimationBegin(Animator animation){};
-    public void onAnimationFinish(Animator animation){};
+    public void onAnimationBegin(Animator animation){}
+
+    public void onAnimationFinish(Animator animation){}
 
     @Override
     public void onAnimationStart(Animator animation) {

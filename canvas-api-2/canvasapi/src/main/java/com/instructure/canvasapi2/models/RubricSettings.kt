@@ -29,6 +29,7 @@ data class RubricSettings(
         var freeFormCriterionComments: Boolean = false
 ) : PaperParcelable {
     companion object {
+        @Suppress("unresolved_reference")
         @JvmField val CREATOR = PaperParcelRubricSettings.CREATOR
     }
 }

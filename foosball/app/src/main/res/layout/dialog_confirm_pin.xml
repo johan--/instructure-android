@@ -26,6 +26,17 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/userName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_grey"
+        android:gravity="center"
+        android:padding="4dp"
+        android:textColor="#FFF"
+        android:textStyle="bold"
+        tools:text="Usename Here"/>
+
+    <TextView
         android:id="@+id/pin_message"
         android:layout_width="match_parent"
         android:layout_height="64dp"

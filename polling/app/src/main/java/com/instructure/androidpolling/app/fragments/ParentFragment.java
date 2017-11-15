@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,22 +17,19 @@
 
 package com.instructure.androidpolling.app.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.instructure.androidpolling.app.interfaces.UpdatePoll;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
+import com.instructure.canvasapi2.models.Poll;
 
-public class ParentFragment extends Fragment implements APIStatusDelegate, UpdatePoll {
+public class ParentFragment extends Fragment implements UpdatePoll {
 
     private OnUpdatePollListener callback;
     // Container Activity must implement this interface
     public interface OnUpdatePollListener {
-        public void onUpdatePoll(Poll poll, String fragmentTag);
+        void onUpdatePoll(Poll poll, String fragmentTag);
     }
 
     @Override
@@ -42,16 +39,14 @@ public class ParentFragment extends Fragment implements APIStatusDelegate, Updat
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            callback = (OnUpdatePollListener) activity;
+            callback = (OnUpdatePollListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnUpdatePollListener");
+            throw new ClassCastException(context.toString() + " must implement OnUpdatePollListener");
         }
     }
 
@@ -62,17 +57,6 @@ public class ParentFragment extends Fragment implements APIStatusDelegate, Updat
     public void loadData() {}
 
     public void reloadData() {}
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        //have to reset butterknife on fragments
-        //ButterKnife.reset(this);
-    }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        
-    }
 
     //override this if we want to update the poll information
     @Override
@@ -81,17 +65,7 @@ public class ParentFragment extends Fragment implements APIStatusDelegate, Updat
     }
 
     @Override
-    public void onNoNetwork() {
-
-    }
-
-    @Override
     public Context getContext() {
         return getActivity();
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
     }
 }

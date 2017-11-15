@@ -20,6 +20,7 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="10000dp" />
+    <solid android:color="#00000000"/>
     <stroke
         android:color="#CCC"
         android:width="0.5dp" />

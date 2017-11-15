@@ -10,7 +10,6 @@
   <string name="unknownDevice">Okänd Enhet</string>
   <string name="errorOccurred">Ett oväntat fel uppstod.</string>
   <string name="pageNotFound">Sidan hittades inte.</string>
-  <string name="okay">Okej</string>
   <string name="confirm">Bekräfta</string>
   <string name="cancel">Avbryt</string>
   <string name="help">Hjälp</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">Försöker du logga in på Canvas Network?</string>
   <string name="remove">Ta bort</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">Användar-ID</string>
+  <string name="domain">Domän</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Ta bort den här användaren?</string>
   <string name="removedForever">Du måste logga in på den här användaren igen för att komma åt dess innehåll.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">Kan du inte hitta din skola? Fyll i skolans URL eller peka här för att få hjälp.</string>
   <string name="loginCanvasHelpWithUser">Fyll i skolans URL eller peka här för att få hjälp.</string>
   <string name="loginHint">Hitta din skola eller distrikt</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Hur går det?</string>
-  <string name="rateUs">Vilket betyg skulle du ge oss?</string>
-  <string name="doBetter">Vad kan vi göra bättre?</string>
-  <string name="sendFeedback">Skicka Feedback</string>
-  <string name="suggestions">Förslag för Android</string>
-  <string name="domain">Domän</string>
-  <string name="versionNum">Version:</string>
-  <string name="userId">Användar-ID</string>
-  <string name="email">E-post</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Visa inte igen</string>
-  <string name="installDate">Installeringsdatum:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Rapportera ett problem</string>
   <string name="zendesk_subject">Ämne</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">Enhet</string>
   <string name="osVersion">Operativsystemets version</string>
+  <string name="empty_feedback">Ett ämne och en beskrivning krävs för att lämna återkoppling.</string>
 </resources>

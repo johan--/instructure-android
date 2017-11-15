@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,18 +30,18 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.views.CanvasWebView;
 
-import retrofit.client.Response;
-
+import retrofit2.Response;
 
 public class ModuleQuizDecider extends ParentFragment {
 
@@ -54,7 +54,7 @@ public class ModuleQuizDecider extends ParentFragment {
     private TextView quizDueDateDetails;
     private Button goToQuizBtn;
 
-    private CanvasCallback<Quiz> quizCanvasCallback;
+    private StatusCallback<Quiz> quizCanvasCallback;
     private CanvasWebView.CanvasWebViewClientCallback webViewClientCallback;
     private CanvasWebView.CanvasEmbeddedWebViewCallback embeddedWebViewCallback;
 
@@ -118,12 +118,12 @@ public class ModuleQuizDecider extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
         };
 
@@ -140,41 +140,33 @@ public class ModuleQuizDecider extends ParentFragment {
             }
         };
 
-        quizCanvasCallback = new CanvasCallback<Quiz>(this) {
+        quizCanvasCallback = new StatusCallback<Quiz>() {
             @Override
-            public void cache(Quiz quiz) {
-
-            }
-
-            @Override
-            public void firstPage(Quiz quiz, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(Response<Quiz> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()) { return; }
 
-                if (quiz != null) {
-                    mQuiz = quiz;
-                    quizTitle.setText(quiz.getTitle());
-                    if (quiz.getDueAt() != null) {
-                        quizDueDateDetails.setText(DateHelpers.getDateTimeString(getActivity(), quiz.getDueAt()));
-                    } else {
-                        quizDueDateDetails.setText(getString(R.string.toDoNoDueDate));
-                    }
-                    quizDetails.formatHTML(quiz.getDescription(), "");
-                    quizDetails.setBackgroundColor(getResources().getColor(R.color.transparent));
-                    //set some callbacks in case there is a link in the quiz description. We want it to open up in a new
-                    //InternalWebViewFragment
-                    quizDetails.setCanvasEmbeddedWebViewCallback(embeddedWebViewCallback);
-
-                    quizDetails.setCanvasWebViewClientCallback(webViewClientCallback);
+                mQuiz = response.body();
+                quizTitle.setText(mQuiz.getTitle());
+                if (mQuiz.getDueAt() != null) {
+                    quizDueDateDetails.setText(DateHelper.getDateTimeString(getActivity(), mQuiz.getDueAt()));
+                } else {
+                    quizDueDateDetails.setText(getString(R.string.toDoNoDueDate));
                 }
-            }
+                quizDetails.formatHTML(mQuiz.getDescription(), "");
+                quizDetails.setBackgroundColor(getResources().getColor(R.color.transparent));
+                //set some callbacks in case there is a link in the quiz description. We want it to open up in a new
+                //InternalWebViewFragment
+                quizDetails.setCanvasEmbeddedWebViewCallback(embeddedWebViewCallback);
 
+                quizDetails.setCanvasWebViewClientCallback(webViewClientCallback);
+            }
         };
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        QuizAPI.getDetailedQuizFromURL(apiURL, quizCanvasCallback);
+        QuizManager.getDetailedQuizByUrl(apiURL, true, quizCanvasCallback);
     }
 
     @Override

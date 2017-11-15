@@ -73,4 +73,25 @@ public class SettingsPresenter extends SyncPresenter<Student, SettingsView> {
             }
         }
     };
+
+    @Override
+    protected int compare(Student item1, Student item2) {
+        if(item1 == null || item2 == null) return -1;
+        if(item1.getStudentName() == null || item2.getStudentName() == null) {
+            return Long.compare(item1.getId(), item2.getId());
+        }
+        return item1.getStudentName().compareTo(item2.getStudentName());
+    }
+
+    @Override
+    protected boolean areContentsTheSame(Student item1, Student item2) {
+        if(item1 == null || item2 == null) return false;
+        return item1.getId() == item2.getId();
+    }
+
+    @Override
+    protected boolean areItemsTheSame(Student item1, Student item2) {
+        if(item1 == null || item2 == null) return false;
+        return item1.getId() == item2.getId();
+    }
 }

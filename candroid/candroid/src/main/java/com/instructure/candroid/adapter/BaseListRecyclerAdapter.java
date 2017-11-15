@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,10 +21,7 @@ import android.content.Context;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 
-import com.instructure.canvasapi.model.CanvasComparable;
-import com.instructure.canvasapi.utilities.APICacheStatusDelegate;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
+import com.instructure.canvasapi2.models.CanvasComparable;
 import com.instructure.pandarecycler.PaginatedRecyclerAdapter;
 import com.instructure.pandarecycler.util.UpdatableSortedList;
 
@@ -32,8 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public abstract class BaseListRecyclerAdapter<MODEL extends CanvasComparable, T extends RecyclerView.ViewHolder> extends PaginatedRecyclerAdapter<T>
-        implements APIStatusDelegate, APICacheStatusDelegate {
+public abstract class BaseListRecyclerAdapter<MODEL extends CanvasComparable, T extends RecyclerView.ViewHolder> extends PaginatedRecyclerAdapter<T> {
     private static final int DEFAULT_LIST_SIZE = 50; // List will increase in size automatically
 
     public abstract void bindHolder(MODEL model, T holder, int position);
@@ -161,18 +157,7 @@ public abstract class BaseListRecyclerAdapter<MODEL extends CanvasComparable, T 
 
     // region Pagination
 
-    @Override
-    public boolean shouldIgnoreCache() {
-        return isRefresh();
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
-    }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished() {
         setLoadedFirstPage(true);
         shouldShowLoadingFooter();
         AdapterToRecyclerViewCallback adapterToRecyclerViewCallback = getAdapterToRecyclerViewCallback();
@@ -182,7 +167,6 @@ public abstract class BaseListRecyclerAdapter<MODEL extends CanvasComparable, T 
         }
     }
 
-    @Override
     public void onNoNetwork() {
         AdapterToRecyclerViewCallback adapterToRecyclerViewCallback = getAdapterToRecyclerViewCallback();
         if(adapterToRecyclerViewCallback != null){

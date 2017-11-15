@@ -19,14 +19,16 @@ package com.instructure.loginapi.login.activities;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,19 +42,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.loginapi.login.R;
 import com.instructure.loginapi.login.adapter.PreviousUsersAdapter;
+import com.instructure.loginapi.login.adapter.SnickerDoodleAdapter;
 import com.instructure.loginapi.login.dialog.NoInternetConnectionDialog;
 import com.instructure.loginapi.login.model.SignedInUser;
+import com.instructure.loginapi.login.snicker.SnickerDoodle;
 import com.instructure.loginapi.login.util.Const;
 import com.instructure.loginapi.login.util.PreviousUsersUtils;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.ViewStyler;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static com.instructure.loginapi.login.util.Const.CANVAS_LOGIN_FLOW;
+import static com.instructure.loginapi.login.util.Const.MASQUERADE_FLOW;
+import static com.instructure.loginapi.login.util.Const.MOBILE_VERIFY_FLOW;
+import static com.instructure.loginapi.login.util.Const.NORMAL_FLOW;
+import static com.instructure.loginapi.login.util.Const.SNICKER_DOODLES;
 
 public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
 
@@ -64,13 +82,16 @@ public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
     private @Nullable TextView mAppDescriptionType;
     private ImageView mCanvasLogo;
     private GestureDetector mGesture;
+    private DrawerLayout mDrawerLayout;
+    private RecyclerView mDrawerRecyclerView;
 
     private boolean mGestureFirstFree = true;
     private long mGestureFirst = 0;
     private long mGestureSecond = 0;
-    private int mCanvasLogin = 0;
+    private int mCanvasLogin = NORMAL_FLOW;
 
     protected abstract Intent beginFindSchoolFlow();
+    protected abstract Intent signInActivityIntent(@NonNull SnickerDoodle snickerDoodle);
     protected abstract Intent beginCanvasNetworkFlow(String url);
     protected abstract @ColorInt int themeColor();
     protected abstract @StringRes int appTypeName();
@@ -84,6 +105,7 @@ public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
         applyTheme();
         loadPreviousUsers();
         setupGesture();
+        setupSnickerDoodles();
     }
 
     private void bindViews() {
@@ -235,26 +257,27 @@ public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
                     //click2 and the next click1 is < 500)
 
                     if (Math.abs(mGestureSecond - mGestureFirst) < 500) {
-                        Resources r = getResources();
-
                         mCanvasLogin++;
 
-                        /* Cycle between 0, 1, and 2
+                        /* Cycle between 0, 1, 2, and 3
                          *
                          * 0 == no special login
                          * 1 == canvas login
                          * 2 == site admin
+                         * 3 == No mobile verify check
                          */
-                        if (mCanvasLogin > 2) {
-                            mCanvasLogin = 0;
+                        if (mCanvasLogin > MOBILE_VERIFY_FLOW) {
+                            mCanvasLogin = NORMAL_FLOW;
                         }
 
-                        if (mCanvasLogin == 0) {
+                        if (mCanvasLogin == NORMAL_FLOW) {
                             Toast.makeText(BaseLoginLandingPageActivity.this, R.string.canvasLoginOff, Toast.LENGTH_SHORT).show();
-                        } else if (mCanvasLogin == 1) {
+                        } else if (mCanvasLogin == CANVAS_LOGIN_FLOW) {
                             Toast.makeText(BaseLoginLandingPageActivity.this, R.string.canvasLoginOn, Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if (mCanvasLogin == MASQUERADE_FLOW) {
                             Toast.makeText(BaseLoginLandingPageActivity.this, R.string.siteAdminLogin, Toast.LENGTH_SHORT).show();
+                        } else if (mCanvasLogin == MOBILE_VERIFY_FLOW) {
+                            Toast.makeText(BaseLoginLandingPageActivity.this, R.string.mobileVerifyOff, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -263,5 +286,71 @@ public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
             //Do Nothing
         }
         return true;
+    }
+
+
+    /**
+     * Adds a simple login method for devs. To add credentials add your snickers (credentials) to the snickers.json
+     * Slide the drawer out from the right to have a handy one click login. FYI: Only works on Debug.
+     * Sample Format is:
+
+         [
+            {
+                 "password":"password",
+                 "subtitle":"subtitle",
+                 "title":"title",
+                 "username":"username",
+                 "domain":"about.blank"
+             },
+              ...
+         ]
+
+     */
+    private void setupSnickerDoodles() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mDrawerRecyclerView = (RecyclerView) findViewById(R.id.drawerRecyclerView);
+        boolean isDebuggable =  (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        mDrawerLayout.setDrawerLockMode(isDebuggable ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        if(isDebuggable) {
+            Writer writer = new StringWriter();
+            try {
+                InputStream is = getResources().openRawResource(getResources().getIdentifier("snickers", "raw", getPackageName()));
+
+                char[] buffer = new char[1024];
+                Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) { writer.write(buffer, 0, n); }
+                is.close();
+            } catch (Exception e) {
+                //Do Nothing
+            }
+
+            String jsonString = writer.toString();
+            if(jsonString != null && jsonString.length() > 0) {
+                ArrayList<SnickerDoodle> snickerDoodles = new Gson().fromJson(jsonString, new TypeToken<ArrayList<SnickerDoodle>>(){}.getType());
+
+                if(snickerDoodles.size() == 0) {
+                    findViewById(R.id.drawerEmptyView).setVisibility(View.VISIBLE);
+                    findViewById(R.id.drawerEmptyText).setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                mDrawerRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
+                mDrawerRecyclerView.setAdapter(new SnickerDoodleAdapter(snickerDoodles, new SnickerDoodleAdapter.SnickerCallback() {
+                    @Override
+                    public void onClick(SnickerDoodle snickerDoodle) {
+                        mDrawerLayout.closeDrawers();
+                        Intent intent = signInActivityIntent(snickerDoodle);
+                        intent.putExtra(SNICKER_DOODLES, snickerDoodle);
+                        startActivity(intent);
+                        finish();
+                    }
+                }));
+            } else {
+                findViewById(R.id.drawerEmptyView).setVisibility(View.VISIBLE);
+                findViewById(R.id.drawerEmptyText).setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ import android.text.TextUtils;
 
 import com.instructure.canvasapi2.models.DiscussionEntry;
 import com.instructure.canvasapi2.models.RemoteFile;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.FileUtils;
 import com.instructure.pandautils.R;
 
 import java.util.Locale;
 
-@Deprecated
 public class DiscussionEntryHTMLHelper {
 
     private static final String NO_PIC = "images/dotted_pic.png";
@@ -180,7 +179,7 @@ public class DiscussionEntryHTMLHelper {
             date = DateHelper.getDateTimeString(context, discussionEntry.getUpdatedAt());
         }
 
-        return (APIHelper.getAssetsFile(context, "discussion_html_template.html")
+        return (FileUtils.getAssetsFile(context, "discussion_html_template.html")
                 .replace("__BORDER_STRING__", borderString)
                 .replace("__COLOR__", "background: " + colorString + ";")
                 .replace("__LISTENER_HTML__", listener)
@@ -220,10 +219,7 @@ public class DiscussionEntryHTMLHelper {
 
     public static boolean isEmptyImage(String avatarURL){
         if(TextUtils.isEmpty(avatarURL)) return true;
-        if(avatarURL.contains(NO_PIC) || avatarURL.contains(Const.PROFILE_URL)){
-            return true;
-        }
-        return false;
+        return avatarURL.contains(NO_PIC) || avatarURL.contains(Const.PROFILE_URL);
     }
 
     private static String formatCommentsCount(Context context, int count) {

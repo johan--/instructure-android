@@ -17,9 +17,6 @@
 
 package com.instructure.parentapp.util;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class Const {
     public static final String CANVAS_PARENT_SP = "Canvas Parent";
     public static final String USER_AGENT = "androidParent";

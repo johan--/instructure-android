@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,29 +21,21 @@ import android.view.View;
 
 public interface PaginatedListInterface {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // View Interface
-    ///////////////////////////////////////////////////////////////////////////
+    int getRootLayoutCode();
+    int getFooterLayoutCode();
+    int getEmptyViewLayoutCode();
+    void configureViews(View rootView);
+    String getTitle();
+    int getDividerHeight();
+    int getDividerColor();
 
-    public int getRootLayoutCode();
-    public int getFooterLayoutCode();
-    public int getEmptyViewLayoutCode();
-    public void configureViews(View rootView);
-    public String getTitle();
-    public int getDividerHeight();
-    public int getDividerColor();
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Data Interface
-    ///////////////////////////////////////////////////////////////////////////
-
-    public void setupCallbacks();
-    public boolean areItemsSorted();
-    public boolean areItemsReverseSorted();
-    public void loadFirstPage();
-    public void loadNextPage(String nextURL);
-    public String getNextURL();
-    public void setNextURLNull();
-    public void resetData();
-    public void finishLoading();
+    void setupCallbacks();
+    boolean areItemsSorted();
+    boolean areItemsReverseSorted();
+    void loadFirstPage();
+    void loadNextPage(String nextURL);
+    String getNextURL();
+    void setNextURLNull();
+    void resetData();
+    void finishLoading();
 }

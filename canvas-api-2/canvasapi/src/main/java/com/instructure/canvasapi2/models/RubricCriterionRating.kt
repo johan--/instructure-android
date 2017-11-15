@@ -22,15 +22,11 @@ import paperparcel.PaperParcelable
 @PaperParcel
 data class RubricCriterionRating(
         var id: String? = null,
-        var criterionId: String? = null,
         var description: String? = null,
-        var points: Double = 0.0,
-        var comments: String? = null,
-        var isGrade: Boolean = false,
-        var isFreeFormComment: Boolean = false,
-        var maxPoints: Double = 0.0
+        var points: Double = 0.0
 ) : PaperParcelable {
     companion object {
+        @Suppress("unresolved_reference")
         @JvmField val CREATOR = PaperParcelRubricCriterionRating.CREATOR
     }
 }

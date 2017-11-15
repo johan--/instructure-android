@@ -112,9 +112,13 @@ public class RatingDialog extends DialogFragment {
 
     public static void showRateDialog(final FragmentActivity context, final AppType appType, final SharedPreferences prefs) {
         final RatingDialog dialog = RatingDialog.newInstance(appType);
-        dialog.show(context.getSupportFragmentManager(), "ratingDialog");
+        dialog.show(context.getSupportFragmentManager(), RatingDialog.class.getSimpleName());
     }
 
+    public static void showRateDialog(final FragmentActivity context, final AppType appType) {
+        final RatingDialog dialog = RatingDialog.newInstance(appType);
+        dialog.show(context.getSupportFragmentManager(), RatingDialog.class.getSimpleName());
+    }
 
     /**
      * Called when the user hits the back button, this will delay the dialog from showing for 4 weeks

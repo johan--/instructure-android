@@ -312,7 +312,7 @@ public class RatingDialog extends DialogFragment {
         //let the user open their favorite mail client
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.mobileSupportEmailAddress)});
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.utils_mobileSupportEmailAddress)});
         //try to get the version number and version code
         PackageInfo pInfo = null;
         String versionName = "";

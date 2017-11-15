@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">اختيار الوسط</string>
   <string name="takeVideo">التقاط فيديو</string>
   <string name="noCameraOnDevice">لا توجد كاميرا</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">التحميل إلى Canvas</string>
   <string name="preparingUpload">إعداد التحميل</string>
   <string name="loadingFilesIndeterminate">جارٍ تحميل الملفات...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">حدث خطأ أثناء الحصول على الصورة. يرجى المحاولة من جديد.</string>
   <string name="errorTextMissing">أضف بعض النصوص لإرسال رسالة</string>
   <string name="fileUploadNotSupported">لا يمكنك تحميل ملفات إلى المهمة المحددة.</string>
+  <string name="noCourseSelected">يرجى تحديد مساق</string>
   <string name="selectCourse">تحديد مساق</string>
   <string name="selectAssignment">تحديد مهمة</string>
   <string name="loadingAssignments">جارٍ تحميل المهام...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">غير مقروء</string>
   <string name="discussion_reply">رد</string>
   <string name="close">إغلاق</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">كيف هو أداؤنا؟</string>
+  <string name="utils_rateUs">كيف ستقيمنا؟</string>
+  <string name="utils_doBetter">ماذا يمكننا فعله لتطوير أداءنا؟</string>
+  <string name="utils_sendFeedback">إرسال ملاحظات وآراء</string>
+  <string name="utils_suggestions">مقترحات لـ Android</string>
+  <string name="utils_domain">المجال</string>
+  <string name="utils_versionNum">الإصدار:</string>
+  <string name="utils_userId">معرف المستخدم</string>
+  <string name="utils_email">البريد الإلكتروني</string>
+  <string name="utils_dontShowAgain">عدم الإظهار مرة أخرى</string>
+  <string name="utils_installDate">تاريخ التثبيت:</string>
+  <string name="utils_device">الجهاز</string>
+  <string name="utils_osVersion">إصدار نظام التشغيل</string>
+  <string name="loading">يتم الآن التحميل</string>
 </resources>

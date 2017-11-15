@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.binders.BaseBinder;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class FileUploadCoursesAdapter extends ArrayAdapter<Course> {
         final CourseViewHolder viewHolder;
 
         if(convertView == null) {
-            Utils.d("creating view holder, getView");
+            Logger.d("creating view holder, getView");
             convertView = mInflater.inflate(R.layout.canvas_context_spinner_adapter_item, null);
             viewHolder = new CourseViewHolder();
             viewHolder.title = (TextView)convertView.findViewById(R.id.title);

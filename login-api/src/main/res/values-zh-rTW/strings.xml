@@ -71,10 +71,7 @@
   <string name="versionNum">版本：</string>
   <string name="userId">使用者ID</string>
   <string name="email">電郵地址</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="dontShowAgain">不要再次顯示</string>
-  <string name="installDate">安裝日期：</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">報告問題</string>
   <string name="zendesk_subject">主題</string>

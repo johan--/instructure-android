@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@ package com.instructure.candroid.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,17 +30,15 @@ import com.android.ex.chips.BaseRecipientAdapter;
 import com.android.ex.chips.RecipientEntry;
 import com.android.ex.chips.RecipientManager;
 import com.instructure.candroid.fragment.ProfileFragment;
-import com.instructure.canvasapi.api.RecipientAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Recipient;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.FileUtilities;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.ProfileUtils;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Recipient;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.FileUtils;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -55,14 +50,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import retrofit.client.Response;
-
 /**
  * Default implementation of {@link RecipientManager} that fetches recipients and
  * their photos using {@link com.android.ex.chips.RecipientEntry}'s
  * photoThumbnailUri.
  */
-public class CanvasRecipientManager implements RecipientManager, APIStatusDelegate {
+public class CanvasRecipientManager implements RecipientManager {
     private static CanvasRecipientManager instance;
 
 
@@ -72,7 +65,7 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
     public static final String RECIPIENTS_CACHE = "Recipients_Cache";
 
     private Context applicationContext;
-    private CanvasCallback<Recipient[]> recipientSuggestionsCallback;
+    private StatusCallback<List<Recipient>> recipientSuggestionsCallback;
     private CanvasContext canvasContext;
 
 
@@ -115,7 +108,6 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
         return this;
     }
 
-    @Override
     public Context getContext() {
         return this.applicationContext;
     }
@@ -205,15 +197,14 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
     }
 
     private void setUpCallback(){
-        recipientSuggestionsCallback = new CanvasCallback<Recipient[]>(this) {
-            @Override public void cache(Recipient[] recipients) {}
+        recipientSuggestionsCallback = new StatusCallback<List<Recipient>>() {
 
             @Override
-            public void firstPage(Recipient[] recipients, LinkHeaders linkHeaders, Response response) {
-                for(Recipient recipient : recipients){
+            public void onResponse(retrofit2.Response<List<Recipient>> response, LinkHeaders linkHeaders, ApiType type) {
+                for(Recipient recipient : response.body()){
                     // TODO : modify the recipient entry to display canvas course info. Currently displaying recipient course id instead of an "address"
 
-                    RecipientEntry entry = new RecipientEntry(recipient.getIdAsLong(), recipient.getName(), recipient.getStringId(), "", recipient.getAvatarURL(), recipient.getUser_count(), recipient.getItemCount(), true,
+                    RecipientEntry entry = new RecipientEntry(recipient.getIdAsLong(), recipient.getName(), recipient.getStringId(), "", recipient.getAvatarURL(), recipient.getUserCount(), recipient.getItemCount(), true,
                             recipient.getCommonCourses() != null ? recipient.getCommonCourses().keySet() : null,
                             recipient.getCommonGroups() != null ?  recipient.getCommonGroups().keySet() : null);
                     if(!allRecipients.contains(entry)){
@@ -225,11 +216,6 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
                     }
                 }
                 notifyNewRecipientsAdded();
-            }
-
-            @Override
-            public void nextPage(Recipient[] recipients, LinkHeaders linkHeaders, Response response){
-
             }
         };
     }
@@ -244,7 +230,7 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
         @Override
         public void run() {
             if(!isKilled && null != constraint && !TextUtils.isEmpty(constraint) && canvasContext != null){
-                RecipientAPI.getFirstPageRecipients(constraint, canvasContext.getContextId(), recipientSuggestionsCallback);
+                com.instructure.canvasapi2.managers.RecipientManager.searchRecipients(constraint, canvasContext.getContextId(), recipientSuggestionsCallback);
             }
         }
 
@@ -253,15 +239,6 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
         }
     }
 
-    // API status delegate
-    @Override
-    public void onCallbackStarted() { }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {}
-
-    @Override
-    public void onNoNetwork() {}
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,15 +339,15 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public void saveCache(){
         if(allRecipients.size() < MAX_RECIPIENT_CACHE_LIMIT){
-            FileUtilities.SerializableToFile(getContext(), RECIPIENTS_CACHE, allRecipients);
+            FileUtils.SerializableToFile(getContext(), RECIPIENTS_CACHE, allRecipients);
         }else{
             ArrayList<RecipientEntry> cacheList = new ArrayList<>(allRecipients.subList(0, MAX_RECIPIENT_CACHE_LIMIT));
-            FileUtilities.SerializableToFile(getContext(), RECIPIENTS_CACHE, cacheList);
+            FileUtils.SerializableToFile(getContext(), RECIPIENTS_CACHE, cacheList);
         }
     }
 
     public void clearCache() {
-        FileUtilities.DeleteFile(getContext(),RECIPIENTS_CACHE);
+        FileUtils.DeleteFile(getContext(),RECIPIENTS_CACHE);
         allRecipients = new ArrayList<>();
     }
 
@@ -386,9 +363,9 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
         protected Serializable doInBackground(String... params) {
             path = params[0];
             try {
-                return FileUtilities.FileToSerializable(getContext(), path);
+                return FileUtils.FileToSerializable(getContext(), path);
             } catch (Exception E) {
-                Log.e(APIHelpers.LOG_TAG, "NO CACHE: " + path);
+                Logger.e("NO CACHE: " + path);
             }
 
             return null;
@@ -403,7 +380,7 @@ public class CanvasRecipientManager implements RecipientManager, APIStatusDelega
                     allRecipients = (ArrayList) serializable;
                 }catch (ClassCastException exception){
                     Log.d(TAG, "Unable to read cache file");
-                    FileUtilities.DeleteFile(getContext(),RECIPIENTS_CACHE);
+                    FileUtils.DeleteFile(getContext(),RECIPIENTS_CACHE);
                     allRecipients = new ArrayList<>();
                 }
             }

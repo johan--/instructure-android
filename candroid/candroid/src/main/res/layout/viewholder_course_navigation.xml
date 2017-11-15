@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
         android:contentDescription="@string/icon"
         android:scaleType="fitCenter"
         android:layout_gravity="start|center_vertical"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@mipmap/ic_launcher"/>
 
     <TextView
         android:id="@+id/title"

@@ -93,10 +93,6 @@
     <string name="shareYourLoveDetails">Powiedz nam o twoich ulubionych częściach aplikacji</string>
     <string name="sendFeedback">Wyślij informację zwrotną</string>
     <string name="sendMail">Wyślij e-mail&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com
-</string>
-    <string name="supportEmailAddress">support@instructure.com
-</string>
     <string name="help_domain">Domena:</string>
     <string name="help_versionNum">Wersja:</string>
     <string name="help_userId">Identyfikator użytkownika:</string>
@@ -165,4 +161,24 @@
     <string name="onlyCanvasObservers">Tylko obserwujący z Canvas mogą używać uwierzytelnienia w Canvas Parent.</string>
     <string name="open_source">Open source</string>
     <string name="open_source_details">Wyświetl licencje open source</string>
+
+    <string name="unitedStates">Stany Zjednoczone</string>
+    <string name="theUnitedStates">Stany Zjednoczone</string>
+    <string name="canada">Kanada</string>
+    <string name="ireland">Irlandia</string>
+    <string name="australia">Australia</string>
+    <string name="germany">Niemcy</string>
+    <string name="singapore">Singapur</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Wybierz region uczestnika</string>
+    <string name="selectRegion">Narzędzie wyboru regionu</string>
+    <string name="unauthorizedRegion">Nieautoryzowany region</string>
+    <string name="mismatchedRegionMessage">Ta instytucja znajduje się poza wybranym regionem. Aby dodać uczestnika do tej instytucji, użyj opcji „Narzędzie wyboru regionu” na stronie logowania w celu utworzenia konta w regionie %1$s.</string>
 </resources>

@@ -210,4 +210,34 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/undoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/teamTwoContainer"
+        android:layout_alignEnd="@id/teamTwoContainer"
+        android:layout_gravity="center|end"
+        android:padding="32dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_outline_thin"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/ic_undo_black_24dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingBottom="8dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:text="@string/undo_last_goal"
+            android:textAllCaps="true"
+            android:textColor="@android:color/black"/>
+
+    </FrameLayout>
+
 </RelativeLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -38,21 +38,21 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.DiscussionTopicHeader;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
-import java.util.HashMap;
 
-import retrofit.client.Response;
+import java.util.HashMap;
 
 public class DiscussionListFragment extends ParentFragment {
 
@@ -141,7 +141,7 @@ public class DiscussionListFragment extends ParentFragment {
         try {
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(refreshReceiver);
         } catch (Exception e) {
-            Utils.e("Could not unregister refreshReceiver");
+            Logger.e("Could not unregister refreshReceiver");
         }
     }
 
@@ -149,6 +149,7 @@ public class DiscussionListFragment extends ParentFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (mRecyclerAdapter != null) {
+                setRefreshing(true);
                 mRecyclerAdapter.refresh();
             }
         }
@@ -210,10 +211,10 @@ public class DiscussionListFragment extends ParentFragment {
         if(canvasContext != null && canvasContext.canCreateDiscussion()) {
             if(canvasContext instanceof Course || canvasContext instanceof Group) {
                 //Check permissions to see if the use can create a discussion or an announcement
-                if(canvasContext.getPermissions() != null && canvasContext.getPermissions().canCreateDiscussionTopic() && !isAnnouncement()) {
+                if(canvasContext.getPermissions() != null && canvasContext.getPermissions().getCanCreateDiscussionTopic() && !isAnnouncement()) {
                     //Can create discussions
                     inflater.inflate(R.menu.menu_new_discussion, menu);
-                } else if(canvasContext.getPermissions() != null && canvasContext.getPermissions().canCreateAnnouncement() && isAnnouncement()) {
+                } else if(canvasContext.getPermissions() != null && canvasContext.getPermissions().getCanCreateAnnouncement() && isAnnouncement()) {
                     //Can create announcement
                     inflater.inflate(R.menu.menu_new_announcement, menu);
                 }
@@ -227,7 +228,7 @@ public class DiscussionListFragment extends ParentFragment {
         if(navigation != null) {
             switch (item.getItemId()) {
                 case R.id.menu_add_announcement:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return true;
                     }
@@ -235,7 +236,7 @@ public class DiscussionListFragment extends ParentFragment {
                             ComposeNewDiscussionFragment.createBundle(getCanvasContext(), true)));
                     return true;
                 case R.id.menu_add_discussion:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return true;
                     }
@@ -273,29 +274,29 @@ public class DiscussionListFragment extends ParentFragment {
         if (getCanvasContext().getPermissions() == null) {
             //Figure out whether to get the COURSE or the GROUP permissions.
             if (getCanvasContext().getType() == CanvasContext.Type.COURSE) {
-                CourseAPI.getCourse(getCanvasContext().getId(), new CanvasCallback<Course>(this) {
+                CourseManager.getCourse(getCanvasContext().getId(), new StatusCallback<Course>() {
                     @Override
-                    public void firstPage(Course course, LinkHeaders linkHeaders, Response response) {
+                    public void onResponse(retrofit2.Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
                         if(!apiCheck()){
                             return;
                         }
 
-                        getCanvasContext().setPermissions(course.getPermissions());
+                        getCanvasContext().setPermissions(response.body().getPermissions());
                         getActivity().supportInvalidateOptionsMenu();
                     }
-                });
+                }, true);
             } else {
-                GroupAPI.getDetailedGroup(getCanvasContext().getId(), new CanvasCallback<Group>(this) {
+                GroupManager.getDetailedGroup(getCanvasContext().getId(), new StatusCallback<Group>() {
                     @Override
-                    public void firstPage(Group group, LinkHeaders linkHeaders, Response response) {
+                    public void onResponse(retrofit2.Response<Group> response, LinkHeaders linkHeaders, ApiType type) {
                         if(!apiCheck()){
                             return;
                         }
 
-                        getCanvasContext().setPermissions(group.getPermissions());
+                        getCanvasContext().setPermissions(response.body().getPermissions());
                         getActivity().supportInvalidateOptionsMenu();
                     }
-                });
+                }, true);
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -93,10 +93,7 @@ public class User extends CanvasContext{
         }
 
         User other = (User) obj;
-        if (id != other.id) {
-            return false;
-        }
-        return true;
+        return id == other.id;
     }
 
     @Override
@@ -106,10 +103,10 @@ public class User extends CanvasContext{
 
     // User Permissions - defaults to false, returned with UserAPI.getSelfWithPermissions()
     public boolean canUpdateAvatar(){
-        return getPermissions() != null && getPermissions().canUpdateAvatar();
+        return getPermissions() != null && getPermissions().getCanUpdateAvatar();
     }
     public boolean canUpdateName(){
-        return getPermissions() != null && getPermissions().canUpdateName();
+        return getPermissions() != null && getPermissions().getCanUpdateName();
     }
 
     //region Getters
@@ -255,6 +252,7 @@ public class User extends CanvasContext{
         dest.writeTypedList(enrollments);
         dest.writeInt(this.enrollmentIndex);
         dest.writeString(this.lastLogin);
+        dest.writeParcelable(this.permissions, flags);
     }
 
     protected User(Parcel in) {
@@ -270,6 +268,7 @@ public class User extends CanvasContext{
         this.enrollments = in.createTypedArrayList(Enrollment.CREATOR);
         this.enrollmentIndex = in.readInt();
         this.lastLogin = in.readString();
+        this.permissions = in.readParcelable(CanvasContextPermission.class.getClassLoader());
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {

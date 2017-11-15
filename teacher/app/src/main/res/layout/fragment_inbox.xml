@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2017 - present  Instructure, Inc.
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/inbox_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/defaultPrimary"
+        android:elevation="6dp"
+        app:theme="@style/ToolBarStyle"
+        tools:ignore="UnusedAttribute" >
+        <com.instructure.teacher.view.CustomToolbarIconView
+            android:id="@+id/logoImageView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/toolbarIconPadding"
+            android:layout_marginTop="@dimen/toolbarIconPadding"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            style="@style/ToolBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:paddingStart="24dp"
+            android:singleLine="true"
+            android:text="@string/tab_inbox"
+            android:maxLines="1"
+            tools:ignore="Deprecated,RtlSymmetry" />
+
+    </android.support.v7.widget.Toolbar>
+    <RelativeLayout
+        android:id="@+id/filterTitleWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:paddingStart="16dp"
+        android:clipToPadding="false"
+        android:layout_marginBottom="-8dp"
+        android:layout_marginTop="-8dp">
+
+        <TextView
+            style="@style/TextFont.Medium"
+            android:id="@+id/courseFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/clearFilterTextView"
+            android:paddingTop="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/all_courses"
+            android:textColor="@color/defaultTextDark"
+            android:textSize="20sp"
+            tools:text="All Courses"/>
+
+        <TextView
+            style="@style/TextFont.Medium"
+            android:id="@+id/clearFilterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBaseline="@+id/courseFilter"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:text="@string/clear_filter"
+            android:textColor="@color/defaultActionColor"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="Clear filter"/>
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/filterWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="?android:listPreferredItemHeightSmall"
+        android:layout_below="@id/filterTitleWrapper">
+
+        <FrameLayout
+            android:id="@+id/filterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:minWidth="120dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <View
+                android:id="@+id/popupViewPosition"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextFont.Regular"
+                    android:id="@+id/filterText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|start"
+                    android:textColor="@color/inbox_filter_gray"
+                    android:textSize="18sp"
+                    tools:text="Inbox" />
+
+                <ImageView
+                    android:id="@+id/filterIndicator"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_cv_expand_white"
+                    android:importantForAccessibility="no"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/filterWrapper">
+
+        <com.instructure.pandautils.views.SwipeRefreshLayoutAppBar
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/inboxRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:cacheColorHint="@android:color/transparent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </com.instructure.pandautils.views.SwipeRefreshLayoutAppBar>
+
+        <com.instructure.teacher.view.EmptyPandaView
+            android:id="@+id/emptyPandaView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/vd_add"
+            app:elevation="4dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/addMessage"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

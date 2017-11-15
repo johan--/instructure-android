@@ -128,8 +128,6 @@
   <string name="domain">Domæne</string>
   <string name="sendFeedback">Send feedback</string>
   <string name="sendMail">Send e-mail...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Rediger</string>
   <plurals name="item_count">
     <item quantity="one">%d Element</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Der var en fejl ved hentning af kurset for dette element.</string>
   <string name="could_not_find_group">Der var en fejl ved hentning af gruppen for dette element.</string>
   <string name="selectBackground">Vælg en baggrund</string>
-  <string name="kalturaSubmissionInProgress">Indsend filer... Tjek notifikationsbjælken for opdateringer.</string>
-  <string name="kalturaSubmissionSuccessful">Afsluttede indsendte fil</string>
+  <string name="notoriousSubmissionInProgress">Indsend filer... Tjek notifikationsbjælken for opdateringer.</string>
+  <string name="notoriousSubmissionSuccessful">Afsluttede indsendte fil</string>
   <string name="poll_title">Hvad kom du til Canvas for at gøre?</string>
   <string name="poll_warning">Et element er ikke valgt.</string>
   <string name="poll_item_1">Tjek mine karakterer</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Del</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super Panda billede</string>
   <string name="newFeatureTitle">Mobil notifikationer</string>
   <string name="newFeatureMsg">For at modtage mobil push notifikationer gå til Canvas Indstillinger &gt; Notifications &gt; og vælg \"For alle enheder\"</string>

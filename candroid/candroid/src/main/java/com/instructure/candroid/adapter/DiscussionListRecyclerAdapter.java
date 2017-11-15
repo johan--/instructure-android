@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.instructure.candroid.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.binders.DiscussionTopicHeaderBinder;
 import com.instructure.candroid.binders.EmptyBinder;
@@ -29,22 +28,21 @@ import com.instructure.candroid.holders.DiscussionTopicHeaderViewHolder;
 import com.instructure.candroid.holders.EmptyViewHolder;
 import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.api.AnnouncementAPI;
-import com.instructure.canvasapi.api.DiscussionAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.DiscussionTopicHeader;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AnnouncementManager;
+import com.instructure.canvasapi2.managers.DiscussionManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import retrofit.client.Response;
 
 public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<String, DiscussionTopicHeader, RecyclerView.ViewHolder> {
 
@@ -58,11 +56,10 @@ public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<Str
 
     private AdapterToDiscussionsCallback mAdapterToDiscussionsCallback;
     private AdapterToFragmentCallback<DiscussionTopicHeader> mAdapterToFragmentCallback;
-    private CanvasCallback<DiscussionTopicHeader[]> mCanvasCallback;
-    private CanvasCallback<DiscussionTopicHeader[]> mPinnedDiscussionCanvasCallback;
+    private StatusCallback<List<DiscussionTopicHeader>> mCanvasCallback;
+    private StatusCallback<List<DiscussionTopicHeader>> mPinnedDiscussionCanvasCallback;
 
-    private boolean mIsFirstPageDiscussionsLoaded = false;
-    private HashMap<String, DiscussionTopicHeader[]> mSyncHash = new HashMap<>();
+    private HashMap<String, List<DiscussionTopicHeader>> mSyncHash = new HashMap<>();
     private int mCourseColor;
     private boolean mIsDiscussions;
 
@@ -138,7 +135,7 @@ public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<Str
         }
     }
 
-    private void populateAdapter(DiscussionTopicHeader[] discussionTopicHeaders){
+    private void populateAdapter(List<DiscussionTopicHeader> discussionTopicHeaders){
         for(DiscussionTopicHeader discussionTopicHeader : discussionTopicHeaders){
             if(!mIsDiscussions){
                 addOrUpdateItem(announcementsHeader, discussionTopicHeader);
@@ -159,21 +156,29 @@ public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<Str
     }
 
     @Override
+    public void refresh() {
+        mCanvasCallback.reset();
+        super.refresh();
+    }
+
+    @Override
     public void loadFirstPage() {
         if(mAdapterToDiscussionsCallback.isDiscussions()){
-            DiscussionAPI.getAllPinnedDiscussionsExhaustive(mCanvasContext, mPinnedDiscussionCanvasCallback);
-            DiscussionAPI.getFirstPageDiscussions(mCanvasContext, mCanvasCallback);
+            DiscussionManager.getAllPinnedDiscussions(mCanvasContext, true, mPinnedDiscussionCanvasCallback);
+            DiscussionManager.getDiscussions(true, mCanvasContext.getId(), mCanvasCallback);
         } else {
-            AnnouncementAPI.getFirstPageAnnouncements(mCanvasContext, mCanvasCallback);
+            AnnouncementManager.getAnnouncements(mCanvasContext.getId(), true, mCanvasCallback);
         }
     }
 
     @Override
     public void loadNextPage(String nextURL) {
         if(mAdapterToDiscussionsCallback.isDiscussions()){
-            DiscussionAPI.getNextPageDiscussions(nextURL, mCanvasCallback);
+            //calls next page auto-magically
+            DiscussionManager.getDiscussions(true, mCanvasContext.getId(), mCanvasCallback);
         } else {
-            AnnouncementAPI.getNextPageAnnouncements(nextURL, mCanvasCallback);
+            //calls next page auto-magically
+            AnnouncementManager.getAnnouncements(mCanvasContext.getId(), true, mCanvasCallback);
         }
     }
 
@@ -186,9 +191,9 @@ public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<Str
             return;
         }
 
-        for (Map.Entry<String, DiscussionTopicHeader[]> entry : mSyncHash.entrySet()) {
-            DiscussionTopicHeader[] discussionTopicHeaders = entry.getValue();
-            if (discussionTopicHeaders != null && discussionTopicHeaders.length > 0) {
+        for (Map.Entry<String, List<DiscussionTopicHeader>> entry : mSyncHash.entrySet()) {
+            List<DiscussionTopicHeader> discussionTopicHeaders = entry.getValue();
+            if (discussionTopicHeaders != null && discussionTopicHeaders.size() > 0) {
                 populateAdapter(discussionTopicHeaders);
             }
         }
@@ -199,40 +204,35 @@ public class DiscussionListRecyclerAdapter extends ExpandableRecyclerAdapter<Str
 
     @Override
     public void setupCallbacks() {
-        mPinnedDiscussionCanvasCallback = new CanvasCallback<DiscussionTopicHeader[]>(this) {
+        mPinnedDiscussionCanvasCallback = new StatusCallback<List<DiscussionTopicHeader>>() {
             @Override
-            public void firstPage(DiscussionTopicHeader[] discussionTopicHeaders, LinkHeaders linkHeaders, Response response) {
-
-                mSyncHash.put("pinned", discussionTopicHeaders);
-                syncCallback(APIHelpers.isCachedResponse(response));
+            public void onResponse(retrofit2.Response<List<DiscussionTopicHeader>> response, LinkHeaders linkHeaders, ApiType type) {
+                mSyncHash.put("pinned", response.body());
+                syncCallback(APIHelper.isCachedResponse(response));
             }
         };
 
-        mCanvasCallback = new CanvasCallback<DiscussionTopicHeader[]>(this) {
+        mCanvasCallback = new StatusCallback<List<DiscussionTopicHeader>>() {
             @Override
-            public void firstPage(DiscussionTopicHeader[] discussionTopicHeaders, LinkHeaders linkHeaders, Response response) {
-
-                //We have the latest from the server. We don't need to worry about what we used to think  was right.
-                if (!APIHelpers.isCachedResponse(response)) {
-                    mAdapterToDiscussionsCallback.clearUnreadCount();
-                }
-
-                if (!mIsFirstPageDiscussionsLoaded && mAdapterToDiscussionsCallback.isDiscussions()) {
-                    mSyncHash.put("firstpage", discussionTopicHeaders);
-                    mIsFirstPageDiscussionsLoaded = true;
-                    syncCallback(APIHelpers.isCachedResponse(response));
+            public void onResponse(retrofit2.Response<List<DiscussionTopicHeader>> response, LinkHeaders linkHeaders, ApiType type) {
+                if (mAdapterToDiscussionsCallback.isDiscussions()) {
+                    mSyncHash.put("firstpage", response.body());
+                    syncCallback(APIHelper.isCachedResponse(response));
                 } else {
-                    populateAdapter(discussionTopicHeaders);
+                    populateAdapter(response.body());
                 }
+                setNextUrl(linkHeaders.nextUrl);
+            }
 
-                setNextUrl(linkHeaders.nextURL);
+            @Override
+            public void onFinished(ApiType type) {
+                DiscussionListRecyclerAdapter.this.onCallbackFinished(type);
             }
         };
     }
 
     @Override
     public void resetData() {
-        mIsFirstPageDiscussionsLoaded = false;
         //The sync hash needs to be cleared on refresh
         mSyncHash.clear();
         super.resetData();

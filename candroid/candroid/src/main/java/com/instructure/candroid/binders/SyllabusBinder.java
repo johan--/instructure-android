@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.holders.SyllabusItemViewHolder;
 import com.instructure.candroid.holders.SyllabusViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.Date;
@@ -49,7 +49,7 @@ public class SyllabusBinder extends BaseBinder {
             }
         });
 
-        switch (item.getType()) {
+        switch (item.getItemType()) {
 
             case TYPE_CALENDAR:
             case TYPE_ASSIGNMENT:
@@ -64,10 +64,10 @@ public class SyllabusBinder extends BaseBinder {
                     drawable = CanvasContextColor.getColoredDrawable(context, drawableResId, courseColor);
                     holder.icon.setImageDrawable(drawable);
 
-                    Date dueDate = assignment.getDueDate();
+                    Date dueDate = assignment.getDueAt();
                     holder.date.setTextColor(context.getResources().getColor(R.color.secondaryText));
                     if(dueDate != null) {
-                        String dateString = DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate);
+                        String dateString = DateHelper.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate);
                         holder.date.setText(dateString);
                     } else {
                         holder.date.setText(context.getResources().getString(R.string.toDoNoDueDate));
@@ -90,7 +90,7 @@ public class SyllabusBinder extends BaseBinder {
 
                 break;
             default:
-                Utils.d("UNSUPPORTED TYPE FOUND IN SYLLABUS BINDER");
+                Logger.d("UNSUPPORTED TYPE FOUND IN SYLLABUS BINDER");
                 break;
         }
     }

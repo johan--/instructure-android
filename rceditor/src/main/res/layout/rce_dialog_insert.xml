@@ -15,7 +15,9 @@
   ~     limitations under the License.
   ~
   -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -24,29 +26,38 @@
     android:clipChildren="false">
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/alt_input_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:textColorHint="@color/rce_gray"
+        app:hintTextAppearance="@style/RCE_TextInputLabel">
 
-        <EditText
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/altEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text|textAutoComplete|textCapWords"
+            android:hint="@string/rce_editTextALTHint"
+            android:nextFocusDown="@+id/urlEditText"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/link_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:textColorHint="@color/rce_gray"
+        app:hintTextAppearance="@style/RCE_TextInputLabel"
+        android:layout_marginTop="12dp">
+
+        <android.support.v7.widget.AppCompatEditText
             android:id="@+id/urlEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textUri"
             android:hint="@string/rce_editTextUrlHint" />
-
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/text_input_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/altEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text|textAutoComplete|textCapWords"
-            android:hint="@string/rce_editTextALTHint" />
 
     </android.support.design.widget.TextInputLayout>
 

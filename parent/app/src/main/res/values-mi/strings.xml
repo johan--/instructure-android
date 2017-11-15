@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Korerotia mai ki a matou e pā ana ki o koutou wahi tino o te taupānga</string>
     <string name="sendFeedback">Tukua Urupare</string>
     <string name="sendMail">Tukua Īmēra&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Rohe:</string>
     <string name="help_versionNum">Putanga:</string>
     <string name="help_userId">ID Kaiwhakamahi:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Ka taea anake e ngā Canvas kaitirotiro te whakamotuhēhē i roto i te Canvas Parent.</string>
     <string name="open_source">tuwhera puna</string>
     <string name="open_source_details">Titiro ki ngā tuwhera puna raihaina</string>
+
+    <string name="unitedStates">Amerika</string>
+    <string name="theUnitedStates">te Amerika</string>
+    <string name="canada">Kānata</string>
+    <string name="ireland">Ireland</string>
+    <string name="australia">Ahitereiria</string>
+    <string name="germany">Tiamana</string>
+    <string name="singapore">Haragapore</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Kōwhiritia te rohe o ngā/akonga </string>
+    <string name="selectRegion">Kaiwhiwhi Rohe</string>
+    <string name="unauthorizedRegion">Rohe kaore e manahia</string>
+    <string name="mismatchedRegionMessage">Tēnei kāinga kei waho o tō rohe kua tohua e koe. Ki te tāpiri atu i tētahi akonga ki tēnei kāinga, tēnā koa whakamahi i te wāhanga "Kaiwhiwhi Rohe" i te rārangi takiuru hei waihanga i tētahi pūkete i te rohe o %1$s.</string>
 </resources>

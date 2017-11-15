@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">LoginAPI</string>
   <string name="hello_world">Hallo wereld!</string>
   <string name="action_settings">Instellingen</string>
   <string name="mobileVerifyGeneral">Deze app mag niet gebruikt worden</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">Onbekend apparaat</string>
   <string name="errorOccurred">Er heeft zich een onverwachte fout voorgedaan.</string>
   <string name="pageNotFound">Pagina niet gevonden.</string>
-  <string name="okay">Oké</string>
   <string name="confirm">Bevestigen</string>
   <string name="cancel">Annuleren</string>
   <string name="help">Help</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">Probeer je je aan te melden bij Canvas Network? </string>
   <string name="remove">Verwijderen</string>
   <string name="exampleURLSimple">myschool.instructure.com </string>
+  <string name="masquerade">Masker toepassen</string>
+  <string name="userId">Gebruikers ID</string>
+  <string name="domain">Domein </string>
+  <string name="masqueradingUserId">Gebruikers-ID verbergen</string>
+  <string name="masqueradingUserDomain">Domein verbergen</string>
+  <string name="masqueradingBegin">Met verbergen beginnen</string>
+  <string name="masqueradingStop">Maskeren stoppen</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Deze gebruiker verwijderen?</string>
   <string name="removedForever">Je moet je bij deze gebruiker weer aanmelden om toegang tot zijn content te verkrijgen.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Zie je je school niet? Voer de school URL in of tik hier voor help.</string>
   <string name="loginCanvasHelpWithUser">Voer de school URL in of tik hier voor help.</string>
   <string name="loginHint">Vind je school of district</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Hoe gaat het?</string>
-  <string name="rateUs">Hoe zou je ons beoordelen?</string>
-  <string name="doBetter">Wat kunnen we verbeteren?</string>
-  <string name="sendFeedback">Feedback versturen</string>
-  <string name="suggestions">Suggesties voor Android</string>
-  <string name="domain">Domein </string>
-  <string name="versionNum">Versie: </string>
-  <string name="userId">Gebruikers ID</string>
-  <string name="email">E-mail</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Niet nogmaals tonen</string>
-  <string name="installDate">Installatiedatum:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Een probleem melden</string>
   <string name="zendesk_subject">Onderwerp</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Apparaat</string>
   <string name="osVersion">OS Versie</string>
+  <string name="previousLoginTitle">Eerdere aanmeldingen</string>
+  <string name="canvasNetworks">Canvas-netwerken</string>
+  <string name="findMySchool">Zoek mijn school</string>
+  <string name="appTypeTeacher">Docent</string>
+  <string name="appTypeStudent">Cursist</string>
+  <string name="appTypeParent">Ouder</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">Wat is de naam van je school?</string>
+  <string name="next">Volgende</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Vorige gebruiker verwijderen</string>
+  <string name="accountDomainFooter">Kun je je school niet vinden? Typ de volledige URL van de school.</string>
+  <string name="accountDomainFooterLink">Tik hier voor hulp.</string>
+  <string name="login_noInternetConnectionTitle">Geen internetverbinding</string>
+  <string name="login_noInternetConnectionMessage">Voor deze actie is een internetverbinding vereist.</string>
+  <string name="empty_feedback">Bij het indienen van de feedback zijn een onderwerp en beschrijving verplicht.</string>
+  <string name="versionNum">Versienummer</string>
+  <string name="scrollInstructions">Scrol om alle details te zien</string>
 </resources>

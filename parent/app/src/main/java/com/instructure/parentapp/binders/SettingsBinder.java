@@ -28,9 +28,6 @@ import com.instructure.parentapp.holders.SettingsViewHolder;
 import com.instructure.parentapp.interfaces.AdapterToFragmentCallback;
 import com.squareup.picasso.Picasso;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class SettingsBinder extends BaseBinder {
 
     public static void bind(
@@ -45,7 +42,7 @@ public class SettingsBinder extends BaseBinder {
                 student.getStudentName(),
                 BuildConfig.IS_TESTING);
 
-        Picasso.with(context).load(student.getAvatarUrl()).placeholder(R.drawable.ic_cv_user_dark).error(R.drawable.ic_cv_user_dark).fit().into(holder.avatar);
+        Picasso.with(context).load(student.getAvatarUrl()).placeholder(R.drawable.ic_cv_user).error(R.drawable.ic_cv_user).fit().into(holder.avatar);
         Utils.testSafeContentDescription(holder.avatar,
                 String.format(context.getString(R.string.avatar_content_desc), holder.getAdapterPosition()),
                 "", // we don't want duplicate a11y elements for this

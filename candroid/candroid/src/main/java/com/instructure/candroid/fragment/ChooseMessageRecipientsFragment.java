@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ import com.instructure.candroid.adapter.ChooseMessageRecipientRecyclerAdapter;
 import com.instructure.candroid.decorations.DividerDecoration;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Recipient;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Recipient;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.Const;
 
@@ -104,7 +104,7 @@ public class ChooseMessageRecipientsFragment extends ParentFragment {
                     setNewAdapter(recipient, true);
                 } else if(recipient.getRecipientType() == Recipient.Type.group) {
                     //If it's a group, make sure there are actually users in that group.
-                    if(recipient.getUser_count() > 0) {
+                    if(recipient.getUserCount() > 0) {
                         if (isCheckbox) {
                             addOrRemoveRecipient(recipient, position);
                         } else {
@@ -170,7 +170,7 @@ public class ChooseMessageRecipientsFragment extends ParentFragment {
 
     private boolean isSelfSelected(String stringId) {
         try{
-            if(Long.parseLong(stringId) == APIHelpers.getCacheUser(getContext()).getId()){
+            if(Long.parseLong(stringId) == ApiPrefs.getUser().getId()){
                 return true;
             }
         } catch(NumberFormatException e) { }
@@ -218,7 +218,7 @@ public class ChooseMessageRecipientsFragment extends ParentFragment {
                 if(r.getRecipientType() == Recipient.Type.person){
                     count++;
                 } else{
-                    count+= r.getUser_count();
+                    count+= r.getUserCount();
                 }
             }
             title += String.format("%d "+users, count);
@@ -234,7 +234,7 @@ public class ChooseMessageRecipientsFragment extends ParentFragment {
         }
         boolean group = false;
         for(Recipient r: allRecipients) {
-            group =  group || (r.getRecipientType() == Recipient.Type.group && r.getUser_count() > 1);
+            group =  group || (r.getRecipientType() == Recipient.Type.group && r.getUserCount() > 1);
         }
         return group;
     }

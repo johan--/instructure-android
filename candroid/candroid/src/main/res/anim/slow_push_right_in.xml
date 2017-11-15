@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Modifications Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
   ~
   -->
 
-<!-- Copyright (C) 2007 The Android Open Source Project
+<!--
+	 Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -32,6 +33,12 @@
 -->
 
 <set xmlns:android="http://schemas.android.com/apk/res/android">
-	<translate android:fromXDelta="-100%p" android:toXDelta="0" android:duration="500"/>
-	<alpha android:fromAlpha="0.0" android:toAlpha="1.0" android:duration="500" />
+    <translate
+        android:duration="500"
+        android:fromXDelta="-100%p"
+        android:toXDelta="0" />
+    <alpha
+        android:duration="500"
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
 </set>

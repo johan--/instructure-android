@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Cuéntenos sobre sus partes favoritas de la aplicación</string>
     <string name="sendFeedback">Enviar los comentarios</string>
     <string name="sendMail">Enviar correo electrónico&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Dominio:</string>
     <string name="help_versionNum">Versión:</string>
     <string name="help_userId">ID del usuario:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Solo los observadores de Canvas pueden autenticar en Canvas para Padres.</string>
     <string name="open_source">Abrir fuente</string>
     <string name="open_source_details">Ver licencias de fuentes abiertas</string>
+
+    <string name="unitedStates">EsEEstados Unidos de América</string>
+    <string name="theUnitedStates">los Estados Unidos de América</string>
+    <string name="canada">Canadá</string>
+    <string name="ireland">Irlanda</string>
+    <string name="australia">Australia</string>
+    <string name="germany">Alemania</string>
+    <string name="singapore">Singapur</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Escoger región del alumno</string>
+    <string name="selectRegion">Selector de región</string>
+    <string name="unauthorizedRegion">Región no autorizada</string>
+    <string name="mismatchedRegionMessage">Esta institución se encuentra fuera de la región que ha seleccionado. Para agregar un alumno a esta institución, utilice la opción “Selector de región” en la página de inicio de sesión a fin de crear una cuenta en la región de %1$s.</string>
 </resources>

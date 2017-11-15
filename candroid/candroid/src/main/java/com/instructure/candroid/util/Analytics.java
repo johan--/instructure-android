@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,13 +22,14 @@ import android.app.Application;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.loginapi.login.interfaces.AnalyticsEventHandling;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+
+import java.util.List;
 
 public class Analytics {
 
-    public static void trackEnrollment(Activity context, Course[] courseList) {
+    public static void trackEnrollment(Activity context, List<Course> courseList) {
 
         if(context == null || courseList == null){
             return;
@@ -78,7 +79,7 @@ public class Analytics {
         }
 
         //Get Domain
-        String domain = APIHelpers.getDomain(context);
+        String domain = ApiPrefs.getDomain();
 
         Application application = context.getApplication();
         if(application instanceof AnalyticsEventHandling) {

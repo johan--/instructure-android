@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,17 +18,23 @@
 package com.instructure.canvasapi2.apis;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.ScheduleItem;
-import com.instructure.canvasapi2.utils.APIHelper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
@@ -47,7 +53,7 @@ public class CalendarEventAPI {
                 @Query("type") String type,
                 @Query("start_date") String startDate,
                 @Query("end_date") String endDate,
-                @Query(value = "context_codes[]", encoded = true) ArrayList<String> contextCodes);
+                @Query(value = "context_codes[]", encoded = true) List<String> contextCodes);
 
         @GET("calendar_events/")
         Call<List<ScheduleItem>>  getCalendarEvents(
@@ -55,11 +61,29 @@ public class CalendarEventAPI {
                 @Query("type") String type,
                 @Query("start_date") String startDate,
                 @Query("end_date") String endDate,
-                @Query(value = "context_codes[]", encoded = true) ArrayList<String> contextCodes);
-
+                @Query(value = "context_codes[]", encoded = true) List<String> contextCodes);
 
         @GET
-        Call <List<ScheduleItem>> next(@Url String url);
+        Call<List<ScheduleItem>> next(@Url String url);
+
+        @GET("calendar_events/{eventId}")
+        Call<ScheduleItem> getCalendarEvent(@Path("eventId") long eventId);
+
+        @DELETE("calendar_events/{eventId}")
+        Call<ScheduleItem> deleteCalendarEvent(@Path("eventId") long eventId, @Query("cancel_reason") String cancelReason);
+
+        @GET("users/self/upcoming_events")
+        Call<List<ScheduleItem>> getUpcomingEvents();
+
+        @POST("calendar_events/")
+        Call<ScheduleItem> createCalendarEvent(
+                @Query("calendar_event[context_code]") String contextCode,
+                @Query("calendar_event[title]") String title,
+                @Query("calendar_event[description]") String description,
+                @Query("calendar_event[start_at]") String startDate,
+                @Query("calendar_event[end_at]") String endDate,
+                @Query("calendar_event[location_name]") String locationName,
+                @Body String body);
 
         //region Airwolf
 
@@ -75,34 +99,86 @@ public class CalendarEventAPI {
                 @Path("student_id") String studentId,
                 @Query("start_date") String startDate,
                 @Query("end_date") String endDate,
-                @Query(value = "context_codes[]", encoded = true) ArrayList<String> contextCodes);
+                @Query(value = "context_codes[]", encoded = true) List<String> contextCodes);
 
         //endregion
     }
 
-    public static String getEventTypeParam(int eventType) {
-        if(eventType == 0) {
-            return "event";
-        } else {
-            return "assignment";
+    public enum CalendarEventType {
+        CALENDAR("event"),
+        ASSIGNMENT("assignment");
+
+        private String apiName;
+
+        CalendarEventType(String apiName) {
+            this.apiName = apiName;
+        }
+
+        public String getApiName() {
+            return apiName;
         }
     }
 
-    public static void getCalendarEvents(final int eventType,
-            @NonNull final String startDate,
-            @NonNull final String endDate,
-            @NonNull final ArrayList<String> canvasContexts,
+    public static void getCalendarEvent(
+            long eventId,
+            @NonNull final RestBuilder adapter,
+            @NonNull final RestParams params,
+            @NonNull final StatusCallback<ScheduleItem> callback) {
+        callback.addCall(adapter.build(CalendarEventInterface.class, params).getCalendarEvent(eventId)).enqueue(callback);
+    }
+
+    public static void getCalendarEvents(
+            boolean allEvents,
+            @NonNull CalendarEventType type,
+            @Nullable final String startDate,
+            @Nullable final String endDate,
+            @NonNull final List<String> canvasContexts,
             @NonNull final RestBuilder adapter,
             @NonNull StatusCallback<List<ScheduleItem>> callback,
             @NonNull final RestParams params) {
-
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
             callback.addCall(adapter.build(CalendarEventInterface.class, params)
-                    .getCalendarEvents(false, getEventTypeParam(eventType), startDate, endDate, canvasContexts)).enqueue(callback);
+                    .getCalendarEvents(allEvents, type.apiName, startDate, endDate, canvasContexts)).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             callback.addCall(adapter.build(CalendarEventInterface.class, params)
                     .next(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
+    }
+
+    public static void getUpcomingEvents(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params,
+            @NonNull StatusCallback<List<ScheduleItem>> callback) {
+        callback.addCall(adapter.build(CalendarEventInterface.class, params).getUpcomingEvents()).enqueue(callback);
+    }
+
+    public static Response<List<ScheduleItem>> getUpcomingEventsSynchronous(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params) throws IOException {
+        return adapter.build(CalendarEventInterface.class, params).getUpcomingEvents().execute();
+    }
+
+    public static void deleteCalendarEvent(
+            long eventId,
+            String cancelReason,
+            @NonNull final RestBuilder adapter,
+            @NonNull final RestParams params,
+            @NonNull final StatusCallback<ScheduleItem> callback) {
+        callback.addCall(adapter.build(CalendarEventInterface.class, params).deleteCalendarEvent(eventId, cancelReason)).enqueue(callback);
+    }
+
+    public static void createCalendarEvent(
+            @NonNull String contextCode,
+            @NonNull String title,
+            @NonNull String description,
+            @NonNull String startDate,
+            @NonNull String endDate,
+            @NonNull String location,
+            @NonNull final RestBuilder adapter,
+            @NonNull final RestParams params,
+            @NonNull StatusCallback<ScheduleItem> callback){
+        Call<ScheduleItem> call = adapter.build(CalendarEventInterface.class, params).createCalendarEvent(contextCode, title, description, startDate, endDate, location, "");
+        callback.addCall(call).enqueue(callback);
     }
 
     //region Airwolf

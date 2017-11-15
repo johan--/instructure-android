@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,15 +17,18 @@
 
 package com.instructure.canvasapi2.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
+import com.instructure.canvasapi2.R;
 import com.instructure.canvasapi2.utils.APIHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Conversation extends CanvasModel<Conversation> {
@@ -101,8 +104,32 @@ public class Conversation extends CanvasModel<Conversation> {
         }
     }
 
+    public static String getWorkflowStateAPIString(WorkflowState workFlowState) {
+        if (workFlowState == WorkflowState.UNREAD) {
+            return "unread";
+        } else if (workFlowState == WorkflowState.ARCHIVED) {
+            return "archived";
+        } else if (workFlowState == WorkflowState.READ) {
+            return "read";
+        } else {
+            return "";
+        }
+    }
+
     public void setWorkflowState(String workflowState) {
         this.workflowState = workflowState;
+    }
+
+    public void setWorkflowState(WorkflowState state) {
+        if(state == WorkflowState.UNREAD){
+            workflowState = "unread";
+        } else if (state == WorkflowState.ARCHIVED){
+            workflowState = "archived";
+        } else if (state == WorkflowState.READ){
+            workflowState = "read";
+        } else{
+            workflowState = "";
+        }
     }
 
     public String getLastMessage() {
@@ -306,6 +333,45 @@ public class Conversation extends CanvasModel<Conversation> {
         return lastAuthoredDate;
     }
 
+    public String getMessageTitle(Context context, long myUserID, String monologue) {
+        return determineMessageTitle(context, myUserID,monologue);
+    }
+
+    private String determineMessageTitle(Context context, long myUserID, String monologueDefault) {
+
+        if(deleted){
+            return deletedString;
+        }
+        else if (isMonologue(myUserID)) {
+            return monologueDefault;
+        }
+
+        ArrayList<BasicUser> normalized = new ArrayList<BasicUser>();
+
+        //Normalize the message!
+        for (int i = 0; i < getParticipants().size(); i++) {
+            if (getParticipants().get(i).getId() == myUserID) {
+                continue;
+            } else {
+                normalized.add(getParticipants().get(i));
+            }
+        }
+
+        if (normalized.size() > 2) {
+            return normalized.get(0).getName() + String.format(Locale.getDefault(), context.getString(R.string.andMore), normalized.size() - 1);
+        } else {
+            String participants = "";
+            for (int i = 0; i < normalized.size(); i++) {
+                if (!participants.equals("")) {
+                    participants += ", ";
+                }
+
+                participants += normalized.get(i).getName();
+            }
+            return  participants;
+        }
+    }
+
     @Nullable
     @Override
     public String getComparisonString() {
@@ -318,11 +384,17 @@ public class Conversation extends CanvasModel<Conversation> {
     public Date getComparisonDate() {
         //sent messages have a last_authored_message_at that other messages won't. In that case last_message_at can be null,
         //but last_authored_message isn't
-        if(lastMessageAt != null) {
+        if(lastMessageAt != null && lastAuthoredMessageAt == null) {
             return getLastMessageSent();
         }
-        else {
+        else if(lastMessageAt == null && lastAuthoredMessageAt != null){
             return getLastAuthoredMessageSent();
+        } else {
+            if(getLastMessageSent().after(getLastAuthoredMessageSent())) {
+                return getLastMessageSent();
+            } else {
+                return getLastAuthoredMessageSent();
+            }
         }
     }
 

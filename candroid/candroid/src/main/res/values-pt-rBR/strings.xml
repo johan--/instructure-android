@@ -128,8 +128,6 @@
   <string name="domain">Domínio</string>
   <string name="sendFeedback">Enviar Comentários</string>
   <string name="sendMail">Enviar E-mail...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Editar </string>
   <plurals name="item_count">
     <item quantity="one">%d item</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Houve um erro ao pegando o curso para este item.</string>
   <string name="could_not_find_group">Houve um erro ao pegar o grupo para este item.</string>
   <string name="selectBackground">Selecionar um pano de fundo</string>
-  <string name="kalturaSubmissionInProgress">Enviando arquivos... Confira na barra de notificações por atualizações.</string>
-  <string name="kalturaSubmissionSuccessful">Terminou de enviar arquivo</string>
+  <string name="notoriousSubmissionInProgress">Enviando arquivos... Confira na barra de notificações por atualizações.</string>
+  <string name="notoriousSubmissionSuccessful">Terminou de enviar arquivo</string>
   <string name="poll_title">Você veio até o Canvas para fazer o que?</string>
   <string name="poll_warning">Um item não foi selecionado.</string>
   <string name="poll_item_1">Conferir as minhas notas</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">AvataresdePanda</string>
   <string name="share">Compartilhar</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Imagem de Super Panda</string>
   <string name="newFeatureTitle">Notificações Móveis</string>
   <string name="newFeatureMsg">Para receber notificações push no celular vai para Configurações &gt; Notificações de Canvas &gt; E selecionar \"Para Todos os Dispositivos\"</string>

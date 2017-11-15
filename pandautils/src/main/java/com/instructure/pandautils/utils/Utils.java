@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 
 import java.io.File;
 import java.util.HashMap;
@@ -48,10 +48,7 @@ public class Utils {
     public static boolean hasCameraAvailable(Activity activity) {
         PackageManager pm = activity.getPackageManager();
 
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) || pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
-            return true;
-        }
-        return false;
+        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) || pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
     }
 
     public static File getAttachmentsDirectory(Context context) {
@@ -82,11 +79,8 @@ public class Utils {
             return true;
         }
 
-        if(!TextUtils.isEmpty(device) && device.contains("amazon")) {
-            return true;
-        }
+        return !TextUtils.isEmpty(device) && device.contains("amazon");
 
-        return false;
     }
 
     public static boolean isNetworkAvailable(Context context) {
@@ -116,7 +110,20 @@ public class Utils {
 
     public static Map<String, String> getReferer(Context context){
         Map<String, String> extraHeaders = new HashMap<>();
-        extraHeaders.put("Referer", APIHelpers.getDomain(context));
+        extraHeaders.put("Referer", ApiPrefs.getDomain());
+
+        return extraHeaders;
+    }
+
+    public static Map<String, String> getRefererAndAuthentication(Context context) {
+        String token = ApiPrefs.getToken();
+        String headerValue = null;
+        if(token != null) {
+            headerValue = String.format("Bearer %s", token);
+        }
+        Map<String,String> extraHeaders = new HashMap<String,String>();
+        extraHeaders.put("Authorization", headerValue);
+        extraHeaders.put("Referer", ApiPrefs.getDomain());
 
         return extraHeaders;
     }

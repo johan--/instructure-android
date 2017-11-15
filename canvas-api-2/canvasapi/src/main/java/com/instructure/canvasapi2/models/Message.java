@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.os.Parcel;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
+import com.instructure.canvasapi2.utils.APIHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -135,7 +136,7 @@ public class Message extends CanvasModel<Message> {
     @Nullable
     @Override
     public Date getComparisonDate() {
-        return null;
+        return APIHelper.stringToDate(createdAt);
     }
 
 

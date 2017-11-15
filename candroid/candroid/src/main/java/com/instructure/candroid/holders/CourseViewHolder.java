@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public class CourseViewHolder extends RecyclerView.ViewHolder {
     public TextView name;
     public TextView courseCode, grade;
     public ImageView pulseOveflow, pulseGrade, overflow;
-    public RippleView clickItem;
+    public View clickItem;
 
     public CourseViewHolder(View itemView) {
         super(itemView);
@@ -44,7 +44,7 @@ public class CourseViewHolder extends RecyclerView.ViewHolder {
         overflow = (ImageView) itemView.findViewById(R.id.overflow);
         pulseOveflow = (ImageView) itemView.findViewById(R.id.pulseOveflow);
         pulseGrade = (ImageView) itemView.findViewById(R.id.pulseGrade);
-        clickItem = (RippleView)itemView.findViewById(R.id.clickItem);
+        clickItem = itemView.findViewById(R.id.clickItem);
     }
 
     public static int holderResId() {

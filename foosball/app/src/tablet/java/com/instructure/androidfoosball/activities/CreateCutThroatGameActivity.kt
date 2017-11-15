@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.instructure.androidfoosball.activities
 
 import android.media.AudioManager
@@ -10,16 +26,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.instructure.androidfoosball.App
 import com.instructure.androidfoosball.R
-import com.instructure.androidfoosball.adapters.UserAdapter
 import com.instructure.androidfoosball.ktmodels.*
-import com.instructure.androidfoosball.utils.copyToRealmOrUpdate
-import com.instructure.androidfoosball.utils.elseIfBlank
-import com.instructure.androidfoosball.utils.mCommentator
-import com.instructure.androidfoosball.utils.setVisible
+import com.instructure.androidfoosball.utils.*
 import io.realm.RealmList
 import kotlinx.android.synthetic.tablet.activity_create_cut_throat_game.*
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.sdk21.listeners.onClick
 import org.jetbrains.anko.startActivity
+import java.util.*
 
 class CreateCutThroatGameActivity : AppCompatActivity() {
 
@@ -33,18 +46,20 @@ class CreateCutThroatGameActivity : AppCompatActivity() {
         set(value) {
             field = value
             rotateAfterButton.text = if (value == 0) String(Character.toChars(0x1F60E)) else value.toString()
+            updateDurationRange()
         }
 
     private var points = 0
         set(value) {
             field = value
             pointButton.text = value.toString()
-            if (rotateAfter > value) rotateAfter = value
+            if (rotateAfter >= value) rotateAfter = value - 1
+            updateDurationRange()
         }
 
     private val nfcListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            val nfc = dataSnapshot.getValue(NfcAssignment::class.java)
+            val nfc = dataSnapshot.getValue(NfcAssignment::class.java) ?: return
             if (nfc.sideOne.isBlank() && nfc.sideTwo.isBlank()) return
             fun getUserById(userId: String): User? = App.realm.where(User::class.java).equalTo("id", userId).findFirst()
             when {
@@ -78,17 +93,17 @@ class CreateCutThroatGameActivity : AppCompatActivity() {
             val options = (3..15).toList()
             MaterialDialog.Builder(this)
                     .items(options)
-                    .itemsCallback { materialDialog, view, i, charSequence -> points = options[i] }
+                    .itemsCallback { _, _, i, _ -> points = options[i] }
                     .show()
         }
 
         // Rotate after selection
         rotateAfter = ROTATE_AFTER_DEFAULT
         rotateAfterButton.onClick {
-            val options = (0..points).toList()
+            val options = (0 until points).toList()
             MaterialDialog.Builder(this)
                     .items(options.map { if (it == 0) "NEVER" else it.toString() })
-                    .itemsCallback { materialDialog, view, i, charSequence -> rotateAfter = options[i] }
+                    .itemsCallback { _, _, i, _ -> rotateAfter = options[i] }
                     .show()
         }
 
@@ -96,21 +111,28 @@ class CreateCutThroatGameActivity : AppCompatActivity() {
         startGameButton.onClick { createGame() }
     }
 
+    private fun updateDurationRange() {
+        val playerCount = playersLayout.players.size
+        if (playerCount < 3) {
+            durationView.text = getString(R.string.durationRangeNoMax, "-")
+        } else {
+            val ra = if (rotateAfter in 1..points) rotateAfter else points
+            val minRotations: Int = Math.ceil(points.toDouble() / ra).toInt() - 1
+            val minGoals = points + ((playerCount - 1) * minRotations)
+            durationView.text = getString(R.string.durationRangeNoMax, minGoals.toString())
+        }
+    }
+
     private fun onPlayersChanged() {
         // Show start button if ready
         val ready = playersLayout.players.size >= 3
         assignTeamsView.setVisible(!ready)
         startGameButton.setVisible(ready)
+        updateDurationRange()
     }
 
     private fun selectPlayer() {
-        val users: List<User> = App.realm.where(User::class.java).findAllSorted("name").toList()
-        MaterialDialog.Builder(this)
-                .title(R.string.pick_a_user)
-                .adapter(UserAdapter(this, users)) { dialog, itemView, which, text ->
-                    dialog.dismiss()
-                    addUser(users[which])
-                }.show()
+        showUserPicker(this) { addUser(it) }
     }
 
     private fun addUser(user: User) {
@@ -119,12 +141,15 @@ class CreateCutThroatGameActivity : AppCompatActivity() {
     }
 
     private fun createGame() {
+        val players = ArrayList(playersLayout.players)
+        Collections.shuffle(players)
+
         val game = CutThroatGame()
         game.status = GameStatus.ONGOING.name
         game.pointsToWin = points
         game.rotateAfter = rotateAfter
         game.startTime = System.currentTimeMillis()
-        game.players = playersLayout.players.mapTo(RealmList()) { it }
+        game.players = players.mapTo(RealmList()) { it }
         game.copyToRealmOrUpdate()
 
         startActivity<CutThroatGameActivity>(CutThroatGameActivity.EXTRA_GAME_ID to game.id)

@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">このアプリの好きな部分を教えてください</string>
     <string name="sendFeedback">フィードバックを送る</string>
     <string name="sendMail">Eメール&#8230;を送信する</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">ドメイン：</string>
     <string name="help_versionNum">バージョン:</string>
     <string name="help_userId">ユーザーID：</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Canvas Parent では、Canvas オブザーバーのみが認証を行うことができます。</string>
     <string name="open_source">ソースを開く</string>
     <string name="open_source_details">オープンソースライセンスを表示する</string>
+
+    <string name="unitedStates">United States of America</string>
+    <string name="theUnitedStates">United States of America</string>
+    <string name="canada">カナダ</string>
+    <string name="ireland">アイルランド</string>
+    <string name="australia">オーストラリア</string>
+    <string name="germany">ドイツ</string>
+    <string name="singapore">シンガポール</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">受講生の地域を選択する</string>
+    <string name="selectRegion">地域ピッカー</string>
+    <string name="unauthorizedRegion">承認されていない地域</string>
+    <string name="mismatchedRegionMessage">この機関は選択した地域の外にあります。この機関に受講生を追加するには、ログインページの[地域選択]オプションを使用して、地域のアカウントを作成してください%1$s。</string>
 </resources>

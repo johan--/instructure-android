@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2017 - present  Instructure, Inc.
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/regionRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:checkedButton="@+id/unitedStates"
+            tools:ignore="UselessParent">
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/unitedStatesRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/unitedStates"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/canadaRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/canada"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/irelandRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/ireland"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/australiaRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/australia"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/germanyRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/germany"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/singaporeRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/singapore"
+                android:textSize="17sp" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/gammaRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/airwolfGamma"
+                android:textSize="17sp"
+                android:visibility="gone" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+</ScrollView>

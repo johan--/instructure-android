@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -36,10 +37,12 @@ import android.view.ViewGroup;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static instructure.rceditor.RCEConst.BUTTON_COLOR;
 import static instructure.rceditor.RCEConst.HTML_ACCESSIBILITY_TITLE;
 import static instructure.rceditor.RCEConst.HTML_CONTENT;
 import static instructure.rceditor.RCEConst.HTML_RESULT;
 import static instructure.rceditor.RCEConst.HTML_TITLE;
+import static instructure.rceditor.RCEConst.THEME_COLOR;
 
 public class RCEFragment extends Fragment {
 
@@ -57,10 +60,12 @@ public class RCEFragment extends Fragment {
         }
     }
 
-    public void loadArguments(String html, String title, String accessibilityTitle) {
+    public void loadArguments(String html, String title, String accessibilityTitle, @ColorInt int themeColor, @ColorInt int buttonColor) {
         getArguments().putString(HTML_CONTENT, html);
         getArguments().putString(HTML_TITLE, title);
         getArguments().putString(HTML_ACCESSIBILITY_TITLE, accessibilityTitle);
+        getArguments().putInt(THEME_COLOR, themeColor);
+        getArguments().putInt(BUTTON_COLOR, buttonColor);
     }
 
     @Override
@@ -230,7 +235,10 @@ public class RCEFragment extends Fragment {
     private View.OnClickListener onInsertPicture = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            RCEInsertDialog dialog = RCEInsertDialog.newInstance(getString(R.string.rce_insertImage));
+            RCEInsertDialog dialog = RCEInsertDialog.newInstance(
+                    getString(R.string.rce_insertImage),
+                    getArguments().getInt(THEME_COLOR, Color.BLACK),
+                    getArguments().getInt(BUTTON_COLOR, Color.BLACK));
             dialog.setListener(new RCEInsertDialog.OnResultListener() {
                 @Override
                 public void onResults(String url, String alt) {
@@ -243,7 +251,10 @@ public class RCEFragment extends Fragment {
     private View.OnClickListener onInsertLink = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            RCEInsertDialog dialog = RCEInsertDialog.newInstance(getString(R.string.rce_insertLink));
+            RCEInsertDialog dialog = RCEInsertDialog.newInstance(
+                    getString(R.string.rce_insertLink),
+                    getArguments().getInt(THEME_COLOR, Color.BLACK),
+                    getArguments().getInt(BUTTON_COLOR, Color.BLACK));
             dialog.setListener(new RCEInsertDialog.OnResultListener() {
                 @Override
                 public void onResults(String url, String alt) {
@@ -300,13 +311,9 @@ public class RCEFragment extends Fragment {
         builder.create().show();
     }
 
-    public static RCEFragment newInstance(String html, String title, String accessibilityTitle) {
+    public static RCEFragment newInstance(String html, String title, String accessibilityTitle, @ColorInt int themeColor, @ColorInt int buttonColor) {
         RCEFragment fragment = new RCEFragment();
-        Bundle args = new Bundle();
-        args.putString(HTML_CONTENT, html);
-        args.putString(HTML_TITLE, title);
-        args.putString(HTML_ACCESSIBILITY_TITLE, accessibilityTitle);
-        fragment.setArguments(args);
+        fragment.setArguments(makeBundle(html, title, accessibilityTitle, themeColor, buttonColor));
         return fragment;
     }
 
@@ -316,11 +323,13 @@ public class RCEFragment extends Fragment {
         return fragment;
     }
 
-    public static Bundle makeBundle(String html, String title, String accessibilityTitle) {
+    public static Bundle makeBundle(String html, String title, String accessibilityTitle, @ColorInt int themeColor, @ColorInt int buttonColor) {
         Bundle args = new Bundle();
         args.putString(HTML_CONTENT, html);
         args.putString(HTML_TITLE, title);
         args.putString(HTML_ACCESSIBILITY_TITLE, accessibilityTitle);
+        args.putInt(THEME_COLOR, themeColor);
+        args.putInt(BUTTON_COLOR, buttonColor);
         return args;
     }
 }

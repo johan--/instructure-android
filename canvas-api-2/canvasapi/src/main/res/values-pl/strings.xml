@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">Adres URL w Internecie</string>
   <string name="canvasAPI_mediaRecording">Nagranie multimedialne</string>
   <string name="canvasAPI_attendance">Frekwencja</string>
+  <string name="quiz_scoring_policy_highest">Najwyższe</string>
+  <string name="quiz_scoring_policy_average">Średni</string>
+  <string name="quiz_scoring_policy_latest">Najnowsze</string>
+  <string name="no">Nie</string>
+  <string name="always">Zawsze</string>
+  <string name="graded_quiz">Oceniony test</string>
+  <string name="practice_quiz">Test próbny</string>
+  <string name="graded_survey">Oceniona ankieta</string>
+  <string name="ungraded_survey">Ankieta bez oceny</string>
 </resources>

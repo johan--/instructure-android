@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,19 +32,21 @@ import com.instructure.candroid.model.DateWindow;
 import com.instructure.candroid.model.EventData;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.CanvasCalendarUtils;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.apis.CalendarEventAPI;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.DateHelper;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
@@ -53,7 +55,6 @@ import com.roomorama.caldroid.CalendarHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,8 +65,8 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+
 
 public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ScheduleItem, RecyclerView.ViewHolder> {
 
@@ -82,11 +83,11 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     private static final int TYPE_ITEM = 1044;
 
     //region Callbacks
-    private CanvasCallback<ScheduleItem[]> mCalendarEventsCallback;
-    private CanvasCallback<ScheduleItem[]> mAssignmentEventsCallback;
-    private CanvasCallback<Course[]> mAllCoursesCallback;
-    private CanvasCallback<Course[]> mAllFavoriteCoursesCallback;
-    private CanvasCallback<Group[]> mAllGroupsCallback;
+    private StatusCallback<List<ScheduleItem>> mCalendarEventsCallback;
+    private StatusCallback<List<ScheduleItem>> mAssignmentEventsCallback;
+    private StatusCallback<List<Course>> mAllCoursesCallback;
+    private StatusCallback<List<Course>> mAllFavoriteCoursesCallback;
+    private StatusCallback<List<Group>> mAllGroupsCallback;
     private AdapterToFragmentCallback<ScheduleItem> mAdapterToFragmentCallback;
     private AdapterToCalendarCallback mAdapterToCalendarCallback;
     //endregion
@@ -112,6 +113,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     private boolean mIsStartDayMonday = false;
     private boolean mIsCalendarViewCreated = false;
     private boolean mHasLoadedCanvasContexts = false;
+    private boolean mHasLoadedCalenderEvents = false;
+    private boolean mHasLoadedAssignmentEvents = false;
     //endregion
 
     private boolean mIsNoNetwork; // With multiple callbacks, some could fail while others don't. This manages when to display no connection when offline
@@ -202,7 +205,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
         boolean isSameString = oldItem.getComparisonString().equals(newItem.getComparisonString());
 
         if (oldItem.getAssignment() != null && newItem.getAssignment() != null) {
-            return oldItem.getAssignment().getDueDate().equals(newItem.getAssignment().getDueDate());
+            return oldItem.getAssignment().getDueAt().equals(newItem.getAssignment().getDueAt());
         } else {
             return !isNullableChanged(oldItem.getAssignment(), newItem.getAssignment()) && isSameDate && isSameString;
         }
@@ -258,7 +261,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         // Workaround for the multiple callbacks, some will succeed while others don't
         setLoadedFirstPage(true);
         shouldShowLoadingFooter();
@@ -285,81 +288,57 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             return;
         }
         if(!mHasLoadedCanvasContexts){
-            CourseAPI.getAllFavoriteCourses(mAllFavoriteCoursesCallback);
-            CourseAPI.getAllCourses(mAllCoursesCallback);
-            GroupAPI.getAllGroups(mAllGroupsCallback);
+            CourseManager.getAllFavoriteCourses(true, mAllFavoriteCoursesCallback);
+            CourseManager.getCourses(true, mAllCoursesCallback);
+            GroupManager.getAllGroups(mAllGroupsCallback, true);
         }
 
     }
 
     // When sliding to the next month, we only want to recreate the events and assignment callbacks
     private void setupAssignmentAndEventCallbacks() {
-        mAssignmentEventsCallback = new CanvasCallback<ScheduleItem[]>(this) {
+        mAssignmentEventsCallback = new StatusCallback<List<ScheduleItem>>() {
+
             @Override
-            public void cache(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                if (scheduleItems == null) {
-                    return;
-                }
-
-                mAssignmentEvents.addAll(Arrays.asList(scheduleItems));
-
+            public void onResponse(retrofit2.Response<List<ScheduleItem>> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                mAssignmentEvents.addAll(response.body());
                 for (ScheduleItem s : mAssignmentEvents) {
-                    s.setType(ScheduleItem.Type.TYPE_ASSIGNMENT);
-                    if(s.getStartDate() != null && !s.isHidden()){
+                    s.setItemType(ScheduleItem.Type.TYPE_ASSIGNMENT);
+                    if(s.getStartAt() != null && !s.isHidden()){
                         mAllEvents.add(s);
                     }
                 }
-                setHasReadFromCache(true);
+                mHasLoadedAssignmentEvents = true;
                 finishCalendarEvents();
-            }
-
-
-            @Override
-            public void firstPage(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                setFinished(true);
                 mAdapterToFragmentCallback.onRefreshFinished();
-
-                cache(scheduleItems, linkHeaders, response);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<ScheduleItem>> callResponse, Throwable error, retrofit2.Response response) {
                 //Panda Loading doesn't disappear on error or lose of data connection
                 mAdapterToCalendarCallback.hidePandaLoading();
-                return super.onFailure(retrofitError);
             }
         };
 
-        mCalendarEventsCallback = new CanvasCallback<ScheduleItem[]>(this) {
-            @Override
-            public void cache(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                if (scheduleItems == null) {
-                    return;
-                }
-                mCalendarEvents.addAll(Arrays.asList(scheduleItems));
+        mCalendarEventsCallback = new StatusCallback<List<ScheduleItem>>() {
 
+            @Override
+            public void onResponse(retrofit2.Response<List<ScheduleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCalendarEvents.addAll(response.body());
                 for (ScheduleItem s : mCalendarEvents) {
-                    s.setType(ScheduleItem.Type.TYPE_CALENDAR);
-                    if(s.getStartDate() != null && !s.isHidden()){
+                    s.setItemType(ScheduleItem.Type.TYPE_CALENDAR);
+                    if(s.getStartAt() != null && !s.isHidden()){
                         mAllEvents.add(s);
                     }
                 }
-                setHasReadFromCache(true);
+                mHasLoadedCalenderEvents = true;
                 finishCalendarEvents();
-            }
-
-            @Override
-            public void firstPage(ScheduleItem[] scheduleItems, LinkHeaders linkHeaders, Response response) {
-                setFinished(true);
                 mAdapterToFragmentCallback.onRefreshFinished();
-
-                cache(scheduleItems, linkHeaders, response);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<ScheduleItem>> callResponse, Throwable error, retrofit2.Response response) {
                 mAdapterToCalendarCallback.hidePandaLoading();
-                return super.onFailure(retrofitError);
             }
         };
     }
@@ -367,10 +346,12 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     @Override
     public void setupCallbacks(){
         setupAssignmentAndEventCallbacks();
-        mAllCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mAllCoursesCallback = new StatusCallback<List<Course>>() {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                if (courses == null) {
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+
+                if (response.body() == null) {
                     return;
                 }
 
@@ -380,7 +361,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
 
                 mGotCourses = true;
 
-                for (Course c : courses) {
+                for (Course c : response.body()) {
                     //we won't be able to get the name if the course hasn't started yet or if the user doesn't have
                     //access to the course. So we don't want to add the course to the list
                     if(!TextUtils.isEmpty(c.getName())) {
@@ -394,16 +375,16 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<Course>> response, Throwable error) {
                 mAdapterToCalendarCallback.hidePandaLoading();
-                return super.onFailure(retrofitError);
             }
         };
 
-        mAllFavoriteCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mAllFavoriteCoursesCallback = new StatusCallback<List<Course>>() {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                if (courses == null) {
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                if (response.body() == null) {
                     return;
                 }
 
@@ -413,7 +394,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
 
                 mGotFavoriteCourses = true;
 
-                for (Course c : courses) {
+                for (Course c : response.body()) {
                     mFavoriteContextIds.add(c.getContextId());
                 }
 
@@ -421,15 +402,16 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<Course>> response, Throwable error) {
                 mAdapterToCalendarCallback.hidePandaLoading();
-                return super.onFailure(retrofitError);
             }
         };
 
-        mAllGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mAllGroupsCallback = new StatusCallback<List<Group>>() {
+
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<Group> groups = response.body();
                 if (groups == null) {
                     return;
                 }
@@ -449,9 +431,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<Group>> response, Throwable error) {
                 mAdapterToCalendarCallback.hidePandaLoading();
-                return super.onFailure(retrofitError);
             }
         };
     }
@@ -464,8 +445,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
      * @param endDate
      */
     private void getEventsForTimePeriod(Calendar startDate, Calendar endDate, ArrayList<String> canvasContextIds) {
-        final String startDateString = APIHelpers.dateToString(new Date(startDate.getTimeInMillis()));
-        final String endDateString = APIHelpers.dateToString(new Date(endDate.getTimeInMillis()));
+        final String startDateString = APIHelper.dateToString(new Date(startDate.getTimeInMillis()));
+        final String endDateString = APIHelper.dateToString(new Date(endDate.getTimeInMillis()));
         mAssignmentEventsCallback.cancel();
         mCalendarEventsCallback.cancel();
 
@@ -476,8 +457,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             //firstShow is false here
             mAdapterToCalendarCallback.showChooserDialog(false);
         } else {
-            CalendarEventAPI.getAllCalendarEventsExhaustive(CalendarEventAPI.EVENT_TYPE.ASSIGNMENT_EVENT, startDateString, endDateString, canvasContextIds, mAssignmentEventsCallback);
-            CalendarEventAPI.getAllCalendarEventsExhaustive(CalendarEventAPI.EVENT_TYPE.CALENDAR_EVENT, startDateString, endDateString, canvasContextIds, mCalendarEventsCallback);
+            CalendarEventManager.getCalendarEventsExhaustive(false, CalendarEventAPI.CalendarEventType.ASSIGNMENT, startDateString, endDateString, canvasContextIds, mAssignmentEventsCallback, isRefresh());
+            CalendarEventManager.getCalendarEventsExhaustive(false, CalendarEventAPI.CalendarEventType.CALENDAR, startDateString, endDateString, canvasContextIds, mCalendarEventsCallback, isRefresh());
         }
     }
 
@@ -491,7 +472,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
             getAdapterToRecyclerViewCallback().setIsEmpty(size() == 0);
         }
 
-        if(mCalendarEventsCallback.hasReadFromCache() && mAssignmentEventsCallback.hasReadFromCache()){
+        if(mHasLoadedCalenderEvents && mHasLoadedAssignmentEvents){
             getExtraData();
             selectDateAfterLoad();
         }
@@ -537,7 +518,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
 
         //This prevents date selection from changing the empty text view before things are loaded
         //(will also be called by cache, so won't interfere with cached behavior)
-        if(mAssignmentEventsCallback.isFinished() && mCalendarEventsCallback.isFinished()){
+        if(mHasLoadedCalenderEvents && mHasLoadedAssignmentEvents){
             mAdapterToCalendarCallback.hidePandaLoading();
             setAllPagesLoaded(true);
         }
@@ -583,7 +564,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
      * @return
      */
     private boolean addItemForViewType(ScheduleItem s) {
-        Date d = s.getStartDate();
+        Date d = s.getStartAt();
         if (d == null) {
             return false;
         }
@@ -592,16 +573,16 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
         CalendarListViewFragment.CalendarView currentCalendarView = CalendarListViewFragment.CalendarView.fromInteger(mAdapterToCalendarCallback.getCurrentCalendarView());
         if (currentCalendarView == CalendarListViewFragment.CalendarView.DAY_VIEW  && mSelectedDay != null) {
             if (dateTime.getDay().equals(mSelectedDay.getDay()) && dateTime.getMonth().equals(mSelectedDay.getMonth())) {
-                addOrUpdateItem(Utils.getCleanDate(d.getTime()), s);
+                addOrUpdateItem(DateHelper.getCleanDate(d.getTime()), s);
             }
         } else if (currentCalendarView == CalendarListViewFragment.CalendarView.WEEK_VIEW && mSelectedDay != null) {
             Date selectedDate = new Date(mSelectedDay.getMilliseconds(TimeZone.getDefault()));
             DateWindow dateWindow = CanvasCalendarUtils.setSelectedWeekWindow(selectedDate, mIsStartDayMonday);
             if (CanvasCalendarUtils.isWithinWeekWindow(d, dateWindow.getStart(), dateWindow.getEnd())) {
-                addOrUpdateItem(Utils.getCleanDate(d.getTime()), s);
+                addOrUpdateItem(DateHelper.getCleanDate(d.getTime()), s);
             }
         } else if (currentCalendarView == CalendarListViewFragment.CalendarView.MONTH_VIEW) {
-            addOrUpdateItem(Utils.getCleanDate(d.getTime()), s);
+            addOrUpdateItem(DateHelper.getCleanDate(d.getTime()), s);
         }
 
         return true;
@@ -623,7 +604,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
 
         //todo optimize
         for (ScheduleItem s : mAllEvents) {
-            Date d = s.getStartDate();
+            Date d = s.getStartAt();
             DateTime dateTime = DateTime.forInstant(d.getTime(), TimeZone.getDefault());
             int dateCount = countDateInEvents(d);
             if (dateCount == 1) {  //ExtraData(date, number of events)
@@ -652,7 +633,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
         int count = 0;
         DateTime dateTime = DateTime.forInstant(d.getTime(), TimeZone.getDefault());
         for (ScheduleItem scheduleItem : mAllEvents) {
-            DateTime compareDate = DateTime.forInstant(scheduleItem.getStartDate().getTime(), TimeZone.getDefault());
+            DateTime compareDate = DateTime.forInstant(scheduleItem.getStartAt().getTime(), TimeZone.getDefault());
             if (dateTime.getMonth().equals(compareDate.getMonth()) && dateTime.getDay().equals(compareDate.getDay()) && dateTime.getYear().equals(compareDate.getYear())) {
                 count++;
             }
@@ -694,7 +675,7 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     }
 
     private void addUserContext(){
-        mUser = APIHelpers.getCacheUser(getContext());
+        mUser = ApiPrefs.getUser();
         mCanvasContextItems.add(0, mUser);
         mContextCourseCodes.add(0, ""); // Blank holder - The user isn't a course.
         mContextNamesMap.put(mUser.getContextId(), mUser.getName());
@@ -798,8 +779,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
         mGotCourses = false;
         mGotGroups = false;
         mGotBothGroupsAndCourses = false;
-        mAssignmentEventsCallback.setHasReadFromCache(false);
-        mCalendarEventsCallback.setHasReadFromCache(false);
+        mHasLoadedAssignmentEvents = false;
+        mHasLoadedCalenderEvents = false;
     }
 
     @Override
@@ -856,8 +837,8 @@ public class CalendarListRecyclerAdapter extends ExpandableRecyclerAdapter<Date,
     }
 
     public void updateSelectedCalendarContexts(List<String> subscribedContexts){
-        mCalendarEventsCallback.setHasReadFromCache(false);
-        mAssignmentEventsCallback.setHasReadFromCache(false);
+        mHasLoadedAssignmentEvents = false;
+        mHasLoadedCalenderEvents = false;
         setFilterPrefs(getContext(), subscribedContexts);
         refreshCalendar();
     }

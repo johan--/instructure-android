@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 
 package com.instructure.pandautils.fragments;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,8 +32,6 @@ import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.pandautils.R;
 import com.instructure.pandautils.interfaces.NavigationCallbacks;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.pandautils.utils.ThemePrefs;
-import com.instructure.pandautils.utils.ToolbarColorizeHelper;
 
 
 public abstract class BaseFragment extends Fragment implements NavigationCallbacks {
@@ -44,7 +40,8 @@ public abstract class BaseFragment extends Fragment implements NavigationCallbac
     protected View mRootView;
 
     //Only gets called if not null
-    public void unBundle(@NonNull Bundle extras){};
+    public void unBundle(@NonNull Bundle extras){}
+
     public abstract int layoutResId();
     public abstract void onCreateView(View view);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,32 +28,30 @@ import com.instructure.candroid.binders.TodoBinder;
 import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.holders.TodoViewHolder;
 import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.ToDoAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.ToDo;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.ToDoManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.ToDo;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToDo, RecyclerView.ViewHolder> {
 
@@ -62,14 +60,14 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
 
     private Map<Long, Course> mCourseMap;
     private Map<Long, Group> mGroupMap;
-    private ArrayList<ToDo> mTodoList;
+    private List<ToDo> mTodoList;
     private ArrayList<ToDo> mScheduleList;
 
 
-    private CanvasCallback<ScheduleItem[]> mScheduleItemCallback;
-    private CanvasCallback<ToDo[]> mTodoCallback;
-    private CanvasCallback<Course[]> mCoursesCallback;
-    private CanvasCallback<Group[]> mGroupsCallback;
+    private StatusCallback<List<ScheduleItem>> mScheduleItemCallback;
+    private StatusCallback<List<ToDo>> mTodoCallback;
+    private StatusCallback<List<Course>> mCoursesCallback;
+    private StatusCallback<List<Group>> mGroupsCallback;
     private CanvasContext mCanvasContext;
 
     private HashSet<ToDo> mCheckedTodos = new HashSet<>();
@@ -132,7 +130,7 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
     public void onBindHeaderHolder(RecyclerView.ViewHolder holder, Date date, boolean isExpanded) {
         //if the to do doesn't have a due date (like if you're a teacher grading an assignment) the date that is set for the
         //header is a cleaned up version of a new date with the value of Long.MAX_VALUE
-        Date defaultDate = Utils.getCleanDate(new Date(Long.MAX_VALUE).getTime());
+        Date defaultDate = DateHelper.getCleanDate(new Date(Long.MAX_VALUE).getTime());
 
         String displayDate;
 
@@ -140,7 +138,7 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
         if(date.equals(defaultDate)) {
             displayDate = getContext().getString(R.string.toDoNoDueDate);
         } else {
-            displayDate = DateHelpers.getFormattedDate(getContext(), date);
+            displayDate = DateHelper.getFormattedDate(getContext(), date);
         }
 
         ExpandableHeaderBinder.bind(getContext(), mCanvasContext, (ExpandableViewHolder) holder, date, displayDate, isExpanded, getViewHolderHeaderClicked());
@@ -148,15 +146,15 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
 
     @Override
     public void loadData() {
-        CourseAPI.getAllCourses(mCoursesCallback);
-        GroupAPI.getAllGroups(mGroupsCallback);
+        CourseManager.getCourses(true, mCoursesCallback);
+        GroupManager.getAllGroups(mGroupsCallback, true);
 
-        ToDoAPI.getTodos(mCanvasContext, mTodoCallback);
-        CalendarEventAPI.getUpcomingEvents(mScheduleItemCallback);
+        ToDoManager.getTodos(mCanvasContext, mTodoCallback, isRefresh());
+        CalendarEventManager.getUpcomingEvents(mScheduleItemCallback, isRefresh());
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         // Workaround for the multiple callbacks, some will succeed while others don't
         setLoadedFirstPage(true);
         shouldShowLoadingFooter();
@@ -187,12 +185,12 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
             return;
         }
 
-        ArrayList<ToDo> todos = ToDoAPI.mergeToDoUpcoming(mTodoList, mScheduleList);
+        List<ToDo> todos = ToDoManager.mergeToDoUpcoming(mTodoList, mScheduleList);
 
         // now populate the todoList and upcomingList with the course information
         for(ToDo toDo : todos) {
             ToDo.setContextInfo(toDo, mCourseMap, mGroupMap);
-            addOrUpdateItem(Utils.getCleanDate(toDo.getComparisonDate().getTime()), toDo);
+            addOrUpdateItem(DateHelper.getCleanDate(toDo.getComparisonDate().getTime()), toDo);
         }
         mAdapterToFragmentCallback.onRefreshFinished();
         setAllPagesLoaded(true);
@@ -211,7 +209,7 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
             public void onCheckChanged(ToDo todo, boolean isChecked, int position) {
                 // We don't want to let them try to delete things while offline because they
                 // won't actually delete them from the server
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -241,27 +239,28 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
             }
         };
 
-        mCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mCoursesCallback = new StatusCallback<List<Course>>() {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                mCourseMap = CourseAPI.createCourseMap(courses);
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCourseMap = CourseManager.createCourseMap(response.body());
                 populateAdapter();
             }
         };
 
-        mGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mGroupsCallback = new StatusCallback<List<Group>>() {
+
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
-                mGroupMap = GroupAPI.createGroupMap(groups);
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
+                mGroupMap = GroupManager.createGroupMap(response.body());
                 populateAdapter();
             }
         };
 
-        mTodoCallback = new CanvasCallback<ToDo[]>(this) {
-
+        mTodoCallback = new StatusCallback<List<ToDo>>() {
             @Override
-            public void firstPage(ToDo[] toDos, LinkHeaders linkHeaders, Response response) {
-                mTodoList = new ArrayList<ToDo>(Arrays.asList(toDos));
+            public void onResponse(retrofit2.Response<List<ToDo>> response, LinkHeaders linkHeaders, ApiType type) {
+                mTodoList = response.body();
                 populateAdapter();
 
                 // remove the todos that have been deleted
@@ -271,12 +270,12 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
             }
         };
 
-        mScheduleItemCallback = new CanvasCallback<ScheduleItem[]>(this) {
+        mScheduleItemCallback = new StatusCallback<List<ScheduleItem>>() {
 
             @Override
-            public void firstPage(ScheduleItem[] upcoming, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<ScheduleItem>> response, LinkHeaders linkHeaders, ApiType type) {
                 mScheduleList = new ArrayList<>();
-                for(ScheduleItem scheduleItem : upcoming) {
+                for(ScheduleItem scheduleItem : response.body()) {
                     if (mCanvasContext.getType() == CanvasContext.Type.USER) {
                         mScheduleList.add(ToDo.toDoWithScheduleItem(scheduleItem));
                     } else if (scheduleItem.getContextId() == mCanvasContext.getId()) { // filter out the upcoming events just for the context
@@ -287,12 +286,17 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                if (retrofitError.getResponse() != null && !APIHelpers.isCachedResponse(retrofitError.getResponse()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            public void onFinished(ApiType type) {
+                TodoListRecyclerAdapter.this.onCallbackFinished(type);
+            }
+
+            @Override
+            public void onFail(Call<List<ScheduleItem>> callResponse, Throwable error, retrofit2.Response response) {
+                if (response != null && !APIHelper.isCachedResponse(response) || !APIHelper.hasNetworkConnection()) {
                     getAdapterToRecyclerViewCallback().setIsEmpty(true);
                 }
-                return super.onFailure(retrofitError);
             }
+
         };
 
     }
@@ -326,18 +330,15 @@ public class TodoListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, ToD
 
 
     private void hideTodoItem(final ToDo todo) {
-        ToDoAPI.dismissTodo(getContext(), todo, new CanvasCallback<Response>(this) {
-            @Override public void cache(Response response) {}
-
+        ToDoManager.dismissTodo(todo, new StatusCallback<Void>() {
             @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
+            public void onResponse(retrofit2.Response<Void> response, LinkHeaders linkHeaders, ApiType type) {
                 removeItem(todo);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<Void> callResponse, Throwable error, retrofit2.Response response) {
                 mDeletedTodos.remove(todo);
-                return false;
             }
         });
     }

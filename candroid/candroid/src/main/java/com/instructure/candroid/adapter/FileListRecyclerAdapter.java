@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,17 +23,18 @@ import android.view.View;
 import com.instructure.candroid.binders.FileBinder;
 import com.instructure.candroid.holders.FileViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentLongClick;
-import com.instructure.canvasapi.api.FileFolderAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.FileFolder;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.FileFolderManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.FileFolder;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class FileListRecyclerAdapter extends BaseListRecyclerAdapter<FileFolder, FileViewHolder>{
 
@@ -47,8 +48,8 @@ public class FileListRecyclerAdapter extends BaseListRecyclerAdapter<FileFolder,
     //endregion
 
     //region Callbacks
-    private CanvasCallback<FileFolder[]> mFolderCallback;
-    private CanvasCallback<FileFolder[]> mFileCallback;
+    private StatusCallback<List<FileFolder>> mFolderCallback;
+    private StatusCallback<List<FileFolder>> mFileCallback;
     private ArrayList<FileFolder> mDeletedFileFolders = new ArrayList<FileFolder>();
     private AdapterToFragmentLongClick<FileFolder> mAdaptertoFragmentLongCLick;
     //endregion
@@ -125,40 +126,41 @@ public class FileListRecyclerAdapter extends BaseListRecyclerAdapter<FileFolder,
     //region Setup Callbacks
     @Override
     public void setupCallbacks() {
-        mFolderCallback = new CanvasCallback<FileFolder[]>(this) {
+        mFolderCallback = new StatusCallback<List<FileFolder>>() {
 
             @Override
-            public void firstPage(FileFolder[] folderList, LinkHeaders linkHeaders, Response response) {
-                mIsFoldersAllPagesLoaded = linkHeaders.nextURL == null;
-                mAdaptertoFragmentLongCLick.onRefreshFinished();
-                setNextUrl(linkHeaders.nextURL);
+            public void onResponse(retrofit2.Response<List<FileFolder>> response, LinkHeaders linkHeaders, ApiType type) {
 
-                addAll(folderList);
-                if(linkHeaders.nextURL == null){
-                    getFiles(APIHelpers.isCachedResponse(response));
+                mIsFoldersAllPagesLoaded = linkHeaders.nextUrl == null;
+                mAdaptertoFragmentLongCLick.onRefreshFinished();
+                setNextUrl(linkHeaders.nextUrl);
+
+                addAll(response.body());
+                if(linkHeaders.nextUrl == null){
+                    getFiles(type == ApiType.API);
                 }
             }
-            
+
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                return false;
+            public void onFail(Call<List<FileFolder>> response, Throwable error) {
+                mAdaptertoFragmentLongCLick.onRefreshFinished();
             }
         };
 
-        mFileCallback = new CanvasCallback<FileFolder[]>(this) {
+        mFileCallback = new StatusCallback<List<FileFolder>>() {
 
             @Override
-            public void firstPage(FileFolder[] fileList, LinkHeaders linkHeaders, Response response) {
-                mIsFilesAllPagesLoaded = linkHeaders.nextURL == null;
+            public void onResponse(retrofit2.Response<List<FileFolder>> response, LinkHeaders linkHeaders, ApiType type) {
+                mIsFilesAllPagesLoaded = linkHeaders.nextUrl == null;
                 mAdaptertoFragmentLongCLick.onRefreshFinished();
-                setNextUrl(linkHeaders.nextURL);
+                setNextUrl(linkHeaders.nextUrl);
 
-                addAll(fileList);
+                addAll(response.body());
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                return false;
+            public void onFail(Call<List<FileFolder>> callResponse, Throwable error, Response response) {
+                mAdaptertoFragmentLongCLick.onRefreshFinished();
             }
         };
     }
@@ -168,24 +170,24 @@ public class FileListRecyclerAdapter extends BaseListRecyclerAdapter<FileFolder,
     public void loadFirstPage() {
         //First request all folders, folders callback will call files
         if (mCurrentFolderId > 0) {
-            FileFolderAPI.getFirstPageFolders(mCurrentFolderId, mFolderCallback);
+            FileFolderManager.getFirstPageFolders(mCurrentFolderId, true, mFolderCallback);
         } else {
-            FileFolderAPI.getFirstPageFoldersRoot(mCanvasContext, mFolderCallback);
+            FileFolderManager.getFirstPageFoldersRoot(mCanvasContext, true, mFolderCallback);
         }
     }
 
-    private void getFiles(boolean isCached) {
+    private void getFiles(boolean isNetwork) {
         if (mCurrentFolderId > 0) {
-            FileFolderAPI.getFirstPageFilesChained(mCurrentFolderId, isCached, mFileCallback);
+            FileFolderManager.getFirstPageFiles(mCurrentFolderId, isNetwork, mFileCallback);
         } else {
-            FileFolderAPI.getFirstPageFilesRootChained(mCanvasContext, isCached, mFileCallback);
+            FileFolderManager.getFirstPageFilesRoot(mCanvasContext, isNetwork, mFileCallback);
         }
     }
 
     @Override
     public void loadNextPage(String nextURL) {
         //The FileFolderAPI request works for both files and folders
-        FileFolderAPI.getNextPageFileFolders(nextURL, mIsFoldersAllPagesLoaded ? mFileCallback : mFolderCallback);
+        FileFolderManager.getNextPageFilesFolder(nextURL, true, mIsFoldersAllPagesLoaded ? mFileCallback : mFolderCallback);
     }
 
     private void removeDeletedFileFolders() {

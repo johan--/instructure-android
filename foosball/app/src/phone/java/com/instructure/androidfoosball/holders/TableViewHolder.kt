@@ -42,49 +42,61 @@ class TableViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val currentGame = table.currentGame
 
         if (context != null) {
-            if ("FREE" == currentGame) {
-                //Table not busy
-                itemView.tableStatusResult.text = context.getString(R.string.status_free)
-                itemView.cardGameState.visibility = View.GONE
-            } else if ("BUSY" == currentGame) {
-                //Table busy
-                itemView.tableStatusResult.text = context.getString(R.string.status_busy)
-                itemView.cardGameState.visibility = View.VISIBLE
-                itemView.bestOfCount.text = table.currentBestOf
-                itemView.roundCount.text = table.currentRound
-                itemView.pointsCount.text = table.currentPointsToWin
-                itemView.teamOneScore.text = table.currentScoreTeamOne
-                itemView.teamTwoScore.text = table.currentScoreTeamTwo
+            when (currentGame) {
+                "FREE" -> {
+                    //Table not busy
+                    itemView.tableStatusResult.text = context.getString(R.string.status_free)
+                    itemView.cardGameState.visibility = View.GONE
+                }
+                "TABLE_KING" -> {
+                    itemView.tableStatusResult.text = context.getString(R.string.tableKing)
+                    itemView.cardGameState.visibility = View.GONE
+                }
+                "TEAM_TWISTER" -> {
+                    itemView.tableStatusResult.text = context.getString(R.string.teamTwister)
+                    itemView.cardGameState.visibility = View.GONE
+                }
+                "BUSY" -> {
+                    //Table busy
+                    itemView.tableStatusResult.text = context.getString(R.string.status_busy)
+                    itemView.cardGameState.visibility = View.VISIBLE
+                    itemView.bestOfCount.text = table.currentBestOf
+                    itemView.roundCount.text = table.currentRound
+                    itemView.pointsCount.text = table.currentPointsToWin
+                    itemView.teamOneScore.text = table.currentScoreTeamOne
+                    itemView.teamTwoScore.text = table.currentScoreTeamTwo
 
-                // Reset avatar views
-                with(itemView) { listOf(playerOne, playerTwo, playerThree, playerFour).forEach { it.visibility = View.INVISIBLE }}
-                
-                safeLet(table.teamOne, table.teamTwo) { teamOne, teamTwo ->
-                    fun setTeamAvatars(users: List<User>, vararg views: CircleImageView) {
-                        for ( (user, view) in users.zip(views)) {
-                            view.visibility = View.VISIBLE
-                            if (user.avatar.isNullOrBlank()) {
-                                view.setImageResource(R.drawable.sadpanda)
-                            } else {
-                                Picasso.with(view.context).load(user.avatar).error(R.drawable.sadpanda).into(view)
+                    // Reset avatar views
+                    with(itemView) { listOf(playerOne, playerTwo, playerThree, playerFour).forEach { it.visibility = View.INVISIBLE }}
+
+                    safeLet(table.teamOne, table.teamTwo) { teamOne, teamTwo ->
+                        fun setTeamAvatars(users: List<User>, vararg views: CircleImageView) {
+                            for ( (user, view) in users.zip(views)) {
+                                view.visibility = View.VISIBLE
+                                if (user.avatar.isNullOrBlank()) {
+                                    view.setImageResource(R.drawable.sadpanda)
+                                } else {
+                                    Picasso.with(view.context).load(user.avatar).error(R.drawable.sadpanda).into(view)
+                                }
                             }
                         }
+                        setTeamAvatars(teamOne.users.reversed(), itemView.playerTwo, itemView.playerOne)
+                        setTeamAvatars(teamTwo.users, itemView.playerThree, itemView.playerFour)
                     }
-                    setTeamAvatars(teamOne.users.reversed(), itemView.playerTwo, itemView.playerOne)
-                    setTeamAvatars(teamTwo.users, itemView.playerThree, itemView.playerFour)
-                }
 
-                itemView.buttonNotifyWhenDone.setOnClickListener {
-                    if (!table.pushId.isBlank()) {
-                        FirebaseMessaging.getInstance().subscribeToTopic(table.pushId)
-                    } else {
-                        Log.e("push", "Table PushId was null cannot subscribe to topic")
+                    itemView.buttonNotifyWhenDone.setOnClickListener {
+                        if (!table.pushId.isBlank()) {
+                            FirebaseMessaging.getInstance().subscribeToTopic(table.pushId)
+                        } else {
+                            Log.e("push", "Table PushId was null cannot subscribe to topic")
+                        }
                     }
-                }
 
-            } else {
-                itemView.tableStatusResult.text = context.getString(R.string.status_unknown)
-                itemView.cardGameState.visibility = View.GONE
+                }
+                else -> {
+                    itemView.tableStatusResult.text = context.getString(R.string.status_unknown)
+                    itemView.cardGameState.visibility = View.GONE
+                }
             }
 
             if (Prefs(context).preferredTableId == table.pushId)

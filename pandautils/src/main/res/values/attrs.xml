@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -34,6 +34,13 @@
         <attr name="rv_zoom" format="boolean" />
         <attr name="rv_zoomScale" format="float" />
 
+    </declare-styleable>
+
+    <declare-styleable name="AvatarCropOverlay">
+        <attr name="aco_strokeWidth" format="dimension"/>
+        <attr name="aco_sourceView" format="reference"/>
+        <attr name="aco_strokeColor" format="color"/>
+        <attr name="aco_overlayColor" format="color"/>
     </declare-styleable>
 
 </resources>

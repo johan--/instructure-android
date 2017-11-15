@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,23 +29,17 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.canvasapi.api.TabAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.TabManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import retrofit.client.Response;
 
 public class CourseNavigationAdapter extends BaseAdapter {
 
@@ -60,7 +54,7 @@ public class CourseNavigationAdapter extends BaseAdapter {
     private OnTabsLoaded mCallback;
 
     private List<Tab> mItems = new ArrayList<>();
-    private CanvasCallback<Tab[]> tabCallback;
+    private StatusCallback<List<Tab>> tabCallback;
 
     public CourseNavigationAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -243,7 +237,7 @@ public class CourseNavigationAdapter extends BaseAdapter {
             this.canvasContext = canvasContext;
             setupCallbacks(mContext);
             color = CanvasContextColor.getCachedColor(mContext, canvasContext);
-            TabAPI.getTabs(canvasContext, tabCallback);
+            TabManager.getTabs(canvasContext, tabCallback, false);
 
         } else if (canvasContext != null) {
             color = CanvasContextColor.getCachedColor(mContext, canvasContext);
@@ -251,32 +245,22 @@ public class CourseNavigationAdapter extends BaseAdapter {
     }
 
     public void setupCallbacks(final Context context) {
-        tabCallback = new CanvasCallback<Tab[]>(APIHelpers.statusDelegateWithContext(context)) {
-
-            public void handleTabs(Tab[] tabs, boolean cache){
+        tabCallback = new StatusCallback<List<Tab>>() {
+            @Override
+            public void onResponse(retrofit2.Response<List<Tab>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<Tab> tabs = response.body();
                 if(canvasContext != null){
                     LoggingUtility.Log(context, Log.DEBUG, "Course/Group: " + canvasContext.getName() + "(" + canvasContext.getId() + ")");
                 }
 
-                String source = cache ? "Cache: " : "FirstPage: ";
-
-                LoggingUtility.Log(context, Log.DEBUG, source + Arrays.asList(tabs));
+                String source = type.isCache() ? "Cache: " : "FirstPage: ";
+                LoggingUtility.Log(context, Log.DEBUG, source + tabs);
                 formatAvailableTabs(context, tabs);
-            }
-
-            @Override
-            public void cache(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
-                handleTabs(tabs, true);
-            }
-
-            @Override
-            public void firstPage(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
-                handleTabs(tabs, false);
             }
         };
     }
 
-    private void formatAvailableTabs(Context context, Tab[] result) {
+    private void formatAvailableTabs(Context context, List<Tab> result) {
         //result might be null if the API returns null
         if (result == null) {
             return;

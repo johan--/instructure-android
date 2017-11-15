@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package com.instructure.canvasapi2.managers;
 
 import android.support.annotation.NonNull;
 
-import com.instructure.canvasapi2.AppManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.AnnouncementAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.DiscussionTopicHeader;
 import com.instructure.canvasapi2.tests.AnnouncementManager_Test;
-
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
+import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class AnnouncementManager extends DiscussionManager {
 
     private static final boolean mTesting = false;
 
-    public static void getAnnouncements(long courseId, StatusCallback<List<DiscussionTopicHeader>> callback) {
+    public static void getAnnouncements(long courseId, boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
         if(isTesting() || mTesting) {
             AnnouncementManager_Test.getAnnouncements(courseId, callback);
         } else {
@@ -43,9 +43,31 @@ public class AnnouncementManager extends DiscussionManager {
             RestParams params = new RestParams.Builder()
                     .withPerPageQueryParam(true)
                     .withShouldIgnoreToken(false)
+                    .withForceReadFromNetwork(forceNetwork)
                     .build();
 
             AnnouncementAPI.getAnnouncements(courseId, adapter, callback, params);
+        }
+    }
+
+    public static void getAllAnnouncements(final long courseId, boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            StatusCallback<List<DiscussionTopicHeader>> depaginatedCallback = new ExhaustiveListCallback<DiscussionTopicHeader>(callback) {
+                @Override
+                public void getNextPage(@NotNull StatusCallback<List<DiscussionTopicHeader>> callback, @NotNull String nextUrl, boolean isCached) {
+                    AnnouncementAPI.getNextPage(nextUrl, adapter, callback, params);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            AnnouncementAPI.getFirstPageAnnouncements(courseId, adapter, depaginatedCallback, params);
         }
     }
 
@@ -81,10 +103,5 @@ public class AnnouncementManager extends DiscussionManager {
             RestBuilder adapter = new RestBuilder(callback);
             AnnouncementAPI.getAnnouncements(courseContextCodes, startDate, endDate, adapter, callback, params);
         }
-    }
-
-    @Override
-    public boolean isAnnouncement() {
-        return true;
     }
 }

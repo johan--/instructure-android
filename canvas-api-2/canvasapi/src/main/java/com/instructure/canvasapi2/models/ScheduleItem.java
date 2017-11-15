@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,19 +17,22 @@
 
 package com.instructure.canvasapi2.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
+import com.instructure.canvasapi2.R;
 import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.DateHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import kotlin.text.StringsKt;
 
 public class ScheduleItem extends CanvasModel<ScheduleItem> {
 
@@ -135,6 +138,48 @@ public class ScheduleItem extends CanvasModel<ScheduleItem> {
         return APIHelper.stringToDate(startAt);
     }
 
+    public String getStartString(Context context) {
+        if (isAllDay()) {
+            return context.getString(R.string.allDayEvent);
+        }
+        if (getStartAt() != null) {
+            return DateHelper.createPrefixedDateString(context, R.string.Starts, getStartAt());
+        }
+        return "";
+    }
+
+    public String getStartDateString(Context context) {
+        if (isAllDay() && getAllDayDate() != null) {
+            return DateHelper.getFormattedDate(context, getAllDayDate());
+        }
+        if (getStartAt() != null) {
+            return DateHelper.getFormattedDate(context, getStartAt());
+        }
+        return "";
+    }
+    public String getStartToEndString(Context context) {
+        if (isAllDay()) {
+            return context.getString(R.string.allDayEvent);
+        }
+        if (getStartAt() != null) {
+            if (getEndAt() != null && !getStartAt().equals(getEndAt())) {
+                return DateHelper.getFormattedTime(context, getStartAt()) + " " + context.getResources().getString(R.string.to) + " " + DateHelper.getFormattedTime(context, getEndAt());
+            }
+            return DateHelper.getFormattedTime(context, getStartAt());
+        }
+        return "";
+    }
+
+    public static ScheduleItem createSyllabus(String title, String description) {
+        ScheduleItem syllabus = new ScheduleItem();
+        syllabus.setItemType(Type.TYPE_SYLLABUS);
+        syllabus.setTitle(title);
+        syllabus.setDescription(description);
+        syllabus.setId(Long.MIN_VALUE);
+
+        return syllabus;
+    }
+
     @Nullable
     public Date getEndAt() {
         return APIHelper.stringToDate(endAt);
@@ -146,7 +191,7 @@ public class ScheduleItem extends CanvasModel<ScheduleItem> {
 
     @Nullable
     public Date getAllDayDate() {
-        if(TextUtils.isEmpty(allDayDate)) return null;
+        if(allDayDate == null || StringsKt.isBlank(allDayDate)) return null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
             return sdf.parse(allDayDate);

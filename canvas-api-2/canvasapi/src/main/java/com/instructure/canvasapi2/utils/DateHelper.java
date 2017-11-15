@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 package com.instructure.canvasapi2.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -37,6 +38,16 @@ public class DateHelper {
             String s = iso8601string.replace("Z", "+00:00");
             s = s.substring(0, 22) + s.substring(23);
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).parse(s);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Date stringToDateWithMillis(final String iso8601string) {
+        try {
+            String s = iso8601string.replace("Z", "+00:00");
+            s = s.substring(0, 22) + s.substring(23);
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).parse(s);
         } catch (Exception e) {
             return null;
         }
@@ -106,8 +117,9 @@ public class DateHelper {
         return sFormat;
     }
 
+    @Nullable
     public static String getFormattedDate(Context context, Date date) {
-        if(context == null) {
+        if(context == null || date == null) {
             return null;
         }
         Format format = getPreferredDateFormat(context);
@@ -150,6 +162,7 @@ public class DateHelper {
         return format.format(date.getTime());
     }
 
+    @NonNull
     public static SimpleDateFormat getPreferredTimeFormat(Context context) {
         if(DateFormat.is24HourFormat(context)) {
             return new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -200,6 +213,7 @@ public class DateHelper {
         return new SimpleDateFormat("MMMM dd", Locale.getDefault());
     }
 
+    @NonNull
     public static SimpleDateFormat getFullMonthNoLeadingZeroDateFormat() {
         return new SimpleDateFormat("MMMM d", Locale.getDefault());
     }
@@ -414,5 +428,29 @@ public class DateHelper {
         compareCal.setTime(compare);
 
         return srcCal.get(Calendar.YEAR) == compareCal.get(Calendar.YEAR);
+    }
+
+    /**
+     * Transform Calendar to ISO 8601 string.
+     */
+    @Nullable
+    public static String dateToDayMonthYearString(Context context, final @Nullable Date date) {
+        if (date == null){
+            return null;
+        }
+
+        return getFormattedDate(context, date);
+    }
+
+    /**
+     * Used for making a clean date when comparing items.
+     * @param dateTime
+     * @return
+     */
+    public static Date getCleanDate(long dateTime) {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(dateTime);
+        GregorianCalendar genericDate = new GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+        return new Date(genericDate.getTimeInMillis());
     }
 }

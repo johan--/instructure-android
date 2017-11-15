@@ -17,7 +17,6 @@
 
 package com.instructure.canvasapi2.apis;
 
-
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
@@ -34,14 +33,14 @@ public class SectionAPI {
 
     interface SectionsInterface {
 
-        @GET("courses/{courseId}/sections")
+        @GET("courses/{courseId}/sections?include[]=total_students")
         Call<List<Section>> getFirstPageSectionsList(@Path("courseId") long courseID);
 
         @GET
         Call<List<Section>> getNextPageSectionsList(@Url String nextUrl);
 
         @GET("courses/{courseId}/sections/{sectionId}")
-        Call<Section> getSingleSection(@Path("courseId") long courseID, @Path("sectionId") long sectionID);
+        Call<Section> getSection(@Path("courseId") long courseID, @Path("sectionId") long sectionID);
     }
 
     public static void getFirstSectionsForCourse(long courseId, RestBuilder adapter, StatusCallback<List<Section>> callback, RestParams params) {
@@ -50,5 +49,9 @@ public class SectionAPI {
 
     public static void getNextPageSections(String nextUrl, RestBuilder adapter, StatusCallback<List<Section>> callback, RestParams params) {
         callback.addCall(adapter.build(SectionsInterface.class, params).getNextPageSectionsList(nextUrl)).enqueue(callback);
+    }
+
+    public static void getSection(long courseId, long sectionId, RestBuilder adapter, StatusCallback<Section> callback, RestParams params) {
+        callback.addCall(adapter.build(SectionsInterface.class, params).getSection(courseId, sectionId)).enqueue(callback);
     }
 }

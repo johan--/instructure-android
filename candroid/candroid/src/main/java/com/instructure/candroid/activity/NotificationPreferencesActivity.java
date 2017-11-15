@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,17 +32,19 @@ import com.instructure.candroid.adapter.CommunicationChannelsAdapter;
 import com.instructure.candroid.adapter.NotificationPreferencesRecyclerAdapter;
 import com.instructure.candroid.delegate.APIContract;
 import com.instructure.candroid.view.ActionbarSpinner;
-import com.instructure.canvasapi.api.CommunicationChannelsAPI;
-import com.instructure.canvasapi.model.CommunicationChannel;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CommunicationChannelsManager;
+import com.instructure.canvasapi2.models.CommunicationChannel;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandarecycler.interfaces.EmptyViewInterface;
 import com.instructure.pandautils.utils.Const;
 
-import retrofit.client.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotificationPreferencesActivity extends ParentActivity implements APIContract {
 
@@ -50,8 +52,8 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
     private ActionbarSpinner mSpinner;
     private NotificationPreferencesRecyclerAdapter mRecyclerAdapter;
 
-    private CanvasCallback<CommunicationChannel[]> communicationChannelCallback;
-    private CommunicationChannel[] allCommunicationChannels;
+    private StatusCallback<List<CommunicationChannel>> communicationChannelCallback;
+    private List<CommunicationChannel> allCommunicationChannels;
     private int selectedPosition = 0;
     private boolean routeToPush = false;
 
@@ -75,13 +77,13 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
         super.onPostCreate(savedInstanceState);
 
         if(savedInstanceState == null) {
-            User user = APIHelpers.getCacheUser(getContext());
+            User user = ApiPrefs.getUser();
             if(user != null) {
-                CommunicationChannelsAPI.getCommunicationChannels(user.getId(), communicationChannelCallback);
+                CommunicationChannelsManager.getCommunicationChannels(user.getId(), communicationChannelCallback, false);
             }
         } else {
             selectedPosition = savedInstanceState.getInt(Const.POSITION, 0);
-            allCommunicationChannels = (CommunicationChannel[])savedInstanceState.getParcelableArray(Const.ARRAY);
+            allCommunicationChannels = savedInstanceState.getParcelableArrayList(Const.ARRAY);
             setupSpinner();
             if(mSpinner != null) {
                 mSpinner.setSelection(selectedPosition);
@@ -123,7 +125,7 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(Const.POSITION, selectedPosition);
-        outState.putParcelableArray(Const.ARRAY, allCommunicationChannels);
+        outState.putParcelableArrayList(Const.ARRAY, new ArrayList<>(allCommunicationChannels));
     }
 
     private void setupActionbarSpinnerForCourse(final ActionBar actionBar, final CommunicationChannelsAdapter adapter) {
@@ -147,22 +149,23 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
 
     @Override
     public void setupCallbacks() {
-        communicationChannelCallback = new CanvasCallback<CommunicationChannel[]>(NotificationPreferencesActivity.this) {
+        communicationChannelCallback = new StatusCallback<List<CommunicationChannel>>() {
+
             @Override
-            public void firstPage(CommunicationChannel[] communicationChannels, LinkHeaders linkHeaders, Response response) {
-                allCommunicationChannels = communicationChannels;
+            public void onResponse(retrofit2.Response<List<CommunicationChannel>> response, LinkHeaders linkHeaders, ApiType type) {
+                allCommunicationChannels = response.body();
                 setupSpinner();
-                if(allCommunicationChannels != null && allCommunicationChannels.length > 0) {
+                if(allCommunicationChannels != null && allCommunicationChannels.size() > 0) {
                     if(routeToPush) {
-                        for (int i = 0; i < communicationChannels.length; i++) {
-                            if("push".equalsIgnoreCase(communicationChannels[i].getType())) {
+                        for (int i = 0; i < allCommunicationChannels.size(); i++) {
+                            if("push".equalsIgnoreCase(allCommunicationChannels.get(i).getType())) {
                                 selectedPosition = i;
                                 mSpinner.setSelection(i);
                                 break;
                             }
                         }
                     }
-                    fetchNotificationPreferences(allCommunicationChannels[0]);
+                    fetchNotificationPreferences(allCommunicationChannels.get(0));
                 }
             }
 
@@ -173,7 +176,9 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
         if(allCommunicationChannels != null) {
             getSupportActionBar().setDisplayShowCustomEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-            CommunicationChannelsAdapter adapter = new CommunicationChannelsAdapter(this, android.R.layout.simple_spinner_dropdown_item, allCommunicationChannels);
+            CommunicationChannel[] channelArray = new CommunicationChannel[allCommunicationChannels.size()];
+            channelArray = allCommunicationChannels.toArray(channelArray);
+            CommunicationChannelsAdapter adapter = new CommunicationChannelsAdapter(this, android.R.layout.simple_spinner_dropdown_item, channelArray);
             setupActionbarSpinnerForCourse(getSupportActionBar(), adapter);
         } else {
             fetchCommunicationChannels();
@@ -185,9 +190,9 @@ public class NotificationPreferencesActivity extends ParentActivity implements A
     }
 
     private void fetchCommunicationChannels() {
-        User user = APIHelpers.getCacheUser(getContext());
+        User user = ApiPrefs.getUser();
         if(user != null) {
-            CommunicationChannelsAPI.getCommunicationChannels(user.getId(), communicationChannelCallback);
+            CommunicationChannelsManager.getCommunicationChannels(user.getId(), communicationChannelCallback, false);
         }
     }
 

@@ -10,7 +10,6 @@
   <string name="unknownDevice">Неизвестное устройство</string>
   <string name="errorOccurred">Возникла непредвиденная ошибка.</string>
   <string name="pageNotFound">Страница не найдена</string>
-  <string name="okay">ОК</string>
   <string name="confirm">Подтвердить</string>
   <string name="cancel">Отменить</string>
   <string name="help">Справка</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">Пытаетесь войти в Canvas Network?</string>
   <string name="remove">Удалить</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">ID пользователя</string>
+  <string name="domain">Домейн</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Удалить пользователя?</string>
   <string name="removedForever">Вам придется войти в систему, как даннa пользователь для получения доступа к их содержимому.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">Не можете найти вашу школу? Введите URL школы или нажмите здесь для справки.</string>
   <string name="loginCanvasHelpWithUser">Введите URL школы или нажмите здесь для справки.</string>
   <string name="loginHint">Найдите свою школу или район</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Как мы работаем?</string>
-  <string name="rateUs">Как бы вы оценили нас?</string>
-  <string name="doBetter">Что мы можем сделать лучше?</string>
-  <string name="sendFeedback">Отправить отзыв</string>
-  <string name="suggestions">Предложения по Android</string>
-  <string name="domain">Домейн</string>
-  <string name="versionNum">Версия:</string>
-  <string name="userId">ID пользователя</string>
-  <string name="email">Email</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Не показывать снова</string>
-  <string name="installDate">Дата установки:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Сообщить о проблеме</string>
   <string name="zendesk_subject">Тема</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">Устройство</string>
   <string name="osVersion">Версия ОС</string>
+  <string name="empty_feedback">Для отправки отзыва необходимо указать тему и дать описание.</string>
 </resources>

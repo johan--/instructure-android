@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 
 public class AnnouncementAPI {
@@ -38,8 +39,8 @@ public class AnnouncementAPI {
         @GET("courses/{context_id}/discussion_topics?only_announcements=1")
         Call<List<DiscussionTopicHeader>> getFirstPageAnnouncementsList(@Path("context_id") long contextId);
 
-        @GET("{next}")
-        Call<List<DiscussionTopicHeader>>  getNextPageAnnouncementsList(@Path(value = "next", encoded = false) String nextUrl);
+        @GET
+        Call<List<DiscussionTopicHeader>>  getNextPageAnnouncementsList(@Url String nextUrl);
 
         @GET("announcements")
         Call<List<DiscussionTopicHeader>> getAnnouncements(@Query("context_codes[]") List<String> contextCodes, @Query("start_date") String startDate, @Query("end_date") String endDate);
@@ -59,5 +60,13 @@ public class AnnouncementAPI {
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             callback.addCall(adapter.build(AnnouncementInterface.class, params).getNextPageAnnouncementsList(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
+    }
+
+    public static void getFirstPageAnnouncements(long contextId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(AnnouncementInterface.class, params).getFirstPageAnnouncementsList(contextId)).enqueue(callback);
+    }
+
+    public static void getNextPage(String nextUrl, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(AnnouncementInterface.class, params).getNextPageAnnouncementsList(nextUrl)).enqueue(callback);
     }
 }

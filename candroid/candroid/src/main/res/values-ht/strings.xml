@@ -128,8 +128,6 @@
   <string name="domain">Domèn</string>
   <string name="sendFeedback">Voye Kòmantè</string>
   <string name="sendMail">Voye Imèl...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Modifye</string>
   <plurals name="item_count">
     <item quantity="one">%d atik</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Gen yon erè ki fèt pou jwenn kou pou atik sa a.</string>
   <string name="could_not_find_group">Gen yon erè ki fèt pou jwenn gwoup pou atik sa a.</string>
   <string name="selectBackground">Chwazi yon twal de fon</string>
-  <string name="kalturaSubmissionInProgress">Soumisyon fichye Verifye ba notifikasyon an pou aktyalizasyon.</string>
-  <string name="kalturaSubmissionSuccessful">Soumisyon fichye fini</string>
+  <string name="notoriousSubmissionInProgress">Soumisyon fichye Verifye ba notifikasyon an pou aktyalizasyon.</string>
+  <string name="notoriousSubmissionSuccessful">Soumisyon fichye fini</string>
   <string name="poll_title">Kisa w vin fè nan Canvas?</string>
   <string name="poll_warning">Gen yon atik ki pa t chwazi.</string>
   <string name="poll_item_1">Verifye nòt mwen yo</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Pataje</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Imaj Super Panda</string>
   <string name="newFeatureTitle">Notifikasyon Mobil</string>
   <string name="newFeatureMsg">Pou resevwa notifikasyon push sou pòtab ou ale nan Konfigirasyon Canvas &gt; Notifikasyon &gt; Epi chwasi \"Pou Tout Aparèy\"</string>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -57,14 +57,15 @@ import com.instructure.candroid.view.ActionbarSpinner;
 import com.instructure.candroid.view.CanvasEditTextView;
 import com.instructure.candroid.view.EmptyPandaView;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.models.FileSubmitObject;
 import com.instructure.pandautils.services.FileUploadService;
@@ -75,8 +76,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class DetailedConversationFragment extends ParentFragment
         implements CanvasEditTextView.CanvasEditTextViewRightListener, TransitionListenerProvider, CanvasEditTextView.CanvasEditTextViewLeftListener,
@@ -106,8 +106,8 @@ public class DetailedConversationFragment extends ParentFragment
 
     // interfaces
     private DetailedConversationAdapterToFragmentCallback mAdapterToFragmentCallback;
-    private CanvasCallback<Response> mDeleteConversationCallback;
-    private CanvasCallback<Response> mArchiveConversationCallback;
+    private StatusCallback<Conversation> mDeleteConversationCallback;
+    private StatusCallback<Conversation> mArchiveConversationCallback;
     private UpdateMessageStateListener mUpdateUnreadCallback;
 
     // data
@@ -186,7 +186,7 @@ public class DetailedConversationFragment extends ParentFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupCallbacks();
-        myUserId = APIHelpers.getCacheUser(getContext()).getId();
+        myUserId = ApiPrefs.getUser().getId();
     }
 
     @Override
@@ -287,31 +287,31 @@ public class DetailedConversationFragment extends ParentFragment
                 }
                 break;
             case R.id.menu_star_conversation:
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                ConversationAPI.starConversation(conversationID, !isStarred, new CanvasCallback<Conversation>(APIHelpers.statusDelegateWithContext(getContext())) {
+                ConversationManager.starConversation(conversationID, !isStarred, null, new StatusCallback<Conversation>() {
                     @Override
-                    public void firstPage(Conversation conversation, LinkHeaders linkHeaders, Response response) {
-                        isStarred = conversation.isStarred();
+                    public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
+                        isStarred = response.body().isStarred();
                         getActivity().invalidateOptionsMenu();
                     }
                 });
                 break;
             case R.id.menu_delete:
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                ConversationAPI.deleteConversation(mDeleteConversationCallback, conversationID);
+                ConversationManager.deleteConversation(conversationID, mDeleteConversationCallback);
                 break;
             case R.id.menu_archive:
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                ConversationAPI.archiveConversation(mArchiveConversationCallback, conversationID);
+                ConversationManager.archiveConversation(conversationID, true, mArchiveConversationCallback);
                 break;
         }
         return true;
@@ -347,17 +347,17 @@ public class DetailedConversationFragment extends ParentFragment
                     return;
                 }
                 isStarred = conversation.isStarred();
-                avatarURL = conversation.getAvatarURL();
-                mParticipants = conversation.getAllParticipants();
+                avatarURL = conversation.getAvatarUrl();
+                mParticipants = conversation.getParticipants();
                 mUserName = conversation.getMessageTitle(getContext(), myUserId, getString(R.string.monologue));
                 onFragmentActionbarSetupComplete(getFragmentPlacement(getContext()));
             }
         };
 
-        mDeleteConversationCallback = new CanvasCallback<Response>(this) {
+        mDeleteConversationCallback = new StatusCallback<Conversation>() {
 
             @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
+            public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
 
                 // Remove the message from the list
                 if (mUpdateUnreadCallback != null) {
@@ -369,11 +369,10 @@ public class DetailedConversationFragment extends ParentFragment
             }
         };
 
-        mArchiveConversationCallback = new CanvasCallback<Response>(this) {
+        mArchiveConversationCallback = new StatusCallback<Conversation>() {
 
             @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-
+            public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
                 // Remove the message from the list
                 if (mUpdateUnreadCallback != null) {
                     mUpdateUnreadCallback.removeMessage(conversation);
@@ -451,29 +450,29 @@ public class DetailedConversationFragment extends ParentFragment
 
         // If we have attachments, start our FileUploadService to submit our message, otherwise, send it normally
         if(mAttachmentsList.size() == 0){
-            CanvasCallback<Conversation> conversationCallback = new CanvasCallback<Conversation>(this) {
+            StatusCallback<Conversation> conversationCallback = new StatusCallback<Conversation>() {
+
                 @Override
-                public void firstPage(Conversation conversation, LinkHeaders linkHeaders, Response response) {
+                public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
                     if(!apiCheck()){
                         return;
                     }
                     //re-enable the send button
                     mCanvasEditTextView.enableRightButton();
 
-                    handleNewConversation(conversation);
+                    handleNewConversation(response.body());
                 }
 
                 @Override
-                public boolean onFailure(RetrofitError retrofitError) {
+                public void onFail(Call<Conversation> response, Throwable error) {
                     //re-enable the send button
                     mCanvasEditTextView.enableRightButton();
                     mCanvasEditTextView.setRightProgressBarLoading(false);
                     showToast(R.string.errorSendingMessage);
-                    return true;
                 }
             };
 
-            ConversationAPI.addMessageToConversation(conversationCallback, conversationID, message);
+            ConversationManager.addMessage(conversationID, message, null, null, null, conversationCallback);
 
         }else{
             Intent intent = new Intent(getActivity(), FileUploadService.class);
@@ -513,9 +512,9 @@ public class DetailedConversationFragment extends ParentFragment
     @Override
     public void onLeftButtonClicked() {
         Bundle bundle = FileUploadDialog.createAttachmentsBundle(mUserName, mAttachmentsList);
-        mUploadFileSourceFragment = FileUploadDialog.newInstance(getChildFragmentManager(),bundle);
+        mUploadFileSourceFragment = FileUploadDialog.newInstance(getActivity().getSupportFragmentManager(),bundle);
         mUploadFileSourceFragment.setTargetFragment(this, 1337);
-        mUploadFileSourceFragment.show(getChildFragmentManager(), FileUploadDialog.TAG);
+        mUploadFileSourceFragment.show(getActivity().getSupportFragmentManager(), FileUploadDialog.TAG);
     }
 
     @Override
@@ -668,11 +667,11 @@ public class DetailedConversationFragment extends ParentFragment
 
         extras.putLong(Const.CONVERSATION_ID, conversation.getId());
         extras.putBoolean(Const.IS_UNREAD, isUnread);
-        extras.putString(Const.URL, conversation.getAvatarURL());
+        extras.putString(Const.URL, conversation.getAvatarUrl());
         extras.putString(Const.NAME, conversationTitle);
         extras.putBoolean(Const.IS_STARRED, conversation.isStarred());
         extras.putBoolean(Const.WAIT_FOR_TRANSITION, waitForTransition);
-        extras.putParcelableArrayList(Const.FROM_PEOPLE, new ArrayList<Parcelable>(conversation.getAllParticipants()));
+        extras.putParcelableArrayList(Const.FROM_PEOPLE, new ArrayList<Parcelable>(conversation.getParticipants()));
         extras.putParcelable(Const.CONVERSATION, conversation);
         return extras;
     }
@@ -682,8 +681,8 @@ public class DetailedConversationFragment extends ParentFragment
         if (conversation != null) {
             extras.putLong(Const.CONVERSATION_ID, conversation.getId());
             extras.putBoolean(Const.IS_STARRED, conversation.isStarred());
-            extras.putString(Const.URL, conversation.getAvatarURL());
-            extras.putParcelableArrayList(Const.FROM_PEOPLE, new ArrayList<Parcelable>(conversation.getAllParticipants()));
+            extras.putString(Const.URL, conversation.getAvatarUrl());
+            extras.putParcelableArrayList(Const.FROM_PEOPLE, new ArrayList<Parcelable>(conversation.getParticipants()));
             extras.putParcelable(Const.CONVERSATION, conversation);
         }
         extras.putBoolean(Const.IS_UNREAD, isUnread);

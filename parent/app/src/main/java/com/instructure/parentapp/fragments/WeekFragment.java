@@ -37,7 +37,6 @@ import android.widget.TextView;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.ScheduleItem;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.decorations.SpacesItemDecoration;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
@@ -323,7 +322,7 @@ public class WeekFragment extends BaseExpandableSyncFragment<WeekHeaderItem, Sch
 
     @Override
     public String airwolfDomain() {
-        return APIHelper.getAirwolfDomain(getContext());
+        return ApiPrefs.getAirwolfDomain();
     }
 
     //For Testing

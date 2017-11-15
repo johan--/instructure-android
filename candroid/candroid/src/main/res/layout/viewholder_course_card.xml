@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -59,16 +59,12 @@
                 android:layout_below="@id/courseName"
                 android:background="@drawable/shadow_top_bottom" />
 
-            <com.instructure.pandautils.views.RippleView
+            <View
                 android:id="@+id/clickItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/courseCode"
-                android:layout_alignParentTop="true"
-                app:rv_alpha="@integer/ripple_alpha"
-                app:rv_centered="false"
-                app:rv_color="@color/white"
-                app:rv_rippleDuration="@integer/ripple_duration_short" />
+                android:layout_alignParentTop="true"/>
 
             <com.instructure.pandautils.views.RippleView
                 android:id="@+id/overflowRipple"

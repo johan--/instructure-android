@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.instructure.candroid.util;
 
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -27,8 +26,10 @@ import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.CheckedTextView;
+
 import com.instructure.candroid.R;
 import com.instructure.candroid.dialog.FileUploadDialog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +69,6 @@ public class UploadCheckboxManager {
         switch (currentCheckBox.getId()){
             case R.id.myFilesCheckBox:
                 return FileUploadDialog.FileUploadType.USER;
-            case R.id.courseFilesCheckBox:
-                return FileUploadDialog.FileUploadType.COURSE;
             case R.id.assignmentCheckBox:
                 return FileUploadDialog.FileUploadType.ASSIGNMENT;
         }
@@ -172,9 +171,6 @@ public class UploadCheckboxManager {
         switch (checkedTextView.getId()){
             case R.id.myFilesCheckBox:
                 listener.onUserFilesSelected();
-                break;
-            case R.id.courseFilesCheckBox:
-                listener.onCourseFilesSelected();
                 break;
             case R.id.assignmentCheckBox:
                 listener.onAssignmentFilesSelected();

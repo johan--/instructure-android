@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -45,20 +45,16 @@ import android.widget.TextView;
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.AnimationHelpers;
-import com.instructure.canvasapi.api.CourseNicknameAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.CourseNickname;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseNicknameManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.CourseNickname;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.views.RippleView;
 
-import retrofit.client.Response;
-
-public class ColorPickerActivity extends FragmentActivity implements APIStatusDelegate {
+public class ColorPickerActivity extends FragmentActivity{
 
     public static final Integer[] courseColors = {
             R.color.courseRed,
@@ -189,7 +185,7 @@ public class ColorPickerActivity extends FragmentActivity implements APIStatusDe
                     final int newColor = getResources().getColor(courseColors[(Integer) v.getTag()]);
 
                     setupViewsByColor(oldColors[0], oldColors[1], newColor, newColor);
-                    CanvasContextColor.setNewColor(ColorPickerActivity.this, getContext(), mCanvasContext, newColor);
+                    CanvasContextColor.setNewColor(mCanvasContext, newColor);
                     Analytics.trackColorSelected(ColorPickerActivity.this, newColor, CanvasContext.Type.isCourse(mCanvasContext));
 
                     setItemChecked((Integer) v.getTag());
@@ -204,10 +200,7 @@ public class ColorPickerActivity extends FragmentActivity implements APIStatusDe
                 //Save the nickname if it's changed.
                 String nickname = mCourseNameEditText.getText().toString();
                 if(!nickname.equals(mCanvasContext.getName()) && nickname.length() > 0) {
-                    CourseNicknameAPI.setNickname(mCanvasContext.getId(), nickname, new CanvasCallback<CourseNickname>(ColorPickerActivity.this) {
-                        @Override
-                        public void firstPage(CourseNickname courseNickname, LinkHeaders linkHeaders, Response response) {}
-                    });
+                    CourseNicknameManager.setCourseNickname(mCanvasContext.getId(), nickname, new StatusCallback<CourseNickname>() { });
                 }
 
                 finish();
@@ -327,22 +320,6 @@ public class ColorPickerActivity extends FragmentActivity implements APIStatusDe
         }
     }
 
-    @Override
-    public void onCallbackStarted() {
-
-    }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-
-    }
-
-    @Override
-    public void onNoNetwork() {
-
-    }
-
-    @Override
     public Context getContext() {
         return getApplicationContext();
     }

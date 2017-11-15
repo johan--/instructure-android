@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,25 +28,25 @@ import com.instructure.candroid.holders.CourseHeaderViewHolder;
 import com.instructure.candroid.holders.FavoritingViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.model.CourseToggleHeader;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.CanvasModel;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.CanvasModel;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import retrofit.client.Response;
 
 public class FavoritingRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggleHeader, CanvasContext, RecyclerView.ViewHolder>{
 
@@ -58,8 +58,8 @@ public class FavoritingRecyclerAdapter extends ExpandableRecyclerAdapter<CourseT
     private Map<Integer, ArrayList<CanvasContext>> mCallbackSyncHash = new HashMap<>();
 
     //callbacks
-    private CanvasCallback<Course[]> mAllCoursesCallback;
-    private CanvasCallback<Group[]> mGroupsCallback;
+    private StatusCallback<List<Course>> mAllCoursesCallback;
+    private StatusCallback<List<Group>> mGroupsCallback;
 
     public FavoritingRecyclerAdapter(Activity context, AdapterToFragmentCallback<CanvasContext> adapterToFragmentCallback) {
         super(context, CourseToggleHeader.class, CanvasModel.class);
@@ -156,8 +156,8 @@ public class FavoritingRecyclerAdapter extends ExpandableRecyclerAdapter<CourseT
 
     @Override
     public void loadData() {
-        CourseAPI.getAllCourses(mAllCoursesCallback);
-        GroupAPI.getAllGroups(mGroupsCallback);
+        CourseManager.getCourses(true, mAllCoursesCallback);
+        GroupManager.getAllGroups(mGroupsCallback, true);
     }
 
     @Override
@@ -175,20 +175,22 @@ public class FavoritingRecyclerAdapter extends ExpandableRecyclerAdapter<CourseT
 
     @Override
     public void setupCallbacks() {
-        mAllCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mAllCoursesCallback = new StatusCallback<List<Course>>() {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                ArrayList<CanvasContext> list = new ArrayList<CanvasContext>(Arrays.asList(courses));
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                ArrayList<CanvasContext> list = new ArrayList<CanvasContext>(response.body());
                 Collections.sort(list);
                 mCallbackSyncHash.put(ALL_COURSES_ID, list);
                 syncCallbacks();
             }
         };
 
-        mGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mGroupsCallback = new StatusCallback<List<Group>>() {
+
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
-                ArrayList<CanvasContext> list = new ArrayList<CanvasContext>(Arrays.asList(groups));
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
+                ArrayList<CanvasContext> list = new ArrayList<CanvasContext>(response.body());
                 Collections.sort(list);
                 mCallbackSyncHash.put(ALL_GROUPS_ID, list);
                 syncCallbacks();

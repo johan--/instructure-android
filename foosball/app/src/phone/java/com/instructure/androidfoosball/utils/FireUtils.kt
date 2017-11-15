@@ -32,7 +32,7 @@ object FireUtils {
         database.keepSynced(false)
         database.child("tables").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                onFinish(dataSnapshot.children.map { it.getValue(Table::class.java).apply { id = it.key } })
+                onFinish(dataSnapshot.children.map { it.getValue(Table::class.java)!!.apply { id = it.key } })
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

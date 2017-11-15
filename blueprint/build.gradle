@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,20 +18,23 @@
 repositories {
     jcenter()
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.google.com' }
 }
 
 buildscript {
     repositories {
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
         // https://bintray.com/android/android-tools/com.android.tools.build.gradle/view
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 String isTesting() {
     if ( System.getenv("IS_TESTING") == "true" ) {
@@ -84,8 +87,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-
-    compile project(':canvas-api-2')
-    compile project(':recyclerview')
-    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile project(path: ':canvas-api-2', configuration: 'default')
+    compile project(path: ':recyclerview', configuration: 'default')
+    compile rootProject.ext.supportDependencies.recyclerView
+    compile rootProject.ext.supportDependencies.appCompat
 }

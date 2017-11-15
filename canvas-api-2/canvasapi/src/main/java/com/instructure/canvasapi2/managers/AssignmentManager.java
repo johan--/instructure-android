@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2.managers;
 
 import android.support.annotation.NonNull;
@@ -25,12 +24,15 @@ import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.AssignmentGroup;
+import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.GradeableStudent;
 import com.instructure.canvasapi2.models.Submission;
 import com.instructure.canvasapi2.models.post_models.AssignmentPostBody;
 import com.instructure.canvasapi2.models.post_models.AssignmentPostBodyWrapper;
 import com.instructure.canvasapi2.tests.AssignmentManager_Test;
-import com.instructure.canvasapi2.utils.DepaginatedCallback;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -53,32 +55,55 @@ public class AssignmentManager extends BaseManager {
         }
     }
 
-    public static void getAssignmentGroupsWithAssignments(long courseId, boolean forceNetwork, StatusCallback<List<AssignmentGroup>> callback) {
+    public static void getAssignmentGroupsWithAssignments(long courseId, final boolean forceNetwork, StatusCallback<List<AssignmentGroup>> callback) {
         if (isTesting() || mTesting) {
             AssignmentManager_Test.getAssignmentGroupsWithAssignments(courseId, callback);
         } else {
-            RestBuilder adapter = new RestBuilder(callback);
+            final RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
                     .withPerPageQueryParam(true)
                     .withShouldIgnoreToken(false)
                     .withForceReadFromNetwork(forceNetwork)
                     .build();
-            AssignmentAPI.getAssignmentGroupsWithAssignments(courseId, adapter, callback, params);
+
+            StatusCallback<List<AssignmentGroup>> depaginatedCallback = new ExhaustiveListCallback<AssignmentGroup>(callback) {
+                @Override
+                public void getNextPage(StatusCallback<List<AssignmentGroup>> callback, String nextUrl, boolean isCached) {
+                    AssignmentAPI.getNextPageAssignmentGroupsWithAssignments(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            AssignmentAPI.getFirstPageAssignmentGroupsWithAssignments(courseId, adapter, callback, params);
         }
     }
 
-    public static void getAssignmentGroupsWithAssignmentsForGradingPeriod(long courseId, boolean forceNetwork, StatusCallback<List<AssignmentGroup>> callback, long gradingPeriodId) {
+    public static void getAssignmentGroupsWithAssignmentsForGradingPeriod(long courseId, final long gradingPeriodId, boolean scopeToStudent, final boolean forceNetwork, StatusCallback<List<AssignmentGroup>> callback) {
+
         if (isTesting() || mTesting) {
             AssignmentManager_Test.getAssignmentGroupsWithAssignmentsForGradingPeriod(courseId, callback, gradingPeriodId);
         } else {
-            RestBuilder adapter = new RestBuilder(callback);
+            final RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
                     .withPerPageQueryParam(true)
                     .withShouldIgnoreToken(false)
                     .withForceReadFromNetwork(forceNetwork)
                     .build();
-            AssignmentAPI.getAssignmentGroupsWithAssignmentsForGradingPeriod(courseId, adapter, callback, params, gradingPeriodId);
+
+            StatusCallback<List<AssignmentGroup>> depaginatedCallback = new ExhaustiveListCallback<AssignmentGroup>(callback) {
+                @Override
+                public void getNextPage(StatusCallback<List<AssignmentGroup>> callback, String nextUrl, boolean isCached) {
+                    AssignmentAPI.getNextPageAssignmentGroupsWithAssignmentsForGradingPeriod(forceNetwork, nextUrl, adapter, callback);
+                }
+            };
+
+            adapter.setStatusCallback(depaginatedCallback);
+            AssignmentAPI.getFirstPageAssignmentGroupsWithAssignmentsForGradingPeriod(courseId, gradingPeriodId, scopeToStudent, adapter, callback, params);
         }
+    }
+
+    public static void getAssignmentGroupsWithAssignmentsForGradingPeriod(long courseId, long gradingPeriodId, boolean forceNetwork, StatusCallback<List<AssignmentGroup>> callback) {
+        getAssignmentGroupsWithAssignmentsForGradingPeriod(courseId, gradingPeriodId, false, forceNetwork, callback);
     }
 
     public static void getAssignmentGroup(long courseId, long assignmentGroupId, boolean forceNetwork, StatusCallback<AssignmentGroup> callback) {
@@ -112,7 +137,7 @@ public class AssignmentManager extends BaseManager {
         }
     }
 
-    public static void editAssignment(long courseId, long assignmentId, AssignmentPostBody body, final StatusCallback<Assignment> callback){
+    public static void editAssignment(long courseId, long assignmentId, AssignmentPostBody body, final StatusCallback<Assignment> callback, boolean serializeNulls){
 
         if (isTesting() || mTesting) {
             AssignmentManager_Test.editAssignment(body, callback);
@@ -125,7 +150,7 @@ public class AssignmentManager extends BaseManager {
 
             AssignmentPostBodyWrapper bodyWrapper = new AssignmentPostBodyWrapper();
             bodyWrapper.setAssignment(body);
-            AssignmentAPI.editAssignment(courseId, assignmentId, bodyWrapper, adapter, callback, params);
+            AssignmentAPI.editAssignment(courseId, assignmentId, bodyWrapper, adapter, callback, params, serializeNulls);
         }
     }
 
@@ -171,12 +196,12 @@ public class AssignmentManager extends BaseManager {
             AssignmentManager_Test.getAllGradeableStudentsForAssignment(courseId, assignmentId, callback);
         } else {
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<GradeableStudent>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<GradeableStudent>() {
+            StatusCallback<List<GradeableStudent>> depaginatedCallback = new ExhaustiveListCallback<GradeableStudent>(callback) {
                 @Override
-                public void getNextPage(DepaginatedCallback<GradeableStudent> callback, String nextUrl, boolean isCached) {
+                public void getNextPage(@NotNull StatusCallback<List<GradeableStudent>> callback, @NotNull String nextUrl, boolean isCached) {
                     AssignmentAPI.getNextPageGradeableStudents(forceNetwork, nextUrl, adapter, callback);
                 }
-            });
+            };
             adapter.setStatusCallback(depaginatedCallback);
             AssignmentAPI.getFirstPageGradeableStudentsForAssignment(courseId, assignmentId, adapter, depaginatedCallback);
         }
@@ -187,12 +212,12 @@ public class AssignmentManager extends BaseManager {
             AssignmentManager_Test.getAllSubmissionsForAssignment(courseId, assignmentId, callback);
         } else {
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<Submission>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<Submission>() {
+            StatusCallback<List<Submission>> depaginatedCallback = new ExhaustiveListCallback<Submission>(callback) {
                 @Override
-                public void getNextPage(DepaginatedCallback<Submission> callback, String nextUrl, boolean isCached) {
+                public void getNextPage(@NonNull StatusCallback<List<Submission>> callback, @NonNull String nextUrl, boolean isCached) {
                     AssignmentAPI.getNextPageSubmissions(nextUrl, adapter, forceNetwork, callback);
                 }
-            });
+            };
             adapter.setStatusCallback(depaginatedCallback);
             AssignmentAPI.getFirstPageSubmissionsForAssignment(courseId, assignmentId, forceNetwork, adapter, depaginatedCallback);
         }
@@ -203,14 +228,32 @@ public class AssignmentManager extends BaseManager {
             AssignmentManager_Test.getAllAssignments(courseId, callback);
         } else {
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<Assignment>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<Assignment>() {
+            StatusCallback<List<Assignment>> depaginatedCallback = new ExhaustiveListCallback<Assignment>(callback) {
                 @Override
-                public void getNextPage(DepaginatedCallback<Assignment> callback, String nextUrl, boolean isCached) {
+                public void getNextPage(@NonNull StatusCallback<List<Assignment>> callback, @NonNull String nextUrl, boolean isCached) {
                     AssignmentAPI.getNextPageAssignments(nextUrl, adapter, forceNetwork, callback);
                 }
-            });
+            };
             adapter.setStatusCallback(depaginatedCallback);
             AssignmentAPI.getFirstPageAssignments(courseId, forceNetwork, adapter, depaginatedCallback);
+        }
+    }
+
+    public static void getFirstPageAssignments(CanvasContext canvasContext, final boolean forceNetwork, StatusCallback<List<Assignment>> callback) {
+        if (isTesting() || mTesting) {
+
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            AssignmentAPI.getFirstPageAssignments(canvasContext.getId(), forceNetwork, adapter, callback);
+        }
+    }
+
+    public static void getNextPageAssignments(String nextUrl, final boolean forceNetwork, StatusCallback<List<Assignment>> callback) {
+        if (isTesting() || mTesting) {
+
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            AssignmentAPI.getNextPageAssignments(nextUrl, adapter, forceNetwork, callback);
         }
     }
 

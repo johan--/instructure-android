@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,27 +20,16 @@ package com.instructure.candroid.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
-import com.instructure.canvasapi.utilities.APICacheStatusDelegate;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
+import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.pandarecycler.BaseExpandableRecyclerAdapter;
 
-public abstract class ExpandableRecyclerAdapter<GROUP, ITEM, VIEWHOLDER extends RecyclerView.ViewHolder> extends BaseExpandableRecyclerAdapter<GROUP, ITEM, VIEWHOLDER> implements APIStatusDelegate, APICacheStatusDelegate {
+public abstract class ExpandableRecyclerAdapter<GROUP, ITEM, VIEWHOLDER extends RecyclerView.ViewHolder> extends BaseExpandableRecyclerAdapter<GROUP, ITEM, VIEWHOLDER> {
 
     public ExpandableRecyclerAdapter(Context context, Class groupKlazz, Class itemKlazz) {
         super(context, groupKlazz, itemKlazz);
     }
 
-    @Override
-    public boolean shouldIgnoreCache() {
-        return isRefresh();
-    }
-
-    @Override
-    public void onCallbackStarted() { }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         setLoadedFirstPage(true);
         boolean shouldShowFooter = shouldShowLoadingFooter();
         //if we're supposed to show the loading footer but there are is a collapsed group we want to keep loading the data.
@@ -57,7 +46,6 @@ public abstract class ExpandableRecyclerAdapter<GROUP, ITEM, VIEWHOLDER extends 
         }
     }
 
-    @Override
     public void onNoNetwork() {
         AdapterToRecyclerViewCallback adapterToRecyclerViewCallback = getAdapterToRecyclerViewCallback();
         if(adapterToRecyclerViewCallback != null){

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ public class GradeableStudent extends CanvasModel<GradeableStudent> {
     private String avatarImageUrl;
     @SerializedName("html_url")
     private String htmlUrl;
+    @SerializedName("fake_student")
+    private boolean isFakeStudent;
 
     @Override
     public long getId() {
@@ -66,6 +68,10 @@ public class GradeableStudent extends CanvasModel<GradeableStudent> {
         return htmlUrl;
     }
 
+    public boolean isFakeStudent() {
+        return isFakeStudent;
+    }
+
     //endregion
 
     //region Setters
@@ -86,6 +92,10 @@ public class GradeableStudent extends CanvasModel<GradeableStudent> {
         this.htmlUrl = htmlUrl;
     }
 
+    public void setFakeStudent(boolean fakeStudent) {
+        isFakeStudent = fakeStudent;
+    }
+
     //endregion
 
     //region Parcelable
@@ -101,6 +111,7 @@ public class GradeableStudent extends CanvasModel<GradeableStudent> {
         dest.writeString(this.displayName);
         dest.writeString(this.avatarImageUrl);
         dest.writeString(this.htmlUrl);
+        dest.writeByte((byte) (this.isFakeStudent ? 1 : 0));
     }
 
     public GradeableStudent() {
@@ -111,6 +122,7 @@ public class GradeableStudent extends CanvasModel<GradeableStudent> {
         this.displayName = in.readString();
         this.avatarImageUrl = in.readString();
         this.htmlUrl = in.readString();
+        this.isFakeStudent = in.readByte() != 0;
     }
 
     public static final Creator<GradeableStudent> CREATOR = new Creator<GradeableStudent>() {

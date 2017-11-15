@@ -18,31 +18,45 @@ package instructure.rceditor;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class RCEInsertDialog extends DialogFragment {
+public class RCEInsertDialog extends AppCompatDialogFragment {
 
     private static final String TITLE = "title";
+    private static final String THEME_COLOR = "theme_color";
+    private static final String BUTTON_COLOR = "button_color";
 
-    private EditText mUrlEditText, mAltEditText;
+    private AppCompatEditText mUrlEditText, mAltEditText;
     private OnResultListener mCallback;
 
     public interface OnResultListener {
         void onResults(String url, String alt);
     }
 
-    public static RCEInsertDialog newInstance(String title) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    public static RCEInsertDialog newInstance(String title, @ColorInt int themeColor, @ColorInt int buttonColor) {
         RCEInsertDialog dialog = new RCEInsertDialog();
         Bundle args = new Bundle();
         args.putString(TITLE, title);
+        args.putInt(THEME_COLOR, themeColor);
+        args.putInt(BUTTON_COLOR, buttonColor);
         dialog.setArguments(args);
         return dialog;
     }
@@ -69,9 +83,31 @@ public class RCEInsertDialog extends DialogFragment {
                 dismiss();
             }
         });
-        mUrlEditText = (EditText) root.findViewById(R.id.urlEditText);
-        mAltEditText = (EditText) root.findViewById(R.id.altEditText);
-        return builder.create();
+
+        final int themeColor = getArguments().getInt(THEME_COLOR, Color.BLACK);
+        final int highlightColor = RCEUtils.increaseAlpha(themeColor);
+        final ColorStateList colorStateList = RCEUtils.makeEditTextColorStateList(Color.BLACK, themeColor);
+
+        mAltEditText = (AppCompatEditText) root.findViewById(R.id.altEditText);
+        mUrlEditText = (AppCompatEditText) root.findViewById(R.id.urlEditText);
+
+        mAltEditText.setHighlightColor(highlightColor);
+        mUrlEditText.setHighlightColor(highlightColor);
+
+        mAltEditText.setSupportBackgroundTintList(colorStateList);
+        mUrlEditText.setSupportBackgroundTintList(colorStateList);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                final int buttonColor = getArguments().getInt(BUTTON_COLOR, Color.BLACK);
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(buttonColor);
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(buttonColor);
+            }
+        });
+
+        return dialog;
     }
 
     public RCEInsertDialog setListener(OnResultListener callback) {

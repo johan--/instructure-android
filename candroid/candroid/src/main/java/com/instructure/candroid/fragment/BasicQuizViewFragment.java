@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,20 +32,21 @@ import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.LockInfoHTMLHelper;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.HashMap;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class BasicQuizViewFragment extends InternalWebviewFragment {
 
@@ -54,8 +55,8 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
     private Quiz quiz;
     private long quizId = -1;
 
-    private CanvasCallback<Quiz> canvasCallback;
-    private CanvasCallback<Quiz> getDetailedQuizCallback;
+    private StatusCallback<Quiz> canvasCallback;
+    private StatusCallback<Quiz> getDetailedQuizCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {return FRAGMENT_PLACEMENT.DETAIL; }
@@ -94,16 +95,16 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
 
                 if (url.contains(host)) { //we need to handle it.
                     if (currentUri != null && currentUri.getPathSegments().size() >= 3 && currentUri.getPathSegments().get(2).equals("quizzes")) {  //if it's a quiz, stay here.
-                        view.loadUrl(url, Utils.getReferer(getContext()));
+                        view.loadUrl(url, APIHelper.getReferrer());
                         return true;
                     }
                     //might need to log in to take the quiz -- the url would say domain/login. If we just use the AppRouter it will take the user
                     //back to the dashboard. This check will keep them here and let them log in and take the quiz
                     else if (currentUri != null && currentUri.getPathSegments().size() >= 1 && currentUri.getPathSegments().get(0).equalsIgnoreCase("login")) {
-                        view.loadUrl(url, Utils.getReferer(getContext()));
+                        view.loadUrl(url, APIHelper.getReferrer());
                         return true;
                     } else { //It's content but not a quiz. Could link to a discussion (or whatever) in a quiz. Route
-                        return RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                        return RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
                     }
                 }
 
@@ -129,12 +130,12 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
         setUpCallback();
         // anything that relies on intent data belongs here
         if(apiURL != null) {
-            QuizAPI.getDetailedQuizFromURL(apiURL, canvasCallback);
-            return;
-        } else if(quiz != null && quiz.getLockInfo() != null) {
+            QuizManager.getDetailedQuizByUrl(apiURL, true, canvasCallback);
+        } else if(quiz != null && quiz.getLockInfo() != null && (CanvasContext.Type.isCourse(getCanvasContext()) && !((Course)getCanvasContext()).isTeacher())) {
+            //if the quiz is locked we don't care if they're a teacher
             populateWebView(LockInfoHTMLHelper.getLockedInfoHTML(quiz.getLockInfo(),getActivity(), R.string.lockedQuizDesc, R.string.lockedAssignmentDescLine2));
         } else if (quizId != -1) {
-            QuizAPI.getDetailedQuiz(getCanvasContext(), quizId, getDetailedQuizCallback);
+            QuizManager.getDetailedQuiz(getCanvasContext(), quizId, true, getDetailedQuizCallback);
         } else {
             authenticate = true;
             loadUrl(baseURL);
@@ -153,28 +154,29 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
     protected Quiz getModelObject() {
         return quiz;
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // View
-    ///////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Callback
-    ///////////////////////////////////////////////////////////////////////////
-
 
     public void setUpCallback(){
-        getDetailedQuizCallback =  new CanvasCallback<Quiz>(this) {
+        getDetailedQuizCallback =  new StatusCallback<Quiz>() {
             Quiz cacheQuiz;
 
             @Override
-            public void cache(Quiz quiz, LinkHeaders linkHeaders, Response response) {
-                cacheQuiz = quiz;
+            public void onResponse(retrofit2.Response<Quiz> response, LinkHeaders linkHeaders, ApiType type) {
+                if(!apiCheck()) return;
+
+                if(type == ApiType.CACHE) cacheQuiz = response.body();
+                loadQuiz(response.body());
             }
 
             @Override
-            public void firstPage(Quiz quiz, LinkHeaders linkHeaders, Response response) {
+            public void onFail(Call<Quiz> callResponse, Throwable error, retrofit2.Response response) {
+                if(!apiCheck()) return;
+
+                loadQuiz(cacheQuiz);
+            }
+
+            private void loadQuiz(Quiz quiz) {
                 if(quiz == null) return;
-                
+
                 BasicQuizViewFragment.this.quiz = quiz;
                 BasicQuizViewFragment.this.baseURL = quiz.getUrl();
 
@@ -183,25 +185,18 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
                 if (quiz.getLockInfo() != null) {
                     populateWebView(LockInfoHTMLHelper.getLockedInfoHTML(quiz.getLockInfo(),getActivity(), R.string.lockedQuizDesc, R.string.lockedAssignmentDescLine2));
                 } else {
-                    canvasWebView.loadUrl(quiz.getUrl(), Utils.getReferer(getContext()));
+                    canvasWebView.loadUrl(quiz.getUrl(), APIHelper.getReferrer());
                 }
-            }
-            @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                firstPage(cacheQuiz, null, null);
-                return true;
             }
         };
-        canvasCallback = new CanvasCallback<Quiz>(this) {
+        canvasCallback = new StatusCallback<Quiz>() {
 
             @Override
-            public void firstPage(Quiz quiz, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
-                    return;
-                }
+            public void onResponse(retrofit2.Response<Quiz> response, LinkHeaders linkHeaders, ApiType type) {
+                if(!apiCheck()) return;
 
                 BasicQuizViewFragment.this.quiz = quiz;
-                if (shouldShowNatively(quiz)) { return; }
+                if (shouldShowNatively(quiz)) return;
 
                 if (quiz.getLockInfo() != null) {
                     populateWebView(LockInfoHTMLHelper.getLockedInfoHTML(quiz.getLockInfo(),getActivity(), R.string.lockedQuizDesc, R.string.lockedAssignmentDescLine2));
@@ -210,7 +205,7 @@ public class BasicQuizViewFragment extends InternalWebviewFragment {
                     if (TextUtils.isEmpty(url)) {
                         url = baseURL;
                     }
-                    canvasWebView.loadUrl(url, Utils.getReferer(getContext()));
+                    canvasWebView.loadUrl(url, APIHelper.getReferrer());
                 }
             }
         };

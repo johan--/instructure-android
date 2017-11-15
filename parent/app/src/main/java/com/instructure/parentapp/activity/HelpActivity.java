@@ -29,11 +29,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 import com.instructure.canvasapi2.models.User;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.loginapi.login.api.zendesk.utilities.ZendeskDialogStyled;
 import com.instructure.pandautils.utils.AppType;
@@ -42,19 +41,13 @@ import com.instructure.pandautils.utils.Prefs;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.parentapp.R;
 import com.instructure.parentapp.util.ApplicationManager;
-import com.marcoscg.easylicensesdialog.EasyLicensesDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class HelpActivity extends AppCompatActivity implements
         ZendeskDialogStyled.ZendeskDialogResultListener {
-
-    //FIXME: probably broke with removing status delegate
 
     private LinearLayout mSearchGuides;
     private LinearLayout mReportProblem;
@@ -146,7 +139,7 @@ public class HelpActivity extends AppCompatActivity implements
         mOpenSource.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new EasyLicensesDialog(HelpActivity.this).show();
+                startActivity(new Intent(HelpActivity.this, OssLicensesMenuActivity.class));
             }
         });
     }
@@ -170,9 +163,9 @@ public class HelpActivity extends AppCompatActivity implements
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
         if(supportFlag){
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.supportEmailAddress)});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.utils_supportEmailAddress)});
         }else{
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.mobileSupportEmailAddress)});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.utils_mobileSupportEmailAddress)});
         }
         //try to get the version number and version code
         PackageInfo pInfo = null;
@@ -194,7 +187,7 @@ public class HelpActivity extends AppCompatActivity implements
         emailBody += title + "\n";
         emailBody += getString(R.string.help_userId) + " " + parentId + "\n";
         emailBody += getString(R.string.help_email) + " " + mEmailAddress + "\n";
-        emailBody += getString(R.string.help_domain) + " " + APIHelper.getAirwolfDomain(HelpActivity.this) + "\n";
+        emailBody += getString(R.string.help_domain) + " " + ApiPrefs.getAirwolfDomain() + "\n";
         emailBody += getString(R.string.help_versionNum) + " " + versionName + " " + versionCode + "\n";
         emailBody += getString(R.string.help_locale) + " " + Locale.getDefault() + "\n";
         emailBody += getString(R.string.installDate) + " " + getInstallDateString() + "\n";

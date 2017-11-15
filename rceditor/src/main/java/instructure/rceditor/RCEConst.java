@@ -23,4 +23,6 @@ public class RCEConst {
     static final String HTML_CONTENT = "HTML_CONTENT";
     static final String HTML_TITLE = "HTML_TITLE";
     static final String HTML_ACCESSIBILITY_TITLE = "HTML_ACCESSIBILITY_TITLE";
+    static final String THEME_COLOR = "THEME_COLOR";
+    static final String BUTTON_COLOR = "BUTTON_COLOR";
 }

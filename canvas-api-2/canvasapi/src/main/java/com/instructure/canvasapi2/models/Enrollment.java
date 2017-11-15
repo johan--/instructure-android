@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
-
 
 public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
 
@@ -57,7 +56,7 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
     @SerializedName("totals_for_all_grading_periods_option")
     private boolean totalsForAllGradingPeriodsOption;
     @SerializedName("current_period_computed_current_score")
-    private double currentPeriodComputedCurrentScore;
+    private Double currentPeriodComputedCurrentScore;
     @SerializedName("current_period_computed_final_score")
     private double currentPeriodComputedFinalScore;
     @SerializedName("current_period_computed_current_grade")
@@ -71,6 +70,10 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
     //The unique id of the associated user. Will be null unless type is ObserverEnrollment.
     @SerializedName("associated_user_id")
     private long associatedUserId;
+    @SerializedName("last_activity_at")
+    private Date lastActivityAt;
+    @SerializedName("limit_privileges_to_course_section")
+    private boolean mLimitPrivilegesToCourseSection;
 
     private User user;
     public Enrollment(){
@@ -99,9 +102,8 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
 
         Enrollment that = (Enrollment) o;
 
-        if (!type.equals(that.type)) return false;
+        return type.equals(that.type);
 
-        return true;
     }
 
     @Override
@@ -125,6 +127,10 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
 
     public boolean isTA() {
         return ("ta".equalsIgnoreCase(type) || "taenrollment".equalsIgnoreCase(type));
+    }
+
+    public boolean isDesigner() {
+        return ("designer".equalsIgnoreCase(type) || "designerenrollment".equalsIgnoreCase(type));
     }
 
     //region Getters
@@ -185,7 +191,7 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         return totalsForAllGradingPeriodsOption;
     }
 
-    public double getCurrentPeriodComputedCurrentScore() {
+    public Double getCurrentPeriodComputedCurrentScore() {
         return currentPeriodComputedCurrentScore;
     }
 
@@ -240,6 +246,14 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
 
     public User getUser() {
         return user;
+    }
+
+    public Date getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    public boolean isLimitPrivilegesToCourseSection() {
+        return mLimitPrivilegesToCourseSection;
     }
 
     //endregion
@@ -302,7 +316,7 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         this.totalsForAllGradingPeriodsOption = totalsForAllGradingPeriodsOption;
     }
 
-    public void setCurrentPeriodComputedCurrentScore(double currentPeriodComputedCurrentScore) {
+    public void setCurrentPeriodComputedCurrentScore(Double currentPeriodComputedCurrentScore) {
         this.currentPeriodComputedCurrentScore = currentPeriodComputedCurrentScore;
     }
 
@@ -334,6 +348,14 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         this.user = user;
     }
 
+    public void setLastActivityAt(Date lastActivityAt) {
+        this.lastActivityAt = lastActivityAt;
+    }
+
+    public void setLimitPrivilegesToCourseSection(boolean limitPrivilegesToCourseSection) {
+        this.mLimitPrivilegesToCourseSection = limitPrivilegesToCourseSection;
+    }
+
     //endregion
 
     //region Parcelable
@@ -359,7 +381,7 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         dest.writeString(this.computedFinalGrade);
         dest.writeByte(this.multipleGradingPeriodsEnabled ? (byte) 1 : (byte) 0);
         dest.writeByte(this.totalsForAllGradingPeriodsOption ? (byte) 1 : (byte) 0);
-        dest.writeDouble(this.currentPeriodComputedCurrentScore);
+        dest.writeValue(this.currentPeriodComputedCurrentScore);
         dest.writeDouble(this.currentPeriodComputedFinalScore);
         dest.writeString(this.currentPeriodComputedCurrentGrade);
         dest.writeString(this.currentPeriodComputedFinalGrade);
@@ -367,6 +389,8 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         dest.writeString(this.currentGradingPeriodTitle);
         dest.writeLong(this.associatedUserId);
         dest.writeParcelable(this.user, flags);
+        dest.writeSerializable(lastActivityAt);
+        dest.writeByte(this.mLimitPrivilegesToCourseSection ? (byte) 1 : (byte) 0);
     }
 
     protected Enrollment(Parcel in) {
@@ -384,7 +408,7 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         this.computedFinalGrade = in.readString();
         this.multipleGradingPeriodsEnabled = in.readByte() != 0;
         this.totalsForAllGradingPeriodsOption = in.readByte() != 0;
-        this.currentPeriodComputedCurrentScore = in.readDouble();
+        this.currentPeriodComputedCurrentScore = (Double)in.readValue(Double.class.getClassLoader());
         this.currentPeriodComputedFinalScore = in.readDouble();
         this.currentPeriodComputedCurrentGrade = in.readString();
         this.currentPeriodComputedFinalGrade = in.readString();
@@ -392,6 +416,8 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
         this.currentGradingPeriodTitle = in.readString();
         this.associatedUserId = in.readLong();
         this.user = in.readParcelable(User.class.getClassLoader());
+        this.lastActivityAt = (Date) in.readSerializable();
+        this.mLimitPrivilegesToCourseSection = in.readByte() != 0;
     }
 
     public static final Creator<Enrollment> CREATOR = new Creator<Enrollment>() {

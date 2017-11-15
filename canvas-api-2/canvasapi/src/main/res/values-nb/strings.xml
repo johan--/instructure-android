@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">Online URL</string>
   <string name="canvasAPI_mediaRecording">Mediainnspilling</string>
   <string name="canvasAPI_attendance">Oppmøte</string>
+  <string name="quiz_scoring_policy_highest">Høyest</string>
+  <string name="quiz_scoring_policy_average">Gjennomsnittlig</string>
+  <string name="quiz_scoring_policy_latest">Siste</string>
+  <string name="no">Nei</string>
+  <string name="always">Alltid</string>
+  <string name="graded_quiz">Karaktersatt test</string>
+  <string name="practice_quiz">Øvelsestest</string>
+  <string name="graded_survey">Karaktersatt undersøkelse</string>
+  <string name="ungraded_survey">Ikke vurdert undersøkelse</string>
 </resources>

@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Выбрать медиа</string>
   <string name="takeVideo">Снять видео</string>
   <string name="noCameraOnDevice">Нет камеры</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Загрузка на Canvas</string>
   <string name="preparingUpload">Подготовка к загрузке</string>
   <string name="loadingFilesIndeterminate">Загрузка файлов...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Произошла ошибка при получении фото. Пожалуйста, попробуйте еще раз.</string>
   <string name="errorTextMissing">Добавьте текст, чтобы отправить сообщение</string>
   <string name="fileUploadNotSupported">Вы не можете загружать файлы в выбранное задание.</string>
+  <string name="noCourseSelected">Пожалуйста, выберите курс</string>
   <string name="selectCourse">Выберите курс</string>
   <string name="selectAssignment">Выберите задание</string>
   <string name="loadingAssignments">Загрузка заданий...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Не прочитано</string>
   <string name="discussion_reply">Ответить</string>
   <string name="close">Закрыть</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Преподаватель Canvas</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Опросы Canvas</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Как мы работаем?</string>
+  <string name="utils_rateUs">Как бы вы оценили нас?</string>
+  <string name="utils_doBetter">Что мы можем сделать лучше?</string>
+  <string name="utils_sendFeedback">Отправить отзыв</string>
+  <string name="utils_suggestions">Предложения по Android</string>
+  <string name="utils_domain">Домен</string>
+  <string name="utils_versionNum">Версия:</string>
+  <string name="utils_userId">Идентификатор пользователя</string>
+  <string name="utils_email">Адрес электронной почты</string>
+  <string name="utils_dontShowAgain">Не показывать снова</string>
+  <string name="utils_installDate">Дата установки:</string>
+  <string name="utils_device">Устройство</string>
+  <string name="utils_osVersion">Версия ОС</string>
+  <string name="loading">Загрузка</string>
 </resources>

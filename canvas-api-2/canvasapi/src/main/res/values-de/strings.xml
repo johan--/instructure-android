@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">Online-URL</string>
   <string name="canvasAPI_mediaRecording">Media-Aufzeichnung</string>
   <string name="canvasAPI_attendance">Anwesenheit</string>
+  <string name="quiz_scoring_policy_highest">Höchste</string>
+  <string name="quiz_scoring_policy_average">Durchschnitt</string>
+  <string name="quiz_scoring_policy_latest">Letzte</string>
+  <string name="no">Kein</string>
+  <string name="always">Immer</string>
+  <string name="graded_quiz">Benotetes Quiz</string>
+  <string name="practice_quiz">Übungsquiz</string>
+  <string name="graded_survey">Benotete Befragung</string>
+  <string name="ungraded_survey">Unbenotete Befragung</string>
 </resources>

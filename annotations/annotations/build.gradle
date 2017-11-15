@@ -24,12 +24,12 @@ apply plugin: 'com.android.library'
 apply from: '../../private-data/merge-private-data.gradle'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion GLOBAL_COMPILE_SDK
+    buildToolsVersion GLOBAL_BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion GLOBAL_TARGET_SDK
         versionCode 1
         versionName "1.0"
 
@@ -47,8 +47,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:support-v4:25.2.0'
+    compile "com.android.support:appcompat-v7:$GLOBAL_SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:support-v4:$GLOBAL_SUPPORT_LIBRARY_VERSION"
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile project(':pspdfkit-2.2.1')
     compile 'io.reactivex:rxjava:1.0.15'

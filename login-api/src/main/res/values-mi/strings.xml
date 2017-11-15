@@ -10,7 +10,6 @@
   <string name="unknownDevice">Pūrere unknown</string>
   <string name="errorOccurred">He hapa ohorere i puta.</string>
   <string name="pageNotFound">Kaore i kitea te whārangi</string>
-  <string name="okay">Te pai</string>
   <string name="confirm">Whakaūngia</string>
   <string name="cancel">Whakakore</string>
   <string name="help">Āwhina</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">E ngana ana ki te haina ki Canvas Network?</string>
   <string name="remove">Tangohia te</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">ID kaiwhakamahi</string>
+  <string name="domain">Domain</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Tangohia te tenei kaiwhakamahi?</string>
   <string name="removedForever">Ka whai koe ki te haina ano ki tenei kaiwhakamahi ki te uru ratou ihirangi.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">Kaua e kite i to koutou kura? E tomo te URL kura pato konei hoki te tauturu ranei.</string>
   <string name="loginCanvasHelpWithUser">E tomo te URL kura pato konei hoki te tauturu ranei.</string>
   <string name="loginHint">Kimihia koutou kura takiwa ranei</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Kia pehea te e mahi tatou?</string>
-  <string name="rateUs">E aha te faito ia tatou a koutou?</string>
-  <string name="doBetter">Eaha ta tatou e nehenehe e rave maitai a\'e?</string>
-  <string name="sendFeedback">Tukua Urupare</string>
-  <string name="suggestions">Te mau mana\'o tauturu no te Android</string>
-  <string name="domain">Domain</string>
-  <string name="versionNum">putanga:</string>
-  <string name="userId">ID kaiwhakamahi</string>
-  <string name="email">īmēra</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Kaua e whakaatu ano</string>
-  <string name="installDate">Tāuta Rā:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Pūrongo te raruraru</string>
   <string name="zendesk_subject">Kaupapa</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">pūrere</string>
   <string name="osVersion">OS Putanga</string>
+  <string name="empty_feedback">E hiahiatia ana te kaupapa me te whakamārama ki te tuku urupare.</string>
 </resources>

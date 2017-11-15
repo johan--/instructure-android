@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">URL en línea</string>
   <string name="canvasAPI_mediaRecording">Grabación multimedia</string>
   <string name="canvasAPI_attendance">Asistencia</string>
+  <string name="quiz_scoring_policy_highest">Más alta</string>
+  <string name="quiz_scoring_policy_average">Promedio</string>
+  <string name="quiz_scoring_policy_latest">Más reciente</string>
+  <string name="no">No</string>
+  <string name="always">Siempre</string>
+  <string name="graded_quiz">Evaluación calificada</string>
+  <string name="practice_quiz">Evaluación de las prácticas</string>
+  <string name="graded_survey">Encuesta calificada</string>
+  <string name="ungraded_survey">Encuesta no calificada</string>
 </resources>

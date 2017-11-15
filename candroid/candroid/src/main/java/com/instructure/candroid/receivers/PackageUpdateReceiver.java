@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,19 +21,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.instructure.candroid.service.AlarmService;
-import com.instructure.candroid.service.PushService;
-
 public class PackageUpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null && intent.getDataString().contains(context.getPackageName())) {
             //Restores stored push notifications when the app is updated
-            PushService.postStoredNotifications(context);
-
-            //set up any wear reminders if they're enabled
-            AlarmService.scheduleAlarm(context);
+            PushExternalReceiver.postStoredNotifications(context);
         }
     }
 }

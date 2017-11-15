@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ public class SubmissionAPI extends BuildInterfaceAPI {
         /////////////////////////////////////////////////////////////////////////////
         @POST("/courses/{courseId}/assignments/{assignmentId}/submissions/self/files")
         FileUploadParams getFileUploadParams(@Path("courseId") long courseId, @Path("assignmentId") long assignmentId, @Query("size") long size, @Query("name") String fileName, @Query("content_type") String content_type, @Body String body);
+
+        @POST("/groups/{groupId}/files")
+        FileUploadParams getFileUploadParamsForGroup(@Path("groupId") long groupId, @Query("size") long size, @Query("name") String fileName, @Query("content_type") String content_type, @Body String body);
 
         @Multipart
         @POST("/")
@@ -368,6 +371,10 @@ public class SubmissionAPI extends BuildInterfaceAPI {
     /////////////////////////////////////////////////////////////////////////////
     public static FileUploadParams getFileUploadParams(Context context, long courseId, long assignmentId, String fileName, long size, String contentType){
         return buildInterface(SubmissionsInterface.class, context).getFileUploadParams(courseId, assignmentId, size, fileName, contentType, "");
+    }
+
+    public static FileUploadParams getFileUploadParamsForGroup(Context context, long groupId, String fileName, long size, String contentType){
+        return buildInterface(SubmissionsInterface.class, context).getFileUploadParamsForGroup(groupId, size, fileName, contentType, "");
     }
 
     public static Attachment uploadAssignmentSubmission(String uploadUrl, LinkedHashMap<String,String> uploadParams, String mimeType, File file){

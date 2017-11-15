@@ -18,6 +18,8 @@
 package com.instructure.parentapp.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.instructure.canvasapi2.models.Student;
+import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.parentapp.BuildConfig;
 import com.instructure.parentapp.R;
@@ -34,9 +37,6 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class CarouselPagerAdapter extends PagerAdapter {
 
     private ArrayList<Student> mUserList = new ArrayList<>();
@@ -71,7 +71,10 @@ public class CarouselPagerAdapter extends PagerAdapter {
                 mUserList.get(position).getStudentName(),
                 BuildConfig.IS_TESTING);
         itemView.setTag(position);
-        Picasso.with(mContext).load(mUserList.get(position).getAvatarUrl()).placeholder(R.drawable.ic_cv_user_white).error(R.drawable.ic_cv_user_white).fit().into(avatarView);
+
+        final Drawable userIcon = ColorUtils.colorIt(mContext, Color.WHITE, R.drawable.ic_cv_user);
+
+        Picasso.with(mContext).load(mUserList.get(position).getAvatarUrl()).placeholder(userIcon).error(userIcon).fit().into(avatarView);
 
         avatarView.setOnClickListener(new View.OnClickListener() {
             @Override

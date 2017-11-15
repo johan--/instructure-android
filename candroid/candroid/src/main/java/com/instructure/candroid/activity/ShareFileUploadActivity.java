@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,36 +33,31 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.dialog.FileUploadDialog;
 import com.instructure.candroid.dialog.ShareFileDestinationDialog;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.AnimationHelpers;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class ShareFileUploadActivity extends FragmentActivity implements ShareFileDestinationDialog.DialogCloseListener{
 
-    private CanvasCallback<Course[]> courseCanvasCallback;
+    private StatusCallback<List<Course>> courseCanvasCallback;
     private DialogFragment uploadFileSourceFragment;
     private ArrayList<Course> courses;
-
-    private boolean isTeacher;
-    private boolean isStudent;
 
     private Uri sharedURI;
 
@@ -85,7 +80,7 @@ public class ShareFileUploadActivity extends FragmentActivity implements ShareFi
         setupCallbacks();
 
         sharedURI = parseIntentType();
-        CourseAPI.getAllCourses(courseCanvasCallback);
+        CourseManager.getCourses(true, courseCanvasCallback);
     }
 
     @Override
@@ -106,17 +101,19 @@ public class ShareFileUploadActivity extends FragmentActivity implements ShareFi
     private void checkLoggedIn(){
         final boolean isLoggedIn = ((ApplicationManager)getApplicationContext()).isUserLoggedIn();
         if(!isLoggedIn){
-            Intent intent = LoginActivity.createIntent(this, true, getString(R.string.notLoggedIn));
+            Intent intent = LoginActivity.Companion.createIntent(this);
             startActivity(intent);
             finish();
         }
     }
 
     public void setupCallbacks(){
-        courseCanvasCallback = new CanvasCallback<Course[]> (APIHelpers.statusDelegateWithContext(this)) {
+        courseCanvasCallback = new StatusCallback<List<Course>> () {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                ShareFileUploadActivity.this.courses = new ArrayList<>(Arrays.asList(courses));
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+
+                ShareFileUploadActivity.this.courses = new ArrayList<>(response.body());
 
                 if(uploadFileSourceFragment == null){
                     showDestinationDialog();
@@ -124,9 +121,8 @@ public class ShareFileUploadActivity extends FragmentActivity implements ShareFi
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                Toast.makeText(getContext(), R.string.uploadingFromSourceFailed, Toast.LENGTH_LONG).show();
-                return true;
+            public void onFail(Call<List<Course>> response, Throwable error) {
+                Toast.makeText(ShareFileUploadActivity.this, R.string.uploadingFromSourceFailed, Toast.LENGTH_LONG).show();
             }
         };
     }
@@ -150,22 +146,11 @@ public class ShareFileUploadActivity extends FragmentActivity implements ShareFi
     // Logic
     ///////////////////////////////////////////////////////////////////////////
     private void showDestinationDialog(){
-        for (Course course : courses) {
-            if (course.isTeacher()) {
-                isTeacher = true;
-                if(isStudent){break;}
-            }
-
-            if (course.isStudent()) {
-                isStudent = true;
-                if(isTeacher){break;}
-            }
-        }
 
         if(sharedURI == null) {
             Toast.makeText(getApplicationContext(), R.string.uploadingFromSourceFailed, Toast.LENGTH_LONG).show();
         } else {
-            uploadFileSourceFragment = ShareFileDestinationDialog.newInstance(ShareFileDestinationDialog.createBundle(sharedURI, courses, isTeacher, isStudent));
+            uploadFileSourceFragment = ShareFileDestinationDialog.newInstance(ShareFileDestinationDialog.createBundle(sharedURI, courses));
             uploadFileSourceFragment.show(getSupportFragmentManager(), ShareFileDestinationDialog.TAG);
         }
     }

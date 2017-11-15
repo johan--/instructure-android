@@ -46,7 +46,7 @@ class ParentAppResetter extends AppResetter {
         editor.apply();
 
         //Reset Airwolf Domain
-        final String airwolfDomain = APIHelper.getAirwolfDomain(context);
+        final String airwolfDomain = ApiPrefs.getAirwolfDomain();
         APIHelper.setAirwolfDomain(context, isTesting ? BuildConfig.GAMMA_DOMAIN : airwolfDomain);
     }
 

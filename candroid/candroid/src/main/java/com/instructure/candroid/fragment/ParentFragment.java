@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -77,15 +77,15 @@ import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.FileUtils;
 import com.instructure.candroid.util.LoggingUtility;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.Logger;
+import com.instructure.canvasapi2.utils.NetworkUtils;
 import com.instructure.pandarecycler.BaseRecyclerAdapter;
 import com.instructure.pandarecycler.PaginatedRecyclerAdapter;
 import com.instructure.pandarecycler.PandaRecyclerView;
@@ -101,9 +101,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-abstract public class ParentFragment extends DialogFragment implements
-        APIStatusDelegate,
-        ConfigureRecyclerView {
+abstract public class ParentFragment extends DialogFragment implements ConfigureRecyclerView {
 
     private CanvasContext canvasContext;
 
@@ -149,7 +147,7 @@ abstract public class ParentFragment extends DialogFragment implements
         }
     }
 
-    public LayoutInflater getLayoutInflater() {
+    public LayoutInflater layoutInflater() {
         return getActivity().getLayoutInflater();
     }
 
@@ -300,7 +298,7 @@ abstract public class ParentFragment extends DialogFragment implements
         if(args != null) {
             handleIntentExtras(args);
         }
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Create");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Create");
     }
 
     public void setRetainInstance(ParentFragment fragment, boolean retain) {
@@ -308,14 +306,14 @@ abstract public class ParentFragment extends DialogFragment implements
             try{
                 fragment.setRetainInstance(retain);
             }catch(IllegalStateException e){
-                Utils.d("failed to setRetainInstance on fragment: " + e);
+                Logger.d("failed to setRetainInstance on fragment: " + e);
             }
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Create View");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Create View");
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -323,7 +321,7 @@ abstract public class ParentFragment extends DialogFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Activity Created");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Activity Created");
 
         LoaderUtils.restoreLoaderFromBundle(getActivity().getSupportLoaderManager(), savedInstanceState, getLoaderCallbacks(), R.id.openMediaLoaderID, Const.OPEN_MEDIA_LOADER_BUNDLE);
         if (savedInstanceState != null && savedInstanceState.getBundle(Const.OPEN_MEDIA_LOADER_BUNDLE) != null) {
@@ -366,7 +364,7 @@ abstract public class ParentFragment extends DialogFragment implements
     @Override
     public void onStart() {
         super.onStart();
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Start");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Start");
     }
 
     @NonNull
@@ -389,13 +387,13 @@ abstract public class ParentFragment extends DialogFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Resume");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Resume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LoggingUtility.Log(getActivity(), Log.DEBUG, Utils.getFragmentName(this) + " --> On Pause.");
+        LoggingUtility.Log(getActivity(), Log.DEBUG, Logger.getFragmentName(this) + " --> On Pause.");
     }
 
     public boolean handleBackPressed() {
@@ -436,7 +434,7 @@ abstract public class ParentFragment extends DialogFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.bookmark) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -498,35 +496,18 @@ abstract public class ParentFragment extends DialogFragment implements
         return null;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Required Overrides for ContextDelegate
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public Context getContext() {
-        return getActivity();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Required Overrides for APIStatusDelegate
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
     public void onCallbackStarted() {
         if (ParentActivity.isUIThread()) {
             showProgressBar();
         }
     }
 
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        if(source.isAPI() && ParentActivity.isUIThread()) {
+    public void onCallbackFinished(ApiType type) {
+        if(type.isAPI() && ParentActivity.isUIThread()) {
             hideProgressBar();
         }
     }
 
-    @Override public void onNoNetwork() { }
-    
     ///////////////////////////////////////////////////////////////////////////
     // Fragment
     ///////////////////////////////////////////////////////////////////////////
@@ -612,7 +593,7 @@ abstract public class ParentFragment extends DialogFragment implements
     public void handleIntentExtras(Bundle extras) {
 
         if(extras == null) {
-            Utils.d("handleIntentExtras extras was null");
+            Logger.d("handleIntentExtras extras was null");
             return;
         }
         Serializable serializable =  extras.getSerializable(Const.URL_PARAMS);
@@ -884,7 +865,7 @@ abstract public class ParentFragment extends DialogFragment implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!com.instructure.pandautils.utils.Utils.isNetworkAvailable(getContext())) {
+                if (!NetworkUtils.isNetworkAvailable()) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 } else {
                     baseRecyclerAdapter.refresh();
@@ -1081,6 +1062,13 @@ abstract public class ParentFragment extends DialogFragment implements
     public void openMedia(String mime, String url, String filename) {
         if(getActivity() != null) {
             openMediaBundle = OpenMediaAsyncTaskLoader.createBundle(getCanvasContext(), mime, url, filename);
+            LoaderUtils.restartLoaderWithBundle(getActivity().getSupportLoaderManager(), openMediaBundle, getLoaderCallbacks(), R.id.openMediaLoaderID);
+        }
+    }
+
+    public void openMedia(boolean isSubmission, String mime, String url, String filename) {
+        if(getActivity() != null) {
+            openMediaBundle = OpenMediaAsyncTaskLoader.createBundle(getCanvasContext(), isSubmission, mime, url, filename);
             LoaderUtils.restartLoaderWithBundle(getActivity().getSupportLoaderManager(), openMediaBundle, getLoaderCallbacks(), R.id.openMediaLoaderID);
         }
     }

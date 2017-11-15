@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -31,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.util.Rfc822Tokenizer;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,40 +60,41 @@ import com.instructure.candroid.dialog.FileUploadDialog;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.view.CanvasRecipientManager;
 import com.instructure.candroid.view.IndicatorCircleView;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.Recipient;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.dialog.GenericDialogStyled;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.Recipient;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.models.FileSubmitObject;
 import com.instructure.pandautils.services.FileUploadService;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.client.Response;
-
-public class ComposeNewMessageFragment extends ParentFragment implements GenericDialogStyled.GenericDialogListener, FileUploadDialog.FileSelectionInterface {
+public class ComposeNewMessageFragment extends ParentFragment implements FileUploadDialog.FileSelectionInterface {
 
     // Callbacks
-    private CanvasCallback<Response> mConversationCanvasCallback;
-    private CanvasCallback<Group[]> mGroupsCallback;
-    private CanvasCallback<Course[]> mCoursesCallback;
+    private StatusCallback<List<Conversation>> mConversationCanvasCallback;
+
+    private StatusCallback<List<Course>> mCoursesCallback;
+    private StatusCallback<List<Group>> mGroupsCallback;
 	private EditText mMessage;
     private EditText mSubject;
 
     // Course Spinner
     private Spinner mCourseSpinner;
-    private Course[] mCourses;
-    private Group[] mGroups;
+    private List<Course> mCourses;
+    private List<Group> mGroups;
     private CanvasContext mSelectedCourse;
 
     // Recipient Chips
@@ -153,8 +156,8 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setUpCallback();
-        CourseAPI.getAllFavoriteCourses(mCoursesCallback);
-        GroupAPI.getAllFavoriteGroups(mGroupsCallback);
+        CourseManager.getAllFavoriteCourses(true, mCoursesCallback);
+        GroupManager.getFavoriteGroups(mGroupsCallback, true);
 
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mSubject.getWindowToken(), 0);
@@ -187,9 +190,10 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
 	}
 
     public void setUpCallback(){
-        mConversationCanvasCallback = new CanvasCallback<Response>(this) {
+        mConversationCanvasCallback = new StatusCallback<List<Conversation>>() {
+
             @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response redundantResponse) {
+            public void onResponse(retrofit2.Response<List<Conversation>> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
@@ -197,24 +201,24 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
             }
         };
 
-        mCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mCoursesCallback = new StatusCallback<List<Course>>() {
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
-                mCourses = courses;
+                mCourses = response.body();
                 populateCourseSpinnerAdapter();
             }
         };
 
-        mGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mGroupsCallback = new StatusCallback<List<Group>>() {
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
-                mGroups = groups;
+                mGroups = response.body();
                 populateCourseSpinnerAdapter();
             }
         };
@@ -302,7 +306,7 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
 
     public void populateRecipients() {
         for(Recipient recipient : ChooseMessageRecipientsFragment.allRecipients){
-            RecipientEntry recipientEntry = new RecipientEntry(recipient.getIdAsLong(), recipient.getName(), recipient.getStringId(), "", recipient.getAvatarURL(), recipient.getUser_count(), recipient.getItemCount(), true,
+            RecipientEntry recipientEntry = new RecipientEntry(recipient.getIdAsLong(), recipient.getName(), recipient.getStringId(), "", recipient.getAvatarURL(), recipient.getUserCount(), recipient.getItemCount(), true,
                     recipient.getCommonCourses() != null ? recipient.getCommonCourses().keySet() : null,
                     recipient.getCommonGroups() != null ?  recipient.getCommonGroups().keySet() : null);
 
@@ -319,7 +323,7 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
             return getString(R.string.noRecipients);
         }
         if(mChipsTextView.getSelectedRecipients().size() > 2) {
-            return mChipsTextView.getSelectedRecipients().get(0).getName() + String.format(Locale.getDefault(), getString(com.instructure.canvasapi.R.string.andMore), mChipsTextView.getSelectedRecipients().size() - 1);
+            return mChipsTextView.getSelectedRecipients().get(0).getName() + String.format(Locale.getDefault(), getString(R.string.andMore), mChipsTextView.getSelectedRecipients().size() - 1);
         } else {
             String participants = "";
             for (int i = 0; i < mChipsTextView.getSelectedRecipients().size(); i++) {
@@ -453,20 +457,6 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
         unregisterReceivers();
     }
 
-    //region Dialog Overrides
-
-    @Override
-    public void onPositivePressed() {
-        sendMessage(true);
-    }
-
-    @Override
-    public void onNegativePressed() {
-        sendMessage(false);
-    }
-
-    //endregion
-
     //region Data Submission.
 
     private boolean isValidNewMessage() {
@@ -497,7 +487,7 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
         }
 
         if(mAttachmentsList.size() == 0) {
-            ConversationAPI.createConversation(mConversationCanvasCallback, mIds, mMessage.getText().toString(), mSubject.getText().toString(), mSelectedCourse.getContextId(), group);
+            ConversationManager.createConversation(mIds, mMessage.getText().toString(), mSubject.getText().toString(), mSelectedCourse.getContextId(), null, group, mConversationCanvasCallback);
         } else {
             //show dialog while it is uploading the attachments
             mProgressDialog = new ProgressDialog(getContext());
@@ -525,7 +515,7 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_send) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -533,9 +523,24 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
             if (isValidNewMessage()) {
                 //	Determine whether or not the user intended this as a group message
                 if (ChooseMessageRecipientsFragment.isPossibleGroupMessage() || (ChooseMessageRecipientsFragment.allRecipients.size() +  mChipsTextView.getSelectedRecipients().size()) > 1) {
-                    GenericDialogStyled newFragment = GenericDialogStyled.newInstance(true, R.string.groupDialogTitle, R.string.groupDialogMessage, R.string.group, R.string.individually, R.drawable.action_about, this);
-                    newFragment.setCancelable(true);
-                    newFragment.show(getFragmentManager(), "tag");
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle(R.string.groupDialogTitle)
+                            .setMessage(R.string.groupDialogMessage)
+                            .setPositiveButton(R.string.group, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    sendMessage(true);
+                                }
+                            })
+                            .setNegativeButton(R.string.individually, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    sendMessage(false);
+                                }
+                            })
+                            .setCancelable(true)
+                            .create()
+                            .show();
                 } else {
                     //Send the message
                     mIsSendEnabled = false;
@@ -591,9 +596,9 @@ public class ComposeNewMessageFragment extends ParentFragment implements Generic
             @Override
             public void onClick(View view) {
                 Bundle bundle = FileUploadDialog.createAttachmentsBundle(getRecipientsString(), mAttachmentsList);
-                mUploadFileSourceFragment = FileUploadDialog.newInstance(getChildFragmentManager(),bundle);
+                mUploadFileSourceFragment = FileUploadDialog.newInstance(getFragmentManager(),bundle);
                 mUploadFileSourceFragment.setTargetFragment(ComposeNewMessageFragment.this, 1337);
-                mUploadFileSourceFragment.show(getChildFragmentManager(), FileUploadDialog.TAG);
+                mUploadFileSourceFragment.show(getFragmentManager(), FileUploadDialog.TAG);
             }
         });
         paperclip.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);

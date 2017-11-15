@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.antonyt.infiniteviewpager.InfiniteViewPager;
 import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.CalendarListRecyclerAdapter;
@@ -49,12 +50,13 @@ import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.ListViewHelpers;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
 import com.roomorama.caldroid.CaldroidListener;
+
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -62,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import hirondelle.date4j.DateTime;
 
 public class CalendarListViewFragment extends OrientationChangeFragment {
@@ -237,9 +240,9 @@ public class CalendarListViewFragment extends OrientationChangeFragment {
         Navigation navigation = getNavigation();
         if (navigation != null) {
             setCanvasContext(findContextForScheduleItem(scheduleItem));
-            if (scheduleItem.getType() == ScheduleItem.Type.TYPE_ASSIGNMENT) {
+            if (scheduleItem.getItemType() == ScheduleItem.Type.TYPE_ASSIGNMENT) {
                 RouterUtils.routeUrl(getActivity(), scheduleItem.getHtmlUrl(), false);
-            } else if (scheduleItem.getType() == ScheduleItem.Type.TYPE_CALENDAR || scheduleItem.getType() == ScheduleItem.Type.TYPE_SYLLABUS) {
+            } else if (scheduleItem.getItemType() == ScheduleItem.Type.TYPE_CALENDAR || scheduleItem.getItemType() == ScheduleItem.Type.TYPE_SYLLABUS) {
                 ParentFragment fragment = FragUtils.getFrag(CalendarEventFragment.class, CalendarEventFragment.createBundle(getCanvasContext(), scheduleItem));
                 navigation.addFragment(fragment);
             }
@@ -376,7 +379,7 @@ public class CalendarListViewFragment extends OrientationChangeFragment {
     }
 
     private void eventCreation(){
-        if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+        if(!APIHelper.hasNetworkConnection()) {
             Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -483,7 +486,7 @@ public class CalendarListViewFragment extends OrientationChangeFragment {
                 fragmentTransaction.detach(mCalendarFragment);
                 fragmentTransaction.commit();
             } catch (IllegalStateException e) {
-                Utils.e("CalendarListViewFragment crash: " + e);
+                Logger.e("CalendarListViewFragment crash: " + e);
             }
         }
 

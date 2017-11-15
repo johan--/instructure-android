@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,16 +21,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-import com.instructure.canvasapi2.AppManager;
 import com.instructure.canvasapi2.StatusCallback;
-import com.instructure.canvasapi2.apis.GroupCategoriesAPI;
+import com.instructure.canvasapi2.apis.AvatarAPI;
 import com.instructure.canvasapi2.apis.UserAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.CanvasColor;
 import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Enrollment;
 import com.instructure.canvasapi2.models.FileUploadParams;
-import com.instructure.canvasapi2.models.Group;
 import com.instructure.canvasapi2.models.Parent;
 import com.instructure.canvasapi2.models.ParentResponse;
 import com.instructure.canvasapi2.models.RemoteFile;
@@ -38,16 +37,15 @@ import com.instructure.canvasapi2.models.ResetParent;
 import com.instructure.canvasapi2.models.Student;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.tests.UserManager_Test;
-import com.instructure.canvasapi2.utils.DepaginatedCallback;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-
 
 public class UserManager extends BaseManager {
 
@@ -80,7 +78,7 @@ public class UserManager extends BaseManager {
 
     @Nullable
     @WorkerThread
-    public static RemoteFile uploadUserFileSynchronous(String uploadUrl, LinkedHashMap<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
+    public static RemoteFile uploadUserFileSynchronous(String uploadUrl, Map<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
         RestBuilder adapter = new RestBuilder();
         if (isTesting() || mTesting) {
             return UserManager_Test.uploadUserFileSynchronous(adapter, uploadUrl, uploadParams, mimeType, file);
@@ -129,7 +127,55 @@ public class UserManager extends BaseManager {
         }
     }
 
-    public static void getUser(String userId, StatusCallback<User> callback, boolean forceNetwork) {
+    public static void getSelf(boolean forceNetwork, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withShouldIgnoreToken(false)
+                    .withPerPageQueryParam(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            UserManager_Test.getSelf(adapter, params, callback);
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withShouldIgnoreToken(false)
+                    .withPerPageQueryParam(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            UserAPI.getSelf(adapter, params, callback );
+        }
+    }
+
+    public static void getSelfEnrollments(boolean forceNetwork, StatusCallback<List<Enrollment>> callback) {
+        if (isTesting() || mTesting) {
+            //TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withShouldIgnoreToken(false)
+                    .withPerPageQueryParam(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            UserAPI.getSelfEnrollments(adapter, params, callback);
+        }
+    }
+
+    public static void getSelfWithPermissions(boolean forceNetwork, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withShouldIgnoreToken(false)
+                    .withPerPageQueryParam(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            UserAPI.getSelfWithPermissions(adapter, params, callback );
+        }
+    }
+
+    public static void getUser(Long userId, StatusCallback<User> callback, boolean forceNetwork) {
         if (isTesting() || mTesting) {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
@@ -149,7 +195,21 @@ public class UserManager extends BaseManager {
         }
     }
 
-    public static void getPeopleList(long canvasContextId, StatusCallback<List<User>> callback, boolean forceNetwork) {
+    public static void getUserForContextId(CanvasContext canvasContext, Long userId, StatusCallback<User> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            //TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withShouldIgnoreToken(false)
+                    .withPerPageQueryParam(false)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
+            UserAPI.getUserForContextId(adapter, params, canvasContext, userId, callback);
+        }
+    }
+
+    public static void getPeopleList(CanvasContext canvasContext, StatusCallback<List<User>> callback, boolean forceNetwork) {
 
         if (isTesting() || mTesting) {
             RestBuilder adapter = new RestBuilder(callback);
@@ -157,19 +217,96 @@ public class UserManager extends BaseManager {
                     .withForceReadFromNetwork(forceNetwork)
                     .build();
 
-            UserManager_Test.getPeopleList(adapter, params, canvasContextId, callback);
+            UserManager_Test.getPeopleList(adapter, params, canvasContext.getId(), callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
+                    .withCanvasContext(canvasContext)
                     .withPerPageQueryParam(false)
                     .withForceReadFromNetwork(forceNetwork)
                     .build();
 
-            UserAPI.getPeopleList(adapter, params, canvasContextId, callback);
+            UserAPI.getPeopleList(adapter, params, canvasContext.getId(), callback);
         }
     }
 
-    public static void getAllPeopleList(final long canvasContextId, StatusCallback<List<User>> callback, boolean forceNetwork) {
+    public static void getAllPeopleList(final CanvasContext canvasContext, StatusCallback<List<User>> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestParams params = new RestParams.Builder()
+                    .withCanvasContext(canvasContext)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .build();
+            final RestBuilder adapter = new RestBuilder(callback);
+            StatusCallback<List<User>> depaginatedCallback = new ExhaustiveListCallback<User>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<User>> callback, @NonNull String nextUrl, boolean isCached) {
+                    UserAPI.getPeopleList(adapter, params, canvasContext.getId(), callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            UserAPI.getPeopleList(adapter, params, canvasContext.getId(), callback);
+        }
+    }
+
+    public static void getAllEnrollmentsPeopleList(final CanvasContext canvasContext, StatusCallback<List<User>> callback, boolean forceNetwork) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestParams params = new RestParams.Builder()
+                    .withCanvasContext(canvasContext)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .build();
+            final RestBuilder adapter = new RestBuilder(callback);
+            StatusCallback<List<User>> depaginatedCallback = new ExhaustiveListCallback<User>(callback) {
+                @Override
+                public void getNextPage(@NonNull StatusCallback<List<User>> callback, @NonNull String nextUrl, boolean isCached) {
+                    UserAPI.getAllPeopleList(adapter, params, canvasContext.getId(), callback);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            UserAPI.getAllPeopleList(adapter, params, canvasContext.getId(), callback);
+        }
+    }
+
+    public static void getFirstPagePeopleList(@NonNull CanvasContext canvasContext, UserAPI.ENROLLMENT_TYPE enrollmentType, boolean forceNetwork, @NonNull StatusCallback<List<User>> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withCanvasContext(canvasContext)
+                    .build();
+            final RestBuilder adapter = new RestBuilder(callback);
+            UserAPI.getFirstPagePeopleList(adapter, params, canvasContext.getId(), enrollmentType, callback);
+        }
+
+    }
+
+    public static void getFirstPagePeopleList(@NonNull CanvasContext canvasContext, boolean forceNetwork, @NonNull StatusCallback<List<User>> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .withShouldIgnoreToken(false)
+                    .withCanvasContext(canvasContext)
+                    .build();
+            final RestBuilder adapter = new RestBuilder(callback);
+            UserAPI.getFirstPagePeopleList(adapter, params, canvasContext.getId(), callback);
+        }
+
+    }
+
+    public static void getNextPagePeopleList(boolean forceNetwork, @NonNull String nextUrl, @NonNull StatusCallback<List<User>> callback) {
         if (isTesting() || mTesting) {
             // TODO
         } else {
@@ -179,17 +316,62 @@ public class UserManager extends BaseManager {
                     .withShouldIgnoreToken(false)
                     .build();
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<User>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<User>() {
-                @Override
-                public void getNextPage(DepaginatedCallback<User> callback, String nextUrl, boolean isCached) {
-                    UserAPI.getPeopleList(adapter, params, canvasContextId, callback);
-                }
-            });
-            adapter.setStatusCallback(depaginatedCallback);
-            UserAPI.getPeopleList(adapter, params, canvasContextId, callback);
+            UserAPI.getNextPagePeopleList(adapter, params, nextUrl, callback);
+        }
+
+    }
+
+    public static void updateUserShortNameAndEmail(String shortName, String email, String bio, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            UserAPI.updateUserShortNameAndEmail(adapter, params, shortName, email, bio, callback);
         }
     }
 
+    public static void updateUserShortName(String shortName, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            UserAPI.updateUserShortName(adapter, params, shortName, callback);
+        }
+    }
+
+    public static void updateUserEmail(String email, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            UserAPI.updateUserEmail(adapter, params, email, callback);
+        }
+    }
+
+    public static void updateUsersAvatar(String urlPath, StatusCallback<User> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            AvatarAPI.updateAvatar(adapter, params,urlPath, callback);
+        }
+    }
 
 
     public static void addStudentToParentAirwolf(String airwolfDomain, String parentId, String studentDomain, StatusCallback<ResponseBody> callback) {
@@ -334,7 +516,7 @@ public class UserManager extends BaseManager {
         }
     }
 
-    public static void resetParentPasswordAirwolf(String airwolfDomain, String email, String password, StatusCallback<ResetParent> callback) {
+    public static void resetParentPasswordAirwolf(String airwolfDomain, String username, String password, StatusCallback<ResetParent> callback) {
         if (isTesting() || mTesting) {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
@@ -344,7 +526,7 @@ public class UserManager extends BaseManager {
                     .withAPIVersion("")
                     .withForceReadFromNetwork(true)
                     .build();
-            UserManager_Test.resetParentPassword(airwolfDomain, adapter, params, email, password, callback);
+            UserManager_Test.resetParentPassword(airwolfDomain, adapter, params, username, password, callback);
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
@@ -354,7 +536,7 @@ public class UserManager extends BaseManager {
                     .withAPIVersion("")
                     .withForceReadFromNetwork(true)
                     .build();
-            UserAPI.resetParentPassword(adapter, params, email, password, callback);
+            UserAPI.resetParentPassword(adapter, params, username, password, callback);
         }
     }
 

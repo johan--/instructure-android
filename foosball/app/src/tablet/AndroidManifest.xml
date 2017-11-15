@@ -60,16 +60,27 @@
             android:name=".activities.CreateCutThroatGameActivity"
             android:screenOrientation="landscape" />
         <activity
+            android:name=".activities.CreateTeamTwisterGameActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".activities.CreateTableKingGameActivity"
+            android:screenOrientation="landscape" />
+        <activity
             android:name=".activities.GameActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".activities.CutThroatGameActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".activities.TableKingGameActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".activities.TeamTwisterGameActivity"
+            android:screenOrientation="landscape" />
 
         <service android:name=".services.FoosballSyncService" />
         <service android:name=".push.PushIntentService"/>
-
-        <activity android:name=".activities.FoosRankLeaderboardActivity" />
 
         <activity android:name=".activities.EloDialogActivity"/>
     </application>

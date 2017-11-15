@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -43,21 +43,21 @@ import com.instructure.candroid.util.Const;
 import com.instructure.candroid.util.ModuleUtility;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.view.ViewPagerNonSwipeable;
-import com.instructure.canvasapi.api.ModuleAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleObject;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ModuleManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleObject;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
 
 public class CourseModuleProgressionFragment extends ParentFragment {
     //View variables
@@ -87,7 +87,7 @@ public class CourseModuleProgressionFragment extends ParentFragment {
     private ArrayList<ArrayList<ModuleItem>> items = new ArrayList<>();
 
     //retrofit callbacks
-    private CanvasCallback<ModuleItem[]> moduleItemsCallback;
+    private StatusCallback<List<ModuleItem>> moduleItemsCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {return FRAGMENT_PLACEMENT.DETAIL; }
@@ -315,6 +315,14 @@ public class CourseModuleProgressionFragment extends ParentFragment {
         Fragment fragment = adapter.getItem(currentPos);
         ((ParentFragment)fragment).setShouldUpdateTitle(true);
 
+        ModuleItem.CompletionRequirement completionRequirement = getCurrentModuleItem(currentPos).getCompletionRequirement();
+        if (completionRequirement != null && ModuleItem.MUST_VIEW.equals(completionRequirement.getType())) {
+            //reload the module object to update the items. By viewing this item subsequent items may now be unlocked
+            adapter.notifyDataSetChanged();
+            addLockedIconIfNeeded(modules, items, groupPos, childPos);
+
+        }
+
         ModuleItem moduleItem = getCurrentModuleItem(currentPos);
         setupTitle(moduleItem.getTitle());
         updateModuleMarkDoneView(moduleItem);
@@ -364,20 +372,20 @@ public class CourseModuleProgressionFragment extends ParentFragment {
             public void onClick(View v) {
                 if (getModelObject() != null && getModelObject().getCompletionRequirement() != null) {
                     if (getModelObject().getCompletionRequirement().isCompleted()) {
-                        ModuleAPI.markModuleAsNotDone(getCanvasContext(), getModelObject().getModuleId(), getModelObject().getId(),
-                                new CanvasCallback<com.squareup.okhttp.Response>(CourseModuleProgressionFragment.this) {
+                        ModuleManager.markAsNotDone(getCanvasContext(), getModelObject().getModuleId(), getModelObject().getId(),
+                                new StatusCallback<ResponseBody>() {
                                     @Override
-                                    public void firstPage(com.squareup.okhttp.Response response, LinkHeaders linkHeaders, Response response2) {
+                                    public void onResponse(retrofit2.Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
                                         markDoneCheckBox.setChecked(false);
                                         getModelObject().getCompletionRequirement().setCompleted(false);
                                         notifyOfItemChanged(getModelObject());
                                     }
                                 });
                     } else {
-                        ModuleAPI.markModuleAsDone(getCanvasContext(), getModelObject().getModuleId(), getModelObject().getId(),
-                                new CanvasCallback<com.squareup.okhttp.Response>(CourseModuleProgressionFragment.this) {
+                        ModuleManager.markAsDone(getCanvasContext(), getModelObject().getModuleId(), getModelObject().getId(),
+                                new StatusCallback<ResponseBody>() {
                                     @Override
-                                    public void firstPage(com.squareup.okhttp.Response response, LinkHeaders linkHeaders, Response response2) {
+                                    public void onResponse(retrofit2.Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
                                         markDoneCheckBox.setChecked(true);
                                         getModelObject().getCompletionRequirement().setCompleted(true);
                                         notifyOfItemChanged(getModelObject());
@@ -400,7 +408,7 @@ public class CourseModuleProgressionFragment extends ParentFragment {
     }
 
     private void getModuleItemData(long moduleId) {
-        ModuleAPI.getModuleItemsExhaustive(course, moduleId, moduleItemsCallback);
+        ModuleManager.getAllModuleItems(course, moduleId, moduleItemsCallback, true);
     }
     /**
      * Items could have a lot of modules with no data because we haven't retrieved it yet. So 
@@ -642,6 +650,11 @@ public class CourseModuleProgressionFragment extends ParentFragment {
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
         public int getCount() {
             return NUM_ITEMS;
         }
@@ -678,16 +691,12 @@ public class CourseModuleProgressionFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     private void setupCallback() {
-        moduleItemsCallback = new CanvasCallback<ModuleItem[]>(this) {
+        moduleItemsCallback = new StatusCallback<List<ModuleItem>>() {
 
             @Override
-            public void cache(ModuleItem[] moduleItems, LinkHeaders linkHeaders, Response response) {
-
-            }
-
-            @Override
-            public void firstPage(ModuleItem[] moduleItems, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck() || moduleItems.length == 0) {
+            public void onResponse(retrofit2.Response<List<ModuleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<ModuleItem> moduleItems = response.body();
+                if(!apiCheck() || moduleItems.size() == 0) {
                     return;
                 }
 
@@ -697,7 +706,7 @@ public class CourseModuleProgressionFragment extends ParentFragment {
                 // Update ui here with results
                 ArrayList<ModuleItem> result = new ArrayList<>();
 
-                result.addAll(Arrays.asList(moduleItems));
+                result.addAll(moduleItems);
 
                 // Holds the position of the module the current module item belongs to
                 int index = 0;

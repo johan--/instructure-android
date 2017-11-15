@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.instructure.canvasapi2.models.User;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CanvasContextTest {
 
@@ -111,7 +111,7 @@ public class CanvasContextTest {
 
     //region equalsTest
     @Test
-    public void equals_TestNull(){
+    public void equals_TestNull() {
         Course course1 = new Course();
         Course course2 = null;
 
@@ -119,7 +119,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void equals_TestFalse(){
+    public void equals_TestFalse() {
         Course course = new Course();
         Group group = new Group();
 
@@ -127,7 +127,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void equals_TestTrue(){
+    public void equals_TestTrue() {
         Course course1 = new Course();
         Course course2 = new Course();
 
@@ -136,7 +136,7 @@ public class CanvasContextTest {
     //endregion
 
     @Test
-    public void getSecondaryName_TestCourse(){
+    public void getSecondaryName_TestCourse() {
         Course course = new Course();
         String courseCode = "Hodor";
         course.setCourseCode(courseCode);
@@ -145,7 +145,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void getSecondaryName_TestGroup(){
+    public void getSecondaryName_TestGroup() {
         Group group = new Group();
         String name = "Hodor";
         group.setName(name);
@@ -197,7 +197,7 @@ public class CanvasContextTest {
 
     //region getContextId
     @Test
-    public void getContextId_TestCourse(){
+    public void getContextId_TestCourse() {
         Course course = new Course();
         course.setId(1234);
 
@@ -205,7 +205,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void getContextId_TestGroup(){
+    public void getContextId_TestGroup() {
         Group group = new Group();
         group.setId(1234);
 
@@ -213,7 +213,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void getContextId_TestUser(){
+    public void getContextId_TestUser() {
         User user = new User();
         user.setId(1234);
 
@@ -223,17 +223,17 @@ public class CanvasContextTest {
 
     //region fromContextCode
     @Test
-    public void fromContextCode_TestNull1(){
+    public void fromContextCode_TestNull1() {
         assertEquals(null, CanvasContext.fromContextCode(""));
     }
 
     @Test
-    public void fromContextCode_TestNull2(){
+    public void fromContextCode_TestNull2() {
         assertEquals(null, CanvasContext.fromContextCode("gr"));
     }
 
     @Test
-    public void fromContextCode_TestCourse(){
+    public void fromContextCode_TestCourse() {
         Course course = new Course();
         course.setId(1234);
 
@@ -241,7 +241,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void fromContextCode_TestGroup(){
+    public void fromContextCode_TestGroup() {
         Group group = new Group();
         group.setId(1234);
 
@@ -249,7 +249,7 @@ public class CanvasContextTest {
     }
 
     @Test
-    public void fromContextCode_TestUser(){
+    public void fromContextCode_TestUser() {
         User user = new User();
         user.setId(1234);
 

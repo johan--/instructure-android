@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,22 +17,26 @@
 
 repositories {
     jcenter()
-    maven { url 'https://jitpack.io' }
+    maven { url "https://jitpack.io" }
+    maven { url 'https://maven.google.com' }
 }
 
 buildscript {
     repositories {
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url "https://maven.google.com" }
     }
     dependencies {
         // https://bintray.com/android/android-tools/com.android.tools.build.gradle/view
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 String isTesting() {
     if ( System.getenv("IS_TESTING") == "true" ) {
@@ -90,24 +94,36 @@ configurations {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':canvas-api')
-    compile project(':canvas-api-2')
-    compile project(':blueprint')
+    compile project(path: ':canvas-api-2', configuration: 'default')
+    compile project(path: ':blueprint', configuration: 'default')
+    compile project(path: ':recyclerview', configuration: 'default')
 
     /* Kotlin */
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$GLOBAL_KOTLIN_VERSION"
 
     compile('com.github.afollestad.material-dialogs:core:0.8.5.6@aar') {
         transitive = true
     }
+
+    /* PaperParcel */
+    compile 'nz.bradcampbell:paperparcel:2.0.2'
+    compile 'nz.bradcampbell:paperparcel-kotlin:2.0.2'
+    kapt 'nz.bradcampbell:paperparcel-compiler:2.0.2'
+
+    /* Media handling */
+    compile 'com.github.bumptech.glide:glide:4.1.1'
+    compile "com.github.bumptech.glide:okhttp3-integration:4.1.1"
+    kapt 'com.github.bumptech.glide:compiler:4.1.1'
+    compile 'com.caverock:androidsvg:1.2.1'
+
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.7.0'
     compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
     compile 'com.getbase:floatingactionbutton:1.10.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'de.hdodenhof:circleimageview:2.0.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    compile 'com.github.marcoscgdev.EasyLicensesDialog:appcompatversion:1.0.4'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
     compile rootProject.ext.supportDependencies.supportAnnotation
     compile rootProject.ext.supportDependencies.design
     compile rootProject.ext.supportDependencies.appCompat

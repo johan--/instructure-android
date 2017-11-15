@@ -52,7 +52,8 @@ public abstract class BaseExpandableSyncFragment<
     protected View mRootView;
 
     //Only gets called if not null
-    public void unBundle(@NonNull Bundle extras){};
+    public void unBundle(@NonNull Bundle extras){}
+
     public abstract int layoutResId();
     public abstract void onCreateView(View view);
 

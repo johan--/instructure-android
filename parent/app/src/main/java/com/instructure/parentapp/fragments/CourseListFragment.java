@@ -26,7 +26,6 @@ import android.widget.ProgressBar;
 
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.decorations.SpacesItemDecoration;
 import com.instructure.pandautils.fragments.BaseSyncFragment;
@@ -103,7 +102,7 @@ public class CourseListFragment extends BaseSyncFragment<Course, CourseListPrese
     @NonNull
     @Override
     public String airwolfDomain() {
-        return APIHelper.getAirwolfDomain(getContext());
+        return ApiPrefs.getAirwolfDomain();
     }
 
     @NonNull
@@ -139,12 +138,14 @@ public class CourseListFragment extends BaseSyncFragment<Course, CourseListPrese
                     new BasicAdapterToFragmentCallback() {
                 @Override
                 public void onRowClicked(int position, boolean isOpenDetail) {
+                    Course course = getAdapter().getItemAtPosition(position);
+                    if(course != null) {
+                        AnalyticUtils.trackFlow(AnalyticUtils.COURSE_FLOW, AnalyticUtils.COURSE_SELECTED);
 
-                    AnalyticUtils.trackFlow(AnalyticUtils.COURSE_FLOW, AnalyticUtils.COURSE_SELECTED);
-
-                    startActivity(DetailViewActivity.createIntent(getContext(),
-                            DetailViewActivity.DETAIL_FRAGMENT.WEEK, getPresenter().getStudent(), getAdapter().getItemAtPosition(position)));
-                    getActivity().overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
+                        startActivity(DetailViewActivity.createIntent(
+                                getContext(), DetailViewActivity.DETAIL_FRAGMENT.WEEK, getPresenter().getStudent(), course));
+                        getActivity().overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
+                    }
                 }
             });
         }

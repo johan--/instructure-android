@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,18 +18,14 @@
 package com.instructure.canvasapi2.utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.instructure.canvasapi2.apis.AlertAPI;
-import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -42,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -51,7 +49,6 @@ import rx.schedulers.Schedulers;
 
 public class APIHelper {
 
-    private final static String SHARED_PREFERENCES_DISMISSED_NETWORK_ERROR = "dismissed_network_error";
     private final static String SHARED_PREFERENCES_AIRWOLF_DOMAIN = "airwolf_domain";
 
     public static boolean hasNetworkConnection() {
@@ -77,9 +74,9 @@ public class APIHelper {
             if ("link".equalsIgnoreCase(name)) {
                 for (String value : map.get(name)) {
                     String[] split = value.split(",");
-                    for (int j = 0; j < split.length; j++) {
-                        int index = split[j].indexOf(">");
-                        String url = split[j].substring(0, index);
+                    for (String segment : split) {
+                        int index = segment.indexOf(">");
+                        String url = segment.substring(0, index);
                         url = url.substring(1);
 
                         //Remove the domain.
@@ -89,13 +86,13 @@ public class APIHelper {
                             url = removeDomainFromUrl(url);
                         }
 
-                        if (split[j].contains("rel=\"next\"")) {
+                        if (segment.contains("rel=\"next\"")) {
                             linkHeaders.nextUrl = url;
-                        } else if (split[j].contains("rel=\"prev\"")) {
+                        } else if (segment.contains("rel=\"prev\"")) {
                             linkHeaders.prevUrl = url;
-                        } else if (split[j].contains("rel=\"first\"")) {
+                        } else if (segment.contains("rel=\"first\"")) {
                             linkHeaders.firstUrl = url;
-                        } else if (split[j].contains("rel=\"last\"")) {
+                        } else if (segment.contains("rel=\"last\"")) {
                             linkHeaders.lastUrl = url;
                         }
                     }
@@ -104,6 +101,35 @@ public class APIHelper {
             }
         }
 
+        return linkHeaders;
+    }
+
+    @NonNull
+    static LinkHeaders parseLinkHeaderResponse(String linkField) {
+        LinkHeaders linkHeaders = new LinkHeaders();
+        if (TextUtils.isEmpty(linkField)) {
+            return linkHeaders;
+        }
+
+        String[] split = linkField.split(",");
+        for (String segment : split) {
+            int index = segment.indexOf(">");
+            String url = segment.substring(0, index);
+            url = url.substring(1);
+
+            //Remove the domain.
+            url = removeDomainFromUrl(url);
+
+            if (segment.contains("rel=\"next\"")) {
+                linkHeaders.nextUrl = url;
+            } else if (segment.contains("rel=\"prev\"")) {
+                linkHeaders.prevUrl = url;
+            } else if (segment.contains("rel=\"first\"")) {
+                linkHeaders.firstUrl = url;
+            } else if (segment.contains("rel=\"last\"")) {
+                linkHeaders.lastUrl = url;
+            }
+        }
         return linkHeaders;
     }
 
@@ -133,7 +159,6 @@ public class APIHelper {
     public static boolean isCachedResponse(@NonNull Response response) {
         return isCachedResponse(response.raw());
     }
-
 
     public static boolean paramIsNull(Object... args) {
         if(args == null) return true;
@@ -199,52 +224,6 @@ public class APIHelper {
         return 0;
     }
 
-    /**
-     * Sets whether the user has seen the network error message
-     *
-     * @param context
-     * @param hasSeenErrorMessage
-     */
-    public static void setHasSeenNetworkErrorMessage(Context context, boolean hasSeenErrorMessage) {
-        if (context == null) return;
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ApiPrefsKt.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        String sharedPrefsKey = SHARED_PREFERENCES_DISMISSED_NETWORK_ERROR;
-        editor.putBoolean(sharedPrefsKey, hasSeenErrorMessage);
-        editor.apply();
-    }
-
-    /*
-     *
-     * GetAssetsFile allows you to open a file that exists in the Assets directory.
-     *
-     * @param context
-     * @param fileName
-     * @return the contents of the file.
-     */
-    public static String getAssetsFile(Context context, String fileName) {
-        try {
-            String file = "";
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(context.getAssets().open(fileName)));
-
-            // do reading
-            String line = "";
-            while (line != null) {
-                file += line;
-                line = reader.readLine();
-            }
-
-            reader.close();
-            return file;
-
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     /*
      * The fromHTML method can cause a character that looks like [obj]
      * to show up. This is undesired behavior most of the time.
@@ -263,24 +242,16 @@ public class APIHelper {
         return "";
     }
 
-    public static Map<String,String> getAuthenticatedURL(Context context) {
+    public static Map<String,String> getAuthenticatedURL() {
         String token = ApiPrefs.getToken();
-        String headerValue = null;
-        headerValue = String.format("Bearer %s", token);
-        Map<String,String> map = new HashMap<String,String>();
+        String headerValue = String.format("Bearer %s", token);
+        Map<String,String> map = new HashMap<>();
         map.put("Authorization", headerValue);
         return map;
     }
 
-    public static Map<String, String> getReferrer(Context context){
+    public static Map<String, String> getReferrer(){
         Map<String, String> extraHeaders = new HashMap<>();
-        //Spelled as it should, misspelled...
-        extraHeaders.put("Referer", ApiPrefs.getDomain());
-        return extraHeaders;
-    }
-
-    public static Map<String, String> getReferrerAndAuthentication(Context context){
-        Map<String, String> extraHeaders = getAuthenticatedURL(context);
         //Spelled as it should, misspelled...
         extraHeaders.put("Referer", ApiPrefs.getDomain());
         return extraHeaders;
@@ -291,73 +262,12 @@ public class APIHelper {
         return builder.build();
     }
 
-    //region Airwolf
-
-
-    /**
-     * Check to see if the Airwolf domain is set. We don't want to return an empty domain, so this check
-     * will return whether the user has set a domain.
-     *
-     * @param context
-     * @return True if an Airwolf domain has been set, false otherwise
-     */
-    public static boolean isAirwolfDomainSet(Context context) {
-        if(context == null){
-            return false;
+    public static RequestBody makeRequestBody(String part) {
+        if (part == null) {
+            return RequestBody.create(MediaType.parse("multipart/form-data"), new byte[0]);
+        } else {
+            return RequestBody.create(MediaType.parse("multipart/form-data"), part);
         }
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ApiPrefsKt.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-
-        //if the shared preference here is empty, that means a domain hasn't been set
-        return !TextUtils.isEmpty(sharedPreferences.getString(SHARED_PREFERENCES_AIRWOLF_DOMAIN, ""));
     }
 
-    /**
-     * Get the Airwolf region to use. This will be set when the user first opens the app depending on which region is fastest
-     *
-     * If no region is set it will use the American Region as default
-     *
-     * @param context
-     * @return Domain to use for Airwolf API calls
-     */
-    public static String getAirwolfDomain(Context context) {
-        if(context == null){
-            return "";
-        }
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ApiPrefsKt.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        //make america the default region
-        return sharedPreferences.getString(SHARED_PREFERENCES_AIRWOLF_DOMAIN, AlertAPI.AIRWOLF_DOMAIN_AMERICA);
-    }
-
-    public static boolean airwolfDomainExists(Context context) {
-        if(context == null){
-            return false;
-        }
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ApiPrefsKt.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.contains(SHARED_PREFERENCES_AIRWOLF_DOMAIN);
-    }
-
-    /**
-     * Sets the current Airwolf domain
-     *
-     * @param context
-     * @param airwolfDomain
-     * @return True if saved successfully, false otherwise
-     */
-
-    public static boolean setAirwolfDomain(Context context, String airwolfDomain) {
-
-        if(airwolfDomain == null || airwolfDomain.equals("")){
-            return false;
-        }
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ApiPrefsKt.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(SHARED_PREFERENCES_AIRWOLF_DOMAIN, airwolfDomain);
-        return editor.commit();
-    }
-
-    //endregion
 }

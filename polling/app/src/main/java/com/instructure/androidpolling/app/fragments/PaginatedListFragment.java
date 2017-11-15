@@ -18,7 +18,9 @@
 package com.instructure.androidpolling.app.fragments;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +34,6 @@ import com.instructure.androidpolling.app.adapter.ListAdapter;
 import com.instructure.androidpolling.app.delegate.ListDelegate;
 import com.instructure.androidpolling.app.util.ListViewHelpers;
 import com.instructure.androidpolling.app.util.PaginationScrollListener;
-import com.instructure.canvasapi.utilities.CanvasCallback;
 
 /**
  * Generic type I is the type of the model object used to create row views in adapter
@@ -43,7 +44,7 @@ public abstract class PaginatedListFragment<I extends Comparable<I>>
         implements ListDelegate<I>, PaginatedListInterface {
 
     // views
-    private SwipeRefreshLayout swipeRefreshLayout;
+    protected SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
     private LinearLayout footer;
     private LinearLayout emptyView;
@@ -74,7 +75,7 @@ public abstract class PaginatedListFragment<I extends Comparable<I>>
         return swipeRefreshLayout;
     }
 
-    public LayoutInflater getLayoutInflater() {
+    public LayoutInflater layoutInflater() {
         if(layoutInflater == null){
             layoutInflater = LayoutInflater.from(getActivity());
         }
@@ -243,20 +244,8 @@ public abstract class PaginatedListFragment<I extends Comparable<I>>
 
     }
 
-
-
     public void onActivityCreatedMemorySafe(Bundle savedInstanceState) {
-        getActivity().getActionBar().setTitle(getTitle());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // View
-    ///////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        if(source.isAPI()) {
-            finishLoading();
-        }
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getTitle());
     }
 
     @Override
@@ -274,7 +263,12 @@ public abstract class PaginatedListFragment<I extends Comparable<I>>
 
     private void setupViews(View rootView) {
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setColorScheme(R.color.polling_aqua, R.color.polling_green, R.color.polling_purple, R.color.canvaspollingtheme_color);
+        swipeRefreshLayout.setColorSchemeColors(
+                ContextCompat.getColor(getContext(), R.color.polling_aqua),
+                ContextCompat.getColor(getContext(), R.color.polling_green),
+                ContextCompat.getColor(getContext(), R.color.polling_purple),
+                ContextCompat.getColor(getContext(), R.color.canvaspollingtheme_color)
+        );
         ListViewHelpers.setupListView(swipeRefreshLayout);
         listView = (ListView)swipeRefreshLayout.findViewById(R.id.listView);
         //add the empty view to the rootview. you can only add one item to a swipeRefreshLayout, so I wrapped that in a frameLayout so we add the

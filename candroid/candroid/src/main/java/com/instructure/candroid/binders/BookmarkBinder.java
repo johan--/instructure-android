@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.holders.BookmarkViewHolder;
 import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.Bookmark;
+import com.instructure.canvasapi2.models.Bookmark;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class BookmarkBinder {

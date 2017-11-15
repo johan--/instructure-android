@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,39 +28,29 @@ import com.instructure.androidpolling.app.activities.BaseActivity;
 import com.instructure.androidpolling.app.activities.StudentPollActivity;
 import com.instructure.androidpolling.app.rowfactories.PollRowFactory;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.PollAPI;
-import com.instructure.canvasapi.api.PollSessionAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollResponse;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.model.PollSessionResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollResponse;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.models.PollSessionResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import retrofit.client.Response;
-
 public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
 
     //callback
-    private CanvasCallback<PollSessionResponse> pollSessionCallback;
-    private CanvasCallback<PollResponse> pollCallback;
+    private StatusCallback<PollSessionResponse> pollSessionCallback;
+    private StatusCallback<PollResponse> pollCallback;
 
     private Map<Long, Course> courseMap;
     private Map<Long, Poll> pollMap;
-
-    public static final String TAG = "ClosedPollListFragment";
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -79,25 +69,19 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
         ((BaseActivity)getActivity()).setActionBarTitle(getString(R.string.studentView));
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // PaginatedExpandableListFragment Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
     @Override
     public void configureViews(View rootView) {
 
         if(getArguments() != null) {
             ArrayList<Course> courseList = (ArrayList<Course>)getArguments().getSerializable(Constants.COURSES_LIST);
             if(courseList != null) {
-                courseMap = CourseAPI.createCourseMap(courseList.toArray(new Course[0]));
+                courseMap = createCourseMap(courseList);
             }
             else {
-                courseMap = new HashMap<Long, Course>();
+                courseMap = new HashMap<>();
             }
-
-        }
-        else {
-            courseMap = new HashMap<Long, Course>();
+        } else {
+            courseMap = new HashMap<>();
         }
 
         //set an animation for adding list items
@@ -107,7 +91,7 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
 
         getListView().setLayoutAnimation(controller);
 
-        pollMap = new HashMap<Long, Poll>();
+        pollMap = new HashMap<>();
     }
 
     @Override
@@ -121,7 +105,7 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
         if(courseMap.containsKey(item.getCourse_id())) {
             courseName = courseMap.get(item.getCourse_id()).getName();
         }
-        return PollRowFactory.buildRowView(getLayoutInflater(), courseName, pollName, convertView, getActivity(), item.getCreated_at());
+        return PollRowFactory.buildRowView(layoutInflater(), courseName, pollName, convertView, getActivity(), item.getCreated_at());
     }
 
     @Override
@@ -157,7 +141,7 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
 
     @Override
     public void loadFirstPage() {
-         PollSessionAPI.getClosedSessions(pollSessionCallback);
+        PollsManager.getClosedSessions(pollSessionCallback, true);
     }
 
     @Override
@@ -181,10 +165,12 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
     @Override
     public void setupCallbacks() {
 
-        pollCallback = new CanvasCallback<PollResponse>(this) {
+        pollCallback = new StatusCallback<PollResponse>() {
             @Override
-            public void cache(PollResponse pollResponse) {
-                List<Poll> polls = pollResponse.getPolls();
+            public void onResponse(retrofit2.Response<PollResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
+
+                List<Poll> polls = response.body().getPolls();
                 if(polls != null) {
                     for (Poll poll : polls) {
                         pollMap.put(poll.getId(), poll);
@@ -192,33 +178,40 @@ public class ClosedPollListFragment extends PaginatedListFragment<PollSession> {
                     //now we have the poll question data, so update the list
                     notifyDataSetChanged();
                 }
-
             }
 
             @Override
-            public void firstPage(PollResponse pollResponse, LinkHeaders linkHeaders, Response response) {
-                cache(pollResponse);
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         };
 
-        pollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
+        pollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
+            public void onResponse(retrofit2.Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 if(pollSessions != null) {
                     for (PollSession pollSession : pollSessions) {
-                        PollAPI.getSinglePoll(pollSession.getPoll_id(), pollCallback);
+                        PollsManager.getSinglePoll(pollSession.getPoll_id(), pollCallback, true);
                         addItem(pollSession);
                     }
                 }
             }
         };
-
     }
 
+    public static Map<Long, Course> createCourseMap(List<Course> courses) {
+        Map<Long, Course> courseMap = new HashMap<>();
+        if(courses == null) {
+            return courseMap;
+        }
+        for (Course course : courses) {
+            courseMap.put(course.getId(), course);
+        }
+        return courseMap;
+    }
 }

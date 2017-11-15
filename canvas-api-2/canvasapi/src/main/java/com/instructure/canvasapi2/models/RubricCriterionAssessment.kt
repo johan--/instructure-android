@@ -26,6 +26,7 @@ data class RubricCriterionAssessment(
         var comments: String? = null
 ) : PaperParcelable, Serializable {
     companion object {
+        @Suppress("unresolved_reference")
         @JvmField val CREATOR = PaperParcelRubricCriterionRating.CREATOR
     }
 }

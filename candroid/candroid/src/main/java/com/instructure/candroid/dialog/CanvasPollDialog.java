@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.canvasapi.utilities.APIHelpers;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -256,7 +256,7 @@ public class CanvasPollDialog extends DialogFragment implements
         final int canBePolled = ApplicationManager.getPrefs(context).load(Const.CAN_BE_POLLED, -1);
         if(canBePolled == -1) {
             String[] pollDomainList = context.getResources().getStringArray(R.array.pollDomainList);
-            String currentDomain = APIHelpers.getDomain(context);
+            String currentDomain = ApiPrefs.getDomain();
             for (String domain : pollDomainList) {
                 if (currentDomain.equalsIgnoreCase(domain)) {
                     ApplicationManager.getPrefs(context).save(Const.CAN_BE_POLLED, 1);

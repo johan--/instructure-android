@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,22 +36,22 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.view.AutoResizeTextView;
-import com.instructure.canvasapi.api.UserAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.Recipient;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.Recipient;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.ProfileUtils;
 
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit.client.Response;
 
 public class PeopleDetailsFragment extends OrientationChangeFragment {
 
@@ -69,7 +69,7 @@ public class PeopleDetailsFragment extends OrientationChangeFragment {
     private User user;
     private long userId = -1; // used for routing from a url
 
-    private CanvasCallback<User> getCourseUserByIdCallback;
+    private StatusCallback<User> getCourseUserByIdCallback;
 
     @Override
     public String getFragmentTitle() {
@@ -135,7 +135,7 @@ public class PeopleDetailsFragment extends OrientationChangeFragment {
 
                 Recipient recipient = new Recipient(Long.toString(user.getId()), user.getShortName(), 0, 0, Recipient.recipientTypeToInt(Recipient.Type.person));
                 recipient.setCommonCourses(user.getEnrollmentsHash());
-                recipient.setAvatarURL(user.getAvatarURL());
+                recipient.setAvatarURL(user.getAvatarUrl());
                 ChooseMessageRecipientsFragment.allRecipients.add(recipient);
 
                 ChooseMessageRecipientsFragment.canvasContext = getCanvasContext();
@@ -148,7 +148,7 @@ public class PeopleDetailsFragment extends OrientationChangeFragment {
         });
         setupCallbacks();
         if (userId != -1) {
-            UserAPI.getCourseUserById(getCanvasContext(), userId, getCourseUserByIdCallback);
+            UserManager.getUserForContextId(getCanvasContext(), userId, getCourseUserByIdCallback, true);
         } else {
             setupUserViews();
         }
@@ -188,10 +188,10 @@ public class PeopleDetailsFragment extends OrientationChangeFragment {
     }
 
     private void setupCallbacks() {
-        getCourseUserByIdCallback =  new CanvasCallback<User>(this) {
 
+        getCourseUserByIdCallback = new StatusCallback<User>() {
             @Override
-            public void firstPage(User user, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<User> response, LinkHeaders linkHeaders, ApiType type) {
                 PeopleDetailsFragment.this.user = user;
                 setupTitle(getActionbarTitle());
                 setupUserViews();

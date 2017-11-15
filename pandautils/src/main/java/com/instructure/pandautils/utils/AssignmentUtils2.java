@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -71,7 +71,6 @@ public class AssignmentUtils2 {
 
             return checkOnTimeOrLate(assignment, submission, hasNoGrade(assignment, submission));
         }
-
     }
 
     //Check to see if an assignment either
@@ -79,11 +78,7 @@ public class AssignmentUtils2 {
     //2. Is "Pending Review"
     //3. Is muted
     private static boolean hasNoGrade(Assignment assignment, @NonNull Submission submission) {
-        if(!submission.isGraded() || Const.PENDING_REVIEW.equals(submission.getWorkflowState()) || assignment.isMuted()) {
-            return true;
-        } else {
-            return false;
-        }
+        return !submission.isGraded() || Const.PENDING_REVIEW.equals(submission.getWorkflowState()) || assignment.isMuted();
     }
 
     //Edge Case - Assignment is either due in the future or an unknown "paper" hand in

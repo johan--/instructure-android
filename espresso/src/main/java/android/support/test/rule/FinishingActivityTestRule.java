@@ -64,7 +64,7 @@ public class FinishingActivityTestRule<T extends Activity> extends ActivityTestR
     }
 
     @Override
-    void finishActivity() {
+    public void finishActivity() {
         finishAllActivities();
     }
 }

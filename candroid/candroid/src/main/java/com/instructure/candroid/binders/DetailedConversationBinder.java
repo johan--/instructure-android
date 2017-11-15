@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@ package com.instructure.candroid.binders;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.DetailedConversationAttachmentViewHolder;
@@ -29,11 +27,12 @@ import com.instructure.candroid.holders.DetailedConversationMessageViewHolder;
 import com.instructure.candroid.interfaces.DetailedConversationAdapterToFragmentCallback;
 import com.instructure.candroid.model.MessageAttachment;
 import com.instructure.candroid.model.MessageWithDepth;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.canvasapi.model.Message;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.canvasapi2.models.Message;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -45,12 +44,12 @@ public class DetailedConversationBinder extends BaseBinder {
     public static void bindMessageText(DetailedConversationMessageViewHolder holder, MessageWithDepth item, Context context, List<BasicUser> allParticipants){
         Message message = item.message;
 
-        BasicUser user = getBasicUser(allParticipants, message.getAuthorID());
+        BasicUser user = getBasicUser(allParticipants, message.getAuthorId());
         final boolean showName = shouldShowName(message, null);
         if (null != user) {
-            ProfileUtils.configureAvatarView(context, user.getUsername(), user.getAvatarUrl(), holder.avatar, false);
+            ProfileUtils.configureAvatarView(context, user.getName(), user.getAvatarUrl(), holder.avatar, false);
             if(showName){
-                holder.username.setText(user.getUsername());
+                holder.username.setText(user.getName());
                 holder.username.setVisibility(View.VISIBLE);
             } else {
                 holder.username.setVisibility(View.GONE);
@@ -58,11 +57,11 @@ public class DetailedConversationBinder extends BaseBinder {
         } else {
             holder.username.setVisibility(View.GONE);
         }
-        String dateString = DateHelpers.getMessageDateString(context, message.getCreationDate());
+        String dateString = DateHelper.getMessageDateString(context, APIHelper.stringToDate(message.getCreatedAt()));
         holder.dateText.setText(dateString);
         holder.dateText.setVisibility(View.VISIBLE);
 
-        final boolean isUser = isUser(context, item.message.getAuthorID());
+        final boolean isUser = isUser(context, item.message.getAuthorId());
 
         if (isUser) {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.conversation_blue_bg));
@@ -93,15 +92,15 @@ public class DetailedConversationBinder extends BaseBinder {
             List<BasicUser> allParticipants,
             final DetailedConversationAdapterToFragmentCallback detailedConversationCallback) {
 
-        BasicUser user = getBasicUser(allParticipants, item.message.getAuthorID());
+        BasicUser user = getBasicUser(allParticipants, item.message.getAuthorId());
         if (null != user && shouldShowName(item.message, attachment.getUrl())) {
-            holder.username.setText(user.getUsername());
+            holder.username.setText(user.getName());
             holder.username.setVisibility(View.VISIBLE);
         } else{
             holder.username.setVisibility(View.GONE);
         }
 
-        final boolean isUser = isUser(context, item.message.getAuthorID());
+        final boolean isUser = isUser(context, item.message.getAuthorId());
         final boolean showName = shouldShowName(item.message, attachment.getUrl());
 
         if (isUser) {
@@ -146,7 +145,8 @@ public class DetailedConversationBinder extends BaseBinder {
     }
 
     private static BasicUser getBasicUser(List<BasicUser> allParticipants, long authorId){
-        BasicUser user = new BasicUser(authorId, null);
+        BasicUser user = new BasicUser();
+        user.setId(authorId);
         int index = allParticipants.indexOf(user);
 
         if (index != -1) {
@@ -157,7 +157,7 @@ public class DetailedConversationBinder extends BaseBinder {
     }
 
     private static boolean isUser(Context context, long authorId){
-        return authorId == APIHelpers.getCacheUser(context.getApplicationContext()).getId();
+        return authorId == ApiPrefs.getUser().getId();
     }
 
     private static boolean shouldShowName(Message message, @Nullable String currentAttachmentUrl){

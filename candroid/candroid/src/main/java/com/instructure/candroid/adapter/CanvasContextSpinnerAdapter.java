@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,13 +28,14 @@ import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.binders.BaseBinder;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
+import com.instructure.canvasapi2.apis.GroupAPI;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class CanvasContextSpinnerAdapter extends ArrayAdapter<CanvasContext> {
 
@@ -134,7 +135,9 @@ public class CanvasContextSpinnerAdapter extends ArrayAdapter<CanvasContext> {
         ImageView indicator;
     }
 
-    public static CanvasContextSpinnerAdapter newAdapterInstance(Context context, Course[] courses, Group[] groups) {
+
+    public static CanvasContextSpinnerAdapter newAdapterInstance(Context context, List<Course> courses, List<Group> groups) {
+
         ArrayList<CanvasContext> canvasContexts = new ArrayList<>();
 
         Course courseSeparator = new Course();
@@ -142,14 +145,14 @@ public class CanvasContextSpinnerAdapter extends ArrayAdapter<CanvasContext> {
         courseSeparator.setId(COURSE_SEPARATOR);
         canvasContexts.add(courseSeparator);
 
-        canvasContexts.addAll(Arrays.asList(courses));
+        canvasContexts.addAll(courses);
 
         Course groupSeparator = new Course();
         groupSeparator.setName(context.getString(R.string.groups));
         groupSeparator.setId(GROUP_SEPARATOR);
         canvasContexts.add(groupSeparator);
 
-        canvasContexts.addAll(Arrays.asList(groups));
+        canvasContexts.addAll(groups);
 
         return new CanvasContextSpinnerAdapter(context, canvasContexts);
     }

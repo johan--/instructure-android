@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,18 +24,18 @@ import android.view.View;
 import com.instructure.candroid.binders.RecipientBinder;
 import com.instructure.candroid.holders.RecipientViewHolder;
 import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
-import com.instructure.canvasapi.api.RecipientAPI;
-import com.instructure.canvasapi.model.Recipient;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.RecipientManager;
+import com.instructure.canvasapi2.models.Recipient;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.HashMap;
-
-import retrofit.client.Response;
+import java.util.List;
 
 public class ChooseMessageRecipientRecyclerAdapter extends BaseListRecyclerAdapter<Recipient, RecyclerView.ViewHolder> {
     private RecipientAdapterToFragmentCallback<Recipient> mAdapterToFragmentCallback;
-    private CanvasCallback<Recipient[]> mRecipientCallback;
+    private StatusCallback<List<Recipient>> mRecipientCallback;
 
     private boolean mIsLastURLFetched = false; // Prevents the lastPage from being fetched in an endless loop
 
@@ -122,30 +122,31 @@ public class ChooseMessageRecipientRecyclerAdapter extends BaseListRecyclerAdapt
 
     @Override
     public void loadFirstPage() {
-        RecipientAPI.getFirstPageRecipients(mSearchTerm, getContextID(), mRecipientCallback);
+        RecipientManager.searchRecipients(mSearchTerm, getContextID(), mRecipientCallback);
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        RecipientAPI.getNextPageRecipients(nextURL, mRecipientCallback);
+        RecipientManager.searchRecipients(mSearchTerm, getContextID(), mRecipientCallback);
     }
 
     @Override
     public void setupCallbacks() {
-        mRecipientCallback = new CanvasCallback<Recipient[]>(this) {
+        mRecipientCallback = new StatusCallback<List<Recipient>>() {
             @Override
-            public void firstPage(Recipient[] recipients, LinkHeaders linkHeaders, Response response) {
-                for (Recipient recipient : recipients) {
+            public void onResponse(retrofit2.Response<List<Recipient>> response, LinkHeaders linkHeaders, ApiType type) {
+                for (Recipient recipient : response.body()) {
                     mInsertedOrderHash.put(recipient.getStringId(), mInsertCount++);
                     add(recipient);
                 }
                 mAdapterToFragmentCallback.onRefreshFinished();
 
-                String nextUrl = linkHeaders.nextURL;
+                String nextUrl = linkHeaders.nextUrl;
                 // Deals with an edge case of not getting the last page. The search API only sends a lastURL
                 //   instead of a nextURL for the last page.
-                if (linkHeaders.nextURL == null && !mIsLastURLFetched) {
-                    nextUrl = linkHeaders.lastURL;
+                if (linkHeaders.nextUrl == null && !mIsLastURLFetched) {
+                    nextUrl = linkHeaders.lastUrl;
+                    linkHeaders.nextUrl = nextUrl;
                     mIsLastURLFetched = true;
                 }
                 setNextUrl(nextUrl);

@@ -48,9 +48,7 @@ def apps
       'teacher',
       'parent',
       'candroid',
-      #'polling',
-      'speedgrader',
-      #'tools-teacher',
+      'polling',
       'InstrumentationTests'
   ]
 end

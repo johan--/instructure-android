@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.model.QuizQuestion;
-import com.instructure.canvasapi.model.Tab;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.models.QuizQuestion;
+import com.instructure.canvasapi2.models.Tab;
 
 import java.util.ArrayList;
 
@@ -119,12 +119,12 @@ public class QuizListFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     public static boolean isNativeQuiz(CanvasContext canvasContext, Quiz quiz) {
-        return !(containsUnsupportedQuestionType(quiz) || quiz.hasAccessCode() || quiz.isOneQuestionAtATime() || (canvasContext instanceof Course && ((Course) canvasContext).isTeacher()));
+        return !(containsUnsupportedQuestionType(quiz) || quiz.isHasAccessCode() || quiz.getOneQuestionAtATime() || (canvasContext instanceof Course && ((Course) canvasContext).isTeacher()));
     }
 
     //currently support TRUE_FALSE, ESSAY, SHORT_ANSWER, MULTI_CHOICE
     private static boolean containsUnsupportedQuestionType(Quiz quiz) {
-        ArrayList<QuizQuestion.QUESTION_TYPE> questionTypes = quiz.getQuestionTypes();
+        ArrayList<QuizQuestion.QUESTION_TYPE> questionTypes = quiz.getParsedQuestionTypes();
         if(questionTypes == null || questionTypes.size() == 0) {
             return true;
         }

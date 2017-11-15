@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,14 +32,9 @@ import butterknife.ButterKnife;
 public class PollSessionRowFactory {
 
     static class ViewHolder {
-        @BindView(R.id.title)
-        TextView txtTitle;
-
-        @BindView(R.id.sectionName)
-        TextView sectionName;
-
-        @BindView(R.id.isPublished)
-        ImageView isPublished;
+        @BindView(R.id.title) TextView txtTitle;
+        @BindView(R.id.sectionName) TextView sectionName;
+        @BindView(R.id.isPublished) ImageView isPublished;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
@@ -55,8 +50,7 @@ public class PollSessionRowFactory {
             holder = new ViewHolder(convertView);
 
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder)convertView.getTag();
         }
 
@@ -65,8 +59,7 @@ public class PollSessionRowFactory {
         if(isPublished) {
             holder.isPublished.setVisibility(View.VISIBLE);
             holder.isPublished.setColorFilter(context.getResources().getColor(R.color.canvaspollingtheme_color), PorterDuff.Mode.SRC_IN);
-        }
-        else {
+        } else {
             holder.isPublished.setVisibility(View.INVISIBLE);
         }
 

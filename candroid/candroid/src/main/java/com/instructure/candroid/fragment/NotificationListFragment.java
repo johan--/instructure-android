@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.ParentActivity;
 import com.instructure.candroid.adapter.NotificationListRecyclerAdapter;
@@ -37,15 +36,15 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.StreamItem;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.StreamItem;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.Const;
 
@@ -239,7 +238,7 @@ public class NotificationListFragment extends ParentFragment {
                     //add an empty submission with the grade to the assignment so that we can see the score.
                     Submission emptySubmission = new Submission();
                     emptySubmission.setGrade(streamItem.getGrade());
-                    streamItem.getAssignment().setLastSubmission(emptySubmission);
+                    streamItem.getAssignment().setSubmission(emptySubmission);
                     fragment = FragUtils.getFrag(AssignmentFragment.class, AssignmentFragment.createBundle((Course)streamItem.getCanvasContext(), streamItem.getAssignment()));
                 }
                 break;
@@ -262,7 +261,7 @@ public class NotificationListFragment extends ParentFragment {
                     hasUnread = true;
                     isStarred = conversation.isStarred();
                 }
-                long userId = APIHelpers.getCacheUser(activity.getApplicationContext()).getId();
+                long userId = ApiPrefs.getUser().getId();
                 String messageTitle = "";
                 if (conversation != null) {
                     messageTitle = conversation.getMessageTitle(activity, userId, activity.getString(R.string.monologue));
@@ -271,8 +270,8 @@ public class NotificationListFragment extends ParentFragment {
                 Bundle extras = DetailedConversationFragment.createBundle(streamItem.getCanvasContext(), conversation, messageTitle, hasUnread);
 
                 List<BasicUser> conversations = new ArrayList<>();
-                if(conversation != null && conversation.getAllParticipants() != null) {
-                    conversations = conversation.getAllParticipants();
+                if(conversation != null && conversation.getParticipants() != null) {
+                    conversations = conversation.getParticipants();
                 }
                 extras.putParcelableArrayList(Const.FROM_PEOPLE, new ArrayList<Parcelable>(conversations));
 

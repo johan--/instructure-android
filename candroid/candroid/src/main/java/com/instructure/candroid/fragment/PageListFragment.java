@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Page;
-import com.instructure.canvasapi.model.Tab;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Page;
+import com.instructure.canvasapi2.models.Tab;
 import com.instructure.pandautils.utils.Const;
 
 public class PageListFragment extends ParentFragment {

@@ -1,0 +1,405 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ */
+@file:JvmName("PandaViewUtils")
+@file:Suppress("unused", "FunctionName")
+
+package com.instructure.pandautils.utils
+
+import android.app.Activity
+import android.app.Dialog
+import android.content.Context
+import android.content.res.TypedArray
+import android.graphics.*
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
+import android.support.annotation.IdRes
+import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
+import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.AttributeSet
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewParent
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
+import com.instructure.canvasapi2.models.Course
+import com.instructure.canvasapi2.utils.APIHelper
+import com.instructure.canvasapi2.utils.ContextKeeper
+import com.instructure.pandautils.R
+import de.hdodenhof.circleimageview.CircleImageView
+
+/** Convenience extension for setting a click listener */
+@Suppress("NOTHING_TO_INLINE")
+inline fun View.onClick(noinline l: (v: View) -> Unit) {
+    setOnClickListener(l)
+}
+
+/** Convenience extension for setting a long click listener */
+@Suppress("NOTHING_TO_INLINE")
+inline fun View.onLongClick(noinline l: (v: View?) -> Boolean) {
+    setOnLongClickListener(l)
+}
+
+/** Set this view's visibility to View.VISIBLE **/
+fun <T : View> T.setVisible(isVisible: Boolean? = null): T = apply {
+    visibility = if (isVisible != false) View.VISIBLE else View.GONE
+}
+
+/** Set this view's visibility to View.INVISIBLE **/
+fun <T : View> T.setInvisible(): T = apply { visibility = View.INVISIBLE }
+
+/** Set this view's visibility to View.GONE **/
+fun <T : View> T.setGone(): T = setVisible(false)
+
+/** Show a toast with a default length of Toast.LENGTH_SHORT */
+fun View.toast(messageResId: Int, length: Int = Toast.LENGTH_SHORT) = Toast.makeText(context, messageResId, length).show()
+
+/** Converts float DIP value to pixel value */
+fun Context.DP(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics)
+
+/** Converts Int DIP value to pixel value */
+fun Context.DP(value: Int) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value.toFloat(), resources.displayMetrics)
+
+/** Converts float DIP value to pixel value */
+fun Context.SP(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
+
+/** Converts Int DIP value to pixel value */
+fun Context.SP(value: Int) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value.toFloat(), resources.displayMetrics)
+
+/** Converts float Pixel value to DIP value */
+fun Context.PX(px: Int) = (px / resources.displayMetrics.density).toInt()
+
+/** Converts float Pixel value to DIP value */
+fun Context.PX(px: Float) = (px / resources.displayMetrics.density).toInt()
+
+fun EditText.onTextChanged(listener: (String) -> Unit) {
+    addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable) {}
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            listener(s.toString())
+        }
+    })
+}
+
+/**
+ * Returns true if the view's layout direction is Right-To-Left, false otherwise
+ */
+fun View.isRTL() = ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL
+
+/** Convenience extension property for getting the MeasureSpec size */
+val Int.specSize get() = View.MeasureSpec.getSize(this)
+/** Convenience extension property for getting the MeasureSpec mode */
+val Int.specMode get() = View.MeasureSpec.getMode(this)
+/** Returns a list of all immediate child views in this ViewGroup */
+val ViewGroup.children: List<View> get() = (0 until childCount).map { getChildAt(it) }
+
+/** Returns a list of all immediate child views of the specified type in this ViewGroup */
+inline fun <reified T : View> ViewGroup.children(): List<T> = children.filterIsInstance<T>()
+
+/** Returns a list of all views in this ViewGroup */
+val ViewGroup.descendants: List<View> get() = children + children<ViewGroup>().flatMap { it.descendants }
+
+/** Returns a list of all views of the specified type in this ViewGroup */
+inline fun <reified T : View> ViewGroup.descendants(): List<T> = descendants.filterIsInstance<T>()
+
+/** Returns the firstAncestor of the specified type, or null if there are no matches */
+inline fun <reified V : View> View.firstAncestorOrNull(): V? {
+    var p: ViewParent? = parent
+    while (p != null) {
+        if (p is V) {
+            return p
+        } else {
+            p = p.parent
+        }
+    }
+    return null
+}
+
+/**
+ * Returns the vertical pixel offset of the top of this view inside the specified ViewGroup.
+ * Returns 0 if the ViewGroup is not an ancestor of this view.
+ */
+fun View.topOffsetIn(ancestor: ViewGroup): Int {
+    var offset = top
+    var p: ViewParent? = parent
+    while (p != null && p is ViewGroup) {
+        if (p === ancestor) {
+            return offset
+        } else {
+            offset += p.top
+            p = p.parent
+        }
+    }
+    return 0
+}
+
+/** Convenience property which wraps getLocationOnScreen() */
+val View.positionOnScreen: Pair<Int, Int>
+    get() {
+        val arr = intArrayOf(0, 0)
+        getLocationOnScreen(arr)
+        return Pair(arr[0], arr[1])
+    }
+
+/**
+ * [Binder] is a delegation class for manual view binding, useful for cases not covered by Kotlin
+ * Android Extensions. Generally, bound view properties will not directly instantiate this class.
+ * Instead, instantiation of a Binder instance should be handled by an extension function of the
+ * class in which views are to be bound, e.g. Dialog.[bind].
+ *
+ * Example of how to use [Binder] in classes that have a bind() extension function:
+ * ```
+ * val myImageView by bind<ImageView>(R.id.my_image_view)
+ * ```
+ *
+ * If your layout has multiple views with the same id but different parents:
+ * ```
+ * val myImageView1 by bind<ImageView>(R.id.my_image_view).withParent(R.id.parent_one)
+ * val myImageView2 by bind<ImageView>(R.id.my_image_view).withParent(R.id.parent_two)
+ * ```
+ * Or, if you already have a reference to the parent views:
+ * ```
+ * val myImageView1 by bind<ImageView>(R.id.my_image_view).withParent { parentLayout1 }
+ * val myImageView2 by bind<ImageView>(R.id.my_image_view).withParent { parentLayout2 }
+ * ```
+ *
+ * For examples on how to create a bind() extension function for a new class, refer to Dialog.bind(),
+ * ViewGroup.bind(), Activity.bind(), or Fragment.bind().
+ *
+ */
+@Suppress("UNCHECKED_CAST")
+class Binder<in T, out V : View>(@IdRes private val viewId: Int, private val finder: (T, Int) -> View?) : kotlin.properties.ReadOnlyProperty<T, V> {
+
+    private var cachedView: V? = null
+    private var useParent = false
+    private var parentId: Int? = null
+    private var parentProvider: (() -> View)? = null
+
+    override fun getValue(thisRef: T, property: kotlin.reflect.KProperty<*>): V {
+        if (cachedView == null) {
+            val v: View
+            if (useParent) {
+                v = when {
+                    parentProvider != null -> {
+                        val parentView = parentProvider!!.invoke()
+                        parentView.findViewById(viewId)
+                                ?: throw RuntimeException("Unable to bind ${property.name}; view not found in provided parent ${parentView.javaClass.simpleName}")
+                    }
+                    parentId != null -> {
+                        val parentView = finder(thisRef, parentId!!)
+                                ?: throw RuntimeException("Unable to bind ${property.name}; could not find specified parent with id ${ContextKeeper.appContext.resources.getResourceEntryName(parentId!!)}")
+                        parentView.findViewById(viewId)
+                                ?: throw RuntimeException("Unable to bind ${property.name}; view not found in specified parent with id ${ContextKeeper.appContext.resources.getResourceEntryName(parentId!!)}")
+                    }
+                    else -> throw RuntimeException("Unable to bind ${property.name}; please provide parent view or specify parent view id")
+                }
+            } else {
+                v = finder(thisRef, viewId) ?: throw RuntimeException("Unable to bind ${property.name}; findViewById returned null.")
+            }
+            cachedView = v as V
+        }
+        return cachedView!!
+    }
+
+    fun withParent(@IdRes parentId: Int): Binder<T, V> {
+        useParent = true
+        this.parentId = parentId
+        return this
+    }
+
+    fun withParent(parentProvider: () -> View): Binder<T, V> {
+        useParent = true
+        this.parentProvider = parentProvider
+        return this
+    }
+
+}
+
+fun AttributeSet.obtainFor(view: View, styleableRes: IntArray, onAttribute: (a: TypedArray, index: Int) -> Unit) {
+    val a: TypedArray = view.context.obtainStyledAttributes(this, styleableRes)
+    for (i in 0 until a.indexCount) onAttribute(a, a.getIndex(i))
+    a.recycle()
+}
+
+/**
+ * Show the keyboard
+ */
+fun View.showKeyboard() {
+    val imm = (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+}
+
+/**
+ * Hide the keyboard
+ */
+fun View.hideKeyboard() {
+    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
+}
+
+/** Provides a view-binding delegate inside classes extending [Dialog]. See [Binder] for more information. */
+inline fun <reified V : View> Dialog.bind(@IdRes id: Int): Binder<Dialog, V> = Binder(id) { dialog, viewId -> dialog.findViewById<V>(viewId) }
+
+/** Provides a view-binding delegate inside classes extending [ViewGroup]. See [Binder] for more information. */
+inline fun <reified V : View> ViewGroup.bind(@IdRes id: Int): Binder<ViewGroup, V> = Binder(id) { viewGroup, viewId -> viewGroup.findViewById<V>(viewId) }
+
+/** Provides a view-binding delegate inside classes extending [Activity]. See [Binder] for more information. */
+inline fun <reified V : View> Activity.bind(@IdRes id: Int): Binder<Activity, V> = Binder(id) { activity, viewId -> activity.findViewById<V>(viewId) }
+
+/** Provides a view-binding delegate inside classes extending [Fragment]. See [Binder] for more information. */
+fun <V : View> Fragment.bind(@IdRes id: Int): Binder<Fragment, V> = Binder(id) { it, viewId -> it.view?.findViewById(viewId) }
+
+fun View.requestAccessibilityFocus(delay: Long = 500) {
+    val a11yManager = (context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager)
+    if (a11yManager.isEnabled || a11yManager.isTouchExplorationEnabled) {
+        isFocusable = true
+        isFocusableInTouchMode = true
+        postDelayed({ requestFocus(); sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED) }, delay)
+    }
+}
+
+/**
+ * OnClickListener for checking internet connection first. If connection exits allow click,
+ * otherwise show no internet dialog.
+ */
+fun View.onClickWithRequireNetwork(clickListener: (v: View) -> Unit) = onClick {
+    if (APIHelper.hasNetworkConnection()) {
+        //Allow click
+        clickListener(this)
+    } else {
+        //show dialog
+        AlertDialog.Builder(context)
+                .setTitle(R.string.noInternetConnectionTitle)
+                .setMessage(R.string.noInternetConnectionMessage)
+                .setCancelable(true)
+                .setPositiveButton(android.R.string.ok, { dialog, _ -> dialog.dismiss() })
+                .showThemed()
+    }
+}
+
+/**
+ * Attempts to download and set the course image on this ImageView. The image will be center cropped,
+ * desaturated, and overlaid with the specified color at 75% opacity.
+ */
+@JvmName("setCourseImage")
+fun ImageView?.setCourseImage(course: Course, courseColor: Int) {
+    if (this == null) return
+    if (!course.imageUrl.isNullOrBlank()) {
+        val requestOptions = RequestOptions().apply {
+            signature(ObjectKey("${course.imageUrl}:$courseColor")) // Use unique signature per url-color combo
+            transform(CourseImageTransformation(courseColor))
+            placeholder(ColorDrawable(courseColor))
+        }
+        Glide.with(context)
+                .load(course.imageUrl)
+                .apply(requestOptions)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(this)
+    } else {
+        setImageDrawable(ColorDrawable(courseColor))
+    }
+}
+
+/** A Glide transformation to center, crop, desaturate, and colorize course images */
+private class CourseImageTransformation(val overlayColor: Int) : CenterCrop() {
+
+    override fun transform(pool: BitmapPool, toTransform: Bitmap, outWidth: Int, outHeight: Int): Bitmap {
+        val cropped = super.transform(pool, toTransform, outWidth, outHeight)
+        with(Canvas(cropped)) {
+            // Draw image in grayscale
+            drawBitmap(cropped, 0f, 0f, CourseImageTransformation.Companion.grayscalePaint)
+            // Draw color overlay at 75% (0xBF) opacity
+            drawColor(overlayColor and 0xBFFFFFFF.toInt())
+        }
+        return cropped
+    }
+
+    companion object {
+        private val grayscalePaint by lazy {
+            val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
+            Paint().apply { colorFilter = ColorMatrixColorFilter(colorMatrix) }
+        }
+    }
+
+}
+
+/**
+ * Attempts to load the provided Uri into this ImageView
+ */
+@JvmName("loadImageFromUri")
+@JvmOverloads
+fun ImageView?.loadUri(imageUri: Uri?, errorImageResourceId: Int = 0) {
+    if (this == null) return
+    imageUri?.path?.let { path ->
+        if (path.contains(".svg", ignoreCase = true)) {
+            SvgUtils.loadSVGImage(this, imageUri, errorImageResourceId)
+        } else {
+            Glide.with(context).load(imageUri).apply(RequestOptions.errorOf(errorImageResourceId)).into(this)
+        }
+        return
+    }
+    if (errorImageResourceId > 0) setImageResource(errorImageResourceId)
+}
+
+/**
+ * Adds a basic avatar content description as well as a click action description which includes the
+ * user's name. E.g. "Avatar button. Double-tap to view user details for John Doe."
+ */
+fun View.setupAvatarA11y(userName: String?) {
+    contentDescription = context.getString(R.string.content_description_avatar)
+    setAccessibilityDelegate(object : View.AccessibilityDelegate() {
+        override fun onInitializeAccessibilityNodeInfo(v: View, info: AccessibilityNodeInfo) {
+            super.onInitializeAccessibilityNodeInfo(v, info)
+            val description = context.getString(R.string.formattedAvatarAction, userName)
+            val customClick = AccessibilityNodeInfo.AccessibilityAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK.id, description)
+            info.addAction(customClick)
+        }
+    })
+}
+
+@JvmName("setUserAvatarImage")
+fun CircleImageView.setAvatarImage(context: Context, userName: String?) {
+    val initials = ProfileUtils.getUserInitials(userName)
+    val color = ContextCompat.getColor(context, R.color.gray)
+    val drawable = TextDrawable.builder()
+            .beginConfig()
+            .height(context.resources.getDimensionPixelSize(com.instructure.pandautils.R.dimen.avatar_size))
+            .width(context.resources.getDimensionPixelSize(com.instructure.pandautils.R.dimen.avatar_size))
+            .toUpperCase()
+            .useFont(Typeface.DEFAULT_BOLD)
+            .textColor(color)
+            .endConfig()
+            .buildRound(initials, Color.TRANSPARENT)
+    this.borderColor = color
+    this.borderWidth = context.DP(0.5f).toInt()
+    this.setImageDrawable(drawable)
+}

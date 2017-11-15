@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 package com.instructure.candroid.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,27 +31,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instructure.candroid.R;
-import com.instructure.candroid.util.CanvasErrorDelegate;
 import com.instructure.candroid.util.DownloadMedia;
 import com.instructure.candroid.util.StringUtilities;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.api.FileFolderAPI;
-import com.instructure.canvasapi.api.ModuleAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.CanvasError;
-import com.instructure.canvasapi.model.FileFolder;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.ErrorDelegate;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.FileFolderManager;
+import com.instructure.canvasapi2.managers.ModuleManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.FileFolder;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.PermissionUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
 
 public class FileDetailsFragment extends ParentFragment {
     // views
@@ -68,11 +64,8 @@ public class FileDetailsFragment extends ParentFragment {
     private FileFolder file;
     private String fileUrl = "";
 
-    private CanvasCallback<FileFolder> fileFolderCanvasCallback;
-    private CanvasCallback<com.squareup.okhttp.Response> markReadCanvasCallback;
-
-    //If the file doesn't exist, we don't want unexpected error. We want them to know it doesn't exist.
-    private ErrorDelegate errorDelegate;
+    private StatusCallback<FileFolder> fileFolderCanvasCallback;
+    private StatusCallback<ResponseBody> markReadCanvasCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -119,9 +112,8 @@ public class FileDetailsFragment extends ParentFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //we need to get the file info based on the URL that we received.
-        setUpErrorDelegate();
         setUpCallback();
-        FileFolderAPI.getFileFolderFromURL(fileUrl, fileFolderCanvasCallback);
+        FileFolderManager.getFileFolderFromURL(fileUrl, fileFolderCanvasCallback);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -141,7 +133,7 @@ public class FileDetailsFragment extends ParentFragment {
                 openMedia(file.getContentType(), file.getUrl(), file.getDisplayName());
 
                 //Mark the module as read
-                ModuleAPI.markModuleItemRead(getCanvasContext(), moduleId, itemId, markReadCanvasCallback);
+                ModuleManager.markModuleItemAsRead(getCanvasContext(), moduleId, itemId, markReadCanvasCallback);
             }
         });
 
@@ -162,7 +154,7 @@ public class FileDetailsFragment extends ParentFragment {
         DownloadMedia.downloadMedia(getActivity(), file.getUrl(), file.getDisplayName(), file.getName());
 
         //Mark the module as read
-        ModuleAPI.markModuleItemRead(getCanvasContext(), moduleId, itemId, markReadCanvasCallback);
+        ModuleManager.markModuleItemAsRead(getCanvasContext(), moduleId, itemId, markReadCanvasCallback);
     }
 
     /////////////////////////////////////////////////////////////////////////// 
@@ -170,19 +162,15 @@ public class FileDetailsFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     public void setUpCallback() {
-        fileFolderCanvasCallback = new CanvasCallback<FileFolder>(this, errorDelegate) {
+        fileFolderCanvasCallback = new StatusCallback<FileFolder>() {
             @Override
-            public void cache(FileFolder fileFolder) {
-            }
-
-            @Override
-            public void firstPage(FileFolder fileFolder, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<FileFolder> response, LinkHeaders linkHeaders, ApiType type) {
                 if (!apiCheck()) {
                     return;
                 }
 
                 //set up everything else now, we should have a file
-                file = fileFolder;
+                file = response.body();
 
                 if (file != null) {
                     if (file.getLockInfo() != null) {
@@ -207,8 +195,8 @@ public class FileDetailsFragment extends ParentFragment {
                         }
 
                         //check to see if there is an unlocked date
-                        if (file.getLockInfo().getUnlockedAt() != null && file.getLockInfo().getUnlockedAt().after(new Date())) {
-                            lockedMessage += DateHelpers.createPrefixedDateTimeString(getContext(), getActivity().getString(R.string.unlockedAt) + "<br>&#8226; ", file.getLockInfo().getUnlockedAt());
+                        if (file.getLockInfo().getUnlockAt() != null && file.getLockInfo().getUnlockAt().after(new Date())) {
+                            lockedMessage += DateHelper.createPrefixedDateTimeString(getContext(), getActivity().getString(R.string.unlockedAt) + "<br>&#8226; ", file.getLockInfo().getUnlockAt());
                         }
                         fileNameTextView.setText(StringUtilities.simplifyHTML(Html.fromHtml(lockedMessage)));
                     } else {
@@ -225,49 +213,9 @@ public class FileDetailsFragment extends ParentFragment {
             }
         };
 
-        markReadCanvasCallback = new CanvasCallback<com.squareup.okhttp.Response>(this, errorDelegate) {
+        markReadCanvasCallback = new StatusCallback<ResponseBody>() {
             @Override
-            public void cache(com.squareup.okhttp.Response response) {
-            }
-
-            @Override
-            public void firstPage(com.squareup.okhttp.Response response, LinkHeaders linkHeaders, Response response2) {
-            }
-        };
-    }
-
-    public void setUpErrorDelegate() {
-        //If the file no longer exists (404), we want to show a different crouton than the default.
-        final ErrorDelegate canvasErrorDelegate = new CanvasErrorDelegate();
-        errorDelegate = new ErrorDelegate() {
-
-            @Override
-            public void noNetworkError(RetrofitError error, Context context) {
-                canvasErrorDelegate.noNetworkError(error, context);
-            }
-
-            @Override
-            public void notAuthorizedError(RetrofitError error, CanvasError canvasError, Context context) {
-                canvasErrorDelegate.notAuthorizedError(error, canvasError, context);
-            }
-
-            @Override
-            public void invalidUrlError(RetrofitError error, Context context) {
-                if (context instanceof Activity) {
-                    showToast(R.string.fileNoLongerExists);
-                }
-            }
-
-            @Override
-            public void serverError(RetrofitError error, Context context) {
-                canvasErrorDelegate.serverError(error, context);
-
-            }
-
-            @Override
-            public void generalError(RetrofitError error, CanvasError canvasError, Context context) {
-                canvasErrorDelegate.generalError(error, canvasError, context);
-            }
+            public void onResponse(retrofit2.Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {}
         };
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@
 package com.instructure.candroid.fragment;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.instructure.candroid.R;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
 
 public class UnSupportedTabFragment extends UnSupportedFeatureFragment {
 
@@ -42,7 +41,7 @@ public class UnSupportedTabFragment extends UnSupportedFeatureFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        String url = APIHelpers.loadProtocol(getContext()) + "://" + APIHelpers.getDomain(getContext());
+        String url = ApiPrefs.getFullDomain();
 
         if (tabId.equalsIgnoreCase(Tab.CONFERENCES_ID)) {
             url += getCanvasContext().toAPIString() + "/conferences";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import android.view.View;
 
 import com.instructure.candroid.holders.MasteryAssignmentViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.MasteryPathAssignment;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.MasteryPathAssignment;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 

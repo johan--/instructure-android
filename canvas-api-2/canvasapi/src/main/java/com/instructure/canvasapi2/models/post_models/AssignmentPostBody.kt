@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName
 import com.instructure.canvasapi2.models.AssignmentOverride
 import java.util.*
 
+interface AbsAssignmentPostBody
 
 /**
  * Editing an assignment requires us to use a GSON serializer that serializes null. Because of this, we need to
@@ -60,6 +61,9 @@ class AssignmentPostBody {
 
     @SerializedName("submission_types")
     var submissionTypes: List<String>? = null
+
+    @SerializedName("muted")
+    var isMuted: Boolean? = null
 }
 
 class OverrideBody {

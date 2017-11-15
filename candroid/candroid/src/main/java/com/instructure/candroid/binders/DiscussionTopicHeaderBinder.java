@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import android.view.View;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.DiscussionTopicHeaderViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.DiscussionTopicHeader;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.ColorUtils;
 
@@ -96,18 +96,18 @@ public class DiscussionTopicHeaderBinder extends BaseBinder {
         }
 
         if(item.isPublished()) {
-            if (item.getLastReply() != null) {
+            if (item.getLastReplyAt() != null) {
                 holder.lastPost.setTypeface(Typeface.DEFAULT);
                 holder.lastPost.setTextColor(context.getResources().getColor(R.color.canvasTextMedium));
                 setVisible(holder.lastPost);
-                Date lastReply = item.getLastReply();
+                Date lastReply = item.getLastReplyAt();
 
                 Calendar day = Calendar.getInstance();
                 day.setTime(lastReply);
                 if(day.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
-                    holder.lastPost.setText(DateHelpers.createPrefixedDateString(context, R.string.lastDiscussionPost, lastReply));
+                    holder.lastPost.setText(DateHelper.createPrefixedDateString(context, R.string.lastDiscussionPost, lastReply));
                 } else {
-                    holder.lastPost.setText(DateHelpers.createPrefixedShortDateString(context, R.string.lastDiscussionPost, lastReply));
+                    holder.lastPost.setText(DateHelper.createPrefixedShortDateString(context, R.string.lastDiscussionPost, lastReply));
                 }
             } else {
                 setGone(holder.lastPost);

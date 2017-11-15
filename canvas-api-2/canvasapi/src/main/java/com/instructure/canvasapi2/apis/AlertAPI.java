@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@ public class AlertAPI {
     public static final String AIRWOLF_DOMAIN_SYDNEY = "https://airwolf-syd-prod.instructure.com";
     public static final String AIRWOLF_DOMAIN_SINGAPORE = "https://airwolf-sin-prod.instructure.com";
     public static final String AIRWOLF_DOMAIN_FRANKFURT = "https://airwolf-fra-prod.instructure.com";
-
+    public static final String AIRWOLF_DOMAIN_CANADA = "https://airwolf-yul-prod.instructure.com";
 
     public static final String[] AIRWOLF_DOMAIN_LIST = {
             AIRWOLF_DOMAIN_AMERICA, AIRWOLF_DOMAIN_DUBLIN,
             AIRWOLF_DOMAIN_SYDNEY, AIRWOLF_DOMAIN_SINGAPORE,
-            AIRWOLF_DOMAIN_FRANKFURT };
+            AIRWOLF_DOMAIN_FRANKFURT, AIRWOLF_DOMAIN_CANADA };
 
     interface AlertInterface {
 

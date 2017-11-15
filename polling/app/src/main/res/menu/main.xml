@@ -16,12 +16,12 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <item android:id="@+id/action_add_question"
         android:title="@string/addQuestion"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 
 </menu>

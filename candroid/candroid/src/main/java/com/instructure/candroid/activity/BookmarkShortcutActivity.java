@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,19 +23,19 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.fragment.BookmarksFragment;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.Bookmark;
+import com.instructure.canvasapi2.models.Bookmark;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
 
-public class BookmarkShortcutActivity extends ActionBarActivity {
+public class BookmarkShortcutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

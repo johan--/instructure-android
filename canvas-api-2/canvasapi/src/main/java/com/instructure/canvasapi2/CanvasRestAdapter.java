@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2;
 
 import android.net.http.HttpResponseCache;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.CanvasContext;
@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
+import okhttp3.Call;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -53,7 +55,6 @@ public abstract class CanvasRestAdapter {
     @NonNull private static Dispatcher mDispatcher = new Dispatcher();
     @Nullable private static Cache mCache;
     @Nullable private static OkHttpClient mOkHttpClient;
-    @Nullable private static OkHttpClient mOkHttpClientNoRedirects;
 
     /**
      * Constructor for CanvasRestAdapter
@@ -162,15 +163,20 @@ public abstract class CanvasRestAdapter {
             }
         }
 
-
-        //Adds current requested params to the config to be used with the OkHttpClient
-        ApiPrefs.setRestParams(params);
-
         //Sets the auth token, user agent, and handles masquerading.
+        final RestParams restParams = params;
         return new Retrofit.Builder()
                 .baseUrl(params.getDomain() + params.getAPIVersion() + apiContext)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getOkHttpClientNoRedirects()).build();
+                .callFactory(new Call.Factory() {
+                    @Override
+                    public Call newCall(Request request) {
+                        // Tag this request with the rest params so we can access them later in RequestInterceptor
+                        request = request.newBuilder().tag(restParams).build();
+                        return getOkHttpClientNoRedirects().newCall(request);
+                    }
+                })
+                .build();
     }
 
     public Retrofit buildAdapterSerializeNulls(@NonNull RestParams params) {
@@ -201,15 +207,20 @@ public abstract class CanvasRestAdapter {
             }
         }
 
-
-        //Adds current requested params to the config to be used with the OkHttpClient
-        ApiPrefs.setRestParams(params);
-
         //Sets the auth token, user agent, and handles masquerading.
+        final RestParams restParams = params;
         return new Retrofit.Builder()
                 .baseUrl(params.getDomain() + params.getAPIVersion() + apiContext)
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().serializeNulls().create()))
-                .client(getOkHttpClient()).build();
+                .callFactory(new Call.Factory() {
+                    @Override
+                    public Call newCall(Request request) {
+                        // Tag this request with the rest params so we can access them later in RequestInterceptor
+                        request = request.newBuilder().tag(restParams).build();
+                        return getOkHttpClient().newCall(request);
+                    }
+                })
+                .build();
     }
 
     public Retrofit buildPingAdapter(@NonNull String url) {
@@ -219,6 +230,22 @@ public abstract class CanvasRestAdapter {
                 .client(new OkHttpClient.Builder()
                         .readTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
                         .build())
+                .build();
+    }
+
+    public Retrofit buildRollCallAdapter(@NonNull String url) {
+        final Gson gson = new GsonBuilder().setLenient().create();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(DEBUG ? HttpLoggingInterceptor.Level.HEADERS : HttpLoggingInterceptor.Level.NONE);
+        return new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(new OkHttpClient.Builder()
+                        .addInterceptor(loggingInterceptor)
+                        .addInterceptor(new RollCallInterceptor())
+                        .readTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+                        .dispatcher(mDispatcher)
+                    .build())
                 .build();
     }
 
@@ -265,48 +292,24 @@ public abstract class CanvasRestAdapter {
      * @param apiContext courses, groups, sections, users, or nothing
      * @return Retrofit.Builder
      */
-    protected Retrofit.Builder finalBuildAdapter(@NonNull RestParams params, String apiContext) {
-        //Adds current requested params to the config to be used with the OkHttpClient
-        ApiPrefs.setRestParams(params);
-
+    protected Retrofit.Builder finalBuildAdapter(@NonNull final RestParams params, String apiContext) {
         //Sets the auth token, user agent, and handles masquerading.
         return new Retrofit.Builder()
                 .baseUrl(params.getDomain() + params.getAPIVersion() + apiContext)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getOkHttpClient());
+                .callFactory(new Call.Factory() {
+                    @Override
+                    public Call newCall(Request request) {
+                        // Tag this request with the rest params so we can access them later in RequestInterceptor
+                        request = request.newBuilder().tag(params).build();
+                        return getOkHttpClient().newCall(request);
+                    }
+                });
     }
     //endregion
 
     public static void cancelAllCalls() {
         mDispatcher.cancelAll();
-    }
-
-    /**
-     * Saves the login information
-     *
-     * Short hand for setdomain, setToken, and setProtocol.
-     *
-     * Clears out any old data before setting the new data.
-     *
-     * @param token An OAuth2 Token
-     * @param domain The domain for the signed in user.
-     *
-     * @return Whether or not the login info was saved. Only returns false if the data is empty or invalid.
-     */
-    public static boolean saveLoginInfo(String token, String domain){
-        if (token == null || token.equals("") || domain == null) {
-            return false;
-        }
-
-        String protocol = "https";
-        if(domain.startsWith("http://")) {
-            protocol = "http";
-        }
-
-        ApiPrefs.setDomain(domain);
-        ApiPrefs.setToken(token);
-        ApiPrefs.setProtocol(protocol);
-        return true;
     }
 
 }

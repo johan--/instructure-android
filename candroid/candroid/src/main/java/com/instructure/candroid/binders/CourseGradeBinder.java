@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import android.widget.Toast;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.CourseGradeViewHolder;
 import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
@@ -67,7 +67,7 @@ public class CourseGradeBinder {
                 holder.gradeWrapper.setVisibility(View.GONE);
             } else {
                 holder.gradeWrapper.setVisibility(View.VISIBLE);
-                if (course.isFinalGradeHidden() || !isAllGradingPeriodsShown) {
+                if (course.isHideFinalGrades() || !isAllGradingPeriodsShown) {
                     holder.letterGrade.setVisibility(View.GONE);
                     holder.percentGrade.setVisibility(View.GONE);
                     holder.lockedGrade.setVisibility(View.VISIBLE);

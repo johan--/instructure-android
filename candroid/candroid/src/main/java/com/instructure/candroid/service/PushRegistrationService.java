@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,18 +20,16 @@ package com.instructure.candroid.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.instructure.candroid.api.CommunicationChannelAPI;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.managers.CommunicationChannelsManager;
+import com.instructure.canvasapi2.utils.Logger;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Response;
+
 
 public class PushRegistrationService extends IntentService {
 
@@ -61,9 +59,9 @@ public class PushRegistrationService extends IntentService {
     }
 
     private void sendRegistrationToServer(String token) throws Exception {
-        Response response = CommunicationChannelAPI.addNewPushCommunicationChannel(token, getApplicationContext());
-        if(response != null && response.getStatus() == 200) {
-            Utils.d("PUSH REGISTRATION SUCCESS");
+        Response response = CommunicationChannelsManager.addNewPushCommunicationChannelSynchronous(token);
+        if(response != null && response.code() == 200) {
+            Logger.d("PUSH REGISTRATION SUCCESS");
         } else {
             LoggingUtility.LogCrashlytics("PUSH GCM REGISTRATION ERROR");
         }

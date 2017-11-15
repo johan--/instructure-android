@@ -1,0 +1,70 @@
+/*
+MIT License
+
+Copyright (c) 2016 WonderKiln
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_GROUP_ID = 'com.flurgle'
+    PUBLISH_ARTIFACT_ID = 'camerakit'
+    PUBLISH_VERSION = '0.9.18'
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        minSdkVersion 18
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true // required for upgrade to 23.0.2 build tools
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/base'
+        main.java.srcDirs += 'src/main/api16'
+        main.java.srcDirs += 'src/main/api21'
+        main.java.srcDirs += 'src/main/types'
+        main.java.srcDirs += 'src/main/utils'
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile "com.android.support:exifinterface:25.3.1"
+
+    compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
+    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
+    annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-alpha1'
+}
+
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+

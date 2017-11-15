@@ -10,7 +10,6 @@
   <string name="unknownDevice">UnknownDevice</string>
   <string name="errorOccurred">Une erreur inattendue est survenue.</string>
   <string name="pageNotFound">Page non trouvée</string>
-  <string name="okay">D\'accord</string>
   <string name="confirm">Confirmer</string>
   <string name="cancel">Annuler</string>
   <string name="help">Aide</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">Vous essayez de vous connecter au Canvas Network ? </string>
   <string name="remove">Supprimer</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">ID d\'utilisateur</string>
+  <string name="domain">Domaine</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Supprimer cet utilisateur ? </string>
   <string name="removedForever">Vous devrez à nouveau vous connecter à cet utilisateur pour accéder à son contenu.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">Vous ne voyez pas votre école ? Saisissez l\'URL de l\'école ou tapez ici pour obtenir de l\'aide. </string>
   <string name="loginCanvasHelpWithUser">Saisir l\'URL de l\'école ou taper ici pour obtenir de l\'aide. </string>
   <string name="loginHint">Trouver votre école ou votre district</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Comment nous débrouillons-nous ?</string>
-  <string name="rateUs">Comment nous évalueriez vous ?</string>
-  <string name="doBetter">Que pourrions-nous faire de mieux ?</string>
-  <string name="sendFeedback">Envoyer un avis</string>
-  <string name="suggestions">Suggestions pour Android</string>
-  <string name="domain">Domaine</string>
-  <string name="versionNum">Version : </string>
-  <string name="userId">ID d\'utilisateur</string>
-  <string name="email">Courriel</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Ne plus montrer à nouveau</string>
-  <string name="installDate">Date d\'installation : </string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Signaler un problème</string>
   <string name="zendesk_subject">Sujet</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">Appareil</string>
   <string name="osVersion">Version de l\'OS</string>
+  <string name="empty_feedback">Vous devez entrer un sujet et une description pour envoyer un retour.</string>
 </resources>

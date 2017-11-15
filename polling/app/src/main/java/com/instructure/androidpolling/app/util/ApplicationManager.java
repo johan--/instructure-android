@@ -20,26 +20,23 @@ package com.instructure.androidpolling.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.Fragment;
 import android.view.ViewConfiguration;
 
-import com.instructure.canvasapi.api.OAuthAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Section;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.FileUtilities;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.instructure.canvasapi2.AppManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Section;
+import com.instructure.canvasapi2.utils.FileUtils;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
-import retrofit.client.Response;
-
-public class ApplicationManager extends MultiDexApplication {
+public class ApplicationManager extends AppManager {
 
     private static final String COURSE_MAP = "course_map";
     private static final String SECTION_MAP = "section_map";
@@ -48,13 +45,6 @@ public class ApplicationManager extends MultiDexApplication {
     public final static String OTHER_SIGNED_IN_USERS_PREF_NAME = "poll_other_signed_in_users";
     public final static String PREF_NAME_PREVIOUS_DOMAINS = "poll_name_prev_domains";
     public final static String MULTI_SIGN_IN_PREF_NAME = "poll_multi_pref_name";
-
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
-    }
 
     @Override
     public void onCreate() {
@@ -94,50 +84,11 @@ public class ApplicationManager extends MultiDexApplication {
     }
 
     public static void trackActivity(Activity activity) {
-        //TODO: re-add analytics if we work on this thing again
+        //TODO: re-add analytics
     }
 
     public static void trackFragment(Activity activity, Fragment fragment) {
-        //TODO: re-add analytics if we work on this thing again
-    }
-    /**
-     * Log out the currently signed in user. Permanently remove credential information.
-     *
-     * @return
-     */
-    public boolean logoutUser() {
-
-        //It is possible for multiple APIs to come back 'simultaneously' as HTTP401s causing a logout
-        //if this has already ran, data is already cleared causing null pointer exceptions
-        if (APIHelpers.getToken(this) != null && !APIHelpers.getToken(this).equals("")) {
-
-            //Delete token from server
-            //We don't actually care about this coming back. Fire and forget.
-            CanvasCallback<Response> deleteTokenCallback = new CanvasCallback<Response>(APIHelpers.statusDelegateWithContext(this)) {
-                @Override
-                public void cache(Response response) {
-                }
-
-                @Override
-                public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                }
-            };
-
-            OAuthAPI.deleteToken(deleteTokenCallback);
-
-            //Clear shared preferences,
-            //Get the Shared Preferences
-            SharedPreferences settings = getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.clear();
-            editor.commit();
-
-            //Clear all Shared Preferences.
-            APIHelpers.clearAllData(this);
-
-        }
-
-        return true;
+        //TODO: re-add analytics
     }
 
     public static void setHasTeacherEnrollment(Context context) {
@@ -145,7 +96,7 @@ public class ApplicationManager extends MultiDexApplication {
         SharedPreferences settings = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Constants.HAS_TEACHER_ENROLLMENT, true);
-        editor.commit();
+        editor.apply();
     }
 
     public static void setHasStudentEnrollment(Context context) {
@@ -153,7 +104,7 @@ public class ApplicationManager extends MultiDexApplication {
         SharedPreferences settings = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Constants.HAS_STUDENT_ENROLLMENT, true);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean hasTeacherEnrollment(Context context) {
@@ -187,7 +138,6 @@ public class ApplicationManager extends MultiDexApplication {
         else {
             return false;
         }
-
     }
 
     /**
@@ -203,7 +153,7 @@ public class ApplicationManager extends MultiDexApplication {
         else {
             editor.putBoolean(Constants.SHOW_TEACHER_VIEW, false);
         }
-        editor.commit();
+        editor.apply();
 
     }
     public static File getAttachmentsDirectory(Context context) {
@@ -214,26 +164,45 @@ public class ApplicationManager extends MultiDexApplication {
             file = context.getFilesDir();
         }
         return file;
-
     }
 
-    public static void saveCourses(Context context, Course[] courses) {
-
-        FileUtilities.SerializableToFile(context, COURSE_MAP, courses);
+    public static void saveCourses(Context context, List<Course> courses) {
+        Type type = new TypeToken<List<Course>>() {}.getType();
+        String json = new Gson().toJson(courses, type);
+        SharedPreferences.Editor editor = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE).edit();
+        editor.putString(COURSE_MAP, json);
+        editor.apply();
     }
 
-    public static void saveSections(Context context, Section[] sections, long courseId) {
-        FileUtilities.SerializableToFile(context, SECTION_MAP + "_" + courseId, sections);
+    public static void saveSections(Context context, List<Section> sections, long courseId) {
+        Type type = new TypeToken<List<Section>>() {}.getType();
+        String json = new Gson().toJson(sections, type);
+        SharedPreferences.Editor editor = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE).edit();
+        editor.putString(SECTION_MAP + "_" + courseId, json);
+        editor.apply();
     }
 
-    public static Course[] getCourseList(Context context) {
-        return (Course[])FileUtilities.FileToSerializable(context, COURSE_MAP);
+    public static ArrayList<Course> getCourseList(Context context) {
+        Type type = new TypeToken<List<Course>>() {}.getType();
+        SharedPreferences sp = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
+        try {
+            String json = sp.getString(COURSE_MAP, "");
+            return new Gson().fromJson(json, type);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
-    public static Section[] getSectionList(Context context, long courseId) {
-        return (Section[])FileUtilities.FileToSerializable(context, SECTION_MAP + "_" + courseId);
+    public static List<Section> getSectionList(Context context, long courseId) {
+        Type type = new TypeToken<List<Section>>() {}.getType();
+        SharedPreferences sp = context.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
+        try {
+            String json = sp.getString(SECTION_MAP + "_" + courseId, "");
+            return new Gson().fromJson(json, type);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
-
 
     /**
      *
@@ -241,17 +210,17 @@ public class ApplicationManager extends MultiDexApplication {
      * submitted a poll, so we need to keep track of that ourselves.
      */
     public static void saveSubmittedPollIds(Context context, long poll_session_id) {
-        ArrayList<Long> id_list = (ArrayList<Long>)FileUtilities.FileToSerializable(context, Constants.SUBMITTED_POLLS);
+        ArrayList<Long> id_list = (ArrayList<Long>) FileUtils.FileToSerializable(context, Constants.SUBMITTED_POLLS);
         if(id_list == null) {
             id_list = new ArrayList<Long>();
         }
         id_list.add(poll_session_id);
-        FileUtilities.SerializableToFile(context, Constants.SUBMITTED_POLLS, id_list);
+        FileUtils.SerializableToFile(context, Constants.SUBMITTED_POLLS, id_list);
 
     }
 
     public static ArrayList<Long> getSubmittedPollIds(Context context) {
-        ArrayList<Long> id_list = (ArrayList<Long>)FileUtilities.FileToSerializable(context, Constants.SUBMITTED_POLLS);
+        ArrayList<Long> id_list = (ArrayList<Long>)FileUtils.FileToSerializable(context, Constants.SUBMITTED_POLLS);
         if(id_list == null) {
             id_list = new ArrayList<Long>();
         }

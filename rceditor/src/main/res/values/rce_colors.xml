@@ -15,6 +15,7 @@
   ~     limitations under the License.
   ~
   -->
+
 <resources>
     <color name="rce_gray">#AAAAAA</color>
     <color name="rce_divider">#D1D3D4</color>

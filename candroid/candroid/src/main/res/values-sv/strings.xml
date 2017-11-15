@@ -128,8 +128,6 @@
   <string name="domain">Domän</string>
   <string name="sendFeedback">Skicka Feedback</string>
   <string name="sendMail">Skicka e-post...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Ändra</string>
   <plurals name="item_count">
     <item quantity="one">%d föremål</item>
@@ -444,8 +442,8 @@ lärarassistenter för kursen</string>
   <string name="could_not_find_course">Ett fel inträffade när kursen hämtades för det här objektet.</string>
   <string name="could_not_find_group">Ett fel inträffade när gruppen hämtades för det här objektet.</string>
   <string name="selectBackground">Välj bakgrund</string>
-  <string name="kalturaSubmissionInProgress">Skickar in filer... Se aviseringsfältet för uppdateringar.</string>
-  <string name="kalturaSubmissionSuccessful">Filen lämnades in</string>
+  <string name="notoriousSubmissionInProgress">Skickar in filer... Se aviseringsfältet för uppdateringar.</string>
+  <string name="notoriousSubmissionSuccessful">Filen lämnades in</string>
   <string name="poll_title">Vad tänkte du göra i Canvas?</string>
   <string name="poll_warning">Inget objekt har valts.</string>
   <string name="poll_item_1">Kontrollera mina betyg</string>
@@ -482,6 +480,7 @@ lärarassistenter för kursen</string>
   <string name="pandaAvatarsFolderName">Panda avatarer</string>
   <string name="share">Dela</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super Panda Bild</string>
   <string name="newFeatureTitle">Mobilaviseringar</string>
   <string name="newFeatureMsg">Fär att få pushmeddelanden i mobilen, gå till Canvas Inställningar &gt; Aviseringar &gt; Och välj \"För alla enheter\"</string>

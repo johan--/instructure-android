@@ -17,10 +17,11 @@
   ~
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_upload_csv"
         android:title="@string/uploadCSV"
         android:icon="@drawable/ic_action_upload_white"
         android:orderInCategory="100"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 </menu>

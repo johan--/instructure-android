@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,19 +36,20 @@ import android.webkit.WebView;
 import com.instructure.candroid.BuildConfig;
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InternalWebViewActivity;
-import com.instructure.candroid.api.CanvasAPI;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.view.CanvasLoading;
-import com.instructure.canvasapi.api.compatibility_synchronous.APIHttpResponse;
-import com.instructure.canvasapi.api.compatibility_synchronous.HttpHelpers;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.Masquerading;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.ApiHttpResponse;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.FileUtils;
+import com.instructure.canvasapi2.utils.HttpHelper;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.Utils;
 import com.instructure.pandautils.video.ActivityContentVideoViewClient;
 import com.instructure.pandautils.views.CanvasWebView;
 
@@ -165,7 +166,6 @@ public class InternalWebviewFragment extends ParentFragment {
             }
         }
 
-
         canvasWebView.setCanvasWebViewClientCallback(new CanvasWebView.CanvasWebViewClientCallback() {
             @Override
             public void openMediaFromWebView(String mime, String url, String filename) {
@@ -185,12 +185,12 @@ public class InternalWebviewFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return shouldRouteInternally && !isUnsupportedFeature && RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), false);
+                return shouldRouteInternally && !isUnsupportedFeature && RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
 
         });
@@ -219,16 +219,14 @@ public class InternalWebviewFragment extends ParentFragment {
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(false);
         }
         super.onCallbackStarted();
     }
 
-    @Override
     public void onNoNetwork() {
-        super.onNoNetwork();
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(true);
         }
@@ -275,19 +273,19 @@ public class InternalWebviewFragment extends ParentFragment {
 
     public void loadHtml(String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         // BaseURL is set as Referer. Referer needed for some vimeo videos to play
-        canvasWebView.loadDataWithBaseURL(APIHelpers.getFullDomain(getContext()), data, mimeType, encoding, historyUrl);
+        canvasWebView.loadDataWithBaseURL(ApiPrefs.getFullDomain(), data, mimeType, encoding, historyUrl);
     }
 
     public void loadHtml(String html) {
         // BaseURL is set as Referer. Referer needed for some vimeo videos to play
-        canvasWebView.loadDataWithBaseURL(APIHelpers.getFullDomain(getContext()), APIHelpers.getAssetsFile(getContext(), "html_text_submission_wrapper.html").replace("{$CONTENT$}", html), "text/html", "UTF-8", null);
+        canvasWebView.loadDataWithBaseURL(ApiPrefs.getFullDomain(), FileUtils.getAssetsFile(getContext(), "html_text_submission_wrapper.html").replace("{$CONTENT$}", html), "text/html", "UTF-8", null);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // AsyncTask
     ///////////////////////////////////////////////////////////////////////////
 
-    private class LoadUrlKindaSafely extends AsyncTask<Void, Void, APIHttpResponse> {
+    private class LoadUrlKindaSafely extends AsyncTask<Void, Void, ApiHttpResponse> {
 
         private String urlString = "";
         private boolean isUnauthorized = false;
@@ -298,38 +296,38 @@ public class InternalWebviewFragment extends ParentFragment {
         }
 
         @Override
-        protected APIHttpResponse doInBackground(Void... params) {
+        protected ApiHttpResponse doInBackground(Void... params) {
 
             try {
-                String html = HttpHelpers.getHtml(urlString);
+                String html = HttpHelper.getHtml(urlString);
                 if(!TextUtils.isEmpty(html) && html.contains("\"status\":\"unauthenticated\"")) {
                     //if the url is a redirect url from a module item, we need to set the headers so it will be authenticated
                     //This is because some module items have a completion requirement (like must view item) and canvas needs to
                     //know who looked at it.
                     isUnauthorized = true;
                 }
-                return HttpHelpers.externalHttpGet(getContext(), urlString, false);
+                return HttpHelper.externalHttpGet(getContext(), urlString, false);
             } catch (IOException e) {
                 return null;
             }
         }
 
         @Override
-        protected void onPostExecute(APIHttpResponse response) {
+        protected void onPostExecute(ApiHttpResponse response) {
             if(getActivity() == null || response == null){return;}
 
             if (response.responseCode > 401 || isUnauthorized) {
-                canvasWebView.loadUrl(url, CanvasAPI.getAuthenticatedURL(getActivity()));
+                canvasWebView.loadUrl(url, APIHelper.getAuthenticatedURL());
             } else {
-                if(Masquerading.isMasquerading(getActivity())) {
+                if(ApiPrefs.isMasquerading()) {
                     canvasWebView.loadUrl(urlString, Utils.getReferer(getContext()));
                 } else {
                     //If the url we are loading is the same domain lets try to add Authentication and referrer headers and load in a borderless way
-                    String domain = APIHelpers.getDomain(getActivity());
+                    String domain = ApiPrefs.getDomain();
                     Uri uri = Uri.parse(urlString).buildUpon().appendQueryParameter("display", "borderless").build();
                     if (uri.getHost().equals(domain)) {
                         //add authentication headers...
-                        Map<String, String> authHeaders = Utils.getRefererAndAuthentication(getContext());
+                        Map<String, String> authHeaders = Utils.getReferer(getContext());
                         canvasWebView.loadUrl(uri.toString(), authHeaders);
                     } else {
                         //IF not same domain load the url as we normally do
@@ -433,7 +431,7 @@ public class InternalWebviewFragment extends ParentFragment {
 
     public static void loadInternalWebView(FragmentActivity activity, Navigation navigation, Bundle bundle) {
         if(activity == null || navigation == null) {
-            Utils.e("loadInternalWebView could not complete, activity or navigation null");
+            Logger.e("loadInternalWebView could not complete, activity or navigation null");
             return;
         }
 

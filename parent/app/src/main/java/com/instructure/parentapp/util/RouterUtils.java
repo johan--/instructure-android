@@ -18,7 +18,6 @@
 package com.instructure.parentapp.util;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,12 +28,12 @@ import android.text.TextUtils;
 
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.parentapp.activity.BaseRouterActivity;
 import com.instructure.parentapp.activity.DetailViewActivity;
-import com.instructure.parentapp.activity.MainActivity;
+import com.instructure.parentapp.activity.SplashActivity;
 import com.instructure.parentapp.fragments.AnnouncementFragment;
 import com.instructure.parentapp.fragments.AssignmentFragment;
 import com.instructure.parentapp.fragments.CourseSyllabusFragment;
@@ -158,7 +157,7 @@ public class RouterUtils {
 
         UrlValidity urlValidity;
         if(TextUtils.isEmpty(domain)) {
-            urlValidity = new UrlValidity(url, APIHelper.getAirwolfDomain(activity));
+            urlValidity = new UrlValidity(url, ApiPrefs.getAirwolfDomain());
         } else {
             urlValidity = new UrlValidity(url, domain);
         }
@@ -171,14 +170,14 @@ public class RouterUtils {
 
         String host = urlValidity.getUri().getHost();
         if(host == null) {
-            url = APIHelper.getAirwolfDomain(activity) + url;
-            urlValidity = new UrlValidity(url, APIHelper.getAirwolfDomain(activity));
+            url = ApiPrefs.getAirwolfDomain() + url;
+            urlValidity = new UrlValidity(url, ApiPrefs.getAirwolfDomain());
         }
         //if host is null that means they didn't pass the domain with the url (so it's something like /courses/alerts/....)
         if (isHostForLoggedInUser || host == null) {
 
             if (isReceivedFromOutsideOfApp) {
-                Intent intent = new Intent(activity, MainActivity.class);
+                Intent intent = new Intent(activity, SplashActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra(Const.PARSE, true);
                 intent.putExtra(Const.URL, url);
@@ -214,7 +213,7 @@ public class RouterUtils {
     private static void routeToMainPage(Context context, boolean isReceivedFromOutsideOfApp) {
         Logger.d("routeToMainPage()");
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, SplashActivity.class);
         if(isReceivedFromOutsideOfApp) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         }

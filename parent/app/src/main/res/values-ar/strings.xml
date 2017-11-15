@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">حدثنا عن الأشياء التي تفضلها في التطبيق</string>
     <string name="sendFeedback">إرسال تعليقات</string>
     <string name="sendMail">إرسال بريد إلكتروني&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">المجال:</string>
     <string name="help_versionNum">الإصدار:</string>
     <string name="help_userId">معرف المستخدم:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">يتمكن مراقبو Canvas  فقط من المصادقة في Canvas Parent.</string>
     <string name="open_source">مصدر مفتوح</string>
     <string name="open_source_details">عرض تراخيص المصدر المفتوح</string>
+
+    <string name="unitedStates">الولايات المتحدة الأمريكية</string>
+    <string name="theUnitedStates">الولايات المتحدة الأمريكية</string>
+    <string name="canada">كندا</string>
+    <string name="ireland">أيرلندا</string>
+    <string name="australia">أستراليا</string>
+    <string name="germany">ألمانيا</string>
+    <string name="singapore">سنغافورة</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">اختر منطقة الطالب</string>
+    <string name="selectRegion">أداة انتقاء المنطقة</string>
+    <string name="unauthorizedRegion">منطقة غير مسموح بها</string>
+    <string name="mismatchedRegionMessage">تقع هذه المؤسسة خارج المنطقة التي حددتها. لإضافة طالب بهذه المؤسسة، الرجاء استخدام خيار "أداة انتقاء المنطقة" بصفحة تسجيل الدخول لإنشاء حساب في منطقة %1$s.</string>
 </resources>

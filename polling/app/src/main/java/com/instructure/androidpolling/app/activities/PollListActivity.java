@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package com.instructure.androidpolling.app.activities;
 
 import android.content.Context;
@@ -39,21 +38,18 @@ import com.instructure.androidpolling.app.fragments.ClosedPollListFragment;
 import com.instructure.androidpolling.app.util.ApplicationManager;
 import com.instructure.androidpolling.app.util.Constants;
 import com.instructure.androidpolling.app.view.PagerSlidingTabStrip;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.jfeinstein.jazzyviewpager.JazzyViewPager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PollListActivity extends BaseActivity implements ParentFragment.OnUpdatePollListener, APIStatusDelegate {
+public class PollListActivity extends BaseActivity implements ParentFragment.OnUpdatePollListener {
 
 
     /**
@@ -75,16 +71,11 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
     @BindView(R.id.tabs) PagerSlidingTabStrip tabs;
     @BindView(R.id.no_poll_text) TextView noPollText;
 
-    private CanvasCallback<Course[]> courseCallback;
     private ArrayList<Course> courseList;
     private User user;
     private boolean hasTeacherEnrollment;
     private ArrayList<Fragment> fragments;
 
-
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,11 +85,10 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
         //remember that the first view should be the student view
         ApplicationManager.setFirstView(this, false);
 
-        user = APIHelpers.getCacheUser(PollListActivity.this);
+        user = ApiPrefs.getUser();
 
         checkEnrollments(user);
-        courseList = new ArrayList<Course>();
-        courseList.addAll(Arrays.asList(ApplicationManager.getCourseList(this)));
+        courseList = ApplicationManager.getCourseList(this);
 
 
         boolean pollsExist = checkPollsExist();
@@ -132,7 +122,6 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
         tabs.setViewPager(mPager);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if(ApplicationManager.hasTeacherEnrollment(this)) {
@@ -144,22 +133,17 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.action_logout:
-                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask(this, null);
+                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask();
                 logoutAsyncTask.execute();
-                break;
+                return true;
             case R.id.action_switch_to_teacher:
-
                 startActivity(FragmentManagerActivity.createIntent(this));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
 
     public void reloadData(View view) {
         ((ParentFragment)fragments.get(mPager.getCurrentItem())).reloadData();
@@ -176,7 +160,6 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
     private boolean checkPollsExist() {
         return true;
     }
-
 
     /**
      * A simple pager adapter that represents 2 ScreenSlidePageFragment objects, in
@@ -218,40 +201,8 @@ public class PollListActivity extends BaseActivity implements ParentFragment.OnU
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Override for OnUpdatePollListener
-    ///////////////////////////////////////////////////////////////////////////
     @Override
-    public void onUpdatePoll(Poll poll, String fragmentTag) {
-
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Overrides for APIStatusDelegate
-    ///////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-
-    }
-
-    @Override
-    public void onNoNetwork() {
-
-    }
-
-    @Override
-    public Context getContext() {
-        return PollListActivity.this;
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Intent
-    ///////////////////////////////////////////////////////////////////////////
+    public void onUpdatePoll(Poll poll, String fragmentTag) {}
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, PollListActivity.class);

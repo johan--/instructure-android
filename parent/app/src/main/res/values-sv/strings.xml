@@ -94,8 +94,6 @@ Du kan återauktoriseras din elev från inställningsmenyn.</string>
     <string name="shareYourLoveDetails">Berätta vad du tycker om mest med appen</string>
     <string name="sendFeedback">Skicka Feedback</string>
     <string name="sendMail">Skicka E-post&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domän:</string>
     <string name="help_versionNum">Version:</string>
     <string name="help_userId">Användar-ID:</string>
@@ -164,4 +162,24 @@ Du kan återauktoriseras din elev från inställningsmenyn.</string>
     <string name="onlyCanvasObservers">Endast Canvastittare kan verifieras i Canvas Parent.</string>
     <string name="open_source">Öppen källa</string>
     <string name="open_source_details">Visa licens för öppen källa</string>
+
+    <string name="unitedStates">USA</string>
+    <string name="theUnitedStates">USA</string>
+    <string name="canada">Kanada</string>
+    <string name="ireland">Irland</string>
+    <string name="australia">Australien</string>
+    <string name="germany">Tyskland</string>
+    <string name="singapore">Singapore</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Välj students region</string>
+    <string name="selectRegion">Regionväljare</string>
+    <string name="unauthorizedRegion">Obehörig region</string>
+    <string name="mismatchedRegionMessage">Denna institution ligger utanför din valda region. För att lägga till en student vid denna institution, använd alternativet "Regionväljare" på inloggningssidan för att skapa ett konto i regionen %1$s.</string>
 </resources>

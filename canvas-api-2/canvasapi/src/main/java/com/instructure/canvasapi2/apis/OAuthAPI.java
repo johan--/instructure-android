@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2.apis;
+
+import android.support.annotation.NonNull;
 
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
+import com.instructure.canvasapi2.models.AuthenticatedSession;
 import com.instructure.canvasapi2.models.OAuthToken;
 
 import retrofit2.Call;
 import retrofit2.http.DELETE;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -37,6 +40,8 @@ public class OAuthAPI {
         @POST("/login/oauth2/token")
         Call<OAuthToken> getToken(@Query("client_id") String clientId, @Query("client_secret") String clientSecret, @Query("code") String oAuthRequest, @Query(value = "redirect_uri", encoded = true) String redirectURI);
 
+        @GET("/login/session_token")
+        Call<AuthenticatedSession> getAuthenticatedSession(@Query("return_to") String targetUrl);
     }
 
     public static void deleteToken(RestBuilder adapter, RestParams params, StatusCallback<Void> callback) {
@@ -45,5 +50,9 @@ public class OAuthAPI {
 
     public static void getToken(RestBuilder adapter, RestParams params, String clientID, String clientSecret, String oAuthRequest, StatusCallback<OAuthToken> callback) {
         callback.addCall(adapter.build(OAuthInterface.class, params).getToken(clientID, clientSecret, oAuthRequest, "urn:ietf:wg:oauth:2.0:oob")).enqueue(callback);
+    }
+
+    public static void getAuthenticatedSession(String targetUrl, @NonNull RestParams params, @NonNull RestBuilder adapter, @NonNull StatusCallback<AuthenticatedSession> callback) {
+        callback.addCall(adapter.build(OAuthInterface.class, params).getAuthenticatedSession(targetUrl)).enqueue(callback);
     }
 }

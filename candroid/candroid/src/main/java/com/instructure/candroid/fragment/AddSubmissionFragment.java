@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -53,26 +53,27 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.dialog.FileUploadDialog;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.VisibilityAnimator;
-import com.instructure.canvasapi.api.ExternalToolAPI;
-import com.instructure.canvasapi.api.SubmissionAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.LTITool;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.pandautils.activities.KalturaMediaUploadPicker;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ExternalToolManager;
+import com.instructure.canvasapi2.managers.SubmissionManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.LTITool;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.pandautils.activities.NotoriousMediaUploadPicker;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.RequestCodes;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class AddSubmissionFragment extends ParentFragment {
 
@@ -124,8 +125,8 @@ public class AddSubmissionFragment extends ParentFragment {
     private boolean isFileUploadCanceled = false;
     private FileUploadDialog.DialogLifecycleCallback uploadDialogLifecycleCallback;
 
-    private CanvasCallback<Submission> canvasCallbackSubmission;
-    private CanvasCallback<LTITool[]> mLTIToolCallback;
+    private StatusCallback<Submission> canvasCallbackSubmission;
+    private StatusCallback<List<LTITool>> mLTIToolCallback;
 
     private LTITool mArcLTITool;
 
@@ -189,14 +190,14 @@ public class AddSubmissionFragment extends ParentFragment {
 
         //if file entry is allowed check to see if the account has arc installed
         if(isFileEntryAllowed) {
-            ExternalToolAPI.getExternalToolsForCanvasContext(getCanvasContext(), mLTIToolCallback);
+            ExternalToolManager.getExternalToolsForCanvasContext(getCanvasContext(), mLTIToolCallback, true);
         }
 
         // If only file is allowed, move to the next page (or go back if we are coming from file uploads).
         if(!isOnlineTextAllowed && !isUrlEntryAllowed) {
             if(isMediaRecordingAllowed && !isFileEntryAllowed){
-                Intent intent = KalturaMediaUploadPicker.createIntentForAssigmnetSubmission(getContext(), assignment);
-                startActivityForResult(intent, RequestCodes.KALTURA_REQUEST);
+                Intent intent = NotoriousMediaUploadPicker.createIntentForAssignmentSubmission(getContext(), assignment);
+                startActivityForResult(intent, RequestCodes.NOTORIOUS_REQUEST);
             }
         }
 
@@ -206,10 +207,10 @@ public class AddSubmissionFragment extends ParentFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Fragment fileUploadDialog =  getChildFragmentManager().findFragmentByTag(FileUploadDialog.TAG);
-        if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.KALTURA_REQUEST) {
-            // When its a Kaltura request, just dismiss the fragment, and the user can look at the notification to see progress.
+        if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.NOTORIOUS_REQUEST) {
+            // When its a Notorious request, just dismiss the fragment, and the user can look at the notification to see progress.
             getActivity().onBackPressed();
-        } else if (resultCode == Activity.RESULT_CANCELED && requestCode == RequestCodes.KALTURA_REQUEST) {
+        } else if (resultCode == Activity.RESULT_CANCELED && requestCode == RequestCodes.NOTORIOUS_REQUEST) {
             isFileUploadCanceled = true;
         } else if(fileUploadDialog != null && fileUploadDialog instanceof FileUploadDialog){
             fileUploadDialog.onActivityResult(requestCode, resultCode, data);
@@ -408,7 +409,7 @@ public class AddSubmissionFragment extends ParentFragment {
                 isFileUploadCanceled = true;
                 FileUploadDialog fileUploadDialog = FileUploadDialog.newInstance(getChildFragmentManager(), FileUploadDialog.createAssignmentBundle(null, course, assignment));
                 fileUploadDialog.setDialogLifecycleCallback(uploadDialogLifecycleCallback);
-                fileUploadDialog.show(getChildFragmentManager(), FileUploadDialog.TAG);
+                fileUploadDialog.show(getFragmentManager(), FileUploadDialog.TAG);
             }
         }
     }
@@ -451,7 +452,7 @@ public class AddSubmissionFragment extends ParentFragment {
             Bundle bundle = FileUploadDialog.createAssignmentBundle(null, course, assignment);
             FileUploadDialog fileUploadDialog = FileUploadDialog.newInstance(getChildFragmentManager(), bundle);
             fileUploadDialog.setDialogLifecycleCallback(uploadDialogLifecycleCallback);
-            fileUploadDialog.show(getChildFragmentManager(), FileUploadDialog.TAG);
+            fileUploadDialog.show(getFragmentManager(), FileUploadDialog.TAG);
             }
         });
 
@@ -611,15 +612,15 @@ public class AddSubmissionFragment extends ParentFragment {
         mediaUpload.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = KalturaMediaUploadPicker.createIntentForAssigmnetSubmission(getContext(), assignment);
-                startActivityForResult(intent, RequestCodes.KALTURA_REQUEST);
+                Intent intent = NotoriousMediaUploadPicker.createIntentForAssignmentSubmission(getContext(), assignment);
+                startActivityForResult(intent, RequestCodes.NOTORIOUS_REQUEST);
             }
         });
 
         mArcUpload.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = String.format(Locale.getDefault(), "%s/%s/external_tools/%d/resource_selection?launch_type=homework_submission&assignment_id=%d", APIHelpers.getFullDomain(getContext()), getCanvasContext().toAPIString(), mArcLTITool.getId(), assignment.getId());
+                String url = String.format(Locale.getDefault(), "%s/%s/external_tools/%d/resource_selection?launch_type=homework_submission&assignment_id=%d", ApiPrefs.getFullDomain(), getCanvasContext().toAPIString(), mArcLTITool.getId(), assignment.getId());
                 ArcWebviewFragment.loadInternalWebView(getActivity(), ((Navigation)getActivity()), InternalWebviewFragment.createBundle(getCanvasContext(), url, mArcLTITool.getName(), true));
             }
         });
@@ -646,7 +647,7 @@ public class AddSubmissionFragment extends ParentFragment {
             //Log to GA
             Analytics.trackButtonPressed(getActivity(), "Submit Text Assignment", null);
 
-            SubmissionAPI.postTextSubmission(course, assignment.getId(), "online_text_entry", textToSubmit, canvasCallbackSubmission);
+            SubmissionManager.postTextSubmission(course, assignment.getId(), textToSubmit, canvasCallbackSubmission);
             dataLossDeleteStoredData(Const.DATA_LOSS_ADD_SUBMISSION);
         }
     }
@@ -660,7 +661,7 @@ public class AddSubmissionFragment extends ParentFragment {
             //Log to GA
             Analytics.trackButtonPressed(getActivity(), "Submit URL Assignment", null);
 
-            SubmissionAPI.postURLSubmission(course, assignment.getId(), "online_url", urlToSubmit, canvasCallbackSubmission);
+            SubmissionManager.postUrlSubmission(course, assignment.getId(), urlToSubmit, false, canvasCallbackSubmission);
             dataLossDeleteStoredData(Const.DATA_LOSS_ADD_SUBMISSION_URL);
         }
     }
@@ -674,7 +675,7 @@ public class AddSubmissionFragment extends ParentFragment {
             //Log to GA
             Analytics.trackButtonPressed(getActivity(), "Submit Arc Assignment", null);
 
-            SubmissionAPI.postURLSubmission(course, assignment.getId(), "basic_lti_launch", urlToSubmit, canvasCallbackSubmission);
+            SubmissionManager.postUrlSubmission(course, assignment.getId(), urlToSubmit, true, canvasCallbackSubmission);
             dataLossDeleteStoredData(Const.DATA_LOSS_ADD_SUBMISSION_URL);
         }
     }
@@ -685,18 +686,14 @@ public class AddSubmissionFragment extends ParentFragment {
 
     public void setUpCallback() {
 
-        canvasCallbackSubmission = new CanvasCallback<Submission>(this) {
+        canvasCallbackSubmission = new StatusCallback<Submission>() {
             @Override
-            public void cache(Submission result) {
-
-            }
-
-            @Override
-            public void firstPage(Submission result, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<Submission> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
 
+                Submission result = response.body();
                 if(result.getBody() != null || result.getUrl() != null) {
                     Toast.makeText(getActivity(), R.string.successPostingSubmission, Toast.LENGTH_LONG).show();
                     // clear text fields because they are saved
@@ -720,31 +717,29 @@ public class AddSubmissionFragment extends ParentFragment {
             }
         };
 
-        mLTIToolCallback = new CanvasCallback<LTITool[]>(this) {
+        mLTIToolCallback = new StatusCallback<List<LTITool>>() {
+
             @Override
-            public void firstPage(LTITool[] ltiTools, LinkHeaders linkHeaders, Response response) {
-                if(!APIHelpers.isCachedResponse(response)) {
-                    for (LTITool ltiTool : ltiTools) {
-                        final String url = ltiTool.getUrl();
-                        if (url != null && url.contains("instructuremedia.com/lti/launch")) {
-                            mArcUpload.setVisibility(View.VISIBLE);
-                            mArcLTITool = ltiTool;
-                            break;
-                        }
+            public void onResponse(retrofit2.Response<List<LTITool>> response, LinkHeaders linkHeaders, ApiType type) {
+                for (LTITool ltiTool : response.body()) {
+                    final String url = ltiTool.getUrl();
+                    if (url != null && url.contains("instructuremedia.com/lti/launch")) {
+                        mArcUpload.setVisibility(View.VISIBLE);
+                        mArcLTITool = ltiTool;
+                        break;
                     }
-                    //check to see if we should automatically show the file upload dialog
-                    showFileUploadDialog();
                 }
+                //check to see if we should automatically show the file upload dialog
+                showFileUploadDialog();
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<LTITool>> callResponse, Throwable error, retrofit2.Response response) {
                 //check to see if we should automatically show the file upload dialog
                 //we don't want to show it if this failed due to there being no cache
-                if(retrofitError.getResponse().getStatus() != 504) {
+                if (response.code() != 504) {
                     showFileUploadDialog();
                 }
-                return super.onFailure(retrofitError);
             }
 
         };

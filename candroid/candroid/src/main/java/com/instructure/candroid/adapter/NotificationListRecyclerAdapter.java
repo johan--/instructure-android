@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,31 +28,32 @@ import com.instructure.candroid.fragment.NotificationListFragment;
 import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.holders.NotificationViewHolder;
 import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.StreamAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.HiddenStreamItem;
-import com.instructure.canvasapi.model.StreamItem;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.StreamManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.HiddenStreamItem;
+import com.instructure.canvasapi2.models.StreamItem;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+
 
 public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<Date, StreamItem, RecyclerView.ViewHolder> {
 
@@ -60,13 +61,13 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
     private NotificationListFragment.OnNotificationCountInvalidated mOnNotificationCountInvalidated;
     private NotificationCheckboxCallback mNotificationCheckboxCallback;
 
-    private StreamItem[] mStreamItems;
+    private List<StreamItem> mStreamItems;
     private Map<Long, Course> mCourseMap;
     private Map<Long, Group> mGroupMap;
 
-    private CanvasCallback<StreamItem[]> mStreamCallback;
-    private CanvasCallback<Course[]> mCoursesCallback;
-    private CanvasCallback<Group[]> mGroupsCallback;
+    private StatusCallback<List<StreamItem>> mStreamCallback;
+    private StatusCallback<List<Course>> mCoursesCallback;
+    private StatusCallback<List<Group>> mGroupsCallback;
     private CanvasContext mCanvasContext;
 
     private HashSet<StreamItem> mCheckedStreamItems = new HashSet<>();
@@ -127,7 +128,7 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
 
     @Override
     public void onBindHeaderHolder(RecyclerView.ViewHolder holder, Date date, boolean isExpanded) {
-        ExpandableHeaderBinder.bind(getContext(), mCanvasContext, (ExpandableViewHolder) holder, date, DateHelpers.getFormattedDate(getContext(), date), isExpanded, getViewHolderHeaderClicked());
+        ExpandableHeaderBinder.bind(getContext(), mCanvasContext, (ExpandableViewHolder) holder, date, DateHelper.getFormattedDate(getContext(), date), isExpanded, getViewHolderHeaderClicked());
     }
 
     // region Pagination
@@ -139,19 +140,23 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
 
     @Override
     public void loadFirstPage() {
-        CourseAPI.getAllCourses(mCoursesCallback);
-        GroupAPI.getAllGroups(mGroupsCallback);
+        CourseManager.getCourses(true, mCoursesCallback);
+        GroupManager.getAllGroups(mGroupsCallback, true);
 
         if (mCanvasContext.getType() == CanvasContext.Type.USER) {
-            StreamAPI.getFirstPageUserStream(mStreamCallback);
+            StreamManager.getUserStream(mStreamCallback, true);
         } else {
-            StreamAPI.getFirstPageCourseStream(mCanvasContext, mStreamCallback);
+            StreamManager.getCourseStream(mCanvasContext, mStreamCallback, true);
         }
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        StreamAPI.getNextPageStream(nextURL, mStreamCallback);
+        if (mCanvasContext.getType() == CanvasContext.Type.USER) {
+            StreamManager.getUserStream(mStreamCallback, true);
+        } else {
+            StreamManager.getCourseStream(mCanvasContext, mStreamCallback, true);
+        }
     }
 
     @Override
@@ -184,25 +189,25 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
         };
 
 
-        mCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mCoursesCallback = new StatusCallback<List<Course>>() {
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                mCourseMap = CourseAPI.createCourseMap(courses);
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCourseMap = CourseManager.createCourseMap(response.body());
                 populateActivityStreamAdapter();
             }
         };
 
-        mGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mGroupsCallback = new StatusCallback<List<Group>>() {
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
-                mGroupMap = GroupAPI.createGroupMap(groups);
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
+                mGroupMap = GroupManager.createGroupMap(response.body());
                 populateActivityStreamAdapter();
             }
         };
 
-        mStreamCallback = new CanvasCallback<StreamItem[]>(this) {
+        mStreamCallback = new StatusCallback<List<StreamItem>>() {
 
-            private void checkPreviouslyCheckedItems(StreamItem[] items) {
+            private void checkPreviouslyCheckedItems(List<StreamItem> items) {
                 for (StreamItem item : items) {
                     if (mCheckedStreamItems.contains(item)) {
                         // update it do the actual item (the right object reference)
@@ -215,39 +220,31 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
             }
 
             @Override
-            public void cache(StreamItem[] streamItems, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<StreamItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<StreamItem> streamItems = response.body();
+
                 checkPreviouslyCheckedItems(streamItems);
-
                 mStreamItems = streamItems;
-                populateActivityStreamAdapter();
-
-                //Remove items from the adapter that have been deleted.
-                for (StreamItem streamItem : mDeletedStreamItems){
-                    removeItem(streamItem);
-                }
-                setNextUrl(linkHeaders.nextURL);
-            }
-
-            @Override
-            public void firstPage(StreamItem[] items, LinkHeaders linkHeaders, Response response) {
-                // we could have had changed dates since the last time we loaded
-                checkPreviouslyCheckedItems(items);
-
-                mStreamItems = items;
                 populateActivityStreamAdapter();
                 mAdapterToFragmentCallback.onRefreshFinished();
 
                 //Clear out the cached deleted items.
                 mDeletedStreamItems.clear();
-                setNextUrl(linkHeaders.nextURL);
+                setNextUrl(linkHeaders.nextUrl);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                if (retrofitError.getResponse() != null && !APIHelpers.isCachedResponse(retrofitError.getResponse()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            public void onFail(Call<List<StreamItem>> callResponse, Throwable error, retrofit2.Response response) {
+                if (!APIHelper.hasNetworkConnection()) {
+                    NotificationListRecyclerAdapter.this.onNoNetwork();
+                } else {
                     getAdapterToRecyclerViewCallback().setIsEmpty(true);
                 }
-                return super.onFailure(retrofitError);
+            }
+
+            @Override
+            public void onFinished(ApiType type) {
+                NotificationListRecyclerAdapter.this.onCallbackFinished(type);
             }
         };
     }
@@ -285,7 +282,7 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         // Workaround for the multiple callbacks, some will succeed while others don't
         setLoadedFirstPage(true);
         shouldShowLoadingFooter();
@@ -302,6 +299,7 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
     public void refresh() {
         mIsNoNetwork = false;
         getAdapterToRecyclerViewCallback().setDisplayNoConnection(false);
+        mStreamCallback.reset();
         super.refresh();
     }
 
@@ -322,34 +320,31 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
             // load conversations if needed
             if (streamItem.getType() == StreamItem.Type.CONVERSATION) {
 
-                ConversationAPI.getDetailedConversation(new CanvasCallback<Conversation>(this) {
+                ConversationManager.getConversation(streamItem.getConversationId(), false,
+                        new StatusCallback<Conversation>() {
                     @Override
-                    public void cache(Conversation conversation) {
-                        streamItem.setConversation(getContext(), conversation, APIHelpers.getCacheUser(getContext()).getId(), getContext().getString(R.string.monologue));
+                    public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
+                        streamItem.setConversation(getContext(), response.body(), ApiPrefs.getUser().getId(), getContext().getString(R.string.monologue));
                         notifyDataSetChanged();
                     }
 
-                    @Override
-                    public void firstPage(Conversation conversation, LinkHeaders linkHeaders, Response response) {
-                        streamItem.setConversation(getContext(), conversation, APIHelpers.getCacheUser(getContext()).getId(), getContext().getString(R.string.monologue));
-                        notifyDataSetChanged();
-                    }
 
                     @Override
-                    public boolean onFailure(RetrofitError error) {
+                    public void onFail(Call<Conversation> response, Throwable error) {
                         //Show crouton if it's a network error
-                        if (error.isNetworkError()) {
+                        if (!APIHelper.hasNetworkConnection()) {
                             mAdapterToFragmentCallback.onShowErrorCrouton(R.string.noDataConnection);
                         }
                         //Otherwise show that it's been deleted.
                         else {
-                            Conversation conversation = new Conversation(true, getContext().getString(R.string.deleted));
-                            streamItem.setConversation(getContext(), conversation, APIHelpers.getCacheUser(getContext()).getId(), getContext().getString(R.string.monologue));
+                            Conversation conversation = new Conversation();
+                            conversation.setDeleted(true);
+                            conversation.setDeletedString(getContext().getString(R.string.deleted));
+                            streamItem.setConversation(getContext(), conversation, ApiPrefs.getUser().getId(), getContext().getString(R.string.monologue));
                             notifyDataSetChanged();
                         }
-                        return true;
                     }
-                }, streamItem.getConversationId(), false);
+                });
             }
 
             //make sure there's something there
@@ -357,7 +352,7 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
                 continue;
             }
 
-            addOrUpdateItem(Utils.getCleanDate(streamItem.getUpdatedAtDate().getTime()), streamItem);
+            addOrUpdateItem(DateHelper.getCleanDate(streamItem.getUpdatedAtDate().getTime()), streamItem);
         }
 
         mStreamItems = null;
@@ -370,22 +365,22 @@ public class NotificationListRecyclerAdapter extends ExpandableRecyclerAdapter<D
     }
 
     private void hideStreamItem(final StreamItem streamItem) {
-        StreamAPI.hideStreamItem(streamItem.getId(), new CanvasCallback<HiddenStreamItem>(this) {
+        StreamManager.hideStreamItem(streamItem.getId(), new StatusCallback<HiddenStreamItem>() {
+
             @Override
-            public void firstPage(HiddenStreamItem hiddenStreamItem, LinkHeaders linkHeaders, Response response) {
-                if(hiddenStreamItem.isHidden()){
+            public void onResponse(retrofit2.Response<HiddenStreamItem> response, LinkHeaders linkHeaders, ApiType type) {
+                if (response.body().isHidden()) {
                     removeItem(streamItem);
 
-                    if(mOnNotificationCountInvalidated != null){
+                    if (mOnNotificationCountInvalidated != null) {
                         mOnNotificationCountInvalidated.invalidateNotificationsCount();
                     }
                 }
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<HiddenStreamItem> callResponse, Throwable error, retrofit2.Response response) {
                 mDeletedStreamItems.remove(streamItem);
-                return false;
             }
         });
     }

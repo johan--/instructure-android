@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Media kiezen</string>
   <string name="takeVideo">Video maken</string>
   <string name="noCameraOnDevice">Geen camera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Uploaden naar Canvas</string>
   <string name="preparingUpload">Upload aan het voorbereiden</string>
   <string name="loadingFilesIndeterminate">Bestanden aan het laden...</string>
-  <string name="fileUploadSuccess">Upload succesvol</string>
+  <string name="fileUploadSuccess">Uploaden gelukt</string>
   <string name="noNetwork">Netwerk niet beschikbaar - probeer het later nogmaals!</string>
   <string name="uploadMessage">\"Bezig met uploaden. Bekijk meldingen voor status upload.</string>
   <string name="mediaUpload">Media Upload</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Er heeft zich een fout voorgedaan om deze foto te verkrijgen. Probeer het nogmaals.</string>
   <string name="errorTextMissing">Voeg wat tekst toe om een bericht te verzenden</string>
   <string name="fileUploadNotSupported">Je kunt geen bestanden uploaden naar de geselecteerde opdracht.</string>
+  <string name="noCourseSelected">Selecteer een cursus</string>
   <string name="selectCourse">Selecteer een cursus</string>
   <string name="selectAssignment">Selecteer een opdracht</string>
   <string name="loadingAssignments">Opdrachten aan het laden...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Ongelezen</string>
   <string name="discussion_reply">Antwoorden</string>
   <string name="close">Sluiten</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas-docent</string>
+  <string name="utils_canvasParent">Canvas-ouder</string>
+  <string name="utils_polls">Canvas-polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Hoe gaat het?</string>
+  <string name="utils_rateUs">Hoe zou je ons beoordelen?</string>
+  <string name="utils_doBetter">Wat kunnen we beter doen?</string>
+  <string name="utils_sendFeedback">Feedback versturen</string>
+  <string name="utils_suggestions">Suggesties voor Android</string>
+  <string name="utils_domain">Domein</string>
+  <string name="utils_versionNum">Versie:</string>
+  <string name="utils_userId">Gebruikers-ID:</string>
+  <string name="utils_email">E-mail</string>
+  <string name="utils_dontShowAgain">Niet nogmaals tonen</string>
+  <string name="utils_installDate">Installatiedatum:</string>
+  <string name="utils_device">Apparaat</string>
+  <string name="utils_osVersion">OS Versie</string>
+  <string name="loading">Bezig met laden...</string>
 </resources>

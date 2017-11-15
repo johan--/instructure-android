@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,9 +29,9 @@ import com.instructure.candroid.fragment.MasteryPathSelectionFragment;
 import com.instructure.candroid.fragment.ModuleQuizDecider;
 import com.instructure.candroid.fragment.PageDetailsFragment;
 import com.instructure.candroid.fragment.ParentFragment;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleObject;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

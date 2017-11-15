@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Расскажите нам о своих любимых моментах приложения</string>
     <string name="sendFeedback">Отправить отзыв</string>
     <string name="sendMail">Отправить Email&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Домен:</string>
     <string name="help_versionNum">Версия:</string>
     <string name="help_userId">ID пользователя:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Только пользователи со статусом Canvas Observer могут аутентифицироваться в Canvas Parent.</string>
     <string name="open_source">Открытый исходный код</string>
     <string name="open_source_details">Просмотреть лицензии на ПО с открытым исходным кодом</string>
+
+    <string name="unitedStates">Соединенные Штаты Америки</string>
+    <string name="theUnitedStates">Соединенные Штаты Америки</string>
+    <string name="canada">Канада</string>
+    <string name="ireland">Ирландия</string>
+    <string name="australia">Австралия</string>
+    <string name="germany">Германия</string>
+    <string name="singapore">Сингапур</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Выбрать студента\регион нахождения студента</string>
+    <string name="selectRegion">Выборщик региона</string>
+    <string name="unauthorizedRegion">Недопустимый регион</string>
+    <string name="mismatchedRegionMessage">Этот институт расположен за пределами выбранного вами региона. Для добавления студента в этот институт воспользуйтесь опцией "Region Picker" (Выборщик региона) на странице регистрации, чтобы создать учетную запись в регионе %1$s.</string>
 </resources>

@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">在線URL</string>
   <string name="canvasAPI_mediaRecording">媒體錄製</string>
   <string name="canvasAPI_attendance">出勤率</string>
+  <string name="quiz_scoring_policy_highest">最高</string>
+  <string name="quiz_scoring_policy_average">平均</string>
+  <string name="quiz_scoring_policy_latest">最新</string>
+  <string name="no">不是</string>
+  <string name="always">始終</string>
+  <string name="graded_quiz">已評分的測驗</string>
+  <string name="practice_quiz">練習測驗</string>
+  <string name="graded_survey">已評分的調查</string>
+  <string name="ungraded_survey">未評分的調查</string>
 </resources>

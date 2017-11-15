@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.instructure.candroid.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,21 +29,13 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.TodoListRecyclerAdapter;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
+import com.instructure.candroid.util.FragUtils;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.ToDo;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.ToDo;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.pandautils.utils.RequestCodes;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
 
 public class ToDoListFragment extends ParentFragment {
 

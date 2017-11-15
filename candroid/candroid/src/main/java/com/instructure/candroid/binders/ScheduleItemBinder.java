@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import android.widget.TextView;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.ScheduleItemViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.Date;
@@ -50,7 +50,7 @@ public class ScheduleItemBinder extends BaseBinder {
             }
         });
 
-        switch (item.getType()) {
+        switch (item.getItemType()) {
 
             case TYPE_SYLLABUS: {
                 holder.title.setText(context.getString(R.string.syllabus));
@@ -84,9 +84,9 @@ public class ScheduleItemBinder extends BaseBinder {
                     drawable = CanvasContextColor.getColoredDrawable(context, drawableResId, courseColor);
                     holder.icon.setImageDrawable(drawable);
 
-                    Date dueDate = assignment.getDueDate();
+                    Date dueDate = assignment.getDueAt();
                     if(dueDate != null) {
-                        String dateString = DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate);
+                        String dateString = DateHelper.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate);
                         holder.date.setText(dateString);
                     } else {
                         holder.date.setText(context.getResources().getString(R.string.toDoNoDueDate));

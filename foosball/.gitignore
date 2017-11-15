@@ -17,6 +17,12 @@ app/src/tablet/res/raw/multikill.mp3
 app/src/tablet/res/raw/murca.mp3
 app/src/tablet/res/raw/rotate_ding.mp3
 app/src/tablet/res/raw/unstoppable.mp3
+app/src/tablet/res/raw/motivation.mp3
+app/src/tablet/res/raw/leeroy_jenkins.mp3
+app/src/tablet/res/raw/illuminati_confirmed.mp3
+app/src/tablet/res/raw/mlg_horn.mp3
+app/src/tablet/res/raw/legitness.mp3
+app/src/tablet/res/raw/profamity.mp3
 
 # built application files #
 *.apk

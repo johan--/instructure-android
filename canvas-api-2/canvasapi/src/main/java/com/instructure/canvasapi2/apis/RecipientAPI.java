@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -38,11 +38,14 @@ public class RecipientAPI {
         @GET("search/recipients?synthetic_contexts=1")
         Call<List<Recipient>> getFirstPageRecipientList(@Query("search") String searchQuery, @Query(value = "context", encoded = true) String context);
 
+        @GET("search/recipients")
+        Call<List<Recipient>> getFirstPageRecipientListNoSyntheticContexts(@Query("search") String searchQuery, @Query(value = "context", encoded = true) String context);
+
         @GET
         Call<List<Recipient>> getNextPageRecipientList(@Url String url);
     }
 
-    public static void getFirstPageRecipients(String searchQuery, String context, @NonNull StatusCallback<List<Recipient>> callback, @NonNull RestBuilder adapter, @NonNull RestParams params) {
+    public static void getRecipients(String searchQuery, String context, @NonNull StatusCallback<List<Recipient>> callback, @NonNull RestBuilder adapter, @NonNull RestParams params) {
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
             callback.addCall(adapter.build(RecipientInterface.class, params).getFirstPageRecipientList(searchQuery, context)).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
@@ -50,4 +53,31 @@ public class RecipientAPI {
         }
     }
 
+    public static void getFirstPageRecipients(boolean forceNetwork, String searchQuery, String context, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<Recipient>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+        callback.addCall(adapter.build(RecipientInterface.class, params).getFirstPageRecipientList(searchQuery, context)).enqueue(callback);
+    }
+
+    // Synthetic contexts == groups and sections, so this search will return only users
+    public static void getFirstPageRecipientsNoSyntheticContexts(boolean forceNetwork, String searchQuery, String context, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<Recipient>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+        callback.addCall(adapter.build(RecipientInterface.class, params).getFirstPageRecipientListNoSyntheticContexts(searchQuery, context)).enqueue(callback);
+    }
+
+    public static void getNextPageRecipients(boolean forceNetwork, String nextUrl, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<Recipient>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+        adapter.build(RecipientInterface.class, params).getNextPageRecipientList(nextUrl).enqueue(callback);
+    }
 }

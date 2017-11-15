@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Choose media</string>
   <string name="takeVideo">Take video</string>
   <string name="noCameraOnDevice">No camera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Uploading to Canvas</string>
   <string name="preparingUpload">Preparing upload</string>
   <string name="loadingFilesIndeterminate">Loading files…</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">There was an error getting the photo. Please try again.</string>
   <string name="errorTextMissing">Add some text to send a message</string>
   <string name="fileUploadNotSupported">You cannot upload files to the selected assignment.</string>
+  <string name="noCourseSelected">Please select a course</string>
   <string name="selectCourse">Select a course</string>
   <string name="selectAssignment">Select an assignment</string>
   <string name="loadingAssignments">Loading assignments…</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Unread</string>
   <string name="discussion_reply">Reply</string>
   <string name="close">Close</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">How are we doing?</string>
+  <string name="utils_rateUs">How would you rate us?</string>
+  <string name="utils_doBetter">What can we do better?</string>
+  <string name="utils_sendFeedback">Send feedback</string>
+  <string name="utils_suggestions">Suggestions for Android</string>
+  <string name="utils_domain">Domain</string>
+  <string name="utils_versionNum">Version:</string>
+  <string name="utils_userId">User ID</string>
+  <string name="utils_email">Email</string>
+  <string name="utils_dontShowAgain">Don\'t show again</string>
+  <string name="utils_installDate">Install date:</string>
+  <string name="utils_device">Device</string>
+  <string name="utils_osVersion">OS version</string>
+  <string name="loading">Loading</string>
 </resources>

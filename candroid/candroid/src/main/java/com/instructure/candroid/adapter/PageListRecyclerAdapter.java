@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,21 +23,22 @@ import android.view.View;
 import com.instructure.candroid.binders.PageBinder;
 import com.instructure.candroid.holders.PageViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.api.PageAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Page;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PageManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Page;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import java.util.List;
+
+import retrofit2.Call;
 
 public class PageListRecyclerAdapter  extends BaseListRecyclerAdapter<Page, PageViewHolder> {
     public static final String FRONT_PAGE_DETERMINER = "";
-    private CanvasCallback<Page[]> mPageListCallback;
+    private StatusCallback<List<Page>> mPageListCallback;
     private CanvasContext mCanvasContext;
     private AdapterToFragmentCallback<Page> mAdapterToFragmentCallback;
     private String mSelectedPageTitle = FRONT_PAGE_DETERMINER; // Page urls only specify the title, not the pageId
@@ -93,11 +94,6 @@ public class PageListRecyclerAdapter  extends BaseListRecyclerAdapter<Page, Page
     }
 
     @Override
-    public void contextReady() {
-
-    }
-
-    @Override
     public void add(Page item) {
         if  (mSelectedPageTitle != null) {
             if (mSelectedPageTitle.equals(item.getUrl())) {
@@ -118,36 +114,35 @@ public class PageListRecyclerAdapter  extends BaseListRecyclerAdapter<Page, Page
 
     @Override
     public void setupCallbacks() {
-        mPageListCallback = new CanvasCallback<Page[]>(this) {
-            @Override
-            public void firstPage(Page[] pages, LinkHeaders linkHeaders, Response response) {
-                setNextUrl(linkHeaders.nextURL);
-                addAll(pages);
-                mAdapterToFragmentCallback.onRefreshFinished();
+        mPageListCallback = new StatusCallback<List<Page>>() {
 
+            @Override
+            public void onResponse(retrofit2.Response<List<Page>> response, LinkHeaders linkHeaders, ApiType type) {
+                setNextUrl(linkHeaders.nextUrl);
+                addAll(response.body());
+                mAdapterToFragmentCallback.onRefreshFinished();
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<Page>> callResponse, Throwable error, retrofit2.Response response) {
                 // When a course has a page set as the home screen that the user first sees but the teacher
                 // hides the pages tab the user will see a 404 error every time they go into the course. There
-                // isn't anything the user can do differently, so just suppress the error crouton.
-                if (retrofitError.getResponse() != null && !APIHelpers.isCachedResponse(retrofitError.getResponse()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                // isn't anything the user can do differently. If empty show the empty view.
+                if(getItemCount() == 0 || !APIHelper.hasNetworkConnection()) {
                     getAdapterToRecyclerViewCallback().setIsEmpty(true);
                 }
-                return true;
             }
         };
     }
 
     @Override
     public void loadFirstPage() {
-        PageAPI.getFirstPagePages(mCanvasContext, mPageListCallback);
+        PageManager.getFirstPagePages(mCanvasContext, mPageListCallback, isRefresh());
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        PageAPI.getNextPagePages(nextURL, mPageListCallback);
+        PageManager.getNextPagePages(nextURL, mPageListCallback, isRefresh());
     }
 
     // endregion

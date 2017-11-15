@@ -42,7 +42,7 @@
                 android:paddingRight="16dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/borderless_item_selector">
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/search_canvas_guides_text"
@@ -69,7 +69,7 @@
                 android:paddingRight="16dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/borderless_item_selector">
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/report_problem_text"
@@ -96,7 +96,7 @@
                 android:paddingRight="16dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/borderless_item_selector">
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/feature_request_text"
@@ -123,7 +123,7 @@
                 android:paddingRight="16dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/borderless_item_selector">
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/share_love_text"
@@ -150,7 +150,7 @@
                 android:paddingRight="16dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/borderless_item_selector">
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/open_source_text"

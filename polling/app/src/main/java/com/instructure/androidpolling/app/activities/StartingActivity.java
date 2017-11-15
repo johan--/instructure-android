@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,52 +25,37 @@ import android.os.Bundle;
 import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.util.ApplicationManager;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
-import retrofit.client.Response;
+import java.util.List;
 
-public class StartingActivity extends BaseActivity implements APIStatusDelegate{
-
-    private CanvasCallback<Course[]> allCoursesCallback;
+public class StartingActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //we need course info every time for teachers and students
-        setupCallback();
-        CourseAPI.getAllCourses(allCoursesCallback);
+        CourseManager.getAllFavoriteCourses(true, new StatusCallback<List<Course>>() {
+            @Override
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                ApplicationManager.saveCourses(StartingActivity.this, response.body());
+                checkEnrollments(response.body());
+            }
+        });
     }
-
 
     @Override
     protected void onPause() {
         super.onPause();
         overridePendingTransition(0, 0);
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
 
-    private void setupCallback() {
-        allCoursesCallback = new CanvasCallback<Course[]>(this) {
-            @Override
-            public void cache(Course[] courses) { }
-
-            @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                ApplicationManager.saveCourses(StartingActivity.this, courses);
-                checkEnrollments(courses);
-            }
-        };
-    }
     //we need to know if the user is a teacher in any course
     //track the enrollments of the user as well
-    private void checkEnrollments(Course[] courses) {
+    private void checkEnrollments(List<Course> courses) {
 
         int teacherCount = 0;
         int studentCount = 0;
@@ -86,7 +71,6 @@ public class StartingActivity extends BaseActivity implements APIStatusDelegate{
             }
         }
 
-
         String enrollmentType = "";
         if(teacherCount > 0) {
             enrollmentType = getString(R.string.teacher);
@@ -99,8 +83,6 @@ public class StartingActivity extends BaseActivity implements APIStatusDelegate{
         }
 
         // Send it
-        //TODO: re-add analytics if we work on this thing again
-
 
         if(ApplicationManager.hasViewPreference(this)) {
             if(ApplicationManager.shouldShowTeacherView(this)) {
@@ -121,29 +103,6 @@ public class StartingActivity extends BaseActivity implements APIStatusDelegate{
         finish();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Overrides for APIStatusDelegate
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-
-    }
-
-    @Override
-    public void onNoNetwork() {
-
-    }
-
-    @Override
-    public Context getContext() {
-        return getApplicationContext();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Intent
-    ///////////////////////////////////////////////////////////////////////////
-
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, StartingActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -155,10 +114,5 @@ public class StartingActivity extends BaseActivity implements APIStatusDelegate{
         intent.putExtra(Constants.PASSED_URI, passedURI);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         return intent;
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
     }
 }

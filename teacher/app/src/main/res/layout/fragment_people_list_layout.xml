@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2017 - present  Instructure, Inc.
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/peopleListToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="6dp"
+        app:popupTheme="@style/ToolBarPopupStyle"
+        app:theme="@style/ToolBarStyle"
+        tools:ignore="UnusedAttribute"/>
+
+    <RelativeLayout
+        android:id="@+id/filterTitleWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:clipToPadding="false">
+
+        <TextView
+            style="@style/TextFont.Medium"
+            android:id="@+id/peopleFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/clearFilterTextView"
+            android:paddingTop="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/allPeople"
+            android:textColor="@color/defaultTextDark"
+            android:textSize="20sp"
+            tools:text="All Courses"/>
+
+        <TextView
+            style="@style/TextFont.Medium"
+            android:id="@+id/clearFilterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBaseline="@+id/peopleFilter"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:text="@string/clear_filter"
+            android:textColor="@color/defaultActionColor"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="Clear filter"/>
+
+    </RelativeLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/recycler_swipe_refresh_layout" />
+
+    </FrameLayout>
+
+</LinearLayout>

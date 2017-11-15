@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@
                 android:id="@+id/icon"
                 android:layout_width="@dimen/gridIconSize"
                 android:layout_height="@dimen/gridIconSize"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/icon"
@@ -53,11 +52,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="12dp"
                 android:layout_marginStart="12dp"
                 android:layout_toEndOf="@id/icon"
-                android:layout_toRightOf="@id/icon"
-                android:layout_toLeftOf="@+id/edit"
                 android:layout_toStartOf="@+id/edit"/>
 
             <ImageView
@@ -68,7 +64,6 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_cv_edit_dark"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:contentDescription="@string/edit"
                 android:layout_centerVertical="true"
                 android:padding="4dp"/>
@@ -87,7 +82,6 @@
                 style="@style/TextStyle.Tertiary.SingleLine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
                 android:gravity="bottom|start"/>
@@ -98,7 +92,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:gravity="end"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
@@ -107,6 +100,15 @@
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:layout_alignParentBottom="true"/>
+
+            <ImageView
+                android:id="@+id/pendingReviewIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/pending_review"
+                android:src="@drawable/vd_quiz"/>
 
         </RelativeLayout>
 

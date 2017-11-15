@@ -30,6 +30,12 @@
         <attr name="ctpl_bgColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="PlayersLayout">
+        <attr name="pl_canEdit" format="boolean" />
+        <attr name="pl_bgColor" format="color" />
+        <attr name="pl_maxPlayers" format="integer"/>
+    </declare-styleable>
+
     <declare-styleable name="CropOverlay">
         <attr name="cutoutViewId" format="reference" />
         <attr name="frameColor" format="color" />

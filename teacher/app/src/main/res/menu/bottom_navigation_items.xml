@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/tab_courses"
+        android:title="@string/tab_courses"
+        android:icon="@drawable/vd_courses"
+        android:checked="true" />
+
+    <item android:id="@+id/tab_inbox"
+        android:title="@string/tab_inbox"
+        android:icon="@drawable/vd_mail" />
+
+    <item android:id="@+id/tab_profile"
+        android:title="@string/tab_profile"
+        android:icon="@drawable/vd_profile" />
+
+</menu>

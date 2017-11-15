@@ -128,8 +128,6 @@
   <string name="domain">Dominio</string>
   <string name="sendFeedback">Enviar los comentarios</string>
   <string name="sendMail">Enviar correo electrónico...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Editar</string>
   <plurals name="item_count">
     <item quantity="one">%d Elemento</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Se ha producido un error al obtener el curso para este elemento.</string>
   <string name="could_not_find_group">Se ha producido un error al obtener el grupo para este elemento.</string>
   <string name="selectBackground">Selecciones un fondo</string>
-  <string name="kalturaSubmissionInProgress">Enviando archivos... Revise la barra de notificación para actualizaciones.</string>
-  <string name="kalturaSubmissionSuccessful">Se ha terminado de enviar el archivo</string>
+  <string name="notoriousSubmissionInProgress">Enviando archivos... Revise la barra de notificación para actualizaciones.</string>
+  <string name="notoriousSubmissionSuccessful">Se ha terminado de enviar el archivo</string>
   <string name="poll_title">¿Qué vino a hacer a Canvas?</string>
   <string name="poll_warning">Un elemento no ha sido seleccionado.</string>
   <string name="poll_item_1">Revisar mis calificaciones</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">Avatares del panda</string>
   <string name="share">Compartir</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Imagen del súper panda</string>
   <string name="newFeatureTitle">Notificaciones móviles</string>
   <string name="newFeatureMsg">Para recibir notificaciones automáticas móviles, vaya a las Configuraciones de Canvas &gt; Notificaciones &gt; y selecciones \"para todos los equipos\"</string>

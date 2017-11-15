@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 package com.instructure.candroid.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,8 +29,7 @@ import com.instructure.candroid.adapter.RubricRecyclerAdapter;
 import com.instructure.candroid.decorations.RubricDecorator;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.view.EmptyPandaView;
-import com.instructure.candroid.view.EmptyRubricView;
-import com.instructure.canvasapi.model.Assignment;
+import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.pandarecycler.PandaRecyclerView;
 
 public class RubricFragment extends ParentFragment {
@@ -69,9 +67,7 @@ public class RubricFragment extends ParentFragment {
     /**
      * Since its a nested fragment, handle the no network case manually
      */
-    @Override
     public void onNoNetwork() {
-        super.onNoNetwork();
         if (mRecyclerAdapter != null) {
             mRecyclerAdapter.onNoNetwork();
         }
@@ -105,7 +101,7 @@ public class RubricFragment extends ParentFragment {
         rootView.findViewById(R.id.fragment_container).setBackgroundColor(Color.WHITE);
         EmptyPandaView emptyRubricView = (EmptyPandaView) rootView.findViewById(R.id.emptyPandaView);
 
-        mRecyclerAdapter = new RubricRecyclerAdapter(getContext(), getCanvasContext(), emptyRubricView, new AdapterToFragmentCallback() {
+        mRecyclerAdapter = new RubricRecyclerAdapter(getContext(), getCanvasContext(), new AdapterToFragmentCallback() {
             @Override
             public void onRowClicked(Object o, int position, boolean isOpenDetail) {}
 

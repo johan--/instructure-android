@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Fortæl os om din favorit part af denne app</string>
     <string name="sendFeedback">Send feedback</string>
     <string name="sendMail">Send E-mail&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domæne:</string>
     <string name="help_versionNum">Version:</string>
     <string name="help_userId">Bruger ID:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Kun Canvas-observatører kan godkende i Canvas Parent.</string>
     <string name="open_source">Open Source</string>
     <string name="open_source_details">Vis open source-licenser</string>
+
+    <string name="unitedStates">USA</string>
+    <string name="theUnitedStates">USA</string>
+    <string name="canada">Canada</string>
+    <string name="ireland">Irland</string>
+    <string name="australia">Australien</string>
+    <string name="germany">Tyskland</string>
+    <string name="singapore">Singapore</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Vælg den studerendes region</string>
+    <string name="selectRegion">Vælg region</string>
+    <string name="unauthorizedRegion">Uautoriseret region</string>
+    <string name="mismatchedRegionMessage">Denne institution er placeret uden for dit valgte område. For at tilføje en studerende på denne institution skal du bruge "Vælg region" på login-siden for at oprette en konto i regionen %1$s.</string>
 </resources>

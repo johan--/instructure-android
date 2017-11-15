@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import android.view.View;
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.QuizViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.Date;
@@ -58,13 +58,6 @@ public class QuizBinder extends BaseBinder{
             setGone(holder.description);
         }
 
-        if (item.getAssignment() != null && item.getAssignment().getDueDate() != null) {
-            String dueDate = DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, item.getAssignment().getDueDate());
-            holder.date.setText(dueDate);
-        } else {
-            holder.date.setText("");
-        }
-
         Drawable drawable = CanvasContextColor.getColoredDrawable(context, R.drawable.ic_cv_quizzes_fill, courseColor);
         holder.icon.setImageDrawable(drawable);
 
@@ -84,7 +77,7 @@ public class QuizBinder extends BaseBinder{
         Date dueDate = item.getDueAt();
 
         if (dueDate != null) {
-            holder.date.setText(DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate));
+            holder.date.setText(DateHelper.createPrefixedDateTimeString(context, R.string.toDoDue, dueDate));
             setVisible(holder.date);
         } else {
             holder.date.setText("");
@@ -93,7 +86,7 @@ public class QuizBinder extends BaseBinder{
 
         Date lockDate = item.getLockAt();
         Date today = new Date();
-        if((lockDate != null && today.after(lockDate)) || (item.getRequireLockdownBrowserForResults())) {
+        if((lockDate != null && today.after(lockDate)) || (item.isRequireLockdownBrowserForResults())) {
             holder.status.setText(R.string.closed);
             holder.status.setTextColor(courseColor);
         } else {

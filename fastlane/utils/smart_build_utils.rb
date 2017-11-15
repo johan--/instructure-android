@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+require 'excon'
 
 class SmartBuildUtils
   class << self
@@ -23,6 +24,10 @@ class SmartBuildUtils
       changed
     end
 
+    def get_env env_key
+      ::ENV[env_key] || raise("Missing ENV ${env_key}")
+    end
+
     # Checks if an app can be skipped due to having no changes. Only works on Bitrise
     def skippable? app
       app = app.to_s
@@ -30,7 +35,7 @@ class SmartBuildUtils
       ui_message "Scanning for changes in '#{app}' project"
 
       # Get destination branch, which is only specified for pull requests
-      dest_branch = ENV['BITRISEIO_GIT_BRANCH_DEST']
+      dest_branch = get_env 'BITRISEIO_GIT_BRANCH_DEST'
       return false if dest_branch.nil? || dest_branch.empty?
 
       # Fetch the destination branch for comparison
@@ -46,7 +51,7 @@ class SmartBuildUtils
 
       # Get libs referenced by the app
       settings_gradle = File.read(join('..', app, 'settings.gradle'))
-      check_libs = settings_gradle.scan(/(?<=:).*?(?=['"])/).uniq & app_libraries
+      check_libs      = settings_gradle.scan(/(?<=:).*?(?=['"])/).uniq & app_libraries
 
       # Do not skip for changes in any referenced lib
       check_libs.each do |lib|
@@ -56,8 +61,26 @@ class SmartBuildUtils
       # Assume the app build can be skipped at this point
       # Set SKIP_BUILD env variable so it can be accessed by the 'run_if' check in subsequent bitrise steps
       ui_success "No changes detected in #{app} or any of its dependencies. Skipping build."
+
+      bitrise_app_slug = get_env 'BITRISE_APP_SLUG'
+      bitrise_build_slug = get_env 'BITRISE_BUILD_SLUG'
+      bitrise_token = get_env 'BITRISE_TOKEN'
+      abort_url = "https://api.bitrise.io/v0.1/apps/#{bitrise_app_slug}/builds/#{bitrise_build_slug}/abort"
+
+      connection = Excon.post(abort_url,
+        headers: { 
+          'Authorization' => "token #{bitrise_token}",
+          'Content-Type' => 'application/json; charset=UTF-8'
+        },
+        body: { 
+          abort_reason: "Build skipped. No changes detected.",
+          skip_notifications: true,
+          abort_with_success: true
+        }.to_json
+      )
+
       system("envman add --key SKIP_BUILD --value 'true'")
       true
-    end 
+    end
   end
 end

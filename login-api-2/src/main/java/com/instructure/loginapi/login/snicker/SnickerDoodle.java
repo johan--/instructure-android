@@ -25,15 +25,17 @@ public class SnickerDoodle implements Parcelable {
     public String subtitle;
     public String username;
     public String password;
+    public String domain = "";
 
     public SnickerDoodle() {
     }
 
-    public SnickerDoodle(String title, String subtitle, String username, String password) {
+    public SnickerDoodle(String title, String subtitle, String username, String password, String domain) {
         this.title = title;
         this.subtitle = subtitle;
         this.username = username;
         this.password = password;
+        this.domain = domain;
     }
 
     @Override
@@ -47,6 +49,7 @@ public class SnickerDoodle implements Parcelable {
         dest.writeString(this.subtitle);
         dest.writeString(this.username);
         dest.writeString(this.password);
+        dest.writeString(this.domain);
     }
 
     protected SnickerDoodle(Parcel in) {
@@ -54,6 +57,7 @@ public class SnickerDoodle implements Parcelable {
         this.subtitle = in.readString();
         this.username = in.readString();
         this.password = in.readString();
+        this.domain = in.readString();
     }
 
     public static final Creator<SnickerDoodle> CREATOR = new Creator<SnickerDoodle>() {

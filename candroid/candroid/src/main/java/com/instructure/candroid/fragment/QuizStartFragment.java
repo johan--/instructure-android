@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,25 +34,29 @@ import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.view.CanvasLoading;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.model.QuizSubmission;
-import com.instructure.canvasapi.model.QuizSubmissionResponse;
-import com.instructure.canvasapi.model.QuizSubmissionTime;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.models.QuizSubmission;
+import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.models.QuizSubmissionTime;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.views.CanvasWebView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class QuizStartFragment extends ParentFragment {
 
@@ -89,10 +93,10 @@ public class QuizStartFragment extends ParentFragment {
     private boolean shouldLetAnswer = true;
     private QuizSubmissionTime quizSubmissionTime;
 
-    private CanvasCallback<QuizSubmissionResponse> quizSubmissionResponseCanvasCallback;
-    private CanvasCallback<Response> quizStartResponseCallback;
-    private CanvasCallback<Response> quizStartSessionCallback;
-    private CanvasCallback<QuizSubmissionTime> quizSubmissionTimeCanvasCallback;
+    private StatusCallback<QuizSubmissionResponse> quizSubmissionResponseCanvasCallback;
+    private StatusCallback<QuizSubmissionResponse> quizStartResponseCallback;
+    private StatusCallback<ResponseBody> quizStartSessionCallback;
+    private StatusCallback<QuizSubmissionTime> quizSubmissionTimeCanvasCallback;
 
     private CanvasWebView.CanvasWebViewClientCallback webViewClientCallback;
     private CanvasWebView.CanvasEmbeddedWebViewCallback embeddedWebViewCallback;
@@ -147,7 +151,7 @@ public class QuizStartFragment extends ParentFragment {
             course = (Course)getCanvasContext();
             quiz = savedInstanceState.getParcelable(Const.QUIZ);
         }
-        QuizAPI.getFirstPageQuizSubmissions(course, quiz.getId(), quizSubmissionResponseCanvasCallback);
+        if(quiz != null) QuizManager.getQuizSubmissions(course, quiz.getId(), true, quizSubmissionResponseCanvasCallback);
     }
 
     //called after submitting a quiz
@@ -155,7 +159,8 @@ public class QuizStartFragment extends ParentFragment {
         canvasLoading.setVisibility(View.VISIBLE);
         //don't let them try to start the quiz until the data loads
         next.setEnabled(false);
-        QuizAPI.getFirstPageQuizSubmissions(course, quiz.getId(), quizSubmissionResponseCanvasCallback);
+        quizSubmissionResponseCanvasCallback.reset(); // Reset to clear out any link headers
+        QuizManager.getQuizSubmissions(course, quiz.getId(), true, quizSubmissionResponseCanvasCallback);
     }
     private void setupViews(View rootView) {
 
@@ -191,12 +196,11 @@ public class QuizStartFragment extends ParentFragment {
                     if(quiz.getLockExplanation() != null) {
                         showToast(quiz.getLockExplanation());
                     }
-
                     return;
                 }
 
                 if(shouldStartQuiz) {
-                    QuizAPI.startQuiz(course, quiz.getId(), quizStartResponseCallback);
+                    QuizManager.startQuiz(course, quiz.getId(), true, quizStartResponseCallback);
                     //if the user hits the back button, we don't want them to try to start the quiz again
                     shouldStartQuiz = false;
                 }
@@ -250,14 +254,14 @@ public class QuizStartFragment extends ParentFragment {
         }
 
         if(quiz.getDueAt() != null) {
-            quizDueDateDetails.setText(DateHelpers.getDateTimeString(getActivity(), quiz.getDueAt()));
+            quizDueDateDetails.setText(DateHelper.getDateTimeString(getActivity(), quiz.getDueAt()));
         } else {
             quizDueDateDetails.setText(getString(R.string.toDoNoDueDate));
         }
 
         if(quiz.getUnlockAt() != null) {
             quizUnlocked.setText(getString(R.string.unlockedAt));
-            quizUnlockedDetails.setText(DateHelpers.getDateTimeString(getActivity(), quiz.getUnlockAt()));
+            quizUnlockedDetails.setText(DateHelper.getDateTimeString(getActivity(), quiz.getUnlockAt()));
         } else {
             quizUnlockedContainer.setVisibility(View.GONE);
         }
@@ -271,16 +275,14 @@ public class QuizStartFragment extends ParentFragment {
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
+    public void onCallbackFinished(ApiType type) {
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(false);
         }
         super.onCallbackStarted();
     }
 
-    @Override
     public void onNoNetwork() {
-        super.onNoNetwork();
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(true);
         }
@@ -306,12 +308,12 @@ public class QuizStartFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
         };
 
@@ -328,24 +330,35 @@ public class QuizStartFragment extends ParentFragment {
             }
         };
 
-        quizSubmissionTimeCanvasCallback = new CanvasCallback<QuizSubmissionTime>(this) {
+        quizSubmissionTimeCanvasCallback = new StatusCallback<QuizSubmissionTime>() {
 
             @Override
-            public void cache(QuizSubmissionTime quizSubmissionTime, LinkHeaders linkHeaders, Response response2) {}
-
-            @Override
-            public void firstPage(QuizSubmissionTime quizSubmissionTime, LinkHeaders linkHeaders, Response response) {
-
+            public void onResponse(Response<QuizSubmissionTime> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) return;
                 QuizStartFragment.this.quizSubmissionTime = quizSubmissionTime;
-                QuizAPI.getFirstPageQuizSubmissions(course, quiz.getId(), quizSubmissionResponseCanvasCallback);
+                QuizManager.getQuizSubmissions(course, quiz.getId(), true, quizSubmissionResponseCanvasCallback);
             }
         };
-        quizSubmissionResponseCanvasCallback = new CanvasCallback<QuizSubmissionResponse>(this) {
+        quizSubmissionResponseCanvasCallback = new StatusCallback<QuizSubmissionResponse>() {
 
             @Override
-            public void firstPage(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) return;
+                final QuizSubmissionResponse quizSubmissionResponse = response.body();
 
-                if (quizSubmissionResponse != null && quizSubmissionResponse.getQuizSubmissions() == null || quizSubmissionResponse.getQuizSubmissions().size() == 0) {
+                //since this is a student app, make sure they only have their own submissions (if they're siteadmin it'll be different)
+                final ArrayList<QuizSubmission> submissions = new ArrayList<>();
+                final User user = ApiPrefs.getUser();
+                if(user != null) {
+                    for (QuizSubmission submission : quizSubmissionResponse.getQuizSubmissions()) {
+                        if (submission.getUserId() == user.getId()){
+                            submissions.add(submission);
+                        }
+                    }
+                }
+
+                quizSubmissionResponse.setQuizSubmissions(submissions);
+                if (quizSubmissionResponse.getQuizSubmissions() == null || quizSubmissionResponse.getQuizSubmissions().size() == 0) {
                     //no quiz submissions, let the user start the quiz.
 
                     //they haven't turned it in yet, so don't show the view
@@ -392,7 +405,7 @@ public class QuizStartFragment extends ParentFragment {
 
                     if(quizSubmission.getFinishedAt() != null) {
                         quizTurnedIn.setText(getString(R.string.turnedIn));
-                        quizTurnedInDetails.setText(DateHelpers.getDateTimeString(getActivity(), quizSubmission.getFinishedAt()));
+                        quizTurnedInDetails.setText(DateHelper.getDateTimeString(getActivity(), quizSubmission.getFinishedAt()));
                         //the user has turned in the quiz, let them see the results
                         viewResults.setVisibility(View.VISIBLE);
 
@@ -404,21 +417,32 @@ public class QuizStartFragment extends ParentFragment {
                     if(quizSubmission.getWorkflowState() == QuizSubmission.WORKFLOW_STATE.UNTAKEN && (quizSubmission.getEndAt() != null && (quizSubmissionTime != null && quizSubmissionTime.getTimeLeft() > 0))) {
                         next.setEnabled(false);
                         //submit the quiz for them
-                        QuizAPI.postQuizSubmit(course, quizSubmission, new CanvasCallback<QuizSubmissionResponse>(QuizStartFragment.this) {
+                        QuizManager.submitQuiz(course, quizSubmission, true, new StatusCallback<QuizSubmissionResponse>() {
                             @Override
-                            public void cache(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
-
-                            }
-
-                            @Override
-                            public void firstPage(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
+                            public void onResponse(Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                                if(type == ApiType.CACHE) return;
                                 //the user has turned in the quiz, let them see the results
                                 viewResults.setVisibility(View.VISIBLE);
                                 next.setEnabled(true);
                                 shouldStartQuiz = true;
                                 next.setText(getString(R.string.takeQuizAgain));
-                                if (quizSubmissionResponse != null && quizSubmissionResponse.getQuizSubmissions() != null && quizSubmissionResponse.getQuizSubmissions().size() > 0) {
-                                    quizSubmission = quizSubmissionResponse.getQuizSubmissions().get(quizSubmissionResponse.getQuizSubmissions().size() - 1);
+                                QuizSubmissionResponse quizResponse = response.body();
+
+                                //since this is a student app, make sure they only have their own submissions (if they're siteadmin it'll be different)
+                                final ArrayList<QuizSubmission> submissions = new ArrayList<>();
+                                final User user = ApiPrefs.getUser();
+                                if(user != null) {
+                                    for (QuizSubmission submission : quizResponse.getQuizSubmissions()) {
+                                        if (submission.getUserId() == user.getId()){
+                                            submissions.add(submission);
+                                        }
+                                    }
+                                }
+
+                                quizResponse.setQuizSubmissions(submissions);
+
+                                if (quizResponse.getQuizSubmissions() != null && quizResponse.getQuizSubmissions().size() > 0) {
+                                    quizSubmission = quizResponse.getQuizSubmissions().get(quizResponse.getQuizSubmissions().size() - 1);
                                 }
                             }
                         });
@@ -440,38 +464,34 @@ public class QuizStartFragment extends ParentFragment {
 
                 canvasLoading.setVisibility(View.GONE);
 
+
             }
 
             @Override
-            public void failure(RetrofitError retrofitError) {
+            public void onFail(Call<QuizSubmissionResponse> response, Throwable error, int code) {
                 canvasLoading.setVisibility(View.GONE);
-
                 //if a quiz is excused we get a 401 error when trying to get the submissions. This is a workaround until we have an excused field
                 //on quizzes.
-                if(retrofitError != null && retrofitError.getResponse() != null && retrofitError.getResponse().getStatus() == 401) {
+                if(code == 401) {
                     populateQuizInfo();
                     //there is a not authorized error, so don't let them start the quiz
                     next.setVisibility(View.GONE);
-                    return;
                 }
-                super.failure(retrofitError);
             }
-
         };
 
-        quizStartResponseCallback = new CanvasCallback<Response>(this) {
-            @Override
-            public void cache(Response response, LinkHeaders linkHeaders, Response response2) {}
+        quizStartResponseCallback = new StatusCallback<QuizSubmissionResponse>() {
 
             @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                if(response.getStatus() == 200) {
+            public void onResponse(Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                if(code == 200 && type == ApiType.API) {
                     //we want to show the quiz here, but we need to get the quizSubmissionId first so our
                     //api call for the QuizQuestionsFragment knows which questions to get
-                    CanvasCallback<QuizSubmissionResponse> quizSubmissionResponseCallback = new CanvasCallback<QuizSubmissionResponse>(QuizStartFragment.this) {
+                    StatusCallback<QuizSubmissionResponse> quizSubmissionResponseCallback = new StatusCallback<QuizSubmissionResponse>() {
 
                         @Override
-                        public void firstPage(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
+                        public void onResponse(Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                            QuizSubmissionResponse quizSubmissionResponse = response.body();
                             if(quizSubmissionResponse != null && quizSubmissionResponse.getQuizSubmissions() != null &&
                                     quizSubmissionResponse.getQuizSubmissions().size() > 0) {
                                 quizSubmission = quizSubmissionResponse.getQuizSubmissions().get(quizSubmissionResponse.getQuizSubmissions().size() - 1);
@@ -484,49 +504,32 @@ public class QuizStartFragment extends ParentFragment {
                         }
                     };
 
-                    QuizAPI.getFirstPageQuizSubmissions(course, quiz.getId(), quizSubmissionResponseCallback);
-
+                    QuizManager.getFirstPageQuizSubmissions(course, quiz.getId(), false, quizSubmissionResponseCallback);
                 }
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                if(retrofitError.getResponse() != null && retrofitError.getResponse().getStatus() == 403) {
+            public void onFail(Call<QuizSubmissionResponse> response, Throwable error, int code) {
+                if(code == 403) {
                     //forbidden
                     //check to see if it's because of IP restriction or bad access code or either
                     getLockedMessage();
-                    return true;
                 }
-                return super.onFailure(retrofitError);
             }
         };
 
-        quizStartSessionCallback = new CanvasCallback<Response>(this) {
-            @Override
-            public void cache(Response response, LinkHeaders linkHeaders, Response response2) {}
-
-            @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                if(response.getStatus() == 204) {
-                    //success
-                }
-                //alerting the user that we couldn't post the start session event doesn't really make sense. If something went wrong the logs will
-                //be off on the admin/teacher side
-            }
-
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                super.failure(retrofitError);
-            }
+        quizStartSessionCallback = new StatusCallback<ResponseBody>() {
+            //alerting the user that we couldn't post the start session event doesn't really make sense. If something went wrong the logs will
+            //be off on the admin/teacher side
         };
     }
 
 
     private void getLockedMessage() {
         //check to see if it's because of IP restriction or bad access code or either
-        if(quiz.getIPFilter() != null && quiz.getAccessCode() == null) {
+        if(quiz.getIpFilter() != null && quiz.getAccessCode() == null) {
             showToast(R.string.lockedIPAddress);
-        } else if(quiz.getIPFilter() == null && quiz.getAccessCode() != null) {
+        } else if(quiz.getIpFilter() == null && quiz.getAccessCode() != null) {
             showToast(R.string.lockedInvalidAccessCode);
         } else {
             //something went wrong (no data possibly)
@@ -539,12 +542,10 @@ public class QuizStartFragment extends ParentFragment {
         if(navigation != null){
 
             //post the android session started event
-            QuizAPI.postQuizStartedEvent(getCanvasContext(), quizSubmission, APIHelpers.getUserAgent(getContext()), quizStartSessionCallback);
-
+            QuizManager.postQuizStartedEvent(getCanvasContext(), quizSubmission.getQuizId(), quizSubmission.getId(), true, quizStartSessionCallback);
             Bundle bundle = QuizQuestionsFragment.createBundle(getCanvasContext(), quiz, quizSubmission, shouldLetAnswer);
 
-            navigation.addFragment(
-                    FragUtils.getFrag(QuizQuestionsFragment.class, bundle));
+            navigation.addFragment(FragUtils.getFrag(QuizQuestionsFragment.class, bundle));
         }
     }
 

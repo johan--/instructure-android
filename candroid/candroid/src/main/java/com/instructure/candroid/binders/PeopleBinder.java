@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import android.view.View;
 
 import com.instructure.candroid.holders.PeopleViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.User;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.pandautils.utils.ProfileUtils;
 
 public class PeopleBinder extends BaseBinder {
 

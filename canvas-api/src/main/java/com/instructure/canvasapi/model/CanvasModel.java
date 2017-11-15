@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -46,8 +46,6 @@ public abstract class CanvasModel<T extends CanvasComparable> extends CanvasComp
         if (getClass() != obj.getClass())
             return false;
         CanvasModel other = (CanvasModel) obj;
-        if (getId() != other.getId())
-            return false;
-        return true;
+        return getId() == other.getId();
     }
 }

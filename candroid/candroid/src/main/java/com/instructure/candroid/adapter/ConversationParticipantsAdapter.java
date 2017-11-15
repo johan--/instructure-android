@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,11 +22,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.instructure.candroid.R;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.pandautils.utils.ProfileUtils;
+
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -85,9 +85,9 @@ public class ConversationParticipantsAdapter extends ArrayAdapter<BasicUser> {
 
         if(isDropdown){
             holder.avatar.setVisibility(View.VISIBLE);
-            holder.userName.setText(mData.get(position).getUsername());
+            holder.userName.setText(mData.get(position).getName());
             holder.userName.setTextColor(mContext.getResources().getColor(R.color.canvasTextDark));
-            ProfileUtils.configureAvatarView(mContext, mData.get(position).getUsername(), mData.get(position).getAvatarUrl(), holder.avatar);
+            ProfileUtils.configureAvatarView(mContext, mData.get(position).getName(), mData.get(position).getAvatarUrl(), holder.avatar);
         }else{
             holder.avatar.setVisibility(View.GONE);
             holder.userName.setText(mDefaultText);

@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">登入API</string>
   <string name="hello_world">你好世界！</string>
   <string name="action_settings">設置</string>
   <string name="mobileVerifyGeneral">該app未獲得使用授權</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">未知服務器</string>
   <string name="errorOccurred">意外錯誤出現。</string>
   <string name="pageNotFound">無法找到該頁。</string>
-  <string name="okay">好的</string>
   <string name="confirm">確認</string>
   <string name="cancel">撤銷</string>
   <string name="help">幫助</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">嘗試登入 Canvas Network？</string>
   <string name="remove">移除</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">以其他身份檢視</string>
+  <string name="userId">使用者ID</string>
+  <string name="domain">域名</string>
+  <string name="masqueradingUserId">偽裝的使用者 ID</string>
+  <string name="masqueradingUserDomain">偽裝的域名</string>
+  <string name="masqueradingBegin">開始偽裝</string>
+  <string name="masqueradingStop">停止偽裝</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">移除這個使用者？</string>
   <string name="removedForever">要使用它們的內容，您必須再次登入該使用者。</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">找不到您的學校？輸入學校URL或按一下此處尋求幫助。</string>
   <string name="loginCanvasHelpWithUser">輸入學校URL或按一下此處尋求幫助。</string>
   <string name="loginHint">查找您的學校或學區</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">我們表現如何？</string>
-  <string name="rateUs">您如何評價我們？</string>
-  <string name="doBetter">我們需要改進的地方？</string>
-  <string name="sendFeedback">發送反饋</string>
-  <string name="suggestions">對Android版的建議</string>
-  <string name="domain">域名</string>
-  <string name="versionNum">版本：</string>
-  <string name="userId">使用者ID</string>
-  <string name="email">電郵地址</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">不要再次顯示</string>
-  <string name="installDate">安裝日期：</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">報告問題</string>
   <string name="zendesk_subject">主題</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">設備</string>
   <string name="osVersion">OS 版本</string>
+  <string name="previousLoginTitle">先前登入</string>
+  <string name="canvasNetworks">Canvas Networks</string>
+  <string name="findMySchool">尋找我的學校</string>
+  <string name="appTypeTeacher">教師</string>
+  <string name="appTypeStudent">學生</string>
+  <string name="appTypeParent">父母</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">您的學校名稱是？</string>
+  <string name="next">下一個</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">移除先前使用者</string>
+  <string name="accountDomainFooter">找不到您的學校？請嘗試輸入學校完整URL。</string>
+  <string name="accountDomainFooterLink">點擊此處獲取支援。</string>
+  <string name="login_noInternetConnectionTitle">沒有網絡連線</string>
+  <string name="login_noInternetConnectionMessage">此動作需要網絡連線。</string>
+  <string name="empty_feedback">需有主題和描述方可提交反饋。</string>
+  <string name="versionNum">版本編號</string>
+  <string name="scrollInstructions">滾動查看所有詳細資料</string>
 </resources>

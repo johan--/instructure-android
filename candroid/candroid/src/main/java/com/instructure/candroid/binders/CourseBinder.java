@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,35 +23,27 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
 import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CourseRecyclerAdapter;
-import com.instructure.candroid.fragment.CourseGridFragment;
-import com.instructure.candroid.util.MGPUtils;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.NumberHelper;
-import com.instructure.pandarecycler.util.GroupSortedList;
-import com.instructure.pandautils.views.RippleView;
 import com.instructure.candroid.activity.ColorPickerActivity;
 import com.instructure.candroid.holders.CourseHeaderViewHolder;
 import com.instructure.candroid.holders.CourseViewHolder;
 import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.candroid.model.CourseToggleHeader;
 import com.instructure.candroid.util.Analytics;
+import com.instructure.candroid.util.MGPUtils;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.utils.NumberHelper;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.CanvasContextColor;
-import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.views.RippleView;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,9 +75,9 @@ public class CourseBinder extends BaseBinder{
             }
         });
 
-        holder.clickItem.setOnRippleCompleteListener(new RippleView.OnRippleCompleteListener() {
+        holder.clickItem.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(RippleView rippleView) {
+            public void onClick(View view) {
                 if(canvasContext != null) {
                     adapterToFragmentCallback.onRowClicked(canvasContext);
                 }
@@ -181,7 +173,7 @@ public class CourseBinder extends BaseBinder{
 
         //If we show grades, is a course, and the final grade is NOT hidden
         if(showGrades && !gradesTabHidden && CanvasContext.Type.isCourse(canvasContext)
-                && !(((Course)canvasContext).isFinalGradeHidden()
+                && !(((Course)canvasContext).isHideFinalGrades()
                 || !MGPUtils.isAllGradingPeriodsShown((Course)canvasContext))) {
             Course course = (Course)canvasContext;
             if(course.isTeacher()) {
@@ -225,6 +217,6 @@ public class CourseBinder extends BaseBinder{
     }
 
     private static String constructUrl(long id, Context context){
-        return "https://" + APIHelpers.getDomain(context) + "/courses/" + id + "/grades";
+        return "https://" + ApiPrefs.getDomain() + "/courses/" + id + "/grades";
     }
 }

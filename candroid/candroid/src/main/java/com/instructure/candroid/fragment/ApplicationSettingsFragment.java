@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -14,72 +14,52 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package com.instructure.candroid.fragment;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.LoginActivity;
 import com.instructure.candroid.activity.NavigationActivity;
 import com.instructure.candroid.activity.NotificationPreferencesActivity;
 import com.instructure.candroid.activity.TutorialActivity;
 import com.instructure.candroid.dialog.LegalDialogStyled;
-import com.instructure.candroid.service.AlarmService;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.MasqueradingCallbackUtil;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.Masquerading;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.Logger;
+import com.instructure.canvasapi2.utils.MasqueradeHelper;
+import com.instructure.loginapi.login.dialog.MasqueradingDialog;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.pandautils.utils.Prefs;
 import com.instructure.pandautils.utils.TutorialUtils;
-import com.sleepbot.datetimepicker.time.RadialPickerLayout;
-import com.sleepbot.datetimepicker.time.TimePickerDialog;
 
-import java.io.File;
 import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-public class ApplicationSettingsFragment extends OrientationChangeFragment implements TimePickerDialog.OnTimeSetListener{
+public class ApplicationSettingsFragment extends OrientationChangeFragment implements MasqueradingDialog.OnMasqueradingSet {
 
     public static final String LANDING_PAGE = "landing_page";
     public static final String LANGUAGE = "language";
@@ -92,23 +72,14 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
     private Spinner landingPageSpinner;
     private Spinner languageSpinner;
     private View rootView;
-    private View wearReminder, wearNotifications;
-    private CheckBox wearNotificationsCheckBox;
-    private TimePickerDialog timePickerDialog;
-    private GoogleApiClient client;
     private CheckBox showTutorialCB;
 
     //for masquerading
-    private LinearLayout masquerade;
-    private Button btnMasquerade;
-    private Button btnMasqueradeSwitch;
     private GestureDetector gesture;
     private View.OnTouchListener gestureListener;
     private long first = 0;
     private long second = 0;
     private boolean firstFree = true;
-    private EditText masqueradeId;
-    private EditText masqueradeDomain;
     private View notificationPreferences;
     private ScrollView scrollView;
 
@@ -120,18 +91,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
         return getString(R.string.settings);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        if(savedInstanceState != null) {
-            boolean showMasquerade = savedInstanceState.getBoolean(Const.MASQUERADE_VISIBLE, false);
-            if(showMasquerade && masquerade != null) {
-                masquerade.setVisibility(View.VISIBLE);
-            }
-        }
-
-        return view;
-    }
 
     @Override
     public View populateView(LayoutInflater inflater, ViewGroup container) {
@@ -204,30 +163,9 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
         funModeCheckBox.setChecked(ApplicationManager.getPrefs(getContext()).load(Const.FUN_MODE, false));
         calendarStartDayCheckBox.setChecked(startWeekMonday);
 
-        btnMasquerade = (Button) rootView.findViewById(R.id.btn_masquerade);
-        btnMasqueradeSwitch = (Button) rootView.findViewById(R.id.btn_masquerade_switch);
-        masquerade = (LinearLayout) rootView.findViewById(R.id.masquerade);
-        masqueradeId = (EditText) rootView.findViewById(R.id.masqueradeId);
-        masqueradeDomain = (EditText) rootView.findViewById(R.id.masqueradeDomain);
-        wearReminder = rootView.findViewById(R.id.wearReminder);
-        wearNotifications = rootView.findViewById(R.id.wearNotifications);
-        wearNotificationsCheckBox = (CheckBox) rootView.findViewById(R.id.wearNotificationsCB);
-
-        if(Masquerading.isMasquerading(getActivity())) {
-            masquerade.setVisibility(View.VISIBLE);
-            masqueradeId.setText(String.valueOf(Masquerading.getMasqueradingId(getActivity())));
-            masqueradeDomain.setText(APIHelpers.getDomain(getActivity()));
-            btnMasquerade.setText(getResources().getString(R.string.stopMasquerading));
-            btnMasqueradeSwitch.setVisibility(View.VISIBLE);
-        } else {
-            btnMasqueradeSwitch.setVisibility(View.GONE);
-        }
-
         showTutorialCB.setChecked(!TutorialUtils.areAllTutorialsRead(ApplicationManager.getPrefs(getContext())));
         showTutorialCB.setOnCheckedChangeListener(tutorialCheckChangeListener);
         notificationPreferences.setOnClickListener(notificationPreferencesClickListener);
-        wearReminder.setOnClickListener(wearReminderClickListener);
-        checkIfWearableConnected();
 
         scrollView = (ScrollView) rootView.findViewById(R.id.scrollView);
 
@@ -243,17 +181,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
             //Log to GA
             Analytics.trackAppFlow(getActivity(), NotificationPreferencesActivity.class);
             startActivity(new Intent(getActivity(), NotificationPreferencesActivity.class));
-        }
-    };
-
-    private View.OnClickListener wearReminderClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            //Log to GA
-            Calendar calendar = Calendar.getInstance();
-            timePickerDialog = TimePickerDialog.newInstance(ApplicationSettingsFragment.this, calendar.get(Calendar.HOUR_OF_DAY) ,calendar.get(Calendar.MINUTE), false, false);
-
-            timePickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG);
         }
     };
 
@@ -302,23 +229,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
         setUpListeners();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(Const.MASQUERADE_VISIBLE, masquerade.getVisibility() == View.VISIBLE);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        //we need to dismiss/show the dialogs so the get recreated in their proper orientation
-        if(timePickerDialog.isAdded()) {
-            timePickerDialog.dismiss();
-            timePickerDialog.show(getActivity().getSupportFragmentManager(), TIMEPICKER_TAG);
-        }
-    }
-
     private void setUpListeners(){
 
         funModeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -336,20 +246,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
             }
         });
 
-        wearNotificationsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                //Log to GA
-                ApplicationManager.getPrefs(getContext()).save(Const.WEAR_NOTIFICATIONS, isChecked);
-
-                if(isChecked) {
-                    wearReminder.setVisibility(View.VISIBLE);
-                } else {
-                    wearReminder.setVisibility(View.GONE);
-                }
-            }
-        });
-
         legal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -357,44 +253,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
             }
         });
 
-        btnMasqueradeSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startMasquerading();
-            }
-        });
-        btnMasquerade.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(btnMasquerade.getText().toString().equals(getResources().getString(R.string.startMasquerading))) {
-                    startMasquerading();
-                }
-                else {
-                    masquerade.setVisibility(View.GONE);
-                    masqueradeId.setText("");
-                    Masquerading.stopMasquerading(getActivity());
-
-                    //delete the cache for the masqueraded user
-                    File cacheDir = new File(getActivity().getFilesDir(), "cache_masquerade");
-                    //need to delete the contents of the internal cache folder so previous user's results don't show up on incorrect user
-                    com.instructure.canvasapi.utilities.FileUtilities.deleteAllFilesInDirectory(cacheDir);
-
-                    //clear any shared preferences for the masqueraded user
-                    SharedPreferences masq_settings = getActivity().getSharedPreferences(ApplicationManager.MASQ_PREF_NAME, 0);
-                    SharedPreferences.Editor masq_editor = masq_settings.edit();
-                    masq_editor.clear();
-                    masq_editor.apply();
-
-
-                    //totally restart the app so the masquerading will apply
-                    Intent mStartActivity = new Intent(getActivity(), NavigationActivity.getStartActivityClass());
-                    PendingIntent mPendingIntent = PendingIntent.getActivity(getActivity(), com.instructure.candroid.util.Const.MASQUERADING_PENDING_INTENT_ID, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                    AlarmManager mgr = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-                    System.exit(0);
-                }
-            }
-        });
 
         //Set up gesture for the two finger double tap to show the masquerading option
         gesture = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener(){
@@ -410,17 +268,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
             }
         };
 
-        masqueradeId.setRawInputType(Configuration.KEYBOARD_12KEY);
-        masqueradeId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_GO) {
-                    btnMasquerade.performClick();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         //set the gestureListener on the rootview so the two finger double tap will register
         rootView.setOnTouchListener(gestureListener);
         View rootScrollView = rootView.findViewById(R.id.rootScrollView);
@@ -435,34 +282,14 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
         }
     }
 
-    private void startMasquerading() {
-        if(masqueradeId.getText().toString().trim().length() == 0) {
-            Toast.makeText(getActivity(), R.string.emptyId, Toast.LENGTH_LONG).show();
-            return;
-        }
+    @Override
+    public void onStartMasquerading(String domain, Long userId) {
+        MasqueradeHelper.startMasquerading(userId, domain, NavigationActivity.getStartActivityClass());
+    }
 
-        //Actually try to masquerade.
-        long id = 0;
-        if(masqueradeId.getText().toString().trim().length() > 0) {
-            try {
-                id = Long.parseLong(masqueradeId.getText().toString());
-            }
-            catch(NumberFormatException e) {
-                id = 0;
-            }
-        }
-
-        String domain = "";
-        //Check to see if they're trying to switch domain as site admin
-        if(masqueradeDomain.getText().toString().trim().length() != 0) {
-            domain = masqueradeDomain.getText().toString().trim();
-            //if there are no periods, append .instructure.com
-            if (!domain.contains(".")) {
-                domain += ".instructure.com";
-            }
-        }
-
-        Masquerading.startMasquerading(id, getActivity(), MasqueradingCallbackUtil.getMasqueradingCallback(this), domain);
+    @Override
+    public void onStopMasquerading() {
+        MasqueradeHelper.stopMasquerading(NavigationActivity.getStartActivityClass());
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -493,18 +320,12 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
                     //click2 and the next click1 is < 500)
 
                     if (Math.abs(second-first) < 500) {
-                        if(masquerade.getVisibility() == View.GONE) {
-                            masquerade.setVisibility(View.VISIBLE);
-                            //set the domain as the current domain, they can change it if they want to
-                            masqueradeDomain.setText(APIHelpers.getDomain(getActivity()));
-                            //put the focus on the edit text for masquerading
-                            masqueradeId.requestFocus();
-                        }
+                        MasqueradingDialog.get(ApiPrefs.getDomain(), ApiPrefs.isMasquerading(), this).show(getFragmentManager(), MasqueradingDialog.class.getSimpleName());
                     }
                 }
             }
         } catch (Exception e){
-            Utils.e("Error: " + e);
+            Logger.e("Error: " + e);
         }
 
         return true;
@@ -588,103 +409,6 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
             return getResources().getStringArray(R.array.supported_languages)[position];
         }
 
-    }
-
-    @Override
-    public void onTimeSet(RadialPickerLayout radialPickerLayout, int hourOfDay, int minute) {
-        Prefs prefs = new Prefs(getActivity(), Const.WEAR_REMINDER);
-        prefs.save(Const.WEAR_REMINDER_HOUR, hourOfDay);
-        prefs.save(Const.WEAR_REMINDER_MIN, minute);
-
-        setupNotification();
-    }
-
-    private void setupNotification() {
-        AlarmService.scheduleAlarm(getActivity());
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Check if wearable is connected
-    //
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void checkIfWearableConnected() {
-
-        retrieveDeviceNode(new Callback() {
-            @Override
-            public void success(String nodeId) {
-                if(getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            wearNotifications.setVisibility(View.VISIBLE);
-
-                            //set the checked state here after the onCheckChanged listener has been set. This way when we set it the
-                            //row to change the reminder time will also appear
-                            wearNotificationsCheckBox.setChecked(ApplicationManager.getPrefs(getContext()).load(Const.WEAR_NOTIFICATIONS, false));
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void failed(String message) {
-                if(getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            wearNotifications.setVisibility(View.GONE);
-                        }
-                    });
-                }
-            }
-        });
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if(client != null) {
-            client.disconnect();
-            client = null;
-        }
-    }
-
-
-    private GoogleApiClient getGoogleApiClient(Context context) {
-        if (client == null)
-            client = new GoogleApiClient.Builder(context)
-                    .addApi(Wearable.API)
-                    .build();
-        return client;
-    }
-
-    private interface Callback {
-        public void success(final String nodeId);
-        public void failed(final String message);
-    }
-
-    private void retrieveDeviceNode(final Callback callback) {
-        final GoogleApiClient client = getGoogleApiClient(getActivity());
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                NodeApi.GetConnectedNodesResult result =
-                        Wearable.NodeApi.getConnectedNodes(client).await();
-                List<Node> nodes = result.getNodes();
-                if (nodes.size() > 0) {
-                    String nodeId = nodes.get(0).getId();
-                    callback.success(nodeId);
-                } else {
-                    callback.failed("no wearables found");
-                }
-                client.disconnect();
-            }
-        }).start();
     }
 
     public boolean allowBookmarking() {

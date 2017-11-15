@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,39 +32,32 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.BaseRouterActivity;
 import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.LoggingUtility;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.StreamItem;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AssignmentManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.StreamItem;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.RequestCodes;
-import com.instructure.pandautils.utils.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.HashMap;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class AssignmentFragment extends ParentFragment implements SubmissionDetailsFragment.SubmissionDetailsFragmentCallback {
 
@@ -91,7 +84,7 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
     private String message;
 
     // callback
-    private CanvasCallback<Assignment> assignmentCallback;
+    private StatusCallback<Assignment> assignmentCallback;
     private Bundle submissionFragmentBundle;
 
     @Override
@@ -205,8 +198,8 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
         super.onResume();
 
         //Handle fragment detached exception. This can get called before onCreate's asynchronous finish happens.
-        if(course != null) {
-            AssignmentAPI.getAssignment(course.getId(), assignmentId, assignmentCallback);
+        if (course != null) {
+            AssignmentManager.getAssignment(assignmentId, course.getId(), true, assignmentCallback);
         }
     }
 
@@ -235,33 +228,6 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
     ///////////////////////////////////////////////////////////////////////////
     // View
     ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void createOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.createOptionsMenu(menu, inflater);
-        if (course != null && course.isTeacher()) {
-            inflater.inflate(R.menu.edit_assignment_menu, menu);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-
-        switch (menuItem.getItemId()) {
-            case R.id.menu_edit_assignment:
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
-                    Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                Navigation navigation = getNavigation();
-                if(navigation != null){
-                    navigation.addFragment(FragUtils.getFrag(EditAssignmentDetailsFragment.class, EditAssignmentDetailsFragment.createBundle(assignment, course)));
-                }
-                return true;
-        }
-
-        return super.onOptionsItemSelected(menuItem);
-    }
 
     public void updatedAssignment(Assignment assignment) {
         populateFragments(assignment, false, false);
@@ -318,8 +284,8 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source){
-        if(source.isAPI()) {
+    public void onCallbackFinished(ApiType type){
+        if(type.isAPI()) {
             hideProgressBar();
         }
     }
@@ -449,35 +415,29 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
     ///////////////////////////////////////////////////////////////////////////
 
     public void setUpCallback() {
-        assignmentCallback = new CanvasCallback<Assignment>(this) {
+        assignmentCallback = new StatusCallback<Assignment>() {
             @Override
-            public void cache(Assignment assignment, LinkHeaders linkHeaders, Response response) {
-                // Do nothing for now
-            }
-
-            @Override
-            public void firstPage(Assignment assignment, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<Assignment> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
-
-                if(assignment != null) {
+                Assignment assignment = response.body();
+                if (assignment != null) {
                     AssignmentFragment.this.assignment = assignment;
-                    populateFragments(assignment, true, APIHelpers.isCachedResponse(response));
+                    populateFragments(assignment, true, APIHelper.isCachedResponse(response));
                     if (getAssignmentDetailsFragment() != null) {
-                        getAssignmentDetailsFragment().setAssignmentWithNotification(assignment, message, true, APIHelpers.isCachedResponse(response));
+                        getAssignmentDetailsFragment().setAssignmentWithNotification(assignment, message, true, APIHelper.isCachedResponse(response));
                     }
                     setupTitle(getActionbarTitle());
                 }
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<Assignment> callResponse, Throwable error, retrofit2.Response response) {
                 RubricFragment rubricFragment = getRubricFragment();
                 if (rubricFragment != null) {
                     rubricFragment.onNoNetwork();
                 }
-                return super.onFailure(retrofitError);
             }
         };
     }

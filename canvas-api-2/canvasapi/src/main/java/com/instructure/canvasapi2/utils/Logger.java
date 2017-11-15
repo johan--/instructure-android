@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,7 +17,11 @@
 
 package com.instructure.canvasapi2.utils;
 
+import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
@@ -27,30 +31,39 @@ import java.util.Locale;
 
 public class Logger {
 
-    public static final String LOG_TAG = "canvasLog";
+    private static final String LOG_TAG = "canvasLog";
 
-    public static void d(String s) {
+    public static void d(@Nullable String s) {
+        if(s == null){ s = "Value was null."; }
         Log.d(LOG_TAG, s);
     }
 
-    public static void i(String s) {
+    public static void i(@Nullable String s) {
+        if(s == null){ s = "Value was null."; }
         Log.i(LOG_TAG, s);
     }
 
-    public static void e(String s) {
+    public static void e(@Nullable String s) {
+        if(s == null){ s = "Value was null."; }
         Log.e(LOG_TAG, s);
     }
 
-    public static void v(String s) {
+    public static void v(@Nullable String s) {
+        if(s == null){ s = "Value was null."; }
         Log.v(LOG_TAG, s);
     }
 
-    public static void date(String s, GregorianCalendar date) {
+    public static void w(@Nullable String s) {
+        if (s == null) s = "Value was null.";
+        Log.w(LOG_TAG, s);
+    }
+
+    public static void date(@Nullable String s, GregorianCalendar date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz", Locale.US);
         Log.d(LOG_TAG, s + ": " + sdf.format(new Date(date.getTimeInMillis())));
     }
 
-    public static void logBundle(final Bundle extras) {
+    public static void logBundle(@Nullable final Bundle extras) {
         if(extras != null) {
             d("---====---LOGGING BUNDLE---====---");
             if(extras.size() == 0) {
@@ -71,5 +84,47 @@ public class Logger {
         } else {
             d("Bundle was null.");
         }
+    }
+
+    public static <F extends Fragment> String getFragmentName(F fragment) {
+        if(fragment != null) {
+            return fragment.getClass().getName();
+        }
+        return "UNKNOWN";
+    }
+
+    public static <F extends android.support.v4.app.Fragment> String getFragmentName(F fragment) {
+        if(fragment != null) {
+            return fragment.getClass().getName();
+        }
+        return "UNKNOWN";
+    }
+
+    /**
+     * List of ISO 3166-1 alpha-2 codes of countries whose laws restrict us from logging user details
+     */
+    private static String[] LOGGING_DISALLOWED_COUNTRY_CODES = new String[]{"CA"};
+
+    /**
+     * Whether user detail logging is allowed for the current country. This checks the network country,
+     * the SIM country, and the current locale country. If <i>any</i> of these match a disallowed
+     * country then this method will return false.
+     * @return True if user detail logging is allowed, false otherwise.
+     */
+    public static boolean canLogUserDetails() {
+        TelephonyManager telephonyManager = (TelephonyManager) ContextKeeper.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+        String networkCountryCode = telephonyManager.getNetworkCountryIso().toUpperCase(Locale.US);
+        String simCountryCode = telephonyManager.getSimCountryIso().toUpperCase(Locale.US);
+        String localeCountryCode = Locale.getDefault().getCountry().toUpperCase(Locale.US);
+
+        for (String disallowedCountryCode : LOGGING_DISALLOWED_COUNTRY_CODES) {
+            if (disallowedCountryCode.equals(networkCountryCode)
+                    || disallowedCountryCode.equals(simCountryCode)
+                    || disallowedCountryCode.equals(localeCountryCode)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

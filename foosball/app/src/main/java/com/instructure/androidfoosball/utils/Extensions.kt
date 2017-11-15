@@ -26,9 +26,12 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.support.design.widget.TextInputLayout
+import android.support.v4.view.GestureDetectorCompat
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -39,9 +42,9 @@ import com.instructure.androidfoosball.ktmodels.User
 import com.instructure.androidfoosball.views.UserInitialsDrawable
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.displayMetrics
+import org.jetbrains.anko.sdk21.listeners.onTouch
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.comparisons.compareBy
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -50,7 +53,7 @@ fun ImageView.setAvatar(user: User?, avatarSize: Int = 0) {
     val picasso = Picasso.with(context).apply { cancelRequest(this@setAvatar) }
     when {
         user == null -> setImageResource(R.drawable.sadpanda)
-        user.avatar.isNullOrBlank() -> setImageDrawable(UserInitialsDrawable(user, avatarSize))
+        user.avatar.isBlank() -> setImageDrawable(UserInitialsDrawable(user, avatarSize))
         else -> picasso.load(user.avatar).placeholder(R.drawable.sadpanda).error(R.drawable.sadpanda).into(this)
     }
 }
@@ -63,7 +66,7 @@ fun ImageView.setAvatarUrl(url: String?) {
     }
 }
 
-fun String.elseIfBlank(alt: String) = if (isBlank()) alt else this
+fun String?.elseIfBlank(alt: String): String = if (isNullOrBlank()) alt else this!!
 
 fun Activity.shortToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 fun Activity.shortToast(messageId: Int) = Toast.makeText(this, messageId, Toast.LENGTH_SHORT).show()
@@ -71,14 +74,14 @@ fun Activity.longToast(message: String) = Toast.makeText(this, message, Toast.LE
 fun Activity.longToast(messageId: Int) = Toast.makeText(this, messageId, Toast.LENGTH_LONG).show()
 
 fun TextInputLayout.validate(validator: (String) -> Boolean, errorMessage: String, afterValidation: (isValid: Boolean) -> Unit): Boolean {
-    if (validator(editText?.text.toString())) {
+    return if (validator(editText?.text.toString())) {
         error = ""
         afterValidation(true)
-        return true
+        true
     } else {
         error = errorMessage
         afterValidation(false)
-        return false
+        false
     }
 }
 
@@ -104,11 +107,11 @@ fun TextInputLayout.validateOnTextChanged(validator: (String) -> Boolean, errorM
 
 var TextInputLayout.text: String
     get() = editText?.text.toString()
-    set(newText: String) {
-        editText?.setText(newText)
+    set(value) {
+        editText?.setText(value)
     }
 
-fun View.setVisible(isVisible: Boolean = true) {
+fun <T : View> T.setVisible(isVisible: Boolean = true): T = apply {
     visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
@@ -150,22 +153,22 @@ val User.avatarColor: Int
 /** The user's initials, or entire name if it's only one word */
 val User.initials: String
     get() {
-        if (name.isNullOrBlank()) return "?"
+        if (name.isBlank()) return "?"
         val names = name.split(' ', limit = 3).filter { it.isNotBlank() }
-        if (names.size == 1) {
-            return names[0]
+        return if (names.size == 1) {
+            names[0]
         } else {
-            return names.fold("") { initials, nextName -> initials + nextName[0].toUpperCase() }
+            names.fold("") { initials, nextName -> initials + nextName[0].toUpperCase() }
         }
     }
 
-class Unless<T>(val value: T, val condition: (T) -> Boolean) {
+class Unless<T>(val value: T, private val condition: (T) -> Boolean) {
     infix fun then(alternateValue: T) = if (condition(value)) alternateValue else value
 }
 
 infix fun <T> T.unless(condition: (T) -> Boolean) = Unless(this, condition)
 
-class ValidatorChain(val validators: MutableList<Validator<*>> = ArrayList()) {
+class ValidatorChain(private val validators: MutableList<Validator<*>> = ArrayList()) {
     infix fun first(validator: Validator<*>) = then(validator)
 
     infix fun then(validator: Validator<*>): ValidatorChain {
@@ -174,13 +177,11 @@ class ValidatorChain(val validators: MutableList<Validator<*>> = ArrayList()) {
     }
 
     infix fun finally(block: () -> Unit) {
-        validators.firstOrNull { !it.validate() }
-        for (validator in validators) if (!validator.validate()) return
-        block()
+        if (validators.all { it.validate() }) block()
     }
 }
 
-data class Validator<T>(val field: T, val errorText: String, val condition: (T) -> Boolean, val onFail: (String) -> Unit) {
+data class Validator<out T>(val field: T, private val errorText: String, private val condition: (T) -> Boolean, private val onFail: (String) -> Unit) {
     fun validate() = condition(field).apply { if (!this) onFail(errorText) }
 }
 
@@ -227,3 +228,26 @@ class Binder<in T, out V : View>(private val finder: (T) -> View?) : ReadOnlyPro
 fun Int.toDp(context: Context) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.displayMetrics)
 fun Float.toDp(context: Context) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, context.displayMetrics)
 
+fun View.onDoubleTap(listener: () -> Unit) {
+    val detector = GestureDetectorCompat(context, object : GestureDetector.OnGestureListener {
+        override fun onShowPress(p0: MotionEvent?) = Unit
+        override fun onSingleTapUp(p0: MotionEvent?): Boolean = true
+        override fun onDown(p0: MotionEvent?): Boolean = true
+        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = true
+        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = true
+        override fun onLongPress(p0: MotionEvent?) = Unit
+    })
+
+    detector.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
+        override fun onDoubleTapEvent(p0: MotionEvent?) = true
+        override fun onSingleTapConfirmed(p0: MotionEvent?) = true
+        override fun onDoubleTap(p0: MotionEvent?): Boolean {
+            listener()
+            return true
+        }
+    })
+
+    this.onTouch { _, event -> detector.onTouchEvent(event) }
+}
+
+fun <E> Iterable<E>.disjunctiveUnion(other: Iterable<E>): Set<E> = (this - other).union(other - this)

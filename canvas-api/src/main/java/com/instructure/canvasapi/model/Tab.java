@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -181,9 +181,8 @@ public class Tab extends CanvasModel<Tab> implements Parcelable {
         Tab tab = (Tab) o;
 
         if (!id.equals(tab.id)) return false;
-        if (!label.equals(tab.label)) return false;
+        return label.equals(tab.label);
 
-        return true;
     }
 
     @Override

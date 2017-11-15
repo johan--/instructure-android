@@ -1,23 +1,31 @@
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, version 3 of the License.
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
  *
  */
 package instructure.rceditor;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +42,21 @@ class RCEUtils {
     //<span style="color: #1482c8;"></span>
     private static final String HEX_COMMA_REGEX = "#([A-Fa-f0-9]{3,8});";
 
+    public static void colorIt(int color, ImageView view) {
+        Drawable drawable = view.getDrawable();
+        if(drawable == null) return;
+
+        drawable.mutate().setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
+        view.setImageDrawable(drawable);
+    }
+
+    public static void colorIt(int color, ImageButton view) {
+        Drawable drawable = view.getDrawable();
+        if(drawable == null) return;
+
+        drawable.mutate().setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
+        view.setImageDrawable(drawable);
+    }
 
     @Nullable
     private static String workaround_RBG_2_HEX(String html) {
@@ -112,5 +135,35 @@ class RCEUtils {
         validated = workaroundInvalidHex(validated);
 //        Log.d("HTML", "VALIDATE(HEX;): " + validated);
         return validated;
+    }
+
+    static ColorStateList makeEditTextColorStateList(@ColorInt int defaultColor, @ColorInt int tintColor) {
+        int[][] states = new int[][] {
+                new int[] {-android.R.attr.state_enabled},
+                new int[] {android.R.attr.state_focused, -android.R.attr.state_pressed},
+                new int[] {android.R.attr.state_focused, android.R.attr.state_pressed},
+                new int[] {-android.R.attr.state_focused, android.R.attr.state_pressed},
+                new int[] {android.R.attr.state_checked},
+                new int[] {}
+        };
+
+        int[] colors = new int[] {
+                defaultColor,
+                tintColor,
+                tintColor,
+                tintColor,
+                tintColor,
+                defaultColor
+        };
+
+        return new ColorStateList(states, colors);
+    }
+
+    static int increaseAlpha(@ColorInt int color) {
+        int a = 0x32;
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        return Color.argb(a, r, g, b);
     }
 }

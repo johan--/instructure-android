@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
 import com.instructure.candroid.R;
 import com.instructure.candroid.binders.ExpandableHeaderBinder;
 import com.instructure.candroid.binders.RubricBinder;
@@ -29,32 +30,38 @@ import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.holders.RubricTopHeaderViewHolder;
 import com.instructure.candroid.holders.RubricViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.util.NoNetworkErrorDelegate;
-import com.instructure.candroid.view.EmptyPandaView;
-import com.instructure.canvasapi.api.SubmissionAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.RubricCriterion;
-import com.instructure.canvasapi.model.RubricCriterionRating;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.candroid.model.RubricCommentItem;
+import com.instructure.candroid.model.RubricItem;
+import com.instructure.candroid.model.RubricRatingItem;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.SubmissionManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.RubricCriterion;
+import com.instructure.canvasapi2.models.RubricCriterionAssessment;
+import com.instructure.canvasapi2.models.RubricCriterionRating;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
+
 import java.util.HashMap;
 import java.util.List;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import java.util.Map;
 
-public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCriterion, RubricCriterionRating, RecyclerView.ViewHolder> {
+import retrofit2.Call;
+
+public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCriterion, RubricItem, RecyclerView.ViewHolder> {
 
     private CanvasContext mCanvasContext;
     private Assignment mAssignment;
     private AdapterToFragmentCallback mAdapterToFragment;
-    private CanvasCallback<Submission> mSubmissionCallback;
+    private StatusCallback<Submission> mSubmissionCallback;
     private RubricCriterion mTopViewHeader; // The top header is just a group with a different view layout
+    private Map<String, RubricCriterionAssessment> mAssessmentMap = new HashMap<>();
 
     // region Order Work-around
     // Since BaseListRecyclerAdapter uses a sorted list to store the list items, there has to be something to order them by.
@@ -64,12 +71,12 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
 
     /* For testing purposes only */
     protected RubricRecyclerAdapter(Context context){
-        super(context, RubricCriterion.class, RubricCriterionRating.class);
+        super(context, RubricCriterion.class, RubricItem.class);
     }
 
-    public RubricRecyclerAdapter(Context context, CanvasContext canvasContext, EmptyPandaView emptyRubricView, AdapterToFragmentCallback adapterToFragmentCallback) {
-        super(context, RubricCriterion.class, RubricCriterionRating.class);
-        mTopViewHeader = new RubricCriterion(null);
+    public RubricRecyclerAdapter(Context context, CanvasContext canvasContext, AdapterToFragmentCallback adapterToFragmentCallback) {
+        super(context, RubricCriterion.class, RubricItem.class);
+        mTopViewHeader = new RubricCriterion();
         mTopViewHeader.setId("TopViewHeader"); // needs an id for expandableRecyclerAdapter to work
         mCanvasContext = canvasContext;
         mAdapterToFragment = adapterToFragmentCallback;
@@ -103,9 +110,10 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
     public void contextReady() {}
 
     @Override
-    public void onBindChildHolder(RecyclerView.ViewHolder holder, RubricCriterion rubricCriterion, RubricCriterionRating rubricCriterionRating) {
+    public void onBindChildHolder(RecyclerView.ViewHolder holder, RubricCriterion rubricCriterion, RubricItem rubricItem) {
         if(!mAssignment.isMuted()){
-            RubricBinder.bind(getContext(), (RubricViewHolder) holder, rubricCriterionRating, mCanvasContext);
+            RubricCriterionAssessment assessment = mAssessmentMap.get(rubricCriterion.getId());
+            RubricBinder.Companion.bind(getContext(), (RubricViewHolder) holder, rubricItem, rubricCriterion, mAssignment.isFreeFormCriterionComments(), assessment, mCanvasContext);
         }
     }
 
@@ -115,7 +123,7 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
             onBindTopHeaderHolder(holder);
         } else {
             if(!mAssignment.isMuted()) {
-                ExpandableHeaderBinder.bind(getContext(), mCanvasContext, (ExpandableViewHolder) holder, rubricCriterion, rubricCriterion.getCriterionDescription(), isExpanded, getViewHolderHeaderClicked());
+                ExpandableHeaderBinder.bind(getContext(), mCanvasContext, (ExpandableViewHolder) holder, rubricCriterion, rubricCriterion.getDescription(), isExpanded, getViewHolderHeaderClicked());
             }
         }
     }
@@ -137,38 +145,25 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
      */
     public void loadDataChained(boolean isWithinAnotherCallback, boolean isCached) {
         if (mAssignment == null) { return; }
-        if (isWithinAnotherCallback) {
-            SubmissionAPI.getSubmissionWithCommentsAndHistoryChained(mCanvasContext, mAssignment.getId(), APIHelpers.getCacheUser(getContext()).getId(), mSubmissionCallback, isCached);
-        } else {
-            SubmissionAPI.getSubmissionWithCommentsAndHistory(mCanvasContext, mAssignment.getId(), APIHelpers.getCacheUser(getContext()).getId(), mSubmissionCallback);
-        }
+        SubmissionManager.getSingleSubmission(mCanvasContext.getId(), mAssignment.getId(), ApiPrefs.getUser().getId(), mSubmissionCallback, isRefresh());
     }
 
     @Override
     public void setupCallbacks() {
-        mSubmissionCallback = new CanvasCallback<Submission>(this, new NoNetworkErrorDelegate()) {
+        mSubmissionCallback = new StatusCallback<Submission>() {
             @Override
-            public void firstPage(Submission submission, LinkHeaders linkHeaders, Response response) {
-                // Don't mark freeFormComments since we only display the RubricCriterionRating in those cases.
-                if (submission != null && mAssignment.hasRubric() && !mAssignment.isFreeFormCriterionComments()) {
-                    mAssignment.getRubric().get(0).markGrades(submission.getRubricAssessment(), mAssignment.getRubric());
-                }
-                mAssignment.setLastSubmission(submission);
+            public void onResponse(retrofit2.Response<Submission> response, LinkHeaders linkHeaders, ApiType type) {
+                Submission submission = response.body();
+                mAssessmentMap = submission.getRubricAssessment();
+                mAssignment.setSubmission(submission);
                 mAdapterToFragment.onRefreshFinished();
                 populateAssignmentDetails();
                 setAllPagesLoaded(true);
             }
 
-            //Submission API stuff sometimes hit 404 errors.
-            //We should hide the progress dialog when that happens.
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<Submission> callResponse, Throwable error, retrofit2.Response response) {
                 populateAssignmentDetails();
-                //getting the submission fails for a teacher, so don't show the crouton
-                if(!((Course)mCanvasContext).isTeacher()) {
-                    return false;
-                }
-                return true;
             }
         };
     }
@@ -195,15 +190,16 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
             final List<RubricCriterionRating> rubricCriterionRatings = rubricCriterion.getRatings();
             for(RubricCriterionRating rating : rubricCriterionRatings) {
                 mInsertedOrderHash.put(rubricCriterion.getId(), ++insertCount);
-                addOrUpdateItem(rubricCriterion, rating);
+                addOrUpdateItem(rubricCriterion, new RubricRatingItem(rating));
             }
+            populateFreeFormRatingItems(rubric);
         }
     }
 
     private void populateFreeFormRatingItems(List<RubricCriterion> rubric) {
         int insertCount = 0;
         for(RubricCriterion rubricCriterion : rubric){
-            RubricCriterionRating gradedRating = getFreeFormRatingForCriterion(rubricCriterion);
+            RubricItem gradedRating = getFreeFormRatingForCriterion(rubricCriterion);
             if( gradedRating != null){
                 mInsertedOrderHash.put(rubricCriterion.getId(), ++insertCount);
                 addOrUpdateItem(rubricCriterion, gradedRating);
@@ -211,16 +207,15 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
         }
     }
 
-    private RubricCriterionRating getFreeFormRatingForCriterion(RubricCriterion criterion){
-        Submission lastSubmission = mAssignment.getLastSubmission();
+    @Nullable
+    private RubricItem getFreeFormRatingForCriterion(RubricCriterion criterion){
+        Submission lastSubmission = mAssignment.getSubmission();
         if(lastSubmission != null){
-          RubricCriterionRating rating =  lastSubmission.getRubricAssessmentHash().get(criterion.getId());
+          RubricCriterionAssessment rating =  lastSubmission.getRubricAssessment().get(criterion.getId());
             if(rating != null){
-                rating.setId(criterion.getId()); // We give the rating the criterion's id since the api doesn't return one
-                rating.setMaxPoints(criterion.getPoints());
-                rating.setIsFreeFormComment(true);
+                return new RubricCommentItem(rating.getComments(), rating.getPoints());
             }
-            return rating;
+            return null;
         }
         return null;
     }
@@ -238,11 +233,11 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
     }
 
     private boolean containsGrade() {
-        return mAssignment != null && mAssignment.getLastSubmission() != null && mAssignment.getLastSubmission().getGrade() != null && !mAssignment.getLastSubmission().getGrade().equals("null");
+        return mAssignment != null && mAssignment.getSubmission() != null && mAssignment.getSubmission().getGrade() != null && !mAssignment.getSubmission().getGrade().equals("null");
     }
 
     private boolean isExcused() {
-        return mAssignment != null && mAssignment.getLastSubmission() != null && mAssignment.getLastSubmission().isExcused();
+        return mAssignment != null && mAssignment.getSubmission() != null && mAssignment.getSubmission().isExcused();
     }
 
     private boolean isGradeLetterOrPercentage(String grade) {
@@ -256,7 +251,7 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
             return getContext().getString(R.string.grade) + "\n" + getContext().getString(R.string.excused) + " / " + pointsPossible;
         }
         if (containsGrade()) {
-            String grade = mAssignment.getLastSubmission().getGrade();
+            String grade = mAssignment.getSubmission().getGrade();
             if (isGradeLetterOrPercentage(grade)) {
                 return getContext().getString(R.string.grade) + "\n" + grade;
             } else {
@@ -272,9 +267,9 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
             return null;
         }
         if (containsGrade()) {
-            String grade = mAssignment.getLastSubmission().getGrade();
+            String grade = mAssignment.getSubmission().getGrade();
             if (isGradeLetterOrPercentage(grade)) {
-                return getContext().getString(R.string.points) + "\n" +  mAssignment.getLastSubmission().getScore() + " / " + pointsPossible;
+                return getContext().getString(R.string.points) + "\n" +  mAssignment.getSubmission().getScore() + " / " + pointsPossible;
             } else {
                 return null;
             }
@@ -313,7 +308,7 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
 
             @Override
             public boolean areContentsTheSame(RubricCriterion oldGroup, RubricCriterion newGroup) {
-                return oldGroup.getCriterionDescription().equals(newGroup.getCriterionDescription());
+                return oldGroup.getDescription().equals(newGroup.getDescription());
             }
 
             @Override
@@ -338,46 +333,60 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
     }
 
     @Override
-    public GroupSortedList.ItemComparatorCallback<RubricCriterion, RubricCriterionRating> createItemCallback() {
-        return new GroupSortedList.ItemComparatorCallback<RubricCriterion, RubricCriterionRating>() {
+    public GroupSortedList.ItemComparatorCallback<RubricCriterion, RubricItem> createItemCallback() {
+        return new GroupSortedList.ItemComparatorCallback<RubricCriterion, RubricItem>() {
             @Override
-            public int compare(RubricCriterion group, RubricCriterionRating o1, RubricCriterionRating o2) {
+            public int compare(RubricCriterion group, RubricItem o1, RubricItem o2) {
                 // put comments at the bottom
-                if (o1.isComment() && o2.isComment()) {
+                if (o1 instanceof RubricCommentItem && o2 instanceof RubricCommentItem) {
                     return 0;
-                } else if (o1.isComment()) {
+                } else if (o1 instanceof RubricCommentItem) {
                     return 1;
-                } else if (o2.isComment()) {
+                } else if (o2 instanceof RubricCommentItem) {
                     return -1;
                 }
-                return Double.compare(o2.getPoints(), o1.getPoints());
+                RubricCriterionRating r1 = ((RubricRatingItem)o1).getRating();
+                RubricCriterionRating r2 = ((RubricRatingItem)o2).getRating();
+                return Double.compare(r2.getPoints(), r1.getPoints());
             }
 
             @Override
-            public boolean areContentsTheSame(RubricCriterionRating oldItem, RubricCriterionRating newItem) {
-                if(oldItem.getRatingDescription() == null || newItem.getRatingDescription() == null){return false;}
-
-                return oldItem.getRatingDescription().equals(newItem.getRatingDescription())
-                        && !(oldItem.isComment() || newItem.isComment()) // if its a comment always refresh the layout
-                        && oldItem.getPoints() == newItem.getPoints();
-            }
-
-            @Override
-            public boolean areItemsTheSame(RubricCriterionRating item1, RubricCriterionRating item2) {
-                return item1.getId().equals(item2.getId());
-            }
-
-            @Override
-            public long getUniqueItemId(RubricCriterionRating item) {
-                return item.getId().hashCode();
-            }
-
-            @Override
-            public int getChildType(RubricCriterion group, RubricCriterionRating item) {
-                if(item.isFreeFormComment() || item.isComment()){
-                    return RubricViewHolder.TYPE_ITEM_COMMENT;
+            public boolean areContentsTheSame(RubricItem oldItem, RubricItem newItem) {
+                if (newItem instanceof RubricCommentItem || oldItem instanceof RubricCommentItem) {
+                    // if its a comment always refresh the layout
+                    return false;
+                } else {
+                    RubricCriterionRating oldRating = ((RubricRatingItem) oldItem).getRating();
+                    RubricCriterionRating newRating = ((RubricRatingItem) newItem).getRating();
+                    return !(oldRating.getDescription() == null || newRating.getDescription() == null)
+                            && oldRating.getDescription().equals(newRating.getDescription())
+                            && oldRating.getPoints() == newRating.getPoints();
                 }
-                return RubricViewHolder.TYPE_ITEM_POINTS;
+            }
+
+            @Override
+            public boolean areItemsTheSame(RubricItem item1, RubricItem item2) {
+                if (item1 instanceof RubricCommentItem ^ item2 instanceof RubricCommentItem) {
+                    return false;
+                } else if (item1 instanceof RubricCommentItem) {
+                    return ((RubricCommentItem) item1).getComment().equals(((RubricCommentItem) item2).getComment());
+                } else {
+                    return ((RubricRatingItem) item1).getRating().getId().equals(((RubricRatingItem) item2).getRating().getId());
+                }
+            }
+
+            @Override
+            public long getUniqueItemId(RubricItem item) {
+                if (item instanceof RubricCommentItem) {
+                    return ((RubricCommentItem) item).getComment().hashCode();
+                } else {
+                    return ((RubricRatingItem)item).getRating().getId().hashCode();
+                }
+            }
+
+            @Override
+            public int getChildType(RubricCriterion group, RubricItem item) {
+                return (item instanceof RubricCommentItem) ? RubricViewHolder.TYPE_ITEM_COMMENT : RubricViewHolder.TYPE_ITEM_POINTS;
             }
         };
     }

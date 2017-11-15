@@ -4,9 +4,7 @@ import android.os.Parcel;
 
 import java.util.Date;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
+
 public class ModuleItemWrapper extends CanvasModel<ModuleItemWrapper> {
 
     private ModuleItem prev;

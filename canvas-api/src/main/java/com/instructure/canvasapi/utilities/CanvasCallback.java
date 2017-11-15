@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -368,7 +368,7 @@ public abstract class CanvasCallback<T> implements Callback<T> {
         }
     }
 
-    public static enum SOURCE{
+    public enum SOURCE{
         API, CACHE;
 
         public boolean isAPI(){

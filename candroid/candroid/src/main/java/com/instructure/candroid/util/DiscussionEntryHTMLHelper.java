@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,12 +21,11 @@ import android.content.Context;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.fragment.ProfileFragment;
-import com.instructure.canvasapi.model.DiscussionAttachment;
-import com.instructure.canvasapi.model.DiscussionEntry;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.utils.*;
+import com.instructure.canvasapi2.models.DiscussionEntry;
+import com.instructure.canvasapi2.models.RemoteFile;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.ProfileUtils;
 
 public class DiscussionEntryHTMLHelper {
     private static final String assetUrl = "file:///android_asset";
@@ -39,7 +38,7 @@ public class DiscussionEntryHTMLHelper {
             html.append("<div class=\"width\">");
             html.append(message);
 
-            for(DiscussionAttachment attachment : discussionEntry.getAttachments()){
+            for(RemoteFile attachment : discussionEntry.getAttachments()){
                 if (attachment.shouldShowToUser() && !discussionEntry.isDeleted()) {
                     html.append("<div class=\"nowrap\">");
                     html.append(String.format("<img class=\"attachmentimg\" src=\"%s/conversation_attachment.png\" /> <a class=\"attachmentlink\" href=\"%s\">%s</a>", assetUrl, attachment.getUrl(), attachment.getDisplayName()));
@@ -139,11 +138,11 @@ public class DiscussionEntryHTMLHelper {
             avatarurl = "background-image:url(ic_cv_student_fill.png);";
             title = deleted;
         } else {
-            if (discussionEntry.getAuthor() != null && discussionEntry.getAuthor().getAvatarUrl() != null) {
+            if (discussionEntry.getAuthor() != null && discussionEntry.getAuthor().getAvatarImageUrl() != null) {
                 //large discussions slow down and sometimes get an ANR due to getting so many avatar images. This
                 //limits to getting 30 profile avatars and then it will just use the initials
-                if(!isEmptyImage(discussionEntry.getAuthor().getAvatarUrl()) && index < 30){
-                    avatarurl = "background-image:url(" +discussionEntry.getAuthor().getAvatarUrl() +");";
+                if(!isEmptyImage(discussionEntry.getAuthor().getAvatarImageUrl()) && index < 30){
+                    avatarurl = "background-image:url(" +discussionEntry.getAuthor().getAvatarImageUrl() +");";
                     borderString = "border: 0px solid " + colorString + ";";
                 }else {
                     avatarurl = "background:" + ProfileUtils.getUserHexColorString(discussionEntry.getAuthor().getDisplayName()) +";";
@@ -165,13 +164,13 @@ public class DiscussionEntryHTMLHelper {
             }
         }
 
-        if (discussionEntry.getLastUpdated() != null) {
+        if (discussionEntry.getUpdatedAt() != null) {
             //don't display seconds
-            String updated = DateHelpers.getDateTimeString(context, discussionEntry.getLastUpdated());
+            String updated = DateHelper.getDateTimeString(context, discussionEntry.getUpdatedAt());
             date = updated;
         }
 
-        return (APIHelpers.getAssetsFile(context, "discussion_html_template.html")
+        return (com.instructure.canvasapi2.utils.FileUtils.getAssetsFile(context, "discussion_html_template.html")
                 .replace("__BORDER_STRING__", borderString)
                 .replace("__LISTENER_HTML__", listener)
                 .replace("__AVATAR_URL__", avatarurl)

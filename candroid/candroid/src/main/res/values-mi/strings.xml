@@ -128,8 +128,6 @@
   <string name="domain">Domain</string>
   <string name="sendFeedback">Tukua Urupare</string>
   <string name="sendMail">Tukua Īmēra ...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Whakatika</string>
   <plurals name="item_count">
     <item quantity="one">%d tūemi</item>
@@ -444,8 +442,8 @@ Tuwhera I roto i te Pūtirotiro</string>
   <string name="could_not_find_course">reira ko te hapa whiwhi i te akoranga mō tēnei tūemi.</string>
   <string name="could_not_find_group">reira ko te hapa whiwhi i te rōpū mō tēnei tūemi.</string>
   <string name="selectBackground">Tīpakohia te puipuitua</string>
-  <string name="kalturaSubmissionInProgress">Tuku kōnae ... Kimihia pae whakamōhiotanga mō whakahōunga.</string>
-  <string name="kalturaSubmissionSuccessful">Mutu kōnae tuku</string>
+  <string name="notoriousSubmissionInProgress">Tuku kōnae ... Kimihia pae whakamōhiotanga mō whakahōunga.</string>
+  <string name="notoriousSubmissionSuccessful">Mutu kōnae tuku</string>
   <string name="poll_title">he aha i haere mai koe ki Kanaweti ki te mahi?</string>
   <string name="poll_warning">e kore kua he tūemi kua tīpakohia.</string>
   <string name="poll_item_1">Tirohia oku māka</string>
@@ -482,6 +480,7 @@ Tuwhera I roto i te Pūtirotiro</string>
   <string name="pandaAvatarsFolderName">Avatar Panda</string>
   <string name="share">wahi</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">image Panda super</string>
   <string name="newFeatureTitle">whakamōhiotanga pūkoro</string>
   <string name="newFeatureMsg">No te farii i whakamōhiotanga pana pūkoro haere ki Tautuhinga Kanaweti &amp; gt; Whakamōhiotanga &amp; gt; A ka tīpako "hoki Pūrere Katoa"</string>

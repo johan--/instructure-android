@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import android.view.View;
  * These must implement Comparable so the adapter can sort the rows/groups
  */
 public interface ExpandableListDelegate<G, I> {
-    public View getGroupViewForItem(G groupItem, View convertView, int groupPosition, boolean isExpanded);
-    public View getRowViewForItem(I item, View convertView, int groupPosition, int childPosition, boolean isLastRowInGroup, boolean isLastRow);
-    public int getChildType(I item);
-    public int getChildCount();
-    public void showFirstItem(I item);
-    public boolean isShowFirstItem();
+    View getGroupViewForItem(G groupItem, View convertView, int groupPosition, boolean isExpanded);
+    View getRowViewForItem(I item, View convertView, int groupPosition, int childPosition, boolean isLastRowInGroup, boolean isLastRow);
+    int getChildType(I item);
+    int getChildCount();
+    void showFirstItem(I item);
+    boolean isShowFirstItem();
 }

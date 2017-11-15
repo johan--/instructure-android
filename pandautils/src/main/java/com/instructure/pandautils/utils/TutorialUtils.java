@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import com.instructure.pandautils.dialogs.TutorialDialog;
 public class TutorialUtils {
 
     //NOTE: if you add something make sure you update ApplicationManager.safeClearSharedPreferences()
-    public static enum TYPE {
+    public enum TYPE {
         STAR_A_COURSE,
         COLOR_CHANGING_DIALOG,
         LANDING_PAGE,

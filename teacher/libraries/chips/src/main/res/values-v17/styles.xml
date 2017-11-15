@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="ChipTitleStyle">
+                <item name="android:id">@android:id/title</item>
+                <item name="android:layout_width">match_parent</item>
+                <item name="android:layout_height">wrap_content</item>
+                <item name="android:ellipsize">middle</item>
+                <item name="android:singleLine">true</item>
+                <item name="android:textAlignment">viewStart</item>
+                <item name="android:textColor">@color/chips_dropdown_title_text</item>
+                <item name="android:textSize">16sp</item>
+        </style>
+
+        <style name="ChipSubtitleStyle">
+                <item name="android:id">@android:id/text1</item>
+                <item name="android:layout_width">match_parent</item>
+                <item name="android:layout_height">wrap_content</item>
+                <item name="android:ellipsize">middle</item>
+                <item name="android:singleLine">true</item>
+                <item name="android:textAlignment">viewStart</item>
+                <item name="android:textColor">@color/chips_dropdown_subtitle_text</item>
+                <item name="android:textSize">14sp</item>
+        </style>
+</resources>

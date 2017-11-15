@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 
 package com.instructure.candroid.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.widget.Toast;
@@ -42,7 +41,6 @@ import com.instructure.candroid.fragment.NotificationListFragment;
 import com.instructure.candroid.fragment.ParentFragment;
 import com.instructure.candroid.fragment.ToDoListFragment;
 import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.CanvasErrorDelegate;
 import com.instructure.candroid.util.FileUtils;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.LoggingUtility;
@@ -50,34 +48,32 @@ import com.instructure.candroid.util.ModuleProgressionUtility;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.util.TabHelper;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.FileFolderAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.ModuleAPI;
-import com.instructure.canvasapi.api.TabAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.CanvasError;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.FileFolder;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleItemSequence;
-import com.instructure.canvasapi.model.ModuleObject;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.ErrorDelegate;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.FileFolderManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.ModuleManager;
+import com.instructure.canvasapi2.managers.TabManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.FileFolder;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleItemSequence;
+import com.instructure.canvasapi2.models.ModuleObject;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.loaders.OpenMediaAsyncTaskLoader;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.LoaderUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 
 //Intended to handle all routing to fragments from links both internal and external
@@ -102,7 +98,7 @@ public abstract class BaseRouterActivity extends CallbackActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.d("BaseRouterActivity: onCreate()");
+        Logger.d("BaseRouterActivity: onCreate()");
 
         if(savedInstanceState == null) {
             parse(getIntent());
@@ -124,7 +120,7 @@ public abstract class BaseRouterActivity extends CallbackActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        Utils.d("BaseRouterActivity: onNewIntent()");
+        Logger.d("BaseRouterActivity: onNewIntent()");
         parse(intent);
     }
 
@@ -188,7 +184,7 @@ public abstract class BaseRouterActivity extends CallbackActivity {
 
         } catch (Exception e) {
             LoggingUtility.LogExceptionPlusCrashlytics(BaseRouterActivity.this, e);
-            Utils.e("Could not parse and route url in BaseRouterActivity");
+            Logger.e("Could not parse and route url in BaseRouterActivity");
             routeToCourseGrid();
         }
     }
@@ -199,17 +195,17 @@ public abstract class BaseRouterActivity extends CallbackActivity {
      */
     private void parse(Intent intent) {
         if(intent == null) {
-            Utils.d("INTENT WAS NULL");
+            Logger.d("INTENT WAS NULL");
             return;
         }
-        Utils.d("INTENT ACTION WAS: " + intent.getAction());
+        Logger.d("INTENT ACTION WAS: " + intent.getAction());
         if(intent.getExtras() == null) {
-            Utils.d("INTENT EXTRAS WERE NULL");
+            Logger.d("INTENT EXTRAS WERE NULL");
             return;
         }
 
         final Bundle extras = intent.getExtras();
-        Utils.logBundle(extras);
+        Logger.logBundle(extras);
 
         if(extras.containsKey(Const.GOOGLE_NOW_VOICE_SEARCH)) {
             Navigation.NavigationPosition position = (Navigation.NavigationPosition)extras.getSerializable(Const.PARSE);
@@ -247,90 +243,65 @@ public abstract class BaseRouterActivity extends CallbackActivity {
     private void routeLTI(final long courseId, final RouterUtils.Route route) {
         //Since we do not know if the LTI is a tab we load in a details fragment.
         if (route.getContextType() == CanvasContext.Type.COURSE) {
-            CourseAPI.getCourseWithGrade(courseId, new CanvasCallback<Course>(BaseRouterActivity.this) {
+            CourseManager.getCourseWithGrade(courseId, new StatusCallback<Course>() {
 
-                private boolean routedWithCache = false;
-
-                @Override
-                public void cache(final Course course, LinkHeaders linkHeaders, Response response) {
-                    // In order to avoid adding fragments twice, just route with the cache
-                    if (routedWithCache) {
-                        return;
-                    }
-                    routedWithCache = true;
-                    if (course != null) {
-                        getUserSelf(true, true);
-                        routeFragment(ParentFragment.createFragment(LTIWebViewRoutingFragment.class,
-                                LTIWebViewRoutingFragment.createBundle(course, route.getUrl())));
-                    }
-                }
+                private boolean routedAlready = false;
 
                 @Override
-                public void firstPage(final Course course, LinkHeaders linkHeaders, Response response) {
-                    if (routedWithCache) {
+                public void onResponse(retrofit2.Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
+
+                    // In order to avoid adding fragments twice, just route with the cache if we can
+                    if (routedAlready) {
                         return;
                     }
-                    routedWithCache = true;
-                    if (course == null) {
+                    routedAlready = true;
+                    if(response.body() == null) {
                         showMessage(getString(R.string.could_not_route_course));
-                    } else {
-                        getUserSelf(true, false);
-                        routeFragment(ParentFragment.createFragment(LTIWebViewRoutingFragment.class,
-                                LTIWebViewRoutingFragment.createBundle(course, route.getUrl())));
                     }
-                }
-            });
-        } else if (route.getContextType() == CanvasContext.Type.GROUP) {
-            GroupAPI.getDetailedGroup(courseId, new CanvasCallback<Group>(BaseRouterActivity.this) {
-
-                private boolean routedWithCache = false;
-
-                @Override
-                public void cache(final Group group, LinkHeaders linkHeaders, Response response) {
-                    // In order to avoid adding fragments twice, just route with the cache
-                    if (routedWithCache) {
-                        return;
-                    }
-                    routedWithCache = true;
-                    if (group != null) {
+                    else {
                         getUserSelf(true, true);
                         routeFragment(ParentFragment.createFragment(LTIWebViewRoutingFragment.class,
-                                LTIWebViewRoutingFragment.createBundle(group, route.getUrl())));
+                                LTIWebViewRoutingFragment.createBundle(response.body(), route.getUrl())));
                     }
                 }
+            }, true);
+        } else if (route.getContextType() == CanvasContext.Type.GROUP) {
+            GroupManager.getDetailedGroup(courseId, new StatusCallback<Group>() {
+
+                private boolean routedAlready = false;
 
                 @Override
-                public void firstPage(final Group group, LinkHeaders linkHeaders, Response response) {
-                    if (routedWithCache) {
+                public void onResponse(retrofit2.Response<Group> response, LinkHeaders linkHeaders, ApiType type) {
+                    if (routedAlready) {
                         return;
                     }
-                    routedWithCache = true;
-                    if (group == null) {
+                    routedAlready = true;
+                    if (response.body() == null) {
                         showMessage(getString(R.string.could_not_route_group));
                     } else {
                         getUserSelf(true, false);
                         routeFragment(ParentFragment.createFragment(LTIWebViewRoutingFragment.class,
-                                LTIWebViewRoutingFragment.createBundle(group, route.getUrl())));
+                                LTIWebViewRoutingFragment.createBundle(response.body(), route.getUrl())));
                     }
                 }
-            });
+            }, true);
         }
     }
 
     private void routeModuleProgression(final CanvasContext canvasContext, final RouterUtils.Route route) {
 
-        ModuleAPI.getModuleItemSequence(canvasContext, ModuleAPI.MODULE_ASSET_MODULE_ITEM, route.getQueryParamsHash().get("module_item_id"), new CanvasCallback<ModuleItemSequence>(BaseRouterActivity.this) {
+        ModuleManager.getModuleItemSequence(canvasContext, ModuleManager.MODULE_ASSET_MODULE_ITEM, route.getQueryParamsHash().get("module_item_id"), new StatusCallback<ModuleItemSequence>() {
 
             private boolean routedWithCache = false;
 
             @Override
-            public void firstPage(final ModuleItemSequence moduleItemSequence, LinkHeaders linkHeaders, Response response) {
-
+            public void onResponse(retrofit2.Response<ModuleItemSequence> response, LinkHeaders linkHeaders, ApiType type) {
+                final ModuleItemSequence moduleItemSequence = response.body();
                 if(routedWithCache) {
                     return;
                 }
 
-                if(APIHelpers.isCachedResponse(response)) {
+                if(APIHelper.isCachedResponse(response)) {
                     routedWithCache = true;
                 }
 
@@ -339,17 +310,18 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                     //get the current module item. we'll use the id of this down below
                     final ModuleItem current = moduleItemSequence.getItems()[0].getCurrent();
 
-                    ModuleAPI.getModuleItemsExhaustive(canvasContext, current.getModuleId(), new CanvasCallback<ModuleItem[]>(BaseRouterActivity.this) {
+                    ModuleManager.getAllModuleItems(canvasContext, current.getModuleId(), new StatusCallback<List<ModuleItem>>() {
 
                         private boolean routedModuleItemsWithCache = false;
 
                         @Override
-                        public void firstPage(ModuleItem[] moduleItems, LinkHeaders linkHeaders, Response response) {
+                        public void onResponse(retrofit2.Response<List<ModuleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+
                             if (routedModuleItemsWithCache) {
                                 return;
                             }
 
-                            if(APIHelpers.isCachedResponse(response)) {
+                            if(APIHelper.isCachedResponse(response)) {
                                 routedModuleItemsWithCache = true;
                             }
 
@@ -359,7 +331,7 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                             moduleObjectsArray.add(moduleItemSequence.getModules()[0]);
 
                             ArrayList<ModuleItem> items = new ArrayList<>();
-                            items.addAll(Arrays.asList(moduleItems));
+                            items.addAll(response.body());
                             moduleItemsArrayList.add(items);
 
                             ModuleProgressionUtility.ModuleHelper moduleHelper = ModuleProgressionUtility.prepareModulesForCourseProgression(getContext(), current.getId(), moduleObjectsArray, moduleItemsArrayList);
@@ -367,20 +339,20 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                             routeFragment(ParentFragment.createFragment(CourseModuleProgressionFragment.class, CourseModuleProgressionFragment.createBundle(moduleObjectsArray, moduleHelper.strippedModuleItems, (Course) canvasContext, moduleHelper.newGroupPosition, moduleHelper.newChildPosition)));
 
                         }
-                    });
+                    }, true);
                 }
 
             }
-        });
+        }, true);
     }
 
     private void routeToCourseGrid() {
-        Utils.d("routeToCourseGrid()");
+        Logger.d("routeToCourseGrid()");
         routeFragment(FragUtils.getFrag(CourseGridFragment.class, this));
     }
 
     private void routeMasterDetail(CanvasContext canvasContext, RouterUtils.Route route, Tab tab) {
-        Utils.d("routing with tab: " + (tab == null ? "??" : tab.getTabId()));
+        Logger.d("routing with tab: " + (tab == null ? "??" : tab.getTabId()));
         Bundle bundle = ParentFragment.createBundle(canvasContext, route.getParamsHash(), route.getQueryParamsHash(), route.getUrl(), tab);
         if (route.getDetailCls() != null) {
             if(existingFragmentCount() == 0) {
@@ -398,82 +370,76 @@ public abstract class BaseRouterActivity extends CallbackActivity {
     }
 
     private void routeToCourse(long id, final RouterUtils.Route route, final Tab tab) {
-        CourseAPI.getCourseWithGrade(id, new CanvasCallback<Course>(BaseRouterActivity.this) {
+        CourseManager.getCourseWithGrade(id, new StatusCallback<Course>() {
             Course cacheCourse;
 
-            @Override
-            public void cache(Course course, LinkHeaders linkHeaders, Response response) {
-                cacheCourse = course;
-            }
-
-            @Override
-            public void firstPage(final Course course, LinkHeaders linkHeaders, Response response) {
+            private void tryToRoute(@Nullable Course course) {
                 if (course == null) {
-                    Utils.d("Course was null, could not route.");
+                    Logger.d("Course was null, could not route.");
                     showMessage(getString(R.string.could_not_route_course));
                 } else {
                     routeToCourseOrGroupWithTabCheck(course, route, tab);
                 }
             }
-
             @Override
-            public void failure(RetrofitError error) {
-                //we don't want to go first page on a 504, it just means we haven't cached the data yet
-                if(error.getResponse() != null && error.getResponse().getStatus() != 504) {
-                    firstPage(cacheCourse, null, null);
+            public void onResponse(retrofit2.Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) {
+                    cacheCourse = response.body();
+                } else {
+                    tryToRoute(response.body());
                 }
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                //we don't want to go first page on a 504, it just means we haven't cached the data yet
-                if(retrofitError.getResponse() != null && retrofitError.getResponse().getStatus() != 504) {
-                    firstPage(cacheCourse, null, null);
+            public void onFail(Call<Course> callResponse, Throwable error, retrofit2.Response response) {
+                if(response != null && response.code() != 504) {
+                    tryToRoute(cacheCourse);
                 }
-                return true;
             }
-        });
+
+        }, true);
     }
 
     private void routeToGroup(long id, final RouterUtils.Route route, final Tab tab) {
-        Utils.d("routeToGroup()");
-        GroupAPI.getDetailedGroup(id, new CanvasCallback<Group>(BaseRouterActivity.this) {
+        Logger.d("routeToGroup()");
+        GroupManager.getDetailedGroup(id, new StatusCallback<Group>() {
             Group cacheGroup;
 
             @Override
-            public void cache(Group group, LinkHeaders linkHeaders, Response response) {
-                cacheGroup = group;
+            public void onResponse(retrofit2.Response<Group> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type.isCache()) {
+                    cacheGroup = response.body();
+                } else {
+                    routeToGroup(response.body());
+                }
             }
 
-            @Override
-            public void firstPage(final Group group, LinkHeaders linkHeaders, Response response) {
+            private void routeToGroup(@Nullable Group group) {
                 if (group == null) {
-                    Utils.d("Group was null, could not route.");
+                    Logger.d("Group was null, could not route.");
                     showMessage(getString(R.string.could_not_route_group));
                 } else {
                     routeToCourseOrGroupWithTabCheck(group, route, tab);
                 }
             }
-
             @Override
-            public void failure(RetrofitError error) {
+            public void onFail(Call<Group> response, Throwable error, int code) {
                 //we don't want to go first page on a 504, it just means we haven't cached the data yet
-                if(error.getResponse() != null && error.getResponse().getStatus() != 504) {
-                    firstPage(cacheGroup, null, null);
+                if(code != 504) {
+                    routeToGroup(cacheGroup);
                 }
             }
-        });
+        }, true);
     }
 
     private void routeToCourseOrGroupWithTabCheck(final CanvasContext canvasContext, final RouterUtils.Route route, final Tab tab) {
-        TabAPI.getTabs(canvasContext, new CanvasCallback<Tab[]>(BaseRouterActivity.this) {
+        TabManager.getTabs(canvasContext, new StatusCallback<List<Tab>>() {
             @Override
-            public void cache(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
-
+            public void onResponse(retrofit2.Response<List<Tab>> response, LinkHeaders linkHeaders, ApiType type) {
                 if(Tab.SYLLABUS_ID.equals(tab.getTabId())) {
                     //We do not allow routing to the syllabus if it's hidden
                     boolean tabExistsForCourse = false;
-                    for (Tab t : tabs) {
+                    for (Tab t : response.body()) {
                         if (t.getTabId().equals(tab.getTabId())) {
                             tabExistsForCourse = true;
                             break;
@@ -482,11 +448,11 @@ public abstract class BaseRouterActivity extends CallbackActivity {
 
                     if(tabExistsForCourse) {
                         //Route cause tab exists
-                        Utils.d("Attempting to route to group: " + canvasContext.getName());
+                        Logger.d("Attempting to route to group: " + canvasContext.getName());
                         getUserSelf(true, true);
                         routeMasterDetail(canvasContext, route, tab);
                     } else {
-                        Utils.d("Course/Group tab hidden, or locked.");
+                        Logger.d("Course/Group tab hidden, or locked.");
                         showMessage(getString(R.string.could_not_route_locked));
                     }
 
@@ -494,71 +460,33 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                     //if we're routing to something in a module then we need to open it inside of CourseModuleProgression
                     routeModuleProgression(canvasContext, route);
                 } else {
-                    Utils.d("Attempting to route to course or group: " + canvasContext.getName());
+                    Logger.d("Attempting to route to course or group: " + canvasContext.getName());
                     getUserSelf(true, true);
                     routeMasterDetail(canvasContext, route, tab);
                 }
                 cancel();
             }
-
-            @Override
-            public void firstPage(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
-                cache(tabs, linkHeaders, response);
-            }
-        });
+        }, true);
     }
 
     private void handleSpecificFile(long courseId, String fileID) {
         final CanvasContext canvasContext = CanvasContext.getGenericContext(CanvasContext.Type.COURSE, courseId, "");
-        Utils.d("handleSpecificFile()");
+        Logger.d("handleSpecificFile()");
         //If the file no longer exists (404), we want to show a different crouton than the default.
-        final ErrorDelegate canvasErrorDelegate = new CanvasErrorDelegate();
-        ErrorDelegate errorDelegate = new ErrorDelegate() {
+        StatusCallback<FileFolder> fileFolderCanvasCallback = new StatusCallback<FileFolder>() {
             @Override
-            public void noNetworkError(RetrofitError error, Context context) {
-                canvasErrorDelegate.noNetworkError(error, context);
-            }
-
-            @Override
-            public void notAuthorizedError(RetrofitError error, CanvasError canvasError, Context context) {
-                canvasErrorDelegate.notAuthorizedError(error, canvasError, context);
-            }
-
-            @Override
-            public void invalidUrlError(RetrofitError error, Context context) {
-                if (context instanceof Activity) {
-                    Toast.makeText(getContext(), R.string.fileNoLongerExists, Toast.LENGTH_LONG).show();
+            public void onResponse(retrofit2.Response<FileFolder> response, LinkHeaders linkHeaders, ApiType type) {
+                FileFolder fileFolder = response.body();
+                if (fileFolder.isLocked() || fileFolder.isLockedForUser()) {
+                    Toast.makeText(getContext(), String.format(getContext().getString(R.string.fileLocked), (fileFolder.getDisplayName() == null) ? getString(R.string.file) : fileFolder.getDisplayName()), Toast.LENGTH_LONG).show();
+                } else {
+                    openMedia(canvasContext, fileFolder.getContentType(), fileFolder.getUrl(), fileFolder.getDisplayName());
                 }
-            }
-
-            @Override
-            public void serverError(RetrofitError error, Context context) {
-                canvasErrorDelegate.serverError(error, context);
-
-            }
-
-            @Override
-            public void generalError(RetrofitError error, CanvasError canvasError, Context context) {
-                canvasErrorDelegate.generalError(error, canvasError, context);
             }
         };
 
-        CanvasCallback<FileFolder> fileFolderCanvasCallback = new CanvasCallback<FileFolder>(BaseRouterActivity.this, errorDelegate) {
-            @Override
-            public void cache(FileFolder fileFolder) {
-            }
-
-                @Override
-                public void firstPage(FileFolder fileFolder, LinkHeaders linkHeaders, Response response) {
-                    if (fileFolder.isLocked() || fileFolder.isLockedForUser()) {
-                        Toast.makeText(getContext(), String.format(getContext().getString(R.string.fileLocked), (fileFolder.getDisplayName() == null) ? getString(R.string.file) : fileFolder.getDisplayName()), Toast.LENGTH_LONG).show();
-                    } else {
-                        openMedia(canvasContext, fileFolder.getContentType(), fileFolder.getUrl(), fileFolder.getDisplayName());
-                    }
-                }
-            };
-            FileFolderAPI.getFileFolderFromURL("files/" + fileID, fileFolderCanvasCallback);
-        }
+        FileFolderManager.getFileFolderFromURL("files/" + fileID, fileFolderCanvasCallback);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // OpenMediaAsyncTaskLoader

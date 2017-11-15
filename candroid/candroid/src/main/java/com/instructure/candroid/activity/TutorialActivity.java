@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,9 +33,9 @@ import android.widget.TextView;
 import com.instructure.candroid.R;
 import com.instructure.candroid.fragment.TutorialFragment;
 import com.instructure.candroid.util.ApplicationManager;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.candroid.view.ViewPagerIndicator;
-import com.instructure.loginapi.login.util.Utils;
 
 public class TutorialActivity extends FragmentActivity implements
         View.OnClickListener,
@@ -166,7 +166,7 @@ public class TutorialActivity extends FragmentActivity implements
 
     @Override
     public void forceExit_Exception(OutOfMemoryError e) {
-        Utils.e("FORCING EXIT FROM TUTORIAL DUE TO OUT OF MEMORY ERROR: " + e);
+        Logger.e("FORCING EXIT FROM TUTORIAL DUE TO OUT OF MEMORY ERROR: " + e);
         super.onBackPressed();
     }
 }

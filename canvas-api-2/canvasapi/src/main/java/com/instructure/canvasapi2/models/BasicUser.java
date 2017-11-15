@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -55,6 +55,14 @@ public class BasicUser extends CanvasModel<BasicUser> {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public static BasicUser userToBasicUser(User user) {
+        BasicUser basicUser = new BasicUser();
+        basicUser.setId(user.getId());
+        basicUser.setName(user.getName());
+        basicUser.setAvatarUrl(user.getAvatarUrl());
+        return basicUser;
     }
 
     @Nullable

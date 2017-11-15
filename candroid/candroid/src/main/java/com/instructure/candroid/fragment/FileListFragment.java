@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -42,19 +42,20 @@ import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.DownloadMedia;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.api.FileFolderAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.FileFolder;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.FileFolderManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.FileFolder;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.PermissionUtils;
 
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class FileListFragment extends OrientationChangeFragment {
 
@@ -135,9 +136,7 @@ public class FileListFragment extends OrientationChangeFragment {
     public void createOptionsMenu(Menu menu, MenuInflater inflater) {
         super.createOptionsMenu(menu, inflater);
         //If it's my files or I'm a teacher.
-        if(getCanvasContext().getType() == CanvasContext.Type.USER ||
-                (getCanvasContext().getType() == CanvasContext.Type.COURSE &&
-                        ((Course)getCanvasContext()).isTeacher())) {
+        if(getCanvasContext().getType() == CanvasContext.Type.USER) {
             inflater.inflate(R.menu.file_upload_menu, menu);
         }
     }
@@ -146,7 +145,7 @@ public class FileListFragment extends OrientationChangeFragment {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
 
         if(menuItem.getItemId() == R.id.fileUpload) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -177,7 +176,7 @@ public class FileListFragment extends OrientationChangeFragment {
                     }
                 }
             });
-            uploadFileSourceFragment.show(getChildFragmentManager(), FileUploadDialog.TAG);
+            uploadFileSourceFragment.show(getFragmentManager(), FileUploadDialog.TAG);
             return true;
         }
 
@@ -200,10 +199,9 @@ public class FileListFragment extends OrientationChangeFragment {
         if(ApplicationManager.isDownloadManagerAvailable(getContext()) && file.getDisplayName() != null) {
             menu.add(getResources().getString(R.string.download));
         }
-            //If it's a course and they're a teacher or it's their files, allow them to delete
+            //If it's their files, allow them to delete
             if( getCanvasContext()!= null &&
-                    (getCanvasContext().getType() == CanvasContext.Type.USER ||
-                    (getCanvasContext().getType() == CanvasContext.Type.COURSE && ((Course)getCanvasContext()).isTeacher()))){
+                    (getCanvasContext().getType() == CanvasContext.Type.USER)){
                 menu.add(getResources().getString(R.string.delete));
         }
     }
@@ -224,12 +222,17 @@ public class FileListFragment extends OrientationChangeFragment {
                 requestPermissions(PermissionUtils.makeArray(PermissionUtils.WRITE_EXTERNAL_STORAGE), PermissionUtils.WRITE_FILE_PERMISSION_REQUEST_CODE);
             }
         } else if (item.getTitle().equals(getResources().getString(R.string.delete))) {
-            FileFolderAPI.deleteFile(file.getId(), new CanvasCallback<Response>(this) {
+            FileFolderManager.deleteFile(file.getId(), new StatusCallback<FileFolder>() {
                 @Override
-                public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                    mRecyclerAdapter.remove(file);
+                public void onResponse(retrofit2.Response<FileFolder> response, LinkHeaders linkHeaders, ApiType type) {
+                    mRecyclerAdapter.remove(response.body());
                     // Mark to be removed from the cache.
-                    mRecyclerAdapter.getDeletedFileFolders().add(file);
+                    mRecyclerAdapter.getDeletedFileFolders().add(response.body());
+                }
+
+                @Override
+                public void onFail(Call<FileFolder> response, Throwable error) {
+                    Toast.makeText(getActivity(), R.string.errorOccurred, Toast.LENGTH_SHORT).show();
                 }
             });
         } else if (item.getTitle().equals(getResources().getString(R.string.openAlternate))) {
@@ -278,7 +281,7 @@ public class FileListFragment extends OrientationChangeFragment {
 
             @Override
             public void onRowLongClicked(FileFolder fileFolder, int position) {
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 } else {
                     mRecyclerAdapter.setLongClickItem(fileFolder);

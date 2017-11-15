@@ -21,8 +21,8 @@ package com.instructure.androidfoosball.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -34,9 +34,8 @@ import com.instructure.androidfoosball.ktmodels.User
 import com.instructure.androidfoosball.utils.*
 import com.instructure.androidfoosball.views.ConfirmPinDialog
 import kotlinx.android.synthetic.main.activity_edit_player.*
-import org.jetbrains.anko.enabled
-import org.jetbrains.anko.onCheckedChange
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.sdk21.listeners.onCheckedChange
+import org.jetbrains.anko.sdk21.listeners.onClick
 
 class EditUserActivity : AppCompatActivity() {
 
@@ -72,7 +71,7 @@ class EditUserActivity : AppCompatActivity() {
 
         enablePinView.onCheckedChange { button, isChecked ->
             mUser.pinDisabled = if (isChecked) "false" else "true"
-            btnChangePin.enabled = isChecked
+            btnChangePin.isEnabled = isChecked
         }
 
         enablePinView.isChecked = mUser.pinDisabled != "true"

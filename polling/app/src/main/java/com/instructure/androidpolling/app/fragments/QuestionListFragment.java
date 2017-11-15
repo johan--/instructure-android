@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.instructure.androidpolling.app.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -35,20 +35,17 @@ import com.instructure.androidpolling.app.activities.FragmentManagerActivity;
 import com.instructure.androidpolling.app.rowfactories.QuestionRowFactory;
 import com.instructure.androidpolling.app.util.Constants;
 import com.instructure.androidpolling.app.util.SwipeDismissListViewTouchListener;
-import com.instructure.androidpolling.app.view.CircleButton;
-import com.instructure.canvasapi.api.PollAPI;
-import com.instructure.canvasapi.api.PollChoiceAPI;
-import com.instructure.canvasapi.api.PollSessionAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollChoice;
-import com.instructure.canvasapi.model.PollChoiceResponse;
-import com.instructure.canvasapi.model.PollResponse;
-import com.instructure.canvasapi.model.PollSession;
-import com.instructure.canvasapi.model.PollSessionResponse;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PollsManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollChoice;
+import com.instructure.canvasapi2.models.PollChoiceResponse;
+import com.instructure.canvasapi2.models.PollResponse;
+import com.instructure.canvasapi2.models.PollSession;
+import com.instructure.canvasapi2.models.PollSessionResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,45 +54,33 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
-public class QuestionListFragment extends PaginatedExpandableListFragment<String, Poll> implements APIStatusDelegate{
-    //callback
-    private CanvasCallback<PollResponse> pollCallback;
-    private CanvasCallback<Response> responseCanvasCallback;
-    private CanvasCallback<PollSessionResponse> pollSessionCallback;
-    private CanvasCallback<PollChoiceResponse> pollChoiceCallback;
+public class QuestionListFragment extends PaginatedExpandableListFragment<String, Poll> {
 
-    @BindView(R.id.empty_state)
-    RelativeLayout emptyState;
+    private StatusCallback<PollResponse> pollCallback;
+    private StatusCallback<ResponseBody> responseCanvasCallback;
+    private StatusCallback<PollSessionResponse> pollSessionCallback;
+    private StatusCallback<PollChoiceResponse> pollChoiceCallback;
 
-    @BindView(R.id.expandableListView)
-    ExpandableListView expandableListView;
-
-    @BindView(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout swipeRefreshLayout;
-
-    @BindView(R.id.addQuestion)
-    CircleButton addQuestion;
+    @BindView(R.id.empty_state) RelativeLayout emptyState;
+    @BindView(R.id.expandableListView) ExpandableListView expandableListView;
+    @BindView(R.id.addQuestion) FloatingActionButton addQuestion;
 
     private boolean hasTeacherEnrollment;
     private SwipeDismissListViewTouchListener touchListener;
 
-    public static final String TAG = "QuestionListFragment";
+    private Map<Long, PollSession> openSessions = new HashMap<>();
+    private Map<Long, PollSession> closedSessions = new HashMap<>();
 
-    private Map<Long, PollSession> openSessions = new HashMap<Long, PollSession>();
-    private Map<Long, PollSession> closedSessions = new HashMap<Long, PollSession>();
-
-    private ArrayList<Poll> pollList = new ArrayList<Poll>();
-    private ArrayList<PollChoice> pollChoiceArrayList = new ArrayList<PollChoice>();
+    private ArrayList<Poll> pollList = new ArrayList<>();
+    private ArrayList<PollChoice> pollChoiceArrayList = new ArrayList<>();
 
     private Poll pollToDelete;
     private Poll selectedPoll;
     private String nextUrl;
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -107,8 +92,7 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         closedSessions.clear();
 
         setupClickListeners();
-        touchListener =
-                new SwipeDismissListViewTouchListener(
+        touchListener = new SwipeDismissListViewTouchListener(
                         expandableListView,
                         new SwipeDismissListViewTouchListener.DismissCallbacks() {
                             @Override
@@ -121,15 +105,11 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
                                 for (int position : reverseSortedPositions) {
                                     //set the poll that we want to remove after the api call returns successfully
                                     pollToDelete = (Poll)expandableListView.getItemAtPosition(position);
-
                                     confirmDelete();
-
                                 }
-
                             }
                         });
         expandableListView.setOnTouchListener(touchListener);
-
         expandableListView.setOnScrollListener(touchListener.makeScrollListener());
 
         //set an animation for adding list items
@@ -142,24 +122,20 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         ((BaseActivity)getActivity()).setActionBarTitle(getString(R.string.pollQuestions));
     }
 
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    ///////////////////////////////////////////////////////////////////////////
-
     private void setupClickListeners() {
         addQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //open the add question fragment
                 AddQuestionFragment addQuestionFragment = new AddQuestionFragment();
-                ((FragmentManagerActivity)getActivity()).swapFragments(addQuestionFragment, AddQuestionFragment.TAG, R.anim.slide_in_from_bottom, 0, 0, R.anim.slide_out_to_bottom);
+                ((FragmentManagerActivity)getActivity()).swapFragments(addQuestionFragment,
+                        AddQuestionFragment.class.getSimpleName(),
+                        R.anim.slide_in_from_bottom, 0, 0, R.anim.slide_out_to_bottom);
             }
         });
     }
     //we need to know if the user is a teacher in any course
-    private void checkEnrollments(Course[] courses) {
-
+    private void checkEnrollments(List<Course> courses) {
         for(Course course: courses) {
             if(course.isTeacher()) {
                 hasTeacherEnrollment = true;
@@ -191,7 +167,7 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
                         removeItem(pollToDelete);
 
                         //delete the poll from canvas
-                        PollAPI.deletePoll(pollToDelete.getId(), responseCanvasCallback);
+                        PollsManager.deletePoll(pollToDelete.getId(), responseCanvasCallback, true);
                         dialog.dismiss();
 
                         //if there are any empty groups we want to remove them
@@ -214,11 +190,7 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
                 .create();
 
         confirmDeleteDialog.show();
-
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // Update Poll
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public void updatePoll(Poll poll) {
@@ -227,16 +199,10 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         reloadData();
     }
 
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Overridden methods from PaginatedListFragment
-    ///////////////////////////////////////////////////////////////////////////
-
     @Override
     public void configureViews(View rootView) {
         ButterKnife.bind(this, rootView);
     }
-
 
     @Override
     public int getRootLayoutCode() {
@@ -249,12 +215,12 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         if(openSessions.containsKey(item.getId())) {
             hasActiveSession = true;
         }
-        return QuestionRowFactory.buildRowView(getLayoutInflater(), getActivity(), item.getQuestion(), hasActiveSession, convertView);
+        return QuestionRowFactory.buildRowView(layoutInflater(), getActivity(), item.getQuestion(), hasActiveSession, convertView);
     }
 
     @Override
     public View getGroupViewForItem(String groupItem, View convertView, int groupPosition, boolean isExpanded) {
-        return QuestionRowFactory.buildGroupView(getLayoutInflater(), groupItem, convertView);
+        return QuestionRowFactory.buildGroupView(layoutInflater(), groupItem, convertView);
     }
 
     @Override
@@ -288,7 +254,7 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         if(!openSessions.containsKey(item.getId()) && !closedSessions.containsKey(item.getId())) {
             selectedPoll = item;
             pollChoiceArrayList.clear();
-            PollChoiceAPI.getFirstPagePollChoices(selectedPoll.getId(), pollChoiceCallback);
+            PollsManager.getFirstPagePollChoices(selectedPoll.getId(), pollChoiceCallback, true);
             return true;
         }
 
@@ -297,7 +263,7 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
         Bundle bundle = new Bundle();
         bundle.putParcelable(Constants.POLL_DATA, item);
         pollSessionListFragment.setArguments(bundle);
-        ((FragmentManagerActivity)getActivity()).swapFragments(pollSessionListFragment, PollSessionListFragment.TAG);
+        ((FragmentManagerActivity)getActivity()).swapFragments(pollSessionListFragment, PollSessionListFragment.class.getSimpleName());
 
         return true;
     }
@@ -309,12 +275,12 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
 
     @Override
     public void loadFirstPage() {
-        PollAPI.getFirstPagePoll(pollCallback);
+        PollsManager.getFirstPagePolls(pollCallback, true);
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        PollAPI.getNextPagePoll(nextURL, pollCallback);
+        PollsManager.getNextPagePolls(nextURL, pollCallback, true);
     }
 
     @Override
@@ -338,41 +304,38 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
     @Override
     public void setupCallbacks() {
 
-        pollCallback = new CanvasCallback<PollResponse>(this) {
+        pollCallback = new StatusCallback<PollResponse>() {
             @Override
-            public void cache(PollResponse pollResponse) {
+            public void onResponse(Response<PollResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollResponse pollResponse, LinkHeaders linkHeaders, Response response) {
-                if(getActivity() == null) return;
-                nextUrl = linkHeaders.nextURL;
-                if(pollResponse.getPolls().size() == 0) {
+                nextUrl = linkHeaders.nextUrl;
+                if(response.body().getPolls().size() == 0) {
                     displayEmptyState();
                 }
                 else {
-                    List<Poll> polls = pollResponse.getPolls();
+                    List<Poll> polls = response.body().getPolls();
                     for(Poll poll: polls) {
                         //add all the polls to a list. we'll use the list later to populate the
                         //different groups after we get some session information about each poll
                         pollList.add(poll);
-                        PollSessionAPI.getFirstPagePollSessions(poll.getId(), pollSessionCallback);
+                        PollsManager.getFirstPagePollSessions(poll.getId(), pollSessionCallback, true);
                     }
+                }
+            }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         };
 
-        responseCanvasCallback = new CanvasCallback<Response>(this) {
+        responseCanvasCallback = new StatusCallback<ResponseBody>() {
             @Override
-            public void cache(Response response) {
-
-            }
-
-            @Override
-            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                //204 means success
-                if(response.getStatus() == 204) {
+            public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
+                if(response.code() == 204) {
                     if(pollToDelete != null) {
                         //reset it so we don't try to remove it from the list again
                         pollToDelete = null;
@@ -381,24 +344,19 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<ResponseBody> response, Throwable error) {
                 AppMsg.makeText(getActivity(), getString(R.string.errorDeletingPoll), AppMsg.STYLE_ERROR).show();
                 //we didn't actually delete anything, but we removed the item from the list to make the animation smoother, so now
                 //lets get the polls again
                 reloadData();
-                return super.onFailure(retrofitError);
             }
         };
 
-        pollSessionCallback = new CanvasCallback<PollSessionResponse>(this) {
+        pollSessionCallback = new StatusCallback<PollSessionResponse>() {
             @Override
-            public void cache(PollSessionResponse pollSessionResponse) {
-
-            }
-
-            @Override
-            public void firstPage(PollSessionResponse pollSessionResponse, LinkHeaders linkHeaders, Response response) {
-                List<PollSession> pollSessions = pollSessionResponse.getPollSessions();
+            public void onResponse(Response<PollSessionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
+                List<PollSession> pollSessions = response.body().getPollSessions();
                 for(PollSession session : pollSessions) {
                     if(session.is_published()) {
                         openSessions.put(session.getPoll_id(), session);
@@ -427,32 +385,33 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
                     }
                 }
                 expandAllGroups();
-                if(linkHeaders.nextURL != null) {
-                    PollSessionAPI.getNextPagePollSessions(linkHeaders.nextURL, pollSessionCallback);
+                if(linkHeaders.nextUrl != null) {
+                    PollsManager.getNextPagePollSessions(linkHeaders.nextUrl, pollSessionCallback, true);
                 }
                 notifyDataSetChanged();
             }
+
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
         };
 
-        pollChoiceCallback = new CanvasCallback<PollChoiceResponse>(this) {
+        pollChoiceCallback = new StatusCallback<PollChoiceResponse>() {
             @Override
-            public void cache(PollChoiceResponse pollChoiceResponse) {
+            public void onResponse(Response<PollChoiceResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(getActivity() == null || type.isCache()) return;
 
-            }
-
-            @Override
-            public void firstPage(PollChoiceResponse pollChoiceResponse, LinkHeaders linkHeaders, Response response) {
-                if (getActivity() == null) return;
-
-
-                List<PollChoice> pollChoices = pollChoiceResponse.getPollChoices();
+                List<PollChoice> pollChoices = response.body().getPollChoices();
                 if (pollChoices != null) {
                     pollChoiceArrayList.addAll(pollChoices);
                 }
 
                 //if linkHeaders.nextURL is null it means we have all the choices, so we can go to the edit poll page now
                 //or generate the CSV, depending on which action they selected
-                if (linkHeaders.nextURL == null) {
+                if (!StatusCallback.moreCallsExist(linkHeaders)) {
 
                     AddQuestionFragment addQuestionFragment = new AddQuestionFragment();
                     //populate the current data with the bundle
@@ -460,28 +419,20 @@ public class QuestionListFragment extends PaginatedExpandableListFragment<String
                     bundle.putParcelable(Constants.POLL_BUNDLE, selectedPoll);
                     bundle.putParcelableArrayList(Constants.POLL_CHOICES, pollChoiceArrayList);
                     addQuestionFragment.setArguments(bundle);
-                    ((FragmentManagerActivity) getActivity()).swapFragments(addQuestionFragment, AddQuestionFragment.TAG);
+                    ((FragmentManagerActivity) getActivity()).swapFragments(addQuestionFragment, AddQuestionFragment.class.getSimpleName());
 
                 } else {
                     //otherwise, get the next group of poll choices.
-                    PollChoiceAPI.getNextPagePollChoices(linkHeaders.nextURL, pollChoiceCallback);
+                    PollsManager.getNextPagePollChoices(linkHeaders.nextUrl, pollChoiceCallback, true);
                 }
+            }
 
-                //onCallbackFinished();
+            @Override
+            public void onFinished(ApiType type) {
+                if(swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         };
-    }
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        if(pollSessionCallback.isFinished() && pollCallback.isFinished()) {
-            swipeRefreshLayout.setRefreshing(false);
-            super.onCallbackFinished(source);
-        }
-    }
-
-    @Override
-    public void onCallbackStarted() {
-
     }
 }

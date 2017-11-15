@@ -49,6 +49,7 @@ import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.UserManager;
 import com.instructure.canvasapi2.models.Student;
 import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.dialogs.RatingDialog;
@@ -68,9 +69,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
+import retrofit2.Response;
+
 public class StudentViewActivity extends BaseRouterActivity implements ViewPager.OnPageChangeListener{
 
     private ImageButton mSettingsButton;
@@ -160,13 +160,13 @@ public class StudentViewActivity extends BaseRouterActivity implements ViewPager
         if(resultCode == RESULT_OK && requestCode == com.instructure.parentapp.util.Const.SETTINGS_ACTIVITY_REQUEST_CODE) {
             //make the api call to get all the students
             UserManager.getStudentsForParentAirwolf(
-                    APIHelper.getAirwolfDomain(StudentViewActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     ApplicationManager.getParentId(StudentViewActivity.this),
-                    new StatusCallback<List<Student>>(){
+                    new StatusCallback<List<Student>>() {
                         @Override
-                        public void onResponse(retrofit2.Response<List<Student>> response, LinkHeaders linkHeaders, ApiType type) {
+                        public void onResponse(Response<List<Student>> response, LinkHeaders linkHeaders, ApiType type) {
                             //Only non-cache data
-                            if(!APIHelper.isCachedResponse(response)) {
+                            if (!APIHelper.isCachedResponse(response)) {
                                 if (response.body() != null && !response.body().isEmpty()) {
                                     //replace the data that the carousel will try to use
                                     if (getIntent().getExtras().getParcelableArrayList(Const.USER) != null) {
@@ -178,10 +178,10 @@ public class StudentViewActivity extends BaseRouterActivity implements ViewPager
                                     setupListeners();
                                 } else {
                                     //we have no students, finish and start the main activity, which will force them to add a student
-                                    finish();
-                                    Intent intent = new Intent(StudentViewActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(StudentViewActivity.this, SplashActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
+                                    finish();
                                 }
                             }
                         }
@@ -533,7 +533,10 @@ public class StudentViewActivity extends BaseRouterActivity implements ViewPager
     }
 
     public Student getCurrentStudent(){
-        return mCarouselAdapter.getItem(mCarouselViewPager.getCurrentItem());
+        if(mCarouselAdapter != null && mCarouselAdapter.getCount() > 0) {
+            return mCarouselAdapter.getItem(mCarouselViewPager.getCurrentItem());
+        }
+        return new Student();
     }
 
     private String getUserFirstName(String name){

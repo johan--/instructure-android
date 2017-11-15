@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,16 +21,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.instructure.candroid.service.AlarmService;
-import com.instructure.candroid.service.PushService;
-
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         //Restores stored push notifications upon boot
-        PushService.postStoredNotifications(context);
-
-        //set up any wear reminders if they're enabled
-        AlarmService.scheduleAlarm(context);
+        PushExternalReceiver.postStoredNotifications(context);
     }
 }

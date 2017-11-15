@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,14 +28,13 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.SyllabusRecyclerAdapter;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.Tab;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.Tab;
 import com.instructure.pandarecycler.BaseRecyclerAdapter;
 import com.instructure.pandautils.utils.Const;
 
@@ -82,7 +81,7 @@ public class ScheduleListFragment extends ParentFragment {
 
                     if (scheduleItem.getAssignment() != null) {
                         fragment = FragUtils.getFrag(AssignmentFragment.class, AssignmentFragment.createBundle((Course)getCanvasContext(), scheduleItem.getAssignment()));
-                    } else if (scheduleItem.getType() == ScheduleItem.Type.TYPE_SYLLABUS) {
+                    } else if (scheduleItem.getItemType() == ScheduleItem.Type.TYPE_SYLLABUS) {
                         fragment = FragUtils.getFrag(SyllabusFragment.class, SyllabusFragment.createBundle((Course) getCanvasContext(), scheduleItem));
                     } else {
                         fragment = FragUtils.getFrag(CalendarEventFragment.class, CalendarEventFragment.createBundle(getCanvasContext(), scheduleItem));

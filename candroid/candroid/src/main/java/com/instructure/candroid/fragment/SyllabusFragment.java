@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,19 +33,18 @@ import android.webkit.WebView;
 import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.video.ActivityContentVideoViewClient;
 import com.instructure.pandautils.views.CanvasWebView;
 
 import java.util.List;
-
-import retrofit.client.Response;
 
 
 public class SyllabusFragment extends ParentFragment {
@@ -56,7 +55,7 @@ public class SyllabusFragment extends ParentFragment {
     private ScheduleItem syllabus;
 
     // callbacks
-    CanvasCallback<Course> syllabusCallback;
+    StatusCallback<Course> syllabusCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {return FRAGMENT_PLACEMENT.DETAIL; }
@@ -109,12 +108,12 @@ public class SyllabusFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
         });
 
@@ -139,7 +138,7 @@ public class SyllabusFragment extends ParentFragment {
         setupCallbacks();
 
         if (syllabus == null || syllabus.getDescription() == null) {
-            CourseAPI.getCourseWithSyllabus(getCanvasContext().getId(), syllabusCallback);
+            CourseManager.getCourseWithSyllabus(getCanvasContext().getId(), syllabusCallback, true);
         } else {
             populateViews();
         }
@@ -182,7 +181,7 @@ public class SyllabusFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     void populateViews() {
-        if (getActivity() == null || syllabus == null || syllabus.getType() != ScheduleItem.Type.TYPE_SYLLABUS) {
+        if (getActivity() == null || syllabus == null || syllabus.getItemType() != ScheduleItem.Type.TYPE_SYLLABUS) {
             return;
         }
 
@@ -196,15 +195,16 @@ public class SyllabusFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     private void setupCallbacks() {
-        syllabusCallback = new CanvasCallback<Course>(this) {
+        syllabusCallback = new StatusCallback<Course>() {
             @Override
-            public void firstPage(Course course, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
+                Course course = response.body();
                 if (course.getSyllabusBody() != null) {
                     syllabus = new ScheduleItem();
-                    syllabus.setType(ScheduleItem.Type.TYPE_SYLLABUS);
+                    syllabus.setItemType(ScheduleItem.Type.TYPE_SYLLABUS);
                     syllabus.setTitle(course.getName());
                     syllabus.setDescription(course.getSyllabusBody());
                     populateViews();

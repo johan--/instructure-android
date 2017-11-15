@@ -18,26 +18,28 @@
 package com.instructure.parentapp.receivers;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
 import com.instructure.pandautils.utils.Const;
 import com.instructure.parentapp.R;
-import com.instructure.parentapp.activity.MainActivity;
+import com.instructure.parentapp.activity.SplashActivity;
 import com.instructure.parentapp.database.DatabaseHandler;
 
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.List;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class AlarmReceiver extends BroadcastReceiver {
+
+    private static final String CHANNEL_ID = "canvasParentNotificationChannel";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -52,14 +54,13 @@ public class AlarmReceiver extends BroadcastReceiver {
             subTitle = "";
         }
         //set up the notification
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.notification_small_icon)
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_notification_canvas_logo)
                         .setContentTitle(title)
                         .setContentText(subTitle);
 
-
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, SplashActivity.class);
         // Because clicking the notification opens a new ("special") activity, there's
         // no need to create an artificial back stack.
         PendingIntent resultPendingIntent =
@@ -70,19 +71,44 @@ public class AlarmReceiver extends BroadcastReceiver {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        mBuilder.setContentIntent(resultPendingIntent);
+        builder.setContentIntent(resultPendingIntent);
 
 
         // Sets an ID for the notification
         // Make it unique based on the title and subtitle
         int mNotificationId = title.hashCode() + subTitle.hashCode();
         // Gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        createNotificationChannel(context, CHANNEL_ID, notificationManager);
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        notificationManager.notify(mNotificationId, builder.build());
     }
 
+
+    private static void createNotificationChannel(Context context, String channelId, NotificationManager nm) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+
+        //Prevents recreation of notification channel if it exists.
+        List<NotificationChannel> channelList = nm.getNotificationChannels();
+        for (NotificationChannel channel : channelList) {
+            if (channelId.equals(channel.getId())) {
+                return;
+            }
+        }
+
+        CharSequence name = context.getString(R.string.notification_channel_name);
+        String description = context.getString(R.string.notification_channel_description);
+
+        //Create the channel and add the group
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+        channel.setDescription(description);
+        channel.enableLights(false);
+        channel.enableVibration(false);
+
+        //create the channel
+        nm.createNotificationChannel(channel);
+    }
     public void setAlarm(Context context, Calendar calendar, long assignmentId, String title, String subTitle) {
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmReceiver.class);

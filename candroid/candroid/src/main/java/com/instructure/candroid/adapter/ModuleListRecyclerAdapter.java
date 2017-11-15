@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -38,17 +38,17 @@ import com.instructure.candroid.holders.ModuleSubHeaderViewHolder;
 import com.instructure.candroid.holders.ModuleViewHolder;
 import com.instructure.candroid.interfaces.ModuleAdapterToFragmentCallback;
 import com.instructure.candroid.util.ModuleUtility;
-import com.instructure.canvasapi.api.ModuleAPI;
-import com.instructure.canvasapi.model.AssignmentSet;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleObject;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ModuleManager;
+import com.instructure.canvasapi2.models.AssignmentSet;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleObject;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
@@ -60,11 +60,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleObject, ModuleItem, RecyclerView.ViewHolder> {
 
@@ -72,7 +72,7 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
     private CanvasContext mCanvasContext;
     private HashMap<Long, ModuleItemCallback> mModuleItemCallbacks = new HashMap<>();
     private ModuleAdapterToFragmentCallback mCallback;
-    private CanvasCallback<ModuleObject[]> mModuleObjectCallback;
+    private StatusCallback<List<ModuleObject>> mModuleObjectCallback;
     private long mDefaultExpandedModuleId;
 
     /* For testing purposes only */
@@ -91,7 +91,7 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
             public void viewClicked(View view, ModuleObject moduleObject) {
                 ModuleItemCallback moduleItemsCallback = getModuleItemsCallback(moduleObject, false);
                 if (!moduleItemsCallback.isFromNetwork() && !isGroupExpanded(moduleObject)) {
-                    ModuleAPI.getFirstPageModuleItems(mCanvasContext, moduleObject.getId(), getModuleItemsCallback(moduleObject, false));
+                    ModuleManager.getFirstPageModuleItems(mCanvasContext, moduleObject.getId(), getModuleItemsCallback(moduleObject, false), true);
                 } else {
                     expandCollapseGroup(moduleObject);
                 }
@@ -284,25 +284,7 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
         if (mModuleItemCallbacks.containsKey(moduleObject.getId())) {
             return mModuleItemCallbacks.get(moduleObject.getId());
         } else {
-            ModuleItemCallback moduleItemCallback = new ModuleItemCallback(this, moduleObject) {
-                @Override
-                public void cache(ModuleItem[] moduleItems, LinkHeaders linkHeaders, Response response) {
-                    int position = (moduleItems.length > 0 && moduleItems[0] != null) ? moduleItems[0].getPosition() - 1 : 0;
-                    for(ModuleItem item : moduleItems) {
-                        item.setPosition(position++);
-                        addOrUpdateItem(this.getModuleObject(), item);
-                    }
-
-                    String nextItemsURL = linkHeaders.nextURL;
-                    if(nextItemsURL != null){
-                        ModuleAPI.getNextPageModuleItemsChained(nextItemsURL, this, true);
-                    }
-
-                    // Wait for the network to expand when there are no items
-                    if (moduleItems.length > 0) {
-                        expandGroup(this.getModuleObject(), isNotifyGroupChange);
-                    }
-                }
+            ModuleItemCallback moduleItemCallback = new ModuleItemCallback(moduleObject) {
 
                 private int checkMasteryPaths(int position, ModuleItem item) {
                     if(item.getMasteryPaths() != null && item.getMasteryPaths().isLocked()) {
@@ -352,34 +334,53 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
                 }
 
                 @Override
-                public void firstPage(ModuleItem[] moduleItems, LinkHeaders linkHeaders, Response response) {
-                    int position = (moduleItems.length > 0 && moduleItems[0] != null) ? moduleItems[0].getPosition() - 1 : 0;
-                    for(ModuleItem item : moduleItems) {
-                        item.setPosition(position++);
-                        addOrUpdateItem(this.getModuleObject(), item);
-                        position = checkMasteryPaths(position, item);
-                    }
+                public void onResponse(retrofit2.Response<List<ModuleItem>> response, LinkHeaders linkHeaders, ApiType type) {
+                    List<ModuleItem> moduleItems = response.body();
+                    if(type == ApiType.API) {
+                       int position = (moduleItems.size() > 0 && moduleItems.get(0) != null) ? moduleItems.get(0).getPosition() - 1 : 0;
+                       for (ModuleItem item : moduleItems) {
+                           item.setPosition(position++);
+                           addOrUpdateItem(this.getModuleObject(), item);
+                           position = checkMasteryPaths(position, item);
+                       }
 
-                    String nextItemsURL = linkHeaders.nextURL;
-                    if(nextItemsURL != null){
-                        ModuleAPI.getNextPageModuleItemsChained(nextItemsURL, this, false);
-                    }
+                       String nextItemsURL = linkHeaders.nextUrl;
+                       if (nextItemsURL != null) {
+                           ModuleManager.getNextPageModuleItems(nextItemsURL, this, true);
+                       }
 
-                    this.setIsFromNetwork(true);
-                    expandGroup(this.getModuleObject(), isNotifyGroupChange);
+                       this.setIsFromNetwork(true);
+                       expandGroup(this.getModuleObject(), isNotifyGroupChange);
+                   } else if (type == ApiType.CACHE) {
+                       int position = (moduleItems.size() > 0 && moduleItems.get(0) != null) ? moduleItems.get(0).getPosition() - 1 : 0;
+                       for(ModuleItem item : moduleItems) {
+                           item.setPosition(position++);
+                           addOrUpdateItem(this.getModuleObject(), item);
+                       }
+
+                       String nextItemsURL = linkHeaders.nextUrl;
+                       if(nextItemsURL != null){
+                           ModuleManager.getNextPageModuleItems(nextItemsURL, this, true);
+                       }
+
+                       // Wait for the network to expand when there are no items
+                       if (moduleItems.size() > 0) {
+                           expandGroup(this.getModuleObject(), isNotifyGroupChange);
+                       }
+                   }
                 }
 
                 @Override
-                public boolean onFailure(RetrofitError retrofitError) {
+                public void onFail(Call<List<ModuleItem>> callResponse, Throwable error, retrofit2.Response response) {
+
                     // Only expand if there was no cache result and no network. No connection empty cell will be displayed
-                    if (retrofitError.getResponse() != null
-                            && retrofitError.getResponse().getStatus() == 504
-                            && APIHelpers.isCachedResponse(retrofitError.getResponse())
+                    if (response != null
+                            && response.code() == 504
+                            && APIHelper.isCachedResponse(response)
                             && getContext() != null
                             && !Utils.isNetworkAvailable(getContext())) {
                         expandGroup(this.getModuleObject(), isNotifyGroupChange);
                     }
-                    return super.onFailure(retrofitError);
                 }
             };
 
@@ -396,24 +397,26 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
 
     @Override
     public void setupCallbacks() {
-        mModuleObjectCallback = new CanvasCallback<ModuleObject[]>(this) {
+        mModuleObjectCallback = new StatusCallback<List<ModuleObject>>() {
 
             @Override
-            public void firstPage(ModuleObject[] moduleObjects, LinkHeaders linkHeaders, Response response) {
-                setNextUrl(linkHeaders.nextURL);
+            public void onResponse(retrofit2.Response<List<ModuleObject>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<ModuleObject> moduleObjects = response.body();
+                setNextUrl(linkHeaders.nextUrl);
 
-                addOrUpdateAllGroups(moduleObjects);
+                addOrUpdateAllGroups(moduleObjects.toArray(new ModuleObject[moduleObjects.size()]));
 
-                if (mDefaultExpandedModuleId == -1 && moduleObjects.length > 0) {
-                    mDefaultExpandedModuleId = moduleObjects[0].getId();
+                if (mDefaultExpandedModuleId == -1 && moduleObjects.size() > 0) {
+                    mDefaultExpandedModuleId = moduleObjects.get(0).getId();
                 }
 
                 if (mDefaultExpandedModuleId != -1) {
                     ModuleObject defaultExpandedModuleObject = getGroup(mDefaultExpandedModuleId);
                     if (defaultExpandedModuleObject != null) {
                         // In order for the arrow to be the correct direction when expanded, set isNotifyGroupChange to true
-                        if (!getModuleItemsCallback(defaultExpandedModuleObject, true).isFinished()) {
-                            ModuleAPI.getFirstPageModuleItems(mCanvasContext, defaultExpandedModuleObject.getId(), getModuleItemsCallback(defaultExpandedModuleObject, true));
+                        // It may be a race condition, but if we don't put the ! before the call in progress check then it will show an empty cell that says no network connection
+                        if (!getModuleItemsCallback(defaultExpandedModuleObject, true).isCallInProgress()) {
+                            ModuleManager.getFirstPageModuleItems(mCanvasContext, defaultExpandedModuleObject.getId(),getModuleItemsCallback(defaultExpandedModuleObject, true), true );
                         } else {
                             expandGroup(defaultExpandedModuleObject, true);
                         }
@@ -428,12 +431,12 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
 
     @Override
     public void loadFirstPage() {
-        ModuleAPI.getFirstPageModuleObjects(mCourse, mModuleObjectCallback);
+        ModuleManager.getFirstPageModuleObjects(mCourse, mModuleObjectCallback, true);
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        ModuleAPI.getNextPageModuleObjects(nextURL, mModuleObjectCallback);
+        ModuleManager.getNextPageModuleObjects(nextURL, mModuleObjectCallback, true);
     }
 
     // endregion
@@ -512,7 +515,7 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
                 if(ids.length > 0 && ids[0] != 0) {
                     reqs.append("\n");
                 }
-                reqs.append(DateHelpers.createPrefixedDateTimeString(getContext(), R.string.unlocked, moduleObject.getUnlock_at()));
+                reqs.append(DateHelper.createPrefixedDateTimeString(getContext(), R.string.unlocked, moduleObject.getUnlock_at()));
             }
 
             prereqString = reqs.toString();
@@ -521,12 +524,10 @@ public class ModuleListRecyclerAdapter extends ExpandableRecyclerAdapter<ModuleO
     }
     // endregion
 
-    private static abstract class ModuleItemCallback extends CanvasCallback<ModuleItem[]> {
+    private static abstract class ModuleItemCallback extends StatusCallback<List<ModuleItem>> {
         private ModuleObject moduleObject;
         private boolean isFromNetwork = false; // When true, there is no need to fetch objects from the network again.
-        public ModuleItemCallback(APIStatusDelegate statusDelegate, ModuleObject moduleObject) {
-            super(statusDelegate);
-            setFinished(false);
+        public ModuleItemCallback(ModuleObject moduleObject) {
             this.moduleObject = moduleObject;
         }
 

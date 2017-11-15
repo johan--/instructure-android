@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,18 +30,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.FavoritingRecyclerAdapter;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Favorite;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Favorite;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
@@ -126,56 +126,41 @@ public class FavoritingFragment extends ParentFragment {
         //Update the favorite to what it should be
         course.setFavorite(!course.isFavorite());
         if (course.isFavorite()) {
-            CourseAPI.addCourseToFavorites(course.getId(), new CanvasCallback<Favorite>(this) {
+            CourseManager.addCourseToFavorites(course.getId(), new StatusCallback<Favorite>() {
+
                 @Override
-                public void cache(Favorite favorite) {
+                public void onResponse(retrofit2.Response<Favorite> response, LinkHeaders linkHeaders, ApiType type) {
                     mRecyclerAdapter.addOrUpdateItem(mRecyclerAdapter.makeHeader(R.string.courses, true, ALL_COURSES_ID), course);
                 }
 
-                @Override
-                public void firstPage(Favorite favorite, LinkHeaders linkHeaders, Response response) {
-                    cache(favorite);
-                }
-            });
+            }, true);
         } else {
-            CourseAPI.removeCourseFromFavorites(course.getId(), new CanvasCallback<Favorite>(this) {
+            CourseManager.removeCourseFromFavorites(course.getId(), new StatusCallback<Favorite>() {
+
                 @Override
-                public void cache(Favorite favorite) {
+                public void onResponse(retrofit2.Response<Favorite> response, LinkHeaders linkHeaders, ApiType type) {
                     mRecyclerAdapter.addOrUpdateItem(mRecyclerAdapter.makeHeader(R.string.courses, true, ALL_COURSES_ID), course);
                 }
 
-                @Override
-                public void firstPage(Favorite favorite, LinkHeaders linkHeaders, Response response) {
-                    cache(favorite);
-                }
-            });
+            }, true);
         }
     }
 
     private void updateGroupFavorite(final Group group) {
         group.setFavorite(!group.isFavorite());
         if (group.isFavorite()) {
-            GroupAPI.addGroupToFavorites(group.getId(), new CanvasCallback<Favorite>(this) {
+            GroupManager.addGroupToFavorites(group.getId(), new StatusCallback<Favorite>() {
                 @Override
-                public void cache(Favorite favorite) {
+                public void onResponse(retrofit2.Response<Favorite> response, LinkHeaders linkHeaders, ApiType type) {
                     mRecyclerAdapter.addOrUpdateItem(mRecyclerAdapter.makeHeader(R.string.groups, true, ALL_GROUPS_ID), group);
                 }
 
-                @Override
-                public void firstPage(Favorite favorite, LinkHeaders linkHeaders, Response response) {
-                    cache(favorite);
-                }
             });
         } else {
-            GroupAPI.removeGroupFromFavorites(group.getId(), new CanvasCallback<Favorite>(this) {
+            GroupManager.removeGroupFromFavorites(group.getId(), new StatusCallback<Favorite>() {
                 @Override
-                public void cache(Favorite favorite) {
+                public void onResponse(retrofit2.Response<Favorite> response, LinkHeaders linkHeaders, ApiType type) {
                     mRecyclerAdapter.addOrUpdateItem(mRecyclerAdapter.makeHeader(R.string.groups, true, ALL_GROUPS_ID), group);
-                }
-
-                @Override
-                public void firstPage(Favorite favorite, LinkHeaders linkHeaders, Response response) {
-                    cache(favorite);
                 }
             });
         }

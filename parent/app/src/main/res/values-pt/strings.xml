@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Diga-nos quais são as suas partes favoritas da app</string>
     <string name="sendFeedback">Enviar Comentários</string>
     <string name="sendMail">Enviar Email&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domínio:</string>
     <string name="help_versionNum">Versão:</string>
     <string name="help_userId">ID do Utilizador:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Apenas os observadores do Canvas podem autenticar-se no Canvas Parent.</string>
     <string name="open_source">Código Aberto</string>
     <string name="open_source_details">Ver licenças de código aberto</string>
+
+    <string name="unitedStates">Estados Unidos da América</string>
+    <string name="theUnitedStates">os Estados Unidos da América</string>
+    <string name="canada">Canadá</string>
+    <string name="ireland">Irlanda</string>
+    <string name="australia">Austrália</string>
+    <string name="germany">Alemanha</string>
+    <string name="singapore">Singapura</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Escolher região dos alunos</string>
+    <string name="selectRegion">Seletor de região</string>
+    <string name="unauthorizedRegion">Região não autorizada</string>
+    <string name="mismatchedRegionMessage">Esta instituição está localizada fora da região selecionada. Para adicionar um aluno nesta instituição, use a opção "Seletor de região" na página de login para criar uma conta na região de %1$s.</string>
 </resources>

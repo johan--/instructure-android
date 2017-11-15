@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.candroid.util.DownloadMedia;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Submission;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Submission;
 import com.instructure.pandautils.utils.PermissionUtils;
 
 import java.io.InputStream;
@@ -122,7 +122,7 @@ public class SubmissionViewOnlineURLFragment extends ParentFragment {
     public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getTitle().equals(getResources().getString(R.string.open))) {
             //Open media
-            openMedia(submission.getAttachments().get(0).getMimeType(), submission.getAttachments().get(0).getUrl(), submission.getAttachments().get(0).getDisplayName());
+            openMedia(submission.getAttachments().get(0).getContentType(), submission.getAttachments().get(0).getUrl(), submission.getAttachments().get(0).getDisplayName());
         } else if (item.getTitle().equals(getResources().getString(R.string.download))) {
             if (PermissionUtils.hasPermissions(getActivity(), PermissionUtils.WRITE_EXTERNAL_STORAGE)) {
                 downloadFile();

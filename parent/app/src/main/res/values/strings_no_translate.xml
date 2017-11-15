@@ -33,4 +33,5 @@
     <string name="date_text_content_desc">date_text_%1$d</string>
     <string name="name_text_content_desc">name_text_%1$d</string>
 
+    <string name="airwolfGamma">Airwolf Gamma</string>
 </resources>

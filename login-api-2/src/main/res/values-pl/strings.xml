@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">Interfejs do logowania</string>
   <string name="hello_world">Witaj świecie!</string>
   <string name="action_settings">Ustawienia</string>
   <string name="mobileVerifyGeneral">Ta aplikacja nie została zatwierdzona do użytku</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">Nieznane urządzenie</string>
   <string name="errorOccurred">Wystąpił nieoczekiwany błąd.</string>
   <string name="pageNotFound">Nie odnaleziono strony.</string>
-  <string name="okay">Okej</string>
   <string name="confirm">Zatwierdź</string>
   <string name="cancel">Usuń</string>
   <string name="help">Pomoc</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">Czy próbujesz się zarejestrować w sieci Canvas Network?</string>
   <string name="remove">Usuń</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">Masquerade</string>
+  <string name="userId">Identyfikator użytkownika</string>
+  <string name="domain">Domena</string>
+  <string name="masqueradingUserId">Identyfikator użytkownika maskowanego</string>
+  <string name="masqueradingUserDomain">Domena maskująca</string>
+  <string name="masqueradingBegin">Rozpocznij maskowanie</string>
+  <string name="masqueradingStop">Zatrzymaj maskowanie</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Usunąć tego użytkownika?</string>
   <string name="removedForever">Trzeba ponownie zalogować się na konto tego użytkownika aby mieć dostęp do jego zawartości.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Nie widzisz swojej szkoły? Wpisz adres URL szkoły lub dotknij tutaj aby uzyskać pomoc.</string>
   <string name="loginCanvasHelpWithUser">Wpisz adres URL szkoły lub dotknij tutaj aby uzyskać pomoc.</string>
   <string name="loginHint">Znajdź swoją szkołę lub dzielnicę</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Jak się czujemy?</string>
-  <string name="rateUs">Jak nas oceniasz?</string>
-  <string name="doBetter">Co możemy ulepszyć?</string>
-  <string name="sendFeedback">Wyślij informację zwrotną</string>
-  <string name="suggestions">Sugestie dla systemu Android</string>
-  <string name="domain">Domena</string>
-  <string name="versionNum">Wersja:</string>
-  <string name="userId">Identyfikator użytkownika</string>
-  <string name="email">Adres e-mail</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Nie pokazuj więcej</string>
-  <string name="installDate">Data instalacji:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Zgłoś problem</string>
   <string name="zendesk_subject">Temat</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Urządzenie</string>
   <string name="osVersion">Wersja OS</string>
+  <string name="previousLoginTitle">Poprzednie logowania</string>
+  <string name="canvasNetworks">Sieci Canvas</string>
+  <string name="findMySchool">Znajdź moją szkołę</string>
+  <string name="appTypeTeacher">Nauczyciel</string>
+  <string name="appTypeStudent">Uczestnik</string>
+  <string name="appTypeParent">Rodzic</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">Jaka jest nazwa Twojej szkoły?</string>
+  <string name="next">Dalej</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Usuń poprzedniego użytkownika</string>
+  <string name="accountDomainFooter">Nie możesz odnaleźć szkoły? Spróbuj wprowadzić pełen adres URL szkoły.</string>
+  <string name="accountDomainFooterLink">Stuknij tutaj, aby uzyskać pomoc.</string>
+  <string name="login_noInternetConnectionTitle">Brak połączenia internetowego</string>
+  <string name="login_noInternetConnectionMessage">To działanie wymaga połączenia internetowego.</string>
+  <string name="empty_feedback">W celu przesłania informacji zwrotnych należy wprowadzić temat i opis.</string>
+  <string name="versionNum">Numer wersji</string>
+  <string name="scrollInstructions">Przewiń, aby wyświetlić wszystkie szczegóły</string>
 </resources>

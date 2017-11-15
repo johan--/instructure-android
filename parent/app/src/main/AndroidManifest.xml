@@ -32,19 +32,41 @@
         android:supportsRtl="true"
         tools:replace="icon, label"
         android:name=".util.ApplicationManager">
-        <activity
-            android:name=".activity.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
 
+        <activity
+            android:name=".activity.SplashActivity"
+            android:theme="@style/LoginFlowTheme.Splash_Parent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
+        <activity android:name=".activity.ParentLoginActivity"
+            android:theme="@style/LoginFlowTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity android:name=".activity.FindSchoolActivity"
+            android:theme="@style/LoginFlowTheme.NoActionBar"
+            android:launchMode="singleTop"/>
+
+        <activity android:name=".activity.SignInActivity"
+            android:theme="@style/LoginFlowTheme.NoActionBar"
+            android:launchMode="singleTop"/>
+
+        <activity android:name=".activity.CreateAccountActivity"
+            android:theme="@style/LoginFlowTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
 
         <activity
             android:name=".activity.StudentViewActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar.NavigationActivity"/>
+
         <activity android:name=".activity.DetailViewActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"/>
+
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/action_settings"
@@ -53,7 +75,7 @@
         <activity
             android:name=".activity.ResetPasswordActivity"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/LoginFlowTheme.NoActionBar"
             android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <data
@@ -84,24 +106,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
-    </activity>
-
-        <activity
-            android:name=".activity.SplashActivity"
-            android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-
-        <activity android:name=".activity.DomainPickerActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activity.CanvasLoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"/>
 
         <activity android:name=".activity.StudentDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
@@ -109,17 +114,7 @@
         <activity android:name=".activity.HelpActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity android:name=".activity.ParentLoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
         <activity android:name=".activity.BaseParentActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activity.CreateAccountActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"/>
-
-        <activity android:name=".activity.ForgotPasswordActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <receiver android:name=".receivers.AlarmReceiver"/>

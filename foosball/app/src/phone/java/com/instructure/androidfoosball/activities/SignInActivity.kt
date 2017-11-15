@@ -39,7 +39,7 @@ import com.instructure.androidfoosball.R
 import com.instructure.androidfoosball.models.User
 import com.instructure.androidfoosball.utils.Prefs
 import kotlinx.android.synthetic.phone.activity_sign_in.*
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.sdk21.listeners.onClick
 
 
 class SignInActivity : BaseFireBaseActivity(), GoogleApiClient.OnConnectionFailedListener {
@@ -120,7 +120,7 @@ class SignInActivity : BaseFireBaseActivity(), GoogleApiClient.OnConnectionFaile
                 if (dataSnapshot.childrenCount == 0L) {
                     mDatabase!!.child("users").child(acctId).setValue(user)
                 } else {
-                    acctId = dataSnapshot.children.iterator().next().getValue(User::class.java).id
+                    acctId = dataSnapshot.children.iterator().next().getValue(User::class.java)!!.id
                     user.id = acctId
                 }
                 Prefs(this@SignInActivity).userId = acctId

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.CanvasColor;
 import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Enrollment;
 import com.instructure.canvasapi2.models.FileUploadParams;
 import com.instructure.canvasapi2.models.Parent;
 import com.instructure.canvasapi2.models.ParentResponse;
@@ -39,8 +40,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -61,9 +62,9 @@ import retrofit2.http.Url;
 
 public class UserAPI {
 
-    interface UsersInterface {
+    public enum ENROLLMENT_TYPE {STUDENT, TEACHER, TA, OBSERVER, DESIGNER}
 
-        public enum ENROLLMENT_TYPE {STUDENT, TEACHER, TA, OBSERVER, DESIGNER}
+    interface UsersInterface {
 
         @GET("users/self/colors")
         Call<CanvasColor> getColors();
@@ -71,9 +72,18 @@ public class UserAPI {
         @PUT("users/self/colors/{context_id}")
         Call<CanvasColor> setColor(@Path("context_id") String contextId, @Query(value = "hexcode") String color);
 
+        @PUT("users/self")
+        Call<User> updateUserShortNameAndEmail(@Query("user[short_name]") String shortName, @Query("user[email]") String email, @Body String body);
+
+        @PUT("users/self")
+        Call<User> updateUserShortName(@Query("user[short_name]") String shortName, @Body String body);
+
+        @PUT("users/self")
+        Call<User> updateUserEmail(@Query("user[email]") String email, @Body String body);
+
         @Multipart
         @POST("/")
-        Call<RemoteFile> uploadUserFile(@PartMap LinkedHashMap<String, RequestBody> params, @Part("file") RequestBody file);
+        Call<RemoteFile> uploadUserFile(@PartMap Map<String, RequestBody> params, @Part("file") RequestBody file);
 
         @POST("users/self/files")
         Call<FileUploadParams> getFileUploadParams(@Query("size") long size, @Query("name") String fileName, @Query("content_type") String content_type, @Query("parent_folder_id") Long parentFolderId, @Body String body);
@@ -84,11 +94,23 @@ public class UserAPI {
         @GET("users/self/profile")
         Call<User> getSelf();
 
-        @GET("users/{user_id}/profile")
-        Call<User> getUser(@Path("user_id") String userId);
+        @GET("users/self/enrollments?state[]=active&state[]=invited&state[]=completed")
+        Call<List<Enrollment>> getSelfEnrollments();
 
-        @GET("courses/{context_id}/users?include[]=enrollments&include[]=avatar_url&include[]=user_id&include[]=email")
+        @GET("users/self")
+        Call<User> getSelfWithPermissions();
+
+        @GET("users/{user_id}/profile")
+        Call<User> getUser(@Path("user_id") Long userId);
+
+        @GET("{contextType}/{contextId}/users/{userId}?include[]=avatar_url&include[]=user_id&include[]=email&include[]=bio")
+        Call<User> getUserForContextId(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("userId")long userId);
+
+        @GET("{context_id}/users?include[]=enrollments&include[]=avatar_url&include[]=user_id&include[]=email&include[]=bio")
         Call<List<User>> getFirstPagePeopleList(@Path("context_id") long context_id, @Query("enrollment_type") String enrollmentType);
+
+        @GET("{context_id}/users?include[]=enrollments&include[]=avatar_url&include[]=user_id&include[]=email&include[]=bio")
+        Call<List<User>> getFirstPageAllPeopleList(@Path("context_id") long context_id);
 
         @GET
         Call<List<User>> next(@Url String nextURL);
@@ -145,7 +167,7 @@ public class UserAPI {
     }
 
     @WorkerThread
-    public static RemoteFile uploadUserFileSynchronous(@NonNull RestBuilder adapter, String uploadUrl, LinkedHashMap<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
+    public static RemoteFile uploadUserFileSynchronous(@NonNull RestBuilder adapter, String uploadUrl, Map<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
         RestParams params = new RestParams.Builder().withShouldIgnoreToken(true).withDomain(uploadUrl).withPerPageQueryParam(false).build();
         RequestBody fileBody = RequestBody.create(MediaType.parse(mimeType), file);
         return adapter.build(UsersInterface.class, params).uploadUserFile(uploadParams, fileBody).execute().body();
@@ -167,19 +189,64 @@ public class UserAPI {
         callback.addCall(adapter.build(UsersInterface.class, params).getSelf()).enqueue(callback);
     }
 
-    public static void getUser(RestBuilder adapter, RestParams params, String userId, StatusCallback<User> callback) {
+    public static void getSelfEnrollments(RestBuilder adapter, RestParams params, StatusCallback<List<Enrollment>> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).getSelfEnrollments()).enqueue(callback);
+    }
+
+    public static void getSelfWithPermissions(RestBuilder adapter, RestParams params, StatusCallback<User> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).getSelfWithPermissions()).enqueue(callback);
+    }
+
+    public static void getUser(RestBuilder adapter, RestParams params, Long userId, StatusCallback<User> callback) {
         callback.addCall(adapter.build(UsersInterface.class, params).getUser(userId)).enqueue(callback);
+    }
+
+    public static void getUserForContextId(RestBuilder adapter, RestParams params, CanvasContext canvasContext, long userId, StatusCallback<User> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).getUserForContextId(canvasContext.apiContext(), canvasContext.getId(), userId)).enqueue(callback);
+    }
+
+    public static void updateUserShortNameAndEmail(RestBuilder adapter, RestParams params, String shortName, String email, String bio, StatusCallback<User> callback) {
+        //At the time of creation the bio field is not supported via Canvas API, left here in hopes that one day all will be made right in the sight of engineers.
+        callback.addCall(adapter.build(UsersInterface.class, params).updateUserShortNameAndEmail(shortName, email, "")).enqueue(callback);
+    }
+
+    public static void updateUserShortName(RestBuilder adapter, RestParams params, String shortName, StatusCallback<User> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).updateUserShortName(shortName, "")).enqueue(callback);
+    }
+
+    public static void updateUserEmail(RestBuilder adapter, RestParams params, String email, StatusCallback<User> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).updateUserEmail(email, "")).enqueue(callback);
     }
 
     public static void getPeopleList(@NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull Long contextId, @NonNull StatusCallback<List<User>> callback) {
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(UsersInterface.class, params).getFirstPagePeopleList(contextId, getEnrollmentTypeString(UsersInterface.ENROLLMENT_TYPE.STUDENT))).enqueue(callback);
+            callback.addCall(adapter.build(UsersInterface.class, params).getFirstPagePeopleList(contextId, getEnrollmentTypeString(ENROLLMENT_TYPE.STUDENT))).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             callback.addCall(adapter.build(UsersInterface.class, params).next(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
     }
 
-    private static String getEnrollmentTypeString(UsersInterface.ENROLLMENT_TYPE enrollmentType){
+    public static void getFirstPagePeopleList(@NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull Long contextId, @NonNull ENROLLMENT_TYPE enrollmentType, @NonNull StatusCallback<List<User>> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).getFirstPagePeopleList(contextId, getEnrollmentTypeString(enrollmentType))).enqueue(callback);
+    }
+
+    public static void getNextPagePeopleList(@NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull String nextUrl, @NonNull StatusCallback<List<User>> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).next(nextUrl)).enqueue(callback);
+    }
+
+    public static void getFirstPagePeopleList(@NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull Long contextId, @NonNull StatusCallback<List<User>> callback) {
+        callback.addCall(adapter.build(UsersInterface.class, params).getFirstPageAllPeopleList(contextId)).enqueue(callback);
+    }
+
+    public static void getAllPeopleList(@NonNull RestBuilder adapter, @NonNull RestParams params, @NonNull Long contextId, @NonNull StatusCallback<List<User>> callback) {
+        if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
+            callback.addCall(adapter.build(UsersInterface.class, params).getFirstPageAllPeopleList(contextId)).enqueue(callback);
+        } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
+            callback.addCall(adapter.build(UsersInterface.class, params).next(callback.getLinkHeaders().nextUrl)).enqueue(callback);
+        }
+    }
+
+    private static String getEnrollmentTypeString(ENROLLMENT_TYPE enrollmentType){
         String enrollmentString = "";
         switch (enrollmentType){
             case DESIGNER:

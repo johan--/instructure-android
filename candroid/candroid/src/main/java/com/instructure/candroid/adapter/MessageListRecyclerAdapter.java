@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,16 +26,15 @@ import com.instructure.candroid.binders.MessageBinder;
 import com.instructure.candroid.fragment.MessageListFragment;
 import com.instructure.candroid.holders.MessageViewHolder;
 import com.instructure.candroid.util.DebounceMessageToAdapterListener;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.apis.ConversationAPI;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.List;
-
-import retrofit.client.Response;
 
 public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conversation, MessageViewHolder> {
 
@@ -44,10 +43,10 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
     private long mMyUserID;
 
     //callbacks and interfaces
-    private CanvasCallback<Conversation[]> mInboxConversationCallback;
-    private CanvasCallback<Conversation[]> mUnreadConversationCallback;
-    private CanvasCallback<Conversation[]> mArchivedConversationCallback;
-    private CanvasCallback<Conversation[]> mSentConversationCallback;
+    private StatusCallback<List<Conversation>> mInboxConversationCallback;
+    private StatusCallback<List<Conversation>> mUnreadConversationCallback;
+    private StatusCallback<List<Conversation>> mArchivedConversationCallback;
+    private StatusCallback<List<Conversation>> mSentConversationCallback;
 
     private DebounceMessageToAdapterListener mAdapterToFragmentCallback;
     private ItemClickedInterface mItemClickedInterface;
@@ -72,7 +71,12 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
         setItemCallback(new ItemComparableCallback<Conversation>() {
             @Override
             public int compare(Conversation o1, Conversation o2) {
-                return o2.getComparisonDate().compareTo(o1.getComparisonDate());
+                // Don't sort the data since the API already gives us the correct order
+                if (o1.getId() == o2.getId()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
             }
 
             @Override
@@ -150,7 +154,7 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
 
             @Override
             public void itemLongClick(Conversation item, MessageViewHolder viewHolder) {
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -172,29 +176,30 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
     }
 
     @Override
+    public void resetData() {
+        super.resetData();
+        mInboxConversationCallback.reset();
+        mUnreadConversationCallback.reset();
+        mArchivedConversationCallback.reset();
+        mSentConversationCallback.reset();
+    }
+
+    @Override
     public void loadFirstPage() {
         if(mMessageType.equals(ConversationAPI.ConversationScope.ALL)){
-            ConversationAPI.getFirstPageConversations(mInboxConversationCallback, mMessageType);
+            ConversationManager.getConversations(mMessageType, true, mInboxConversationCallback);
         } else if (mMessageType.equals(ConversationAPI.ConversationScope.UNREAD)){
-            ConversationAPI.getFirstPageConversations(mUnreadConversationCallback, mMessageType);
+            ConversationManager.getConversations(mMessageType, true, mUnreadConversationCallback);
         } else if (mMessageType.equals(ConversationAPI.ConversationScope.ARCHIVED)){
-            ConversationAPI.getFirstPageConversations(mArchivedConversationCallback, mMessageType);
+            ConversationManager.getConversations(mMessageType, true, mArchivedConversationCallback);
         } else {
-            ConversationAPI.getFirstPageConversations(mSentConversationCallback, mMessageType);
+            ConversationManager.getConversations(mMessageType, true, mSentConversationCallback);
         }
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        if(mMessageType.equals(ConversationAPI.ConversationScope.ALL)){
-            ConversationAPI.getNextPageConversations(mInboxConversationCallback, nextURL);
-        } else if (mMessageType.equals(ConversationAPI.ConversationScope.UNREAD)){
-            ConversationAPI.getNextPageConversations(mUnreadConversationCallback, nextURL);
-        } else if (mMessageType.equals(ConversationAPI.ConversationScope.ARCHIVED)){
-            ConversationAPI.getNextPageConversations(mArchivedConversationCallback, nextURL);
-        } else {
-            ConversationAPI.getNextPageConversations(mSentConversationCallback, nextURL);
-        }
+        loadFirstPage();
     }
 
     public void clearSelectedPosition(){
@@ -211,19 +216,20 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
         }
     }
 
-    private CanvasCallback<Conversation[]> createCallback(final ConversationAPI.ConversationScope messageType){
-        return new CanvasCallback<Conversation[]>(this) {
+    private StatusCallback<List<Conversation>> createCallback(final ConversationAPI.ConversationScope messageType){
+        return new StatusCallback<List<Conversation>>() {
 
             @Override
-            public void firstPage(Conversation[] conversations, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Conversation>> response, LinkHeaders linkHeaders, ApiType type) {
+
                 if(!mMessageType.equals(messageType)){
                     return;
                 }
-                addAll(conversations);
-                setNextUrl(linkHeaders.nextURL);
+                addAll(response.body());
+                setNextUrl(linkHeaders.nextUrl);
 
                 //update unread count
-                if (mUnReadCountInvalidated != null && !APIHelpers.isCachedResponse(response)) {
+                if (mUnReadCountInvalidated != null && !APIHelper.isCachedResponse(response)) {
                     mUnReadCountInvalidated.invalidateUnreadCount();
                 }
 
@@ -233,9 +239,8 @@ public class MessageListRecyclerAdapter extends MultiSelectRecyclerAdapter<Conve
             }
 
             @Override
-            public void nextPage(Conversation[] conversations, LinkHeaders linkHeaders, Response response) {
-                addAll(conversations);
-                setNextUrl(linkHeaders.nextURL);
+            public void onFinished(ApiType type) {
+                MessageListRecyclerAdapter.this.onCallbackFinished();
             }
         };
     }

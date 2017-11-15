@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import android.content.Context;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.model.NotificationCategoryHeader;
-import com.instructure.canvasapi.model.NotificationPreference;
+import com.instructure.canvasapi2.models.NotificationPreference;
 
 import java.util.ArrayList;
 import java.util.HashMap;

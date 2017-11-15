@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.core.deps.guava.base.Charsets;
-import android.support.test.espresso.core.deps.guava.io.Files;
 import android.support.test.uiautomator.UiDevice;
 import android.util.Printer;
 import android.util.StringBuilderPrinter;
@@ -40,6 +38,9 @@ import org.w3c.dom.Element;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -400,7 +401,7 @@ public class ViewToXml {
      * Dumps view as a String
      **/
     private static String dumpDom(View view) throws Exception {
-        return new String(dumpDomBytes(view), Charsets.UTF_8);
+        return new String(dumpDomBytes(view), Charset.forName("UTF-8"));
     }
 
     /**
@@ -414,7 +415,12 @@ public class ViewToXml {
         DUMP_XML.delete();
         try {
             device.takeScreenshot(DUMP_PNG);
-            Files.write(dumpDomBytes(view), DUMP_XML);
+
+            FileOutputStream fos = new FileOutputStream(DUMP_XML);
+            fos.write(dumpDomBytes(view));
+            fos.flush();
+            fos.close();
+
             result = true;
         } catch (Exception e) {
             // ignored

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,12 +29,11 @@ import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.asynctasks.LogoutAsyncTask;
 import com.instructure.androidpolling.app.fragments.QuestionListFragment;
 import com.instructure.androidpolling.app.util.ApplicationManager;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 
 import static com.instructure.androidpolling.app.R.menu.switch_to_student_view;
 
 public class FragmentManagerActivity extends BaseActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,15 +63,13 @@ public class FragmentManagerActivity extends BaseActivity {
 
             // Add the fragment to the 'fragment_container' FrameLayout
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container, firstFragment, QuestionListFragment.TAG);
+            fragmentTransaction.add(R.id.fragment_container, firstFragment, QuestionListFragment.class.getSimpleName());
 
             fragmentTransaction.commit();
         }
 
-        checkEnrollments(APIHelpers.getCacheUser(FragmentManagerActivity.this));
+        checkEnrollments(ApiPrefs.getUser());
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,28 +80,15 @@ public class FragmentManagerActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.action_logout:
-                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask(this, null);
+                LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask();
                 logoutAsyncTask.execute();
                 break;
             case R.id.action_switch_to_student:
                 startActivity(PollListActivity.createIntent(this));
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Intent
-    ///////////////////////////////////////////////////////////////////////////
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, FragmentManagerActivity.class);
@@ -118,6 +102,4 @@ public class FragmentManagerActivity extends BaseActivity {
         intent.putExtra("passedURI", passedURI);
         return intent;
     }
-
-
 }

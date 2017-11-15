@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,19 +29,18 @@ import com.instructure.candroid.interfaces.NotifyChecked;
 import com.instructure.candroid.model.NotificationCategoryHeader;
 import com.instructure.candroid.model.NotificationSubCategory;
 import com.instructure.candroid.util.NotificationPreferenceUtils;
-import com.instructure.canvasapi.api.NotificationPreferencesAPI;
-import com.instructure.canvasapi.model.CommunicationChannel;
-import com.instructure.canvasapi.model.NotificationPreference;
-import com.instructure.canvasapi.model.NotificationPreferenceResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.NotificationPreferencesManager;
+import com.instructure.canvasapi2.models.CommunicationChannel;
+import com.instructure.canvasapi2.models.NotificationPreference;
+import com.instructure.canvasapi2.models.NotificationPreferenceResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 
 import java.util.List;
 import java.util.Map;
-
-import retrofit.client.Response;
 
 /**
  * Handles two different view types.
@@ -86,16 +85,10 @@ public class NotificationPreferencesRecyclerAdapter extends ExpandableRecyclerAd
         NotificationPreferenceBinder.bind(holder, notificationSubCategory, new NotifyChecked() {
             @Override
             public void notifyCheckChanged(final NotificationSubCategory notifSubCategory, final boolean isChecked) {
-                NotificationPreferencesAPI.updateMultipleNotificationPreferences(mCurrentChannel.id, notifSubCategory.notifications, getFrequency(isChecked), new CanvasCallback<NotificationPreferenceResponse>(NotificationPreferencesRecyclerAdapter.this) {
-
+                NotificationPreferencesManager.updateMultipleNotificationPreferences(mCurrentChannel.id, notifSubCategory.notifications, getFrequency(isChecked), new StatusCallback<NotificationPreferenceResponse>() {
                     @Override
-                    public void cache(NotificationPreferenceResponse notificationPreferenceResponse, LinkHeaders linkHeaders, Response response) {
+                    public void onResponse(retrofit2.Response<NotificationPreferenceResponse> response, LinkHeaders linkHeaders, ApiType type) {
                         updateItemCheckedState(notifSubCategory, isChecked);
-                    }
-
-                    @Override
-                    public void firstPage(NotificationPreferenceResponse notificationPreferenceResponse, LinkHeaders linkHeaders, Response response) {
-                        cache(notificationPreferenceResponse, linkHeaders, response);
                     }
                 });
             }
@@ -176,24 +169,18 @@ public class NotificationPreferencesRecyclerAdapter extends ExpandableRecyclerAd
     }
 
     protected String getFrequency(boolean isChecked) {
-        return isChecked ? NotificationPreferencesAPI.IMMEDIATELY : NotificationPreferencesAPI.NEVER;
+        return isChecked ? NotificationPreferencesManager.IMMEDIATELY : NotificationPreferencesManager.NEVER;
     }
 
     public void fetchNotificationPreferences(CommunicationChannel channel) {
         mCurrentChannel = channel;
         clear();
 
-        NotificationPreferencesAPI.getNotificationPreferences(channel.user_id, channel.id,
-                new CanvasCallback<NotificationPreferenceResponse>(this) {
-
+        NotificationPreferencesManager.getNotificationPreferences(channel.user_id, channel.id,
+                new StatusCallback<NotificationPreferenceResponse>() {
                     @Override
-                    public void cache(NotificationPreferenceResponse notificationPreferenceResponse, LinkHeaders linkHeaders, Response response) {
-                        groupNotifications(notificationPreferenceResponse.notification_preferences);
-                    }
-
-                    @Override
-                    public void firstPage(NotificationPreferenceResponse notificationPreferenceResponse, LinkHeaders linkHeaders, Response response) {
-                        cache(notificationPreferenceResponse, linkHeaders, response);
+                    public void onResponse(retrofit2.Response<NotificationPreferenceResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                        groupNotifications(response.body().notificationPreferences);
                     }
                 });
     }

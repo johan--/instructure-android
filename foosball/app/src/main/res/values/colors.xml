@@ -25,4 +25,6 @@
     <color name="confirm_blue">#00ACEC</color>
     <color name="error_red">#DC3C00</color>
     <color name="success_green">#00AC4C</color>
+    <color name="lightGray">#DDD</color>
+    <color name="victory">#fdcd20</color>
 </resources>

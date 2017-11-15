@@ -28,7 +28,7 @@
     <ImageView
         android:id="@+id/help_button"
         android:padding="5dip"
-        android:background="@drawable/cv_transparent_button"
+        android:background="?android:selectableItemBackground"
         android:contentDescription="@string/help"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
@@ -99,7 +99,7 @@
         android:paddingLeft="5dip"
         android:paddingRight="5dip"
         android:layout_width="wrap_content"
-        android:background="@drawable/cv_transparent_button"
+        android:background="?android:selectableItemBackground"
         android:src="@drawable/ic_cv_forward"/>
 
     <TextView

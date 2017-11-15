@@ -88,6 +88,37 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="20sp" />
 
+
+            <TextView
+                android:id="@+id/tableKingGameButton"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginStart="32dp"
+                android:background="@drawable/circle_outline_blue_medium"
+                android:clickable="true"
+                android:gravity="center"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:text="@string/tableKing"
+                android:textAllCaps="true"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/teamTwisterGameButton"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginStart="32dp"
+                android:background="@drawable/circle_outline_blue_medium"
+                android:clickable="true"
+                android:gravity="center"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:text="@string/teamTwister"
+                android:textAllCaps="true"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/resumeGameButton"
                 android:layout_width="120dp"

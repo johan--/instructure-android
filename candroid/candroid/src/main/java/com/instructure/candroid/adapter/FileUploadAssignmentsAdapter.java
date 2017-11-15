@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,21 +18,17 @@
 package com.instructure.candroid.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.instructure.candroid.R;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Course;
+import com.instructure.canvasapi2.models.Assignment;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class FileUploadAssignmentsAdapter extends ArrayAdapter<Assignment> {
@@ -115,7 +111,7 @@ public class FileUploadAssignmentsAdapter extends ArrayAdapter<Assignment> {
 
         for(Assignment assignment : newAssignments){
             if (assignment.getSubmissionTypes().contains(Assignment.SUBMISSION_TYPE.ONLINE_UPLOAD)
-                    && (assignment.getlockAtDate() == null || (assignment.getlockAtDate() != null && currentDate.before(assignment.getlockAtDate())))){
+                    && (assignment.getLockAt() == null || (assignment.getLockAt() != null && currentDate.before(assignment.getLockAt())))){
                 onlineUploadAssignments.add(assignment);
             }
         }

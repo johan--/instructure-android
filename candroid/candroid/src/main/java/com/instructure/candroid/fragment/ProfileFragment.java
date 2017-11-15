@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,17 +21,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -55,54 +48,43 @@ import android.widget.Toast;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.PandaAvatarActivity;
-import com.instructure.candroid.activity.ProfileBackdropPickerActivity;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.canvasapi.api.AvatarAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.UserAPI;
-import com.instructure.canvasapi.api.compatibility_synchronous.UploadFileSynchronousAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.canvasapi.utilities.Masquerading;
-import com.instructure.canvasapi.utilities.UserCallback;
-import com.instructure.loginapi.login.api.GlobalDataSyncAPI;
-import com.instructure.loginapi.login.asynctasks.GlobalDataSyncPostTask;
-import com.instructure.loginapi.login.model.GlobalDataSync;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.FileUploadManager;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.AvatarWrapper;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.pandautils.utils.AvatarCropActivity;
+import com.instructure.pandautils.utils.AvatarCropConfig;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.pandautils.utils.FileUploadUtils;
 import com.instructure.pandautils.utils.LoaderUtils;
 import com.instructure.pandautils.utils.PermissionUtils;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.instructure.pandautils.utils.RequestCodes;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.pandautils.views.RippleView;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit.client.Response;
-
 
 public class ProfileFragment extends OrientationChangeFragment implements
-        android.support.v4.app.LoaderManager.LoaderCallbacks<UploadFileSynchronousAPI.AvatarWrapper> {
+        android.support.v4.app.LoaderManager.LoaderCallbacks<AvatarWrapper> {
 
-    //View variables
-    private View rootView, nameChangeWrapper;
+    private static final int REQUEST_CODE_PERMISSIONS_TAKE_PHOTO = 223;
+    private static final int REQUEST_CODE_PERMISSIONS_GALLERY = 332;
+
+    private View nameChangeWrapper;
     private EditText name;
     private RippleView files;
     private ImageView headerImage, nameChangeDone;
@@ -114,18 +96,15 @@ public class ProfileFragment extends OrientationChangeFragment implements
     private Uri mCapturedImageURI;
 
     //Callbacks.
-    private CanvasCallback<User> updateUserCallback;
-    private UserCallback getUserCallback;
-    private CanvasCallback<Course[]> coursesCallback;
-    private CanvasCallback<User> updateCanvasCallback;
-    private CanvasCallback<User> userPermissionCallback;
+    private StatusCallback<User> updateUserCallback;
+    private StatusCallback<User> updateCanvasCallback;
+    private StatusCallback<User> userPermissionCallback;
 
     //User
     private User user;
 
     //Logic
     ApplicationManager applicationManager;
-    boolean hasNonTeacherEnrollment = false;
     boolean canUpdateName;
     boolean canUpdateAvatar;
     private boolean editMode;
@@ -135,8 +114,7 @@ public class ProfileFragment extends OrientationChangeFragment implements
     private OnProfileChangedCallback onProfileChangedCallback;
 
     public interface OnProfileChangedCallback {
-        public void onProfileChangedCallback();
-        public void onProfileBackgroundImageChanged(String url);
+        void onProfileChangedCallback();
     }
 
     @Override
@@ -161,39 +139,36 @@ public class ProfileFragment extends OrientationChangeFragment implements
 
     @Override
     public View populateView(LayoutInflater inflater, ViewGroup container) {
-        rootView = getLayoutInflater().inflate(R.layout.profile_fragment_layout, container, false);
+        View rootView = getLayoutInflater().inflate(R.layout.profile_fragment_layout, container, false);
         setupDialogToolbar(rootView);
         styleToolbar();
-        clickContainer = (RelativeLayout)rootView.findViewById(R.id.clickContainer);
-        name = (EditText) rootView.findViewById(R.id.userName);
-        headerImage = (ImageView) rootView.findViewById(R.id.headerImage);
-        nameChangeDone = (ImageView) rootView.findViewById(R.id.nameChangeDone);
+        clickContainer = rootView.findViewById(R.id.clickContainer);
+        name = rootView.findViewById(R.id.userName);
+        headerImage = rootView.findViewById(R.id.headerImage);
+        nameChangeDone = rootView.findViewById(R.id.nameChangeDone);
         nameChangeDone.setImageDrawable(ColorUtils.colorIt(Color.BLACK, nameChangeDone.getDrawable()));
         nameChangeDone.setOnClickListener(nameChangedListener);
         nameChangeWrapper = rootView.findViewById(R.id.userNameWrapper);
         ColorDrawable colorDrawable = new ColorDrawable(Color.TRANSPARENT);
-        avatar = (CircleImageView) rootView.findViewById(R.id.avatar);
-        name.setBackgroundDrawable(colorDrawable);
-        files = (RippleView) rootView.findViewById(R.id.files);
+        avatar = rootView.findViewById(R.id.avatar);
+        name.setBackground(colorDrawable);
+        files = rootView.findViewById(R.id.files);
 
-        enrollment = (TextView) rootView.findViewById(R.id.enrollment);
-        bio = (TextView) rootView.findViewById(R.id.bio);
+        enrollment = rootView.findViewById(R.id.enrollment);
+        bio = rootView.findViewById(R.id.bio);
         bio.setMovementMethod(new ScrollingMovementMethod());
 
         if(!editMode){
             hideEditTextView();
         }
 
-        String backgroundUrl = getImageBackgroundUrl(getActivity());
-        loadBackdropImage(getContext(), backgroundUrl, headerImage);
-
         setUpCallbacks();
         setUpListeners();
 
-        UserAPI.getSelf(getUserCallback);
-        UserAPI.getSelfWithPermissions(userPermissionCallback);
-        //Figure out if we have a non-student enrollment.
-        CourseAPI.getAllFavoriteCourses(coursesCallback);
+        user = ApiPrefs.getUser();
+        setUpUserViews();
+        UserManager.getSelfWithPermissions(true, userPermissionCallback);
+
 
         return rootView;
     }
@@ -220,193 +195,61 @@ public class ProfileFragment extends OrientationChangeFragment implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == RequestCodes.CAMERA_PIC_REQUEST && resultCode != Activity.RESULT_CANCELED) {
-            Bitmap thumbnail = null;
+        if (requestCode == RequestCodes.CROP_IMAGE && resultCode == Activity.RESULT_OK) {
+            String croppedPath = data.getData().getPath();
+            File croppedFile = new File(croppedPath);
+            loaderBundle = createLoaderBundle("profilePic.jpg", "image/jpeg", croppedPath, croppedFile.length(), true);
+            showProgressBar();
+            LoaderUtils.restartLoaderWithBundle(getLoaderManager(), loaderBundle, this, R.id.avatarLoaderID);
 
-            //don't want to directly decode the stream because we could get out of memory errors
-            //if the URI is null, try to get the information from the intent that we saved earlier
-            if(mCapturedImageURI == null) {
+        } else if (requestCode == RequestCodes.CAMERA_PIC_REQUEST && resultCode != Activity.RESULT_CANCELED) {
+            // Don't want to directly decode the stream because we could get out of memory errors
+            // if the URI is null, try to get the information from the intent that we saved earlier
+            if (mCapturedImageURI == null) {
                 //save the intent information in case we get booted from memory.
                 SharedPreferences settings = getActivity().getSharedPreferences(ApplicationManager.PREF_NAME, 0);
-
-                mCapturedImageURI = (Uri) Uri.parse(settings.getString("ProfileFragment-URI", null));
+                mCapturedImageURI = Uri.parse(settings.getString("ProfileFragment-URI", null));
             }
-            //if it's still null, tell the user there is an error and return.
-            if(mCapturedImageURI == null) {
+
+            // If it's still null, tell the user there is an error and return.
+            if (mCapturedImageURI == null) {
                 showToast(R.string.errorGettingPhoto);
                 return;
             }
-            thumbnail = readBitmap(mCapturedImageURI, getActivity());
 
-            if(thumbnail != null) {
+            // Open image for cropping
+            AvatarCropConfig config = new AvatarCropConfig(mCapturedImageURI);
+            Intent cropIntent = AvatarCropActivity.createIntent(getContext(), config);
+            startActivityForResult(cropIntent, RequestCodes.CROP_IMAGE);
 
-                String[] projection = { MediaStore.Images.Media.DATA};
-                String capturedImageFilePath = null;
-                Cursor cursor = getActivity().getContentResolver().query(mCapturedImageURI, projection, null, null, null);
-                int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                if(cursor.moveToFirst()) {
-                    capturedImageFilePath = cursor.getString(column_index_data);
-                }
-
-                int height = thumbnail.getHeight();
-                int width = thumbnail.getWidth();
-                int imageSize = getImageSize(height, width);
-                float x = getStartX(width, imageSize);
-                float y = getStartY(height, imageSize);
-
-                thumbnail = cropThumbnail(x, y, height, width, imageSize, thumbnail);
-                thumbnail = rotateIfNecessary(thumbnail, capturedImageFilePath);
-
-                //overwrite the picture just taken
-                try {
-                    FileOutputStream out = new FileOutputStream(capturedImageFilePath);
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                } catch (Exception e) {
-                    LoggingUtility.LogException(getContext(), e);
-                }
-
-                long size = thumbnail.getRowBytes() * thumbnail.getHeight();
-
-                //let the bitmap be recycled
-                thumbnail.recycle();
-
-                String name = "profilePic.jpg";
-                String contentType = "image/jpeg";
-
-                //Start loader
-                loaderBundle = createLoaderBundle(name, contentType, capturedImageFilePath, size);
-                showProgressBar();
-                LoaderUtils.restartLoaderWithBundle(getLoaderManager(), loaderBundle, this, R.id.avatarLoaderID);
-            }
-        }
-        else if(requestCode == RequestCodes.PICK_IMAGE_GALLERY && resultCode != Activity.RESULT_CANCELED) {
-
-            if(data.getData() != null) {
+        } else if (requestCode == RequestCodes.PICK_IMAGE_GALLERY && resultCode != Activity.RESULT_CANCELED) {
+            if (data.getData() != null) {
                 Uri u = data.getData();
                 String urlPath = u.getPath();
 
-                if(u.getPath().contains("googleusercontent")){
+                if (u.getPath().contains("googleusercontent")) {
                     urlPath = changeGoogleURL(urlPath);
-                    ProfileFragment.this.user.setAvatarURL(urlPath);
-                    AvatarAPI.updateAvatar(urlPath, updateCanvasCallback);
+                    ProfileFragment.this.user.setAvatarUrl(urlPath);
+                    UserManager.updateUsersAvatar(urlPath, updateCanvasCallback);
                     return;
                 }
 
-                Bitmap thumbnail = null;
-
-                thumbnail = readBitmap(u, getActivity());
-
-                String[] projection = { MediaStore.Images.Media.DATA};
-                String capturedImageFilePath = null;
-                CursorLoader loader = new CursorLoader(getContext(), u, projection, null, null, null);
-                Cursor cursor = loader.loadInBackground();
-
-                //on kindle fire's gallery app the cursor is null. according to http://stackoverflow.com/questions/9951006/android-image-picker-doesnt-work-on-kindle-fire
-                //it's a firmware update's fault
-                if(cursor == null) {
-                    //let the user know the file wasn't updated
-                    showToast(R.string.uploadAvatarFailMsg);
-                    return;
-                }
-                int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-
-                if(cursor.moveToFirst()) {
-                    capturedImageFilePath = cursor.getString(column_index_data);
-                }
-                if(capturedImageFilePath == null && thumbnail == null) {
-                    //let the user know the file wasn't updated
-                    showToast(R.string.uploadAvatarFailMsg);
-                    return;
-                } else if(capturedImageFilePath == null) {
-                    //it will get to this line with google photos cloud photos (pics that aren't stored on the device)
-                    
-                    // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
-                    Uri tempUri = FileUploadUtils.getImageUri(getActivity().getContentResolver(), thumbnail);
-
-                    // CALL THIS METHOD TO GET THE ACTUAL PATH
-                    capturedImageFilePath = FileUploadUtils.getRealPathFromURI(getActivity().getContentResolver(), tempUri);
-                }
-                //don't want to overwrite the user's image, create a thumbnail copy...
-                int dot = capturedImageFilePath.lastIndexOf('.');
-                String newPath = capturedImageFilePath;
-                if(dot != -1) {
-                    String ext = capturedImageFilePath.substring(dot, capturedImageFilePath.length());
-                    newPath = capturedImageFilePath.substring(0, dot - 1) + "_thumb" + ext;
-                }
-                //need to make a smaller version of the image...
-                //keep the aspect ratio, but limit the height to 75
-                int height = thumbnail.getHeight();
-                int width = thumbnail.getWidth();
-                int imageSize = getImageSize(height, width);
-                float x = getStartX(width, imageSize);
-                float y = getStartY(height, imageSize);
-
-                thumbnail = cropThumbnail(x, y, height, width, imageSize, thumbnail);
-                thumbnail = rotateIfNecessary(thumbnail, capturedImageFilePath);
-
-                //save the smaller, rotated picture just selected
-                try {
-                    FileOutputStream out = new FileOutputStream(newPath);
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                } catch (Exception e) {
-                    LoggingUtility.LogException(getActivity(), e);
-                }
-
-                long size = thumbnail.getRowBytes() * thumbnail.getHeight();
-
-                //allow it to be garbage collected
-                thumbnail.recycle();
-
-                String name = "profilePic.jpg";
-                String contentType = "image/jpeg";
-
-                //Start loader
-                loaderBundle = createLoaderBundle(name, contentType, newPath, size);
-                showProgressBar();
-                LoaderUtils.restartLoaderWithBundle(getLoaderManager(), loaderBundle, this, R.id.avatarLoaderID);
+                // Open image for cropping
+                AvatarCropConfig config = new AvatarCropConfig(u);
+                Intent cropIntent = AvatarCropActivity.createIntent(getContext(), config);
+                startActivityForResult(cropIntent, RequestCodes.CROP_IMAGE);
             }
-        } else if(resultCode == Const.PROFILE_BACKGROUND_SELECTED_RESULT_CODE) {
-            String backgroundUrl = data.getStringExtra(Const.URL);
-            saveBackgroundImage(getContext(), ((TextUtils.isEmpty(backgroundUrl) ? "" : backgroundUrl)));
-            loadBackdropImage(getContext(), backgroundUrl, headerImage);
 
-            if(getActivity() instanceof OnProfileChangedCallback) {
-                ((OnProfileChangedCallback)getActivity()).onProfileBackgroundImageChanged(backgroundUrl);
-            }
-        } else if(requestCode == Const.PANDA_AVATAR_RESULT_CODE && resultCode == Activity.RESULT_OK) {
-            if(data != null) {
+        } else if (requestCode == Const.PANDA_AVATAR_RESULT_CODE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
                 String pandaPath = data.getStringExtra(Const.PATH);
                 long size = data.getLongExtra(Const.SIZE, 0);
                 //the api will rename the avatar automatically for us
-                loaderBundle = createLoaderBundle("pandaAvatar.png", "image/png", pandaPath, size);
+                loaderBundle = createLoaderBundle("pandaAvatar.png", "image/png", pandaPath, size, false);
                 showProgressBar();
                 LoaderUtils.restartLoaderWithBundle(getLoaderManager(), loaderBundle, this, R.id.avatarLoaderID);
             }
         }
-    }
-
-    /**
-     *
-     * @param x horizontal starting point for crop
-     * @param y vertical starting point for crop
-     * @param height height of thumbnail prior to crop
-     * @param width width of thumbnail prior to crop
-     * @param imageSize max size of square for cropping
-     * @param thumbnail reference to bitmap
-     * @return modified bitmap
-     */
-    private Bitmap cropThumbnail(float x, float y, int height, int width, int imageSize, Bitmap thumbnail){
-        if(x == 0 && y != 0) {
-            thumbnail = Bitmap.createScaledBitmap(thumbnail, width, imageSize, false);
-        } else if(x != 0 && y == 0) {
-            thumbnail = Bitmap.createScaledBitmap(thumbnail, imageSize, height, false);
-        } else if(x == 0 && y == 0) {
-            thumbnail = Bitmap.createScaledBitmap(thumbnail, imageSize, imageSize, false);
-        } else {
-            thumbnail = Bitmap.createBitmap(thumbnail, (int)x, (int)y, imageSize, imageSize);
-        }
-
-        return thumbnail;
     }
 
     private String changeGoogleURL(String url){
@@ -436,7 +279,7 @@ public class ProfileFragment extends OrientationChangeFragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Prevent all actions besides About when there is no network
-        if(item.getItemId() != R.id.about && !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+        if(item.getItemId() != R.id.about && !APIHelper.hasNetworkConnection()) {
             Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -452,10 +295,7 @@ public class ProfileFragment extends OrientationChangeFragment implements
                 chooseFromGallery();
                 break;
             case R.id.menu_set_to_default:
-                AvatarAPI.updateAvatar(noPictureURL, updateCanvasCallback);
-                break;
-            case R.id.menu_choose_background_image:
-                startActivityForResult(new Intent(getActivity(), ProfileBackdropPickerActivity.class), Const.PROFILE_BACKGROUND_SELECTED_RESULT_CODE);
+                UserManager.updateUsersAvatar(noPictureURL, updateCanvasCallback);
                 break;
             case R.id.menu_create_panda_avatar:
                 startActivityForResult(new Intent(getActivity(), PandaAvatarActivity.class), Const.PANDA_AVATAR_RESULT_CODE);
@@ -468,12 +308,12 @@ public class ProfileFragment extends OrientationChangeFragment implements
                             .show();
 
                     if (dialog != null) {
-                        TextView domain = (TextView) dialog.findViewById(R.id.domain);
-                        TextView loginId = (TextView) dialog.findViewById(R.id.loginId);
-                        TextView email = (TextView) dialog.findViewById(R.id.email);
-                        TextView version = (TextView) dialog.findViewById(R.id.version);
+                        TextView domain = dialog.findViewById(R.id.domain);
+                        TextView loginId = dialog.findViewById(R.id.loginId);
+                        TextView email = dialog.findViewById(R.id.email);
+                        TextView version = dialog.findViewById(R.id.version);
 
-                        domain.setText(APIHelpers.getDomain(getContext()));
+                        domain.setText(ApiPrefs.getDomain());
                         loginId.setText(user.getLoginId());
                         email.setText(user.getEmail());
                         version.setText(getText(R.string.canvasVersionNum) + " " + ApplicationManager.getVersionName(getActivity()));
@@ -497,19 +337,21 @@ public class ProfileFragment extends OrientationChangeFragment implements
         if(PermissionUtils.hasPermissions(getActivity(), PermissionUtils.WRITE_EXTERNAL_STORAGE, PermissionUtils.CAMERA)) {
             takeNewPhotoBecausePermissionsAlreadyGranted();
         } else {
-            requestPermissions(PermissionUtils.makeArray(PermissionUtils.WRITE_EXTERNAL_STORAGE, PermissionUtils.CAMERA), PermissionUtils.PERMISSION_REQUEST_CODE);
+            requestPermissions(PermissionUtils.makeArray(PermissionUtils.WRITE_EXTERNAL_STORAGE, PermissionUtils.CAMERA), REQUEST_CODE_PERMISSIONS_TAKE_PHOTO);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == PermissionUtils.PERMISSION_REQUEST_CODE) {
-            if(PermissionUtils.allPermissionsGrantedResultSummary(grantResults)) {
+        if (PermissionUtils.allPermissionsGrantedResultSummary(grantResults)) {
+            if (requestCode == REQUEST_CODE_PERMISSIONS_TAKE_PHOTO) {
                 takeNewPhotoBecausePermissionsAlreadyGranted();
-            } else {
-                Toast.makeText(getActivity(), R.string.permissionDenied, Toast.LENGTH_LONG).show();
+            } else if (requestCode == REQUEST_CODE_PERMISSIONS_GALLERY) {
+                chooseFromGallery();
             }
+        } else {
+            Toast.makeText(getActivity(), R.string.permissionDenied, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -536,50 +378,14 @@ public class ProfileFragment extends OrientationChangeFragment implements
     }
 
     private void chooseFromGallery(){
+        if (!PermissionUtils.hasPermissions(getActivity(), PermissionUtils.WRITE_EXTERNAL_STORAGE)) {
+            requestPermissions(PermissionUtils.makeArray(PermissionUtils.WRITE_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSIONS_GALLERY);
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         File file = new File(getContext().getFilesDir(), "/image/*");
         intent.setDataAndType(FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + Const.FILE_PROVIDER_AUTHORITY, file), "image/*");
         startActivityForResult(intent, RequestCodes.PICK_IMAGE_GALLERY);
-    }
-
-
-    private int getImageSize(int height, int width) {
-        int imageSize = 512;
-
-        //if the image is very small, we want to have a smaller "crop size"
-        if(imageSize > width && imageSize > height){
-            imageSize = 256;
-        }
-        int minSize = 0;
-
-        if(height < width) {
-            minSize = width;
-        } else if(width <= height) {
-            minSize = height;
-        }
-
-        if(minSize > imageSize) {
-            minSize = imageSize;
-        }
-        return minSize;
-    }
-
-    private float getStartX(int width, int size){
-        float x = 0;
-        if(width > size){
-            x = (width - size) / (float) 2;
-        }
-
-        return x;
-    }
-
-    private float getStartY(int height, int size){
-        float y = 0;
-        if(height > size){
-            y = (height - size) / (float) 2;
-        }
-
-        return y;
     }
 
     private void styleToolbar() {
@@ -645,21 +451,23 @@ public class ProfileFragment extends OrientationChangeFragment implements
                 name.setText(nameText);
                 hideEditTextView();
 
-                UserAPI.updateShortName(nameText, updateUserCallback);
+                UserManager.updateUserShortName(nameText, updateUserCallback);
             }
         }
     };
 
     public void setUpCallbacks(){
-        updateUserCallback = new CanvasCallback<User>(this) {
-
+        updateUserCallback = new StatusCallback<User>() {
             @Override
-            public void firstPage(User user, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<User> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
+                User user = response.body();
                 name.setText(user.getShortName());
-                APIHelpers.setCachedShortName(getContext(),user.getShortName());
+                User cacheUser = ApiPrefs.getUser();
+                cacheUser.setName(user.getShortName());
+                ApiPrefs.setUser(cacheUser);
                 ProfileFragment.this.user.setShortName(user.getShortName());
                 setUpUserAvatar();
                 if(onProfileChangedCallback != null){
@@ -668,46 +476,14 @@ public class ProfileFragment extends OrientationChangeFragment implements
             }
         };
 
-        getUserCallback = new UserCallback(this) {
-            @Override
-            public void cachedUser(User user) {
-                //need to call cache in case we're masquerading or if there is no network
-                if(Masquerading.isMasquerading(getActivity()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
-                    user(user, null);
-                }
-            }
 
+        updateCanvasCallback = new StatusCallback<User>() {
             @Override
-            public void user(User user, Response response) {
-                ProfileFragment.this.user = user;
-                setUpUserViews();
-            }
-        };
-
-        coursesCallback = new CanvasCallback<Course[]>(this) {
-            @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<User> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
                     return;
                 }
-                for(Course course: courses){
-                    if(!course.isTeacher() && !course.isObserver()){
-                        hasNonTeacherEnrollment = true;
-                        break;
-                    }
-                }
-            }
-        };
-
-        updateCanvasCallback = new CanvasCallback<User>(ProfileFragment.this) {
-            @Override public void cache(User user) {}
-
-            @Override
-            public void firstPage(User user, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
-                    return;
-                }
-                ProfileFragment.this.user = user;
+                user = response.body();
                 setUpUserAvatar();
                 if(onProfileChangedCallback != null){
                     onProfileChangedCallback.onProfileChangedCallback();
@@ -715,16 +491,14 @@ public class ProfileFragment extends OrientationChangeFragment implements
             }
         };
 
-        userPermissionCallback = new CanvasCallback<User>(ProfileFragment.this) {
-            @Override public void cache(User user) {}
-
+        userPermissionCallback = new StatusCallback<User>() {
             @Override
-            public void firstPage(User user, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<User> response, LinkHeaders linkHeaders, ApiType type) {
+                if(!apiCheck()) {
                     return;
                 }
-                canUpdateAvatar = user.canUpdateAvatar();
-                canUpdateName = user.canUpdateName();
+                canUpdateAvatar = response.body().canUpdateAvatar();
+                canUpdateName = response.body().canUpdateName();
                 getActivity().invalidateOptionsMenu();
             }
         };
@@ -734,24 +508,29 @@ public class ProfileFragment extends OrientationChangeFragment implements
     // Loader test
     /////////////////////////////////////////////////////////////////////////
 
-    public static class PostAvatarLoader extends android.support.v4.content.AsyncTaskLoader<UploadFileSynchronousAPI.AvatarWrapper> {
+    public static class PostAvatarLoader extends android.support.v4.content.AsyncTaskLoader<AvatarWrapper> {
         final String name;
         final String contentType;
         final String path;
         final long size;
+        final boolean deleteOnCompletion;
 
-        public PostAvatarLoader(Context context, String name, String contentType, String path, long size) {
+        PostAvatarLoader(Context context, String name, String contentType, String path, long size, boolean deleteOnCompletion) {
             super(context);
 
             this.name = name;
             this.contentType = contentType;
             this.path = path;
             this.size = size;
+            this.deleteOnCompletion = deleteOnCompletion;
         }
 
+        @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
-        public UploadFileSynchronousAPI.AvatarWrapper loadInBackground() {
-            return UploadFileSynchronousAPI.postAvatar(name, size, contentType, path, getContext());
+        public AvatarWrapper loadInBackground() {
+            AvatarWrapper wrapper = FileUploadManager.uploadAvatarSynchronous(name, size, contentType, path);
+            if (deleteOnCompletion) new File(path).delete();
+            return wrapper;
         }
 
         @Override protected void onStopLoading() {
@@ -769,35 +548,35 @@ public class ProfileFragment extends OrientationChangeFragment implements
      *             -String content type
      *             -String path
      *             -int size
-     * @return
+     * @return Loader
      */
     @Override
-    public android.support.v4.content.Loader<UploadFileSynchronousAPI.AvatarWrapper> onCreateLoader(int id, Bundle args) {
-        return new PostAvatarLoader(getActivity(), args.getString(Const.NAME), args.getString(Const.CONTENT_TYPE), args.getString(Const.PATH), args.getLong(Const.SIZE));
+    public android.support.v4.content.Loader<AvatarWrapper> onCreateLoader(int id, Bundle args) {
+        return new PostAvatarLoader(getActivity(), args.getString(Const.NAME), args.getString(Const.CONTENT_TYPE), args.getString(Const.PATH), args.getLong(Const.SIZE), args.getBoolean(Const.DELETE));
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<UploadFileSynchronousAPI.AvatarWrapper> loader, UploadFileSynchronousAPI.AvatarWrapper data) {
+    public void onLoadFinished(android.support.v4.content.Loader<AvatarWrapper> loader, AvatarWrapper data) {
         hideProgressBar();
 
-        if(data != null && data.avatar != null) {
-            ProfileFragment.this.user.setAvatarURL(data.avatar.getUrl());
+        if(data != null && data.getAvatar() != null) {
+            ProfileFragment.this.user.setAvatarUrl(data.getAvatar().getUrl());
             setUpUserAvatar();
-            AvatarAPI.updateAvatar((data).avatar.getUrl(), updateCanvasCallback);
+            UserManager.updateUsersAvatar(data.getAvatar().getUrl(), updateCanvasCallback);
         }
         else if(data != null) {
             //check to see the error messages
-            if(data.error == UploadFileSynchronousAPI.AvatarError.QUOTA_EXCEEDED) {
+            if(data.getError() == AvatarWrapper.ERROR_QUOTA_EXCEEDED) {
                 showToast(R.string.fileQuotaExceeded);
             }
-            else if(data.error == UploadFileSynchronousAPI.AvatarError.UNKNOWN) {
+            else if(data.getError() == AvatarWrapper.ERROR_UNKNOWN) {
                 showToast(R.string.errorUploadingFile);
             }
         }
     }
 
     @Override
-    public void onLoaderReset(android.support.v4.content.Loader<UploadFileSynchronousAPI.AvatarWrapper> loader) {}
+    public void onLoaderReset(android.support.v4.content.Loader<AvatarWrapper> loader) {}
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -815,7 +594,7 @@ public class ProfileFragment extends OrientationChangeFragment implements
     private void hideEditTextView(){
         editMode = false;
         nameChangeDone.setVisibility(View.GONE);
-        nameChangeWrapper.setBackgroundDrawable(null);
+        nameChangeWrapper.setBackground(null);
         name.setEnabled(false);
     }
 
@@ -849,98 +628,13 @@ public class ProfileFragment extends OrientationChangeFragment implements
         ProfileUtils.configureAvatarView(getContext(), user, avatar);
     }
 
-    // Helper method to read bitmap without using so much memory
-    public static Bitmap readBitmap(Uri selectedImage, Activity activity) {
-        Bitmap bm = null;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-
-        //subsample original image
-        options.inSampleSize = 5;
-        AssetFileDescriptor fileDescriptor = null;
-        try {
-            fileDescriptor = activity.getContentResolver().openAssetFileDescriptor(selectedImage,"r");
-        } catch (FileNotFoundException e) {
-            LoggingUtility.LogException(activity, e);
-            Toast.makeText(activity, R.string.fileNotFound, Toast.LENGTH_SHORT).show();
-        }
-        finally{
-            try {
-                bm = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
-                fileDescriptor.close();
-            } catch (Exception e) {
-                LoggingUtility.LogException(activity, e);
-                Toast.makeText(activity, R.string.errorGettingPhoto, Toast.LENGTH_SHORT).show();
-            }
-        }
-        return bm;
-    }
-
-    //helper method to rotate the images
-    public Bitmap rotateIfNecessary(Bitmap thumbnail, String path) {
-        int rotate = 0;
-        File imageFile = new File(path);
-        ExifInterface exif;
-        try {
-            exif = new ExifInterface(
-                    imageFile.getAbsolutePath());
-
-            int orientation2 = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL);
-
-            switch (orientation2) {
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotate = 270;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotate = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotate = 90;
-                    break;
-            }
-        } catch (IOException e1) {
-            LoggingUtility.LogException(getActivity(), e1);
-        }
-        //rotate the image if necessary
-        Bitmap rotatedBitmap = null;
-
-        /*
-      	normal landscape: 0
-		normal portrait: 90
-		upside-down landscape: 180
-		upside-down portrait: 270
-		image not found: -1
-         */
-
-        if(rotate == 90) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            rotatedBitmap = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
-        }
-        else if(rotate == 180) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(180);
-            rotatedBitmap = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
-        }
-        else if(rotate == 270) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(270);
-            rotatedBitmap = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
-        }
-
-        if(rotatedBitmap == null) {
-            rotatedBitmap = thumbnail;
-        }
-        return rotatedBitmap;
-    }
-
-    private Bundle createLoaderBundle(String name, String contentType, String path, long size){
+    private Bundle createLoaderBundle(String name, String contentType, String path, long size, boolean deleteOnCompletion){
         Bundle bundle = new Bundle();
         bundle.putString(Const.NAME, name);
         bundle.putString(Const.CONTENT_TYPE, contentType);
         bundle.putString(Const.PATH, path);
         bundle.putLong(Const.SIZE, size);
+        bundle.putBoolean(Const.DELETE, deleteOnCompletion);
 
         return bundle;
     }
@@ -953,7 +647,7 @@ public class ProfileFragment extends OrientationChangeFragment implements
         super.handleIntentExtras(extras);
 
         if (extras.containsKey(Const.USER)) {
-            user = (User) extras.getParcelable(Const.USER);
+            user = extras.getParcelable(Const.USER);
         }
     }
 
@@ -968,28 +662,6 @@ public class ProfileFragment extends OrientationChangeFragment implements
         Bundle extras = createBundle(canvasContext);
         extras.putSerializable(Const.PLACEMENT, placement);
         return extras;
-    }
-
-    public static void saveBackgroundImage(Context context, String url) {
-        new GlobalDataSyncPostTask(context, GlobalDataSyncAPI.NAMESPACE.MOBILE_CANVAS_USER_BACKDROP_IMAGE).execute(new GlobalDataSync(url));
-    }
-
-    public static String getImageBackgroundUrl(Context context) {
-        GlobalDataSync data = GlobalDataSync.getCachedGlobalData(context, GlobalDataSyncAPI.NAMESPACE.MOBILE_CANVAS_USER_BACKDROP_IMAGE);
-        return data.data;
-    }
-
-    public static void loadBackdropImage(Context context, String url, ImageView imageView) {
-        if(TextUtils.isEmpty(url)) {
-            imageView.setImageResource(R.drawable.default_backdrop_img);
-        } else {
-            Picasso.with(context)
-                    .load(url)
-                    .placeholder(R.drawable.ic_empty)
-                    .fit()
-                    .centerCrop()
-                    .into(imageView);
-        }
     }
 
     @Override

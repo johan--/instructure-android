@@ -21,9 +21,9 @@ def gradlew(command)
   raise 'Missing command' unless command
 
   action_name = "gradlew #{command}"
-  command = "#{gradlew_path} #{command}"
+  command     = "#{gradlew_path} #{command}"
 
   execute_action(action_name) do
-   _execute(command: command, print_all: false)
+    _execute(command: command, print_all: false)
   end # execute_action
 end # def gradlew

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -13,6 +13,21 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  *
+ *
+ * Scrolling Behavior Modifications Taken From
+ * Copyright (C) 2015 takahirom
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package com.instructure.pandautils.views;
@@ -29,35 +44,52 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.view.NestedScrollingChildHelper;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.instructure.canvasapi.utilities.APIHelpers;
 import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.FileUtils;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.R;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.pandautils.video.ContentVideoViewClient;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class CanvasWebView extends WebView {
+public class CanvasWebView extends WebView implements NestedScrollingChild {
 
     private static final int VIDEO_PICKER_RESULT_CODE = 1202;
     private final String encoding = "UTF-8";
+
+    private int mLastY;
+    private final int[] mScrollOffset = new int[2];
+    private final int[] mScrollConsumed = new int[2];
+    private int mNestedOffsetY;
+    private boolean firstScroll = true;
+    private NestedScrollingChildHelper mChildHelper;
 
     public interface CanvasWebViewClientCallback {
         void openMediaFromWebView(String mime, String url, String filename);
@@ -109,6 +141,7 @@ public class CanvasWebView extends WebView {
     @SuppressLint("SetJavaScriptEnabled")
     private void init(Context context) {
         mContext = context;
+
         this.getSettings().setJavaScriptEnabled(true);
         this.getSettings().setBuiltInZoomControls(true);
         // Hide the zoom controls
@@ -117,11 +150,12 @@ public class CanvasWebView extends WebView {
         this.getSettings().setUseWideViewPort(true);
         this.setWebViewClient(new CanvasWebViewClient());
 
+        this.getSettings().setDomStorageEnabled(true);
         //increase text size based on the devices accessibility setting
         //fontScale comes back as a float
         int scalePercent = (int)(getResources().getConfiguration().fontScale * 100);
         this.getSettings().setTextZoom(scalePercent);
-        
+
         mWebChromeClient = new CanvasWebChromeClient();
         this.setWebChromeClient(mWebChromeClient);
 
@@ -140,7 +174,7 @@ public class CanvasWebView extends WebView {
                             filename = contentDisposition.substring(index + 1, end - 1);
                         }
                         //make the filename unique
-                        filename = String.format("%s_%d", filename, url.hashCode());
+                        filename = String.format(Locale.getDefault(), "%s_%d", filename, url.hashCode());
                     }
 
                     if (mCanvasWebViewClientCallback != null) {
@@ -152,6 +186,17 @@ public class CanvasWebView extends WebView {
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if(getParent() instanceof CoordinatorLayout) {
+                mChildHelper = new NestedScrollingChildHelper(this);
+                setNestedScrollingEnabled(true);
+            }
         }
     }
 
@@ -176,7 +221,7 @@ public class CanvasWebView extends WebView {
      * @return true if handled; false otherwise
      */
     public boolean handleGoBack() {
-        if (mClient.isFullscreen()) {
+        if (mClient != null && mClient.isFullscreen()) {
             mWebChromeClient.onHideCustomView();
             return true;
         } else if (super.canGoBack()) {
@@ -189,11 +234,18 @@ public class CanvasWebView extends WebView {
     @Deprecated
     public static String getRefererDomain(Context context) {
         // Mainly for embedded content such as vimeo, youtube, video tags, iframes, etc
-        return APIHelpers.loadProtocol(context) + "://" + APIHelpers.getDomain(context);
+        return ApiPrefs.getFullDomain();
     }
 
     public static String getReferrer() {
         return ApiPrefs.getDomain();
+    }
+
+    public static String getReferrer(boolean shouldIncludeProtocol) {
+        if(shouldIncludeProtocol) {
+            return ApiPrefs.getFullDomain();
+        }
+        return getReferrer();
     }
 
     public static String applyWorkAroundForDoubleSlashesAsUrlSource(String html) {
@@ -206,6 +258,23 @@ public class CanvasWebView extends WebView {
         return html;
     }
 
+
+    /**
+     * When we parse the HTML if the links don't have a protocol we aren't able to handle them. This
+     * will add http:// to any link that doesn't have one
+     *
+     * @param html
+     * @return HTML with protocol added
+     */
+    public static String addProtocolToLinks(String html) {
+        if(TextUtils.isEmpty(html)) return "";
+
+        html = html.replaceAll("href=\"www.", "href=\"http://www.");
+        html = html.replaceAll("href='www.", "href='http://www.");
+        html = html.replaceAll("src=\"www.", "src=\"http://www.");
+        html = html.replaceAll("src='www.", "src='http://www.");
+        return html;
+    }
 
     public class CanvasWebChromeClient extends WebChromeClient {
         private CustomViewCallback mCallback;
@@ -254,9 +323,21 @@ public class CanvasWebView extends WebView {
         public CanvasWebViewClient() {
         }
 
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return handleShouldOverrideUrlLoading(view, request.getUrl().toString());
+            }
+            return super.shouldOverrideUrlLoading(view, request);
+        }
+
         @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            return handleShouldOverrideUrlLoading(view, url);
+        }
+
+        private boolean handleShouldOverrideUrlLoading(WebView view, String url) {
             //check to see if we need to do anything with the link that was clicked
 
             // Default headers
@@ -371,10 +452,12 @@ public class CanvasWebView extends WebView {
      */
     @Deprecated
     public String formatHTML(String content, String title) {
-        String html = APIHelper.getAssetsFile(mContext, "html_wrapper.html");
+        String html = FileUtils.getAssetsFile(mContext, "html_wrapper.html");
 
         content = CanvasWebView.applyWorkAroundForDoubleSlashesAsUrlSource(content);
+        content = CanvasWebView.addProtocolToLinks(content);
 
+        content = checkForMathTags(content);
         String result = html.replace("{$CONTENT$}", content);
 
         // BaseURL is set as Referer. Referer needed for some vimeo videos to play
@@ -385,15 +468,43 @@ public class CanvasWebView extends WebView {
         return result;
     }
 
+    @NonNull
+    private String checkForMathTags(String content) {
+        // If this html that we're about to load has a math tag and isn't just an image we want to parse it with MathJax.
+        // This is the version that web currently uses (the 2.7.1 is the version number) and this is the check that they do to
+        // decide if they'll run the MathJax script on the webview
+        if(content.contains("<math") && !content.contains("<img class='equation_image'")) {
+            content = "<script type=\"text/javascript\"\n" +
+                    "                src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML\">\n" +
+                    "        </script>" + content;
+        }
+        return content;
+    }
+
+    public static boolean containsArcLTI(@NonNull String html, String encoding) {
+        // BaseURL is set as Referer. Referer needed for some vimeo videos to play
+        // Arc needs the protocol attached to the referrer, so use that if we're using arc
+        try {
+            //sanitize the html
+            String sanitized =html.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+            if (URLDecoder.decode(sanitized, encoding).contains("instructuremedia.com/lti/launch")) {
+                return true;
+            }
+        } catch (UnsupportedEncodingException e) {}
+
+        return false;
+    }
+
     public String loadHtml(String html, String contentDescription) {
-        String htmlWrapper = APIHelper.getAssetsFile(mContext, "html_wrapper.html");
+        String htmlWrapper = FileUtils.getAssetsFile(mContext, "html_wrapper.html");
 
         html = CanvasWebView.applyWorkAroundForDoubleSlashesAsUrlSource(html);
+        html = CanvasWebView.addProtocolToLinks(html);
+        html = checkForMathTags(html);
 
         String result = htmlWrapper.replace("{$CONTENT$}", html);
 
-        // BaseURL is set as Referer. Referer needed for some vimeo videos to play
-        this.loadDataWithBaseURL(CanvasWebView.getReferrer(), result, "text/html", encoding, getHtmlAsUrl(result, encoding));
+        this.loadDataWithBaseURL(CanvasWebView.getReferrer(CanvasWebView.containsArcLTI(html, encoding)), result, "text/html", encoding, getHtmlAsUrl(result, encoding));
 
         setupAccessibilityContentDescription(result, contentDescription);
 
@@ -425,7 +536,12 @@ public class CanvasWebView extends WebView {
         if (title != null) {
             contentDescription = title + " " + formattedHtml;
         }
-        this.setContentDescription(APIHelper.simplifyHTML(Html.fromHtml(contentDescription)));
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            this.setContentDescription(APIHelper.simplifyHTML(Html.fromHtml(contentDescription, Html.FROM_HTML_MODE_LEGACY)));
+        } else {
+            this.setContentDescription(APIHelper.simplifyHTML(Html.fromHtml(contentDescription)));
+        }
     }
 
     // region Getter & Setters
@@ -493,8 +609,8 @@ public class CanvasWebView extends WebView {
     }
 
     private void startVideoChooser(final int requestCode) {
-        Intent vi‌​deoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        vi‌​deoIntent.setType("video/*");
+        Intent videoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        videoIntent.setType("video/*");
 
         // Camera.
         final List<Intent> cameraIntents = new ArrayList<>();
@@ -509,7 +625,7 @@ public class CanvasWebView extends WebView {
             cameraIntents.add(intent);
         }
         // Chooser of filesystem options.
-        final Intent chooserIntent = Intent.createChooser(vi‌​deoIntent, getContext().getString(R.string.pickVideo));
+        final Intent chooserIntent = Intent.createChooser(videoIntent, getContext().getString(R.string.pickVideo));
 
         // Add the camera options.
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
@@ -531,6 +647,109 @@ public class CanvasWebView extends WebView {
         clearPickerCallback();
 
         return true;
+    }
+
+    //endregion
+
+    //region Nested Scrolling Child
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if(mChildHelper == null) return super.onTouchEvent(ev);
+
+        boolean returnValue = false;
+
+        MotionEvent event = MotionEvent.obtain(ev);
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mNestedOffsetY = 0;
+        }
+        int eventY = (int) event.getY();
+        event.offsetLocation(0, mNestedOffsetY);
+        switch (action) {
+            case MotionEvent.ACTION_MOVE:
+                int deltaY = mLastY - eventY;
+                // NestedPreScroll
+                if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
+                    deltaY -= mScrollConsumed[1];
+                    mLastY = eventY - mScrollOffset[1];
+                    event.offsetLocation(0, -mScrollOffset[1]);
+                    mNestedOffsetY += mScrollOffset[1];
+                }
+                returnValue = super.onTouchEvent(event);
+
+                // NestedScroll
+                if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY, mScrollOffset)) {
+                    event.offsetLocation(0, mScrollOffset[1]);
+                    mNestedOffsetY += mScrollOffset[1];
+                    mLastY -= mScrollOffset[1];
+                }
+                break;
+            case MotionEvent.ACTION_DOWN:
+                returnValue = super.onTouchEvent(event);
+                if (firstScroll) {
+                    // dispatching first down scrolling properly by making sure that first deltaY will be -ve
+                    mLastY = eventY - 5;
+                    firstScroll = false;
+                } else {
+                    mLastY = eventY;
+                }
+                // start NestedScroll
+                startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+                break;
+            default:
+                returnValue = super.onTouchEvent(event);
+                // end NestedScroll
+                stopNestedScroll();
+                break;
+        }
+        return returnValue;
+    }
+
+
+    @Override
+    public void setNestedScrollingEnabled(boolean enabled) {
+        if(mChildHelper != null) mChildHelper.setNestedScrollingEnabled(enabled);
+    }
+
+    @Override
+    public boolean isNestedScrollingEnabled() {
+        return mChildHelper != null && mChildHelper.isNestedScrollingEnabled();
+    }
+
+    @Override
+    public boolean startNestedScroll(int axes) {
+        return mChildHelper != null && mChildHelper.startNestedScroll(axes);
+    }
+
+    @Override
+    public void stopNestedScroll() {
+        if(mChildHelper != null) mChildHelper.stopNestedScroll();
+    }
+
+    @Override
+    public boolean hasNestedScrollingParent() {
+        return mChildHelper.hasNestedScrollingParent();
+    }
+
+    @Override
+    public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int[] offsetInWindow) {
+        return mChildHelper != null && mChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow);
+    }
+
+    @Override
+    public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow) {
+        return mChildHelper != null && mChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow);
+    }
+
+    @Override
+    public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed) {
+        return mChildHelper != null && mChildHelper.dispatchNestedFling(velocityX, velocityY, consumed);
+    }
+
+    @Override
+    public boolean dispatchNestedPreFling(float velocityX, float velocityY) {
+        return mChildHelper != null && mChildHelper.dispatchNestedPreFling(velocityX, velocityY);
     }
 
     //endregion

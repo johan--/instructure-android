@@ -34,17 +34,10 @@ import butterknife.ButterKnife;
 public class StudentPollResultsRowFactory {
 
     static class ViewHolder {
-        @BindView(R.id.answer)
-        TextView answer;
-
-        @BindView(R.id.correct_answer)
-        ImageView correctAnswer;
-
-        @BindView(R.id.numAnswered)
-        TextView numAnswered;
-
-        @BindView(R.id.percent_answered)
-        ProgressBar percentAnswered;
+        @BindView(R.id.answer) TextView answer;
+        @BindView(R.id.correct_answer) ImageView correctAnswer;
+        @BindView(R.id.numAnswered) TextView numAnswered;
+        @BindView(R.id.percent_answered) ProgressBar percentAnswered;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

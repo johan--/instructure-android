@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.instructure.candroid.BuildConfig;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -141,8 +140,8 @@ public class PushNotification implements Parcelable {
     };
 
     private static String getPushStorePrefix(Context context) {
-        final User user = APIHelpers.getCacheUser(context);
-        String domain = APIHelpers.getDomain(context);
+        final User user = ApiPrefs.getUser();
+        String domain = ApiPrefs.getDomain();
 
         if(user == null || TextUtils.isEmpty(domain)) {
             return null;

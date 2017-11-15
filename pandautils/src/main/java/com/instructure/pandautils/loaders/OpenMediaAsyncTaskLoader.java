@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.instructure.canvasapi.api.compatibility_synchronous.HttpHelpers;
-import com.instructure.canvasapi.model.CanvasContext;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.utils.HttpHelper;
 import com.instructure.pandautils.R;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.FileUploadUtils;
@@ -58,6 +58,9 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
         private boolean isHtmlFile;
         private boolean isUseOutsideApps;
 
+        // Used to identify when we don't want to show annotations/etc for pspdfkit
+        private boolean isSubmission;
+
         private Intent intent;
         private Bundle bundle; // Used for html files
 
@@ -77,6 +80,10 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
         public void setBundle(Bundle bundle) {
             isHtmlFile = true;
             this.bundle = bundle;
+        }
+
+        public void setHtmlFile(boolean htmlFile) {
+            isHtmlFile = htmlFile;
         }
 
         public Intent getIntent() {
@@ -106,6 +113,12 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
             this.isError = true;
         }
 
+        public boolean isSubmission() { return isSubmission; }
+
+        public void setIsSubmission(boolean isSubmission) {
+            this.isSubmission = isSubmission;
+        }
+
         public ERROR_TYPE getErrorType() {
             return errorType;
         }
@@ -116,6 +129,7 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
     private String mimeType;
     private String url;
     private String filename;
+    private boolean isSubmission;
     private CanvasContext canvasContext;
     private boolean isUseOutsideApps;
 
@@ -135,6 +149,9 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
                 filename = args.getString(Const.FILE_URL);
                 filename = makeFilenameUnique(filename, url);
             }
+            if(args.containsKey(Const.IS_SUBMISSION)) {
+                isSubmission = args.getBoolean(Const.IS_SUBMISSION);
+            }
             canvasContext = args.getParcelable(Const.CANVAS_CONTEXT);
         }
 
@@ -149,25 +166,34 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
             loadedMedia.setUseOutsideApps(true);
         }
 
+        if(this.isSubmission) {
+            loadedMedia.setIsSubmission(true);
+        }
+
         final Context context = getContext();
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.putExtra(Const.IS_MEDIA_TYPE, true);
-            if (isHtmlFile()) {
+            if (isHtmlFile() && canvasContext != null) {
                 File file = downloadFile(context, url, filename);
                 Bundle bundle = FileUploadUtils.createTaskLoaderBundle(canvasContext, FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + Const.FILE_PROVIDER_AUTHORITY, file).toString(), filename, false);
+                loadedMedia.setBundle(bundle);
+            } else if(isHtmlFile() && canvasContext == null) {
+                //when the canvasContext is null we're routing from the teacher app, which just needs the url and title to get the html file
+                Bundle bundle = new Bundle();
+                bundle.putString(Const.INTERNAL_URL, url);
+                bundle.putString(Const.ACTION_BAR_TITLE, filename);
                 loadedMedia.setBundle(bundle);
             } else if (Utils.isAmazonDevice()) {
                 attemptDownloadFile(context, intent, loadedMedia, url, filename);
             } else {
+                loadedMedia.setHtmlFile(isHtmlFile());
                 Uri uri = attemptConnection(url);
                 if (uri != null) {
                     intent.setDataAndType(uri, mimeType);
                     loadedMedia.setIntent(intent);
                     Log.d(Const.OPEN_MEDIA_ASYNC_TASK_LOADER_LOG, "Intent can be handled: " + isIntentHandledByActivity(intent));
-                    if (!isIntentHandledByActivity(intent)) {
-                        attemptDownloadFile(context, intent, loadedMedia, url, filename);
-                    }
+                    attemptDownloadFile(context, intent, loadedMedia, url, filename);
                 } else {
                     loadedMedia.setErrorMessage(R.string.noDataConnection);
                 }
@@ -188,10 +214,17 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
     }
 
     boolean isHtmlFile() {
-        if (isHtmlFile == null) {
-            isHtmlFile = filename != null && (filename.toLowerCase().endsWith(".htm") || filename.toLowerCase().endsWith(".html"));
-        }
+        isHtmlFile = filename != null && (filename.toLowerCase().endsWith(".htm") || filename.toLowerCase().endsWith(".html"));
+
         return isHtmlFile;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     private String parseFilename(String headerField) {
@@ -225,7 +258,7 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
     private Uri attemptConnection(String url) throws IOException {
         Uri uri = null;
         final HttpURLConnection hc = (HttpURLConnection) new URL(url).openConnection();
-        final HttpURLConnection connection = HttpHelpers.redirectURL(hc);
+        final HttpURLConnection connection = HttpHelper.redirectURL(hc);
 
         if(connection != null) {
             final String connectedUrl = connection.getURL().toString();
@@ -304,7 +337,7 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
 
         //and connect!
         urlConnection.connect();
-        HttpURLConnection connection = HttpHelpers.redirectURL(urlConnection);
+        HttpURLConnection connection = HttpHelper.redirectURL(urlConnection);
 
         //this will be used to write the downloaded uri into the file we created
         String name = toWriteTo.getName();
@@ -358,6 +391,30 @@ public class OpenMediaAsyncTaskLoader extends AsyncTaskLoader<OpenMediaAsyncTask
         Bundle openMediaBundle = new Bundle();
         openMediaBundle.putString(Const.URL, url);
         openMediaBundle.putParcelable(Const.CANVAS_CONTEXT, canvasContext);
+        return openMediaBundle;
+    }
+
+    public static Bundle createBundle(String url) {
+        Bundle openMediaBundle = new Bundle();
+        openMediaBundle.putString(Const.URL, url);
+        return openMediaBundle;
+    }
+
+    public static Bundle createBundle(String mime, String url, String filename) {
+        Bundle openMediaBundle = new Bundle();
+        openMediaBundle.putString(Const.MIME, mime);
+        openMediaBundle.putString(Const.URL, url);
+        openMediaBundle.putString(Const.FILE_URL, filename);
+        return openMediaBundle;
+    }
+
+    public static Bundle createBundle(CanvasContext canvasContext, boolean isSubmission, String mime, String url, String filename) {
+        Bundle openMediaBundle = new Bundle();
+        openMediaBundle.putString(Const.MIME, mime);
+        openMediaBundle.putString(Const.URL, url);
+        openMediaBundle.putString(Const.FILE_URL, filename);
+        openMediaBundle.putParcelable(Const.CANVAS_CONTEXT, canvasContext);
+        openMediaBundle.putBoolean(Const.IS_SUBMISSION, isSubmission);
         return openMediaBundle;
     }
 }

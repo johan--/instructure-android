@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2017 - present  Instructure, Inc.
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+
+    <!-- Pukey Colors, use these to know when we haven't styled something -->
+    <!--<color name="color_primary">#7d7a00</color>-->
+    <!--<color name="color_primary_dark">#7d7a00</color>-->
+    <!--<color name="color_accent">#551A8B</color>-->
+
+
+    <!-- Real Colors, use these for when things get real -->
+    <color name="color_primary">#394b58</color>
+    <color name="color_primary_dark">#27333d</color>
+    <color name="color_accent">#394b58</color>
+    <!--<color name="color_primary_dark">#0096DB</color>-->
+    <!--<color name="color_primary">#0096DB</color>-->
+
+
+    <color name="bottomNavBarBg">#c7cdd1</color>
+
+    <color name="canvas_default_primary">#34444F</color>
+    <color name="canvas_default_primary_text">#FFFFFF</color>
+    <color name="canvas_default_accent">#0081BD</color>
+    <color name="canvas_default_button">#0096DB</color>
+    <color name="canvas_default_button_text">#FFFFFF</color>
+
+    <color name="canvas_default_tab_unselected">#73818C</color>
+
+    <color name="notSelectedSpinnerColor">#808080</color>
+    <color name="white_alpha">#AAFFFFFF</color>
+    <color name="status_bar_semi_transparent">#20000000</color>
+    <color name="date_bar_off_white">#F1F1F3</color>
+    <color name="background">#FAFAFC</color>
+    <color name="inbox_filter_gray">#212121</color>
+    <color name="inbox_star_color">#FDC02D</color>
+    <color name="published_green">#00ac18</color>
+
+    <color name="divider">#D1D3D4</color>
+
+    <color name="message_text_color">#333333</color>
+    <color name="message_text_secondary">#9B9B9B</color>
+
+    <color name="attachment_color_doc">#2ca3de</color>
+    <color name="attachment_color_pdf">#f2422e</color>
+    <color name="attachment_color_video">#f2422e</color>
+    <color name="attachment_color_image">#AAAAAA</color>
+    <color name="attachment_color_txt">#1682c7</color>
+    <color name="attachment_color_xls">#48af49</color>
+    <color name="attachment_color_zip">#903a99</color>
+    <color name="attachment_color_audio">#4452a6</color>
+    <color name="attachment_color_misc">#00bcd5</color>
+
+    <color name="submission_status_color_late">#F68508</color>
+    <color name="submission_status_color_missing">#C30016</color>
+    <color name="submission_status_color_submitted">#00AC18</color>
+
+    <color name="default_thumb_color">#EBEDEE</color>
+    <color name="default_track_color">#C7CDD1</color>
+    <color name="unselected_radio_color">#010101</color>
+
+    <color name="speedGraderTutorialColor">#00AC18</color>
+
+    <color name="remove_override_color">#EE0612</color>
+    <color name="default_unselected_donut_gray">#F5F5F5</color>
+    <color name="error">#FFD50000</color>
+    <color name="destructive">#EE0612</color>
+
+    <color name="colorPrimary">#394b58</color>
+    <color name="colorPrimaryDark">#283742</color>
+    <color name="colorAccent">#008ee2</color>
+
+    <color name="defaultTextDark">#2d3b45</color>
+    <color name="defaultTextGray">#8b969e</color>
+    <color name="disabledText">#9D9FA2</color>
+    <color name="defaultActionColor">#008ee2</color>
+    <color name="publishedGreen">#00ac18</color>
+
+    <color name="textLightGray">#8B969E</color>
+    <color name="semiTransparentDark">#50000000</color>
+    <color name="messageBackgroundGray">#F5F5F5</color>
+
+    <!-- Course Colors - Primary -->
+    <color name="colorCottonCandy">#FFF26090</color>
+    <color name="colorBarbie">#FFEA1661</color>
+    <color name="colorBarneyPurple">#FF903A99</color>
+    <color name="colorEggplant">#FF65469F</color>
+    <color name="colorUltramarine">#FF4452A6</color>
+    <color name="colorOcean11">#FF1482C8</color>
+    <color name="colorCyan">#FF2CA3DE</color>
+    <color name="colorAquaMarine">#FF00BCD5</color>
+    <color name="colorEmeraldGreen">#FF009788</color>
+    <color name="colorFreshCutLawn">#FF3FA142</color>
+    <color name="colorChartreuse">#FF89C540</color>
+    <color name="colorSunFlower">#FFFFC100</color>
+    <color name="colorTangerine">#FFFA9800</color>
+    <color name="colorBloodOrange">#FFF2581B</color>
+    <color name="colorSriracha">#FFF2422E</color>
+    <color name="comment_bubble_outgoing">#178FDF</color>
+    <color name="comment_bubble_incoming">#F5F5F5</color>
+
+    <!-- Annotation Colors -->
+    <color name="redAnnotation">#EE0612</color>
+    <color name="orangeAnnotation">#FC5E13</color>
+    <color name="yellowAnnotation">#FCB900</color>
+    <color name="brownAnnotation">#8D6437</color>
+    <color name="greenAnnotation">#00AC18</color>
+    <color name="darkBlueAnnotation">#234C9F</color>
+    <color name="blueAnnotation">#008EE2</color>
+    <color name="pinkAnnotation">#C31FA8</color>
+    <color name="purpleAnnotation">#741865</color>
+    <color name="darkGrayAnnotation">#363636</color>
+
+    <!-- Annotation Colors -->
+    <color name="redHighlightAnnotation">#FF9999</color>
+    <color name="orangeHighlightAnnotation">#FFC166</color>
+    <color name="yellowHighlightAnnotation">#FCE680</color>
+    <color name="greenHighlightAnnotation">#99EBA4</color>
+    <color name="blueHighlightAnnotation">#80D0FF</color>
+    <color name="pinkHighlightAnnotation">#FFB9F1</color>
+    <color name="transparentWhite">#88FFFFFF</color>
+    <color name="annotationToolbarBackground">#556572</color>
+
+    <color name="discussion_liking">#8b969e</color>
+    <color name="profileBorderColor">#d8dcdf</color>
+    <color name="mediaOverlayBackground">#AA000000</color>
+    <color name="progressBarBackground">#F5F5F5</color>
+
+    <color name="record_button_stroke">#EBEDEE</color>
+    <color name="record_floating_view_background">#F5F5F5</color>
+    <color name="record_replay_text_color">#76848D</color>
+
+</resources>

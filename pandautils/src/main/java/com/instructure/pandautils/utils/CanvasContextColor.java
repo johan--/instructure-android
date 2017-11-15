@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,18 +26,16 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.instructure.canvasapi.api.UserAPI;
-import com.instructure.canvasapi.model.CanvasColor;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.CanvasColor;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.R;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import retrofit.client.Response;
 
 
 public class CanvasContextColor {
@@ -193,34 +191,12 @@ public class CanvasContextColor {
         }
 
         //No cached color found do api call for color
-        UserAPI.getColors(context, new CanvasCallback<CanvasColor>(new APIStatusDelegate() {
+        UserManager.getColors(new StatusCallback<CanvasColor>() {
             @Override
-            public void onCallbackStarted() {
-            }
-
-            @Override
-            public void onCallbackFinished(CanvasCallback.SOURCE source) {
-            }
-
-            @Override
-            public void onNoNetwork() {
-            }
-
-            @Override
-            public Context getContext() {
-                return context;
-            }
-
-        }) {
-            @Override
-            public void cache(CanvasColor canvasColor) {
-            }
-
-            @Override
-            public void firstPage(CanvasColor canvasColor, LinkHeaders linkHeaders, Response response) {
-                if (response.getStatus() == 200) {
-                    addToCache(canvasColor);
-                    Integer color = findColorInCanvasColors(canvasColor, canvasContext);
+            public void onResponse(retrofit2.Response<CanvasColor> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                if (code == 200) {
+                    addToCache(response.body());
+                    Integer color = findColorInCanvasColors(response.body(), canvasContext);
                     if (color != null) {
                         callback.gotColor(color);
                     } else {
@@ -229,7 +205,7 @@ public class CanvasContextColor {
                     }
                 }
             }
-        });
+        }, true);
     }
 
     /**
@@ -283,29 +259,20 @@ public class CanvasContextColor {
 
     /**
      * Sets a new color to the api and caches the result
-     * @param delegate api delegate for doing api calls
-     * @param context android context
      * @param canvasContext canvasContext
      * @param newColor the new color to set
      */
-    public static void setNewColor(final APIStatusDelegate delegate, final Context context, final CanvasContext canvasContext, final int newColor) {
+    public static void setNewColor(final CanvasContext canvasContext, final int newColor) {
 
-        if(delegate == null || canvasContext == null) {
+        if(canvasContext == null) {
             return;
         }
 
         addToCache(canvasContext, newColor);
-        UserAPI.setColor(context, canvasContext, newColor, new CanvasCallback<CanvasColor>(delegate) {
+        UserManager.setColors(new StatusCallback<CanvasColor>() {
             @Override
-            public void cache(CanvasColor canvasColor) {
-
-            }
-
-            @Override
-            public void firstPage(CanvasColor canvasColor, LinkHeaders linkHeaders, Response response) {
-
-            }
-        });
+            public void onResponse(retrofit2.Response<CanvasColor> response, LinkHeaders linkHeaders, ApiType type) {}
+        }, canvasContext.getContextId(), newColor);
     }
 
     public static void addToCache(CanvasColor canvasColor) {

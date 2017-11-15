@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Escolher Multimédia</string>
   <string name="takeVideo">Fazer Vídeo</string>
   <string name="noCameraOnDevice">Sem Câmara</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Carregando para Canvas</string>
   <string name="preparingUpload">Preparando carregamento</string>
   <string name="loadingFilesIndeterminate">Carregando Ficheiros...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Ocorreu um erro ao carregar a fotografia. Por favor tente novamente.</string>
   <string name="errorTextMissing">Adicionar algum texto para enviar uma mensagem</string>
   <string name="fileUploadNotSupported">Não pode carregar ficheiros para a tarefaescolhida.</string>
+  <string name="noCourseSelected">Por favor selecione uma disciplina</string>
   <string name="selectCourse">Selecione uma disciplina</string>
   <string name="selectAssignment">Selecione uma tarefa</string>
   <string name="loadingAssignments">Carregando Tarefas...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Não lida</string>
   <string name="discussion_reply">Responder</string>
   <string name="close">Fechar</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Como está?</string>
+  <string name="utils_rateUs">Como nos classificaria?</string>
+  <string name="utils_doBetter">O que podemos melhorar?</string>
+  <string name="utils_sendFeedback">Enviar Comentários</string>
+  <string name="utils_suggestions">Sugestões para Android</string>
+  <string name="utils_domain">Domínio</string>
+  <string name="utils_versionNum">Versão:</string>
+  <string name="utils_userId">ID do utilizador</string>
+  <string name="utils_email">Email</string>
+  <string name="utils_dontShowAgain">Não apresentar novamente</string>
+  <string name="utils_installDate">Data de Instalação:</string>
+  <string name="utils_device">Dispositivo</string>
+  <string name="utils_osVersion">Versão SO</string>
+  <string name="loading">A carregar</string>
 </resources>

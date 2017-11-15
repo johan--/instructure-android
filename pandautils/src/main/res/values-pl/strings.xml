@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Wybierz media</string>
   <string name="takeVideo">Nagraj wideo</string>
   <string name="noCameraOnDevice">Brak kamery</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Ładowanie do Canvas</string>
   <string name="preparingUpload">Przygotowanie do przesyłania</string>
   <string name="loadingFilesIndeterminate">Ładowanie plików...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Wystąpił błąd podczas ładowania zdjęcia. Spróbuj ponownie później.</string>
   <string name="errorTextMissing">Dodaj tekst, aby wysłać wiadomość</string>
   <string name="fileUploadNotSupported">Nie możesz załadować plików do wybranego zadania.</string>
+  <string name="noCourseSelected">Proszę wybrać kurs</string>
   <string name="selectCourse">Wybierz kurs</string>
   <string name="selectAssignment">Wybierz zadanie</string>
   <string name="loadingAssignments">Ładowanie zadań...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Nieprzeczytane</string>
   <string name="discussion_reply">Odpowiedź</string>
   <string name="close">Zamknij</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Jak się czujemy?</string>
+  <string name="utils_rateUs">Jak nas oceniasz?</string>
+  <string name="utils_doBetter">Co możemy ulepszyć?</string>
+  <string name="utils_sendFeedback">Wyślij informację zwrotną</string>
+  <string name="utils_suggestions">Sugestie dla systemu Android</string>
+  <string name="utils_domain">Domena</string>
+  <string name="utils_versionNum">Wersja:</string>
+  <string name="utils_userId">ID użytkownika</string>
+  <string name="utils_email">E-mail</string>
+  <string name="utils_dontShowAgain">Nie pokazuj więcej</string>
+  <string name="utils_installDate">Data instalacji:</string>
+  <string name="utils_device">Urządzenie</string>
+  <string name="utils_osVersion">Wersja OS</string>
+  <string name="loading">Wczytywanie</string>
 </resources>

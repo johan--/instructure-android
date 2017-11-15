@@ -25,15 +25,16 @@
 package com.instructure.espresso;
 
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.core.deps.guava.base.Preconditions;
-import android.support.test.espresso.core.deps.guava.collect.Iterables;
-import android.support.test.espresso.core.deps.guava.collect.Sets;
+import android.support.test.espresso.core.internal.deps.guava.base.Preconditions;
+import android.support.test.espresso.core.internal.deps.guava.collect.Iterables;
+import android.support.test.espresso.core.internal.deps.guava.collect.Sets;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,7 +57,7 @@ public abstract class ActivityHelper {
     }
 
     private static Set<Activity> getActivitiesInStages(Stage... stages) {
-        final Set<Activity> activities = Sets.newHashSet();
+        final Set<Activity> activities = new HashSet();
         final ActivityLifecycleMonitor instance = ActivityLifecycleMonitorRegistry.getInstance();
         for (Stage stage : stages) {
             activities.addAll(instance.getActivitiesInStage(stage));

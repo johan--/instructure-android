@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,30 +30,34 @@ import com.instructure.candroid.holders.EmptyViewHolder;
 import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.interfaces.AdapterToAssignmentsCallback;
 import com.instructure.candroid.interfaces.GradingPeriodsCallback;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentGroup;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.GradingPeriod;
-import com.instructure.canvasapi.model.GradingPeriodResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AssignmentManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.AssignmentGroup;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.GradingPeriod;
+import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import java.util.List;
+
+import retrofit2.Call;
+
 
 public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapter<AssignmentGroup, Assignment, RecyclerView.ViewHolder> implements GradingPeriodsCallback {
 
     private CanvasContext mCanvasContext;
     private AdapterToAssignmentsCallback mAdapterToAssignmentsCallback;
-    private CanvasCallback<GradingPeriodResponse> mGradingPeriodsCallback;
-    private CanvasCallback<AssignmentGroup[]> mAssignmentGroupCallback;
+    private StatusCallback<List<AssignmentGroup>> mAssignmentGroupCallback;
+    private StatusCallback<GradingPeriodResponse> mGradingPeriodsCallback;
+
     private GradingPeriod mCurrentGradingPeriod;
 
 
@@ -63,7 +67,7 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
     }
 
     public AssignmentGroupListRecyclerAdapter(Context context, CanvasContext canvasContext,
-        CanvasCallback<GradingPeriodResponse> gradingPeriodsCallback,
+        StatusCallback<GradingPeriodResponse> gradingPeriodsCallback,
         AdapterToAssignmentsCallback adapterToAssignmentsCallback) {
         super(context, AssignmentGroup.class, Assignment.class);
 
@@ -78,10 +82,11 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
 
     @Override
     public void setupCallbacks() {
-        mAssignmentGroupCallback = new CanvasCallback<AssignmentGroup[]>(this) {
+        mAssignmentGroupCallback = new StatusCallback<List<AssignmentGroup>>() {
+
             @Override
-            public void firstPage(AssignmentGroup[] assignmentGroups, LinkHeaders linkHeaders, Response response) {
-                for (AssignmentGroup assignmentGroup : assignmentGroups) {
+            public void onResponse(retrofit2.Response<List<AssignmentGroup>> response, LinkHeaders linkHeaders, ApiType type) {
+                for (AssignmentGroup assignmentGroup : response.body()) {
                     addOrUpdateAllItems(assignmentGroup, assignmentGroup.getAssignments());
                 }
                 mAdapterToAssignmentsCallback.onRefreshFinished();
@@ -90,9 +95,8 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<AssignmentGroup>> callResponse, Throwable error, retrofit2.Response response) {
                 mAdapterToAssignmentsCallback.setTermSpinnerState(true);
-                return super.onFailure(retrofitError);
             }
         };
     }
@@ -164,7 +168,7 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
                     mCurrentGradingPeriod.setTitle(enrollment.getCurrentGradingPeriodTitle());
                     //request the grading period objects and make the assignment calls
                     //This callback is fulfilled in the grade list fragment.
-                    CourseAPI.getGradingPeriodsForCourse(course.getId(), mGradingPeriodsCallback);
+                    CourseManager.getGradingPeriodsForCourse(mGradingPeriodsCallback, course.getId(), true);
                     //Then we go ahead and load up the assignments for the current period
                     loadAssignmentsForGradingPeriod(mCurrentGradingPeriod.getId(), false);
                     return;
@@ -188,13 +192,13 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
             resetData();
         }
         //TODO: Add filter boolean when its real
-        AssignmentAPI.getAssignmentGroupsListWithAssignmentsAndSubmissionsForGradingPeriod(mCanvasContext.getId(), gradingPeriodID, mAssignmentGroupCallback);
+        AssignmentManager.getAssignmentGroupsWithAssignmentsForGradingPeriod(mCanvasContext.getId(), gradingPeriodID, isRefresh(), mAssignmentGroupCallback);
     }
 
 
     @Override
     public void loadAssignment () {
-        AssignmentAPI.getAssignmentGroupsListWithAssignmentsAndSubmissions(mCanvasContext.getId(), mAssignmentGroupCallback);
+        AssignmentManager.getAssignmentGroupsWithAssignments(mCanvasContext.getId(), isRefresh(), mAssignmentGroupCallback);
     }
 
     @Override
@@ -249,11 +253,11 @@ public class AssignmentGroupListRecyclerAdapter extends ExpandableRecyclerAdapte
             @Override
             public boolean areContentsTheSame(Assignment oldItem, Assignment newItem) {
                 boolean isSameName = oldItem.getName().equals(newItem.getName());
-                if (oldItem.getDueDate() != null && newItem.getDueDate() != null) {
-                    return isSameName && oldItem.getDueDate().equals(newItem.getDueDate());
-                } else if (oldItem.getDueDate() == null && newItem.getDueDate() != null) {
+                if (oldItem.getDueAt() != null && newItem.getDueAt() != null) {
+                    return isSameName && oldItem.getDueAt().equals(newItem.getDueAt());
+                } else if (oldItem.getDueAt() == null && newItem.getDueAt() != null) {
                     return false;
-                } else if (oldItem.getDueDate() != null && newItem.getDueDate() == null) {
+                } else if (oldItem.getDueAt() != null && newItem.getDueAt() == null) {
                     return false;
                 }
                 return isSameName;

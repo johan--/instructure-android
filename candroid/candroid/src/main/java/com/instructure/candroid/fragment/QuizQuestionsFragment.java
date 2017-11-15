@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,13 +20,14 @@ package com.instructure.candroid.fragment;
 import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,19 +48,19 @@ import com.instructure.candroid.dialog.QuizQuestionDialog;
 import com.instructure.candroid.interfaces.QuizFileUploadListener;
 import com.instructure.candroid.util.PreCachingLayoutManager;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.model.QuizSubmission;
-import com.instructure.canvasapi.model.QuizSubmissionQuestion;
-import com.instructure.canvasapi.model.QuizSubmissionQuestionResponse;
-import com.instructure.canvasapi.model.QuizSubmissionResponse;
-import com.instructure.canvasapi.model.QuizSubmissionTime;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.dialog.GenericDialogStyled;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.models.QuizSubmission;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestionResponse;
+import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.models.QuizSubmissionTime;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.services.FileUploadService;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
@@ -69,8 +70,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import retrofit.client.Response;
 
 public class QuizQuestionsFragment extends ParentFragment implements FileUploadDialog.FileUploadStartedInterface {
 
@@ -104,9 +103,9 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
     private QuizSubmissionTime mQuizSubmissionTime;
 
     //callback
-    private CanvasCallback<QuizSubmissionQuestionResponse> quizSubmissionQuestionResponseCanvasCallback;
-    private CanvasCallback<QuizSubmissionResponse> submitQuizCallback;
-    private CanvasCallback<QuizSubmissionTime> quizSubmissionTimeCanvasCallback;
+    private StatusCallback<QuizSubmissionQuestionResponse> quizSubmissionQuestionResponseCanvasCallback;
+    private StatusCallback<QuizSubmissionResponse> submitQuizCallback;
+    private StatusCallback<QuizSubmissionTime> quizSubmissionTimeCanvasCallback;
     private QuizFileUploadListener quizFileUploadListener;
 
     @Override
@@ -143,13 +142,12 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
         }
 
         if(quizQuestionAdapter != null) {
-            //we might be coming back from a link that opened a webview, and we don't want to
-            //add duplicates.
+            //we might be coming back from a link that opened a webview, and we don't want to add duplicates.
             quizQuestionAdapter.clear();
         }
 
-        if(quizSubmission != null && !(quiz.getRequireLockdownBrowserForResults())) {
-            QuizAPI.getFirstPageSubmissionQuestions(quizSubmission.getId(), quizSubmissionQuestionResponseCanvasCallback);
+        if(quizSubmission != null && !(quiz.isRequireLockdownBrowserForResults())) {
+            QuizManager.getFirstPageSubmissionQuestions(quizSubmission.getId(), true, quizSubmissionQuestionResponseCanvasCallback);
         } else {
             showToast(R.string.cantStartQuiz);
         }
@@ -179,7 +177,7 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
     @Override
     public void onResume() {
         super.onResume();
-        QuizAPI.getQuizSubmissionTime(getCanvasContext(), quizSubmission, quizSubmissionTimeCanvasCallback);
+        QuizManager.getQuizSubmissionTime(getCanvasContext(), quizSubmission, true, quizSubmissionTimeCanvasCallback);
     }
 
     @Override
@@ -282,21 +280,19 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
             @Override
             public void onFileUploadClicked(long quizQuestionId, int position) {
                 Bundle bundle = FileUploadDialog.createQuizFileBundle(quizQuestionId, course.getId(), quiz.getId(), position);
-                mUploadFileSourceFragment = FileUploadDialog.newInstance(getChildFragmentManager(),bundle);
+                mUploadFileSourceFragment = FileUploadDialog.newInstance(getFragmentManager(),bundle);
                 mUploadFileSourceFragment.setTargetFragment(QuizQuestionsFragment.this, 1234);
-                mUploadFileSourceFragment.show(getChildFragmentManager(), FileUploadDialog.TAG);
+                mUploadFileSourceFragment.show(getFragmentManager(), FileUploadDialog.TAG);
             }
         };
 
-        quizSubmissionQuestionResponseCanvasCallback = new CanvasCallback<QuizSubmissionQuestionResponse>(this) {
+        quizSubmissionQuestionResponseCanvasCallback = new StatusCallback<QuizSubmissionQuestionResponse>() {
 
             @Override
-            public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
+            public void onResponse(retrofit2.Response<QuizSubmissionQuestionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) return;
 
-            @Override
-            public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {
-
-                List<QuizSubmissionQuestion> questions = quizSubmissionQuestionResponse.getQuizSubmissionQuestions();
+                List<QuizSubmissionQuestion> questions = response.body().getQuizSubmissionQuestions();
 
                 //sort the questions based on position that is part of the model object
                 if(questions != null) {
@@ -321,24 +317,21 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
                     quizQuestionAdapter.addAll(questions);
                 }
                 //cache the views after we view them
-                recyclerView.setItemViewCacheSize(quizSubmissionQuestionResponse.getQuizSubmissionQuestions().size());
+                recyclerView.setItemViewCacheSize(response.body().getQuizSubmissionQuestions().size());
 
                 recyclerView.setAdapter(quizQuestionAdapter);
 
-                if(linkHeaders.nextURL != null) {
-                    QuizAPI.getNextPageSubmissionQuestions(linkHeaders.nextURL, quizSubmissionQuestionResponseCanvasCallback);
+                if(linkHeaders.nextUrl != null) {
+                    QuizManager.getNextPageSubmissionQuestions(linkHeaders.nextUrl, false, quizSubmissionQuestionResponseCanvasCallback);
                 }
             }
         };
 
-        submitQuizCallback = new CanvasCallback<QuizSubmissionResponse>(this) {
-
+        submitQuizCallback = new StatusCallback<QuizSubmissionResponse>() {
             @Override
-            public void cache(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {}
+            public void onResponse(retrofit2.Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) return;
 
-            @Override
-            public void firstPage(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
-                //submitted! Let the user know.
                 switch (auto_submit_reason) {
                     case TIMED_QUIZ:
                         showToast(R.string.submitReasonTimedQuiz);
@@ -361,37 +354,32 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
                 }
 
                 getActivity().onBackPressed();
-
             }
         };
 
-        quizSubmissionTimeCanvasCallback = new CanvasCallback<QuizSubmissionTime>(this) {
+        quizSubmissionTimeCanvasCallback = new StatusCallback<QuizSubmissionTime>() {
             @Override
-            public void cache(QuizSubmissionTime quizSubmissionTime, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<QuizSubmissionTime> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.CACHE) return;
 
-            }
-
-            @Override
-            public void firstPage(QuizSubmissionTime quizSubmissionTime, LinkHeaders linkHeaders, Response response) {
-
-                mQuizSubmissionTime = quizSubmissionTime;
+                mQuizSubmissionTime = response.body();
                 if(shouldLetAnswer && isAdded()) {
 
                     if (quiz.getTimeLimit() == 0 && quiz.getDueAt() == null && quiz.getLockAt() == null) {
                         normalTimer();
 
                     } else if (quiz.getTimeLimit() > 0) {
-                        timeLimitCountDown(quizSubmissionTime.getTimeLeft());
+                        timeLimitCountDown(mQuizSubmissionTime.getTimeLeft());
                     } else if (quiz.getDueAt() != null && (quiz.getLockAt() == null || quiz.getDueAt().before(quiz.getLockAt()))) {
                         //if we have a due date, we want to give them an option to submit it when it gets to that point, but only if the due date is before the lock date
                         auto_submit_reason = AUTO_SUBMIT_REASON.DUE_DATE;
 
-                        countDownForSubmit(quizSubmissionTime.getTimeLeft() * MILLISECOND);
+                        countDownForSubmit(mQuizSubmissionTime.getTimeLeft() * MILLISECOND);
 
                     } else if (quiz.getLockAt() != null) {
                         auto_submit_reason = AUTO_SUBMIT_REASON.LOCK_DATE;
 
-                        countDownForSubmit(quizSubmissionTime.getTimeLeft() * MILLISECOND);
+                        countDownForSubmit(mQuizSubmissionTime.getTimeLeft() * MILLISECOND);
                     }
                 } else {
                     int minutes = (int)Math.ceil((double)(quizSubmission.getTimeSpent()) / 60);
@@ -401,7 +389,6 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
                 }
             }
         };
-
     }
 
     //just count up, no due date, no lock date
@@ -469,7 +456,7 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
                 //there are actually 5 seconds left, but the timer will show 0 seconds because we subtract it when we set the variable "seconds"
                 if (seconds == 0) {
                     //auto-submit the quiz.
-                    QuizAPI.postQuizSubmit(course, quizSubmission, submitQuizCallback);
+                    QuizManager.postQuizSubmit(course, quizSubmission, true, submitQuizCallback);
                     auto_submit_reason = AUTO_SUBMIT_REASON.TIMED_QUIZ;
                     showToast(R.string.autoSubmitting);
                     if(countDownTimer != null) {
@@ -499,27 +486,29 @@ public class QuizQuestionsFragment extends ParentFragment implements FileUploadD
                     showToast(R.string.thirtySecondWarning);
                     // if it's a due date, let them decide if they want to submit, so show a dialog
                     if(auto_submit_reason == AUTO_SUBMIT_REASON.DUE_DATE) {
-                        GenericDialogStyled dialogStyled = GenericDialogStyled.newInstance(true, R.string.almostDue, R.string.almostDueMsg, R.string.logout_yes, R.string.logout_no, R.drawable.ic_cv_alert, new GenericDialogStyled.GenericDialogListener() {
-                            @Override
-                            public void onPositivePressed() {
-                                //submit the quiz
-                                QuizAPI.postQuizSubmit(course, quizSubmission, submitQuizCallback);
-                            }
-
-                            @Override
-                            public void onNegativePressed() {
-                                //do nothing
-                            }
-                        });
-                        dialogStyled.setCancelable(true);
-                        dialogStyled.show((getActivity()).getSupportFragmentManager(), "tag");
+                        new AlertDialog.Builder(getContext())
+                                .setTitle(R.string.almostDue)
+                                .setMessage(R.string.almostDueMsg)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        QuizManager.postQuizSubmit(course, quizSubmission, false, submitQuizCallback);
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {}
+                                })
+                                .create()
+                                .show();
                     }
                 }
                 if (seconds == 0) {
 
                     //auto-submit the quiz if it's a lock_date type. We don't auto submit at the due date
                     if(auto_submit_reason == AUTO_SUBMIT_REASON.LOCK_DATE) {
-                        QuizAPI.postQuizSubmit(course, quizSubmission, submitQuizCallback);
+                        QuizManager.postQuizSubmit(course, quizSubmission, false, submitQuizCallback);
+
                         showToast(R.string.autoSubmitting);
                         if(countDownTimer != null) {
                             countDownTimer.cancel();

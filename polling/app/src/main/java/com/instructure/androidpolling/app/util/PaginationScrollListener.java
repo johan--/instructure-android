@@ -58,6 +58,5 @@ public class PaginationScrollListener implements OnScrollListener {
 	}
 
 	@Override
-     public void onScrollStateChanged(AbsListView view, int scrollState) {
-    }
+	public void onScrollStateChanged(AbsListView view, int scrollState) {}
 }

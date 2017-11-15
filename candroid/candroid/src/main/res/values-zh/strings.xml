@@ -127,8 +127,6 @@
   <string name="domain">域名</string>
   <string name="sendFeedback">发送反馈</string>
   <string name="sendMail">发送电邮</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">编辑</string>
   <plurals name="item_count">
     <item quantity="other">%d 项目</item>
@@ -441,8 +439,8 @@
   <string name="could_not_find_course">获取课程项目时出现错误。</string>
   <string name="could_not_find_group">获取小组项目时出现错误。</string>
   <string name="selectBackground">选择背景</string>
-  <string name="kalturaSubmissionInProgress">提交文件...检查通知栏更新。</string>
-  <string name="kalturaSubmissionSuccessful">完成提交文件</string>
+  <string name="notoriousSubmissionInProgress">提交文件...检查通知栏更新。</string>
+  <string name="notoriousSubmissionSuccessful">完成提交文件</string>
   <string name="poll_title">您来Canvas做什么？</string>
   <string name="poll_warning">项目没有被选中。</string>
   <string name="poll_item_1">查看我的成绩</string>
@@ -479,6 +477,7 @@
   <string name="pandaAvatarsFolderName">熊猫头像</string>
   <string name="share">分享</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">超级熊猫图片</string>
   <string name="newFeatureTitle">手机通知</string>
   <string name="newFeatureMsg">要接收移动推送的通知，转到Canvas设置的＆gt；通知＆GT；并选择“所有设备”</string>

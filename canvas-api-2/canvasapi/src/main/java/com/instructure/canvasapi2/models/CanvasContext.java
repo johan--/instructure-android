@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> {
     public static final String HOME_ASSIGNMENTS = "assignments";
     public static final String HOME_SYLLABUS = "syllabus";
 
-    public static enum Type {
+    public enum Type {
         GROUP, COURSE, USER, SECTION, UNKNOWN;
 
         public static boolean isGroup(CanvasContext canvasContext) {
@@ -89,7 +89,7 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> {
     }
 
     public boolean canCreateDiscussion() {
-        return (permissions != null && permissions.canCreateDiscussionTopic());
+        return (permissions != null && permissions.getCanCreateDiscussionTopic());
     }
 
     @Override
@@ -113,9 +113,8 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> {
 
         CanvasContext that = (CanvasContext) o;
 
-        if (getType() != that.getType() || getId() != that.getId()) return false;
+        return !(getType() != that.getType() || getId() != that.getId());
 
-        return true;
     }
 
     /**
@@ -231,6 +230,10 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> {
         return canvasContext.getType() == Type.COURSE ? "courses" : "groups";
     }
 
+    public String apiContext() {
+        return getType() == Type.COURSE ? "courses" : "groups";
+    }
+
     /**
      * Get home page label returns the fragment identifier.
      *
@@ -298,4 +301,6 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> {
     public static CanvasContext emptyUserContext() {
         return getGenericContext(Type.USER, 0, "");
     }
+
+
 }

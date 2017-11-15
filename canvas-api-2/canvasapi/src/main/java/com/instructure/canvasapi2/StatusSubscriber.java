@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.canvasapi2.utils.Logger;
-import com.instructure.canvasapi2.utils.RetrofitCounter;
 
 import retrofit2.Response;
 import rx.Subscriber;
@@ -61,19 +60,15 @@ public class StatusSubscriber<T extends Response> extends Subscriber<T> {
 
     @Override
     final public void onStart() {
-        RetrofitCounter.increment();
         onCallbackStarted();
         super.onStart();
     }
 
     @Override
-    final public void onCompleted() {
-        RetrofitCounter.decrement();
-    }
+    final public void onCompleted() {}
 
     @Override
     final public void onError(Throwable e) {
-        RetrofitCounter.decrement();
         Logger.e("ON_ERROR: " + e);
         onFail(e);
     }

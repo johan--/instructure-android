@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
     android:id="@+id/previousUsersWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone"
-    android:layout_below="@+id/profileLayout">
+    android:layout_below="@+id/profileLayout"
+    android:visibility="gone">
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -40,38 +40,24 @@
 
     <RelativeLayout
         android:id="@+id/addAccount"
-        android:layout_above="@+id/logout"
-        style="@style/Canvas.NavDrawerItem">
+        style="@style/Canvas.NavDrawerItem"
+        android:layout_above="@+id/logout">
 
-    <ImageView
-        android:id="@+id/addAccountIcon"
-        android:src="@drawable/ic_cv_add_white_thin"
-        style="@style/Canvas.NavIcon"/>
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_toRightOf="@+id/addAccountIcon"
-        android:layout_toEndOf="@+id/addAccountIcon"
-        android:text="@string/addAccount"
-        style="@style/Canvas.NavDrawerText"/>
+        <TextView
+            android:id="@+id/text"
+            style="@style/Canvas.NavDrawerText"
+            android:text="@string/changeUser" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/logout"
-        android:layout_alignParentBottom="true"
-        style="@style/Canvas.NavDrawerItem">
-
-        <ImageView
-            android:id="@+id/logoutIcon"
-            android:src="@drawable/ic_exit_to_app_black_36dp"
-            style="@style/Canvas.NavIcon"/>
+        style="@style/Canvas.NavDrawerItem"
+        android:layout_alignParentBottom="true">
 
         <TextView
-            android:layout_toRightOf="@+id/logoutIcon"
-            android:layout_toEndOf="@+id/logoutIcon"
-            android:text="@string/logout"
-            style="@style/Canvas.NavDrawerText"/>
+            style="@style/Canvas.NavDrawerText"
+            android:text="@string/logout" />
 
     </RelativeLayout>
 

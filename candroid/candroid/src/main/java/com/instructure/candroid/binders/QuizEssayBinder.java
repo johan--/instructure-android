@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.holders.QuizEssayViewHolder;
 import com.instructure.candroid.interfaces.QuizPostEssay;
 import com.instructure.candroid.interfaces.QuizToggleFlagState;
-import com.instructure.canvasapi.model.QuizSubmissionQuestion;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.views.CanvasWebView;
 

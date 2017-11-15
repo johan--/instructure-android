@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.CanvasColor;
-import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.FileUploadParams;
 import com.instructure.canvasapi2.models.Parent;
 import com.instructure.canvasapi2.models.ParentResponse;
@@ -36,8 +35,8 @@ import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.Protocol;
@@ -69,7 +68,7 @@ public class UserManager_Test {
         //TODO: not sure what to do about PUTs
     }
 
-    public static RemoteFile uploadUserFileSynchronous(@NonNull RestBuilder adapter, String uploadUrl, LinkedHashMap<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
+    public static RemoteFile uploadUserFileSynchronous(@NonNull RestBuilder adapter, String uploadUrl, Map<String, RequestBody> uploadParams, String mimeType, File file) throws IOException {
         // TODO
         return null;
     }
@@ -88,7 +87,7 @@ public class UserManager_Test {
         // TODO
     }
 
-    public static void getUser(RestBuilder adapter, RestParams params, String userId, StatusCallback<User> callback) {
+    public static void getUser(RestBuilder adapter, RestParams params, Long userId, StatusCallback<User> callback) {
         // TODO
     }
 

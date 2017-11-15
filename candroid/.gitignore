@@ -68,5 +68,6 @@ release_build/dropbox/target/dropbox-core-sdk-0-SNAPSHOT.jar
 release_build/dropbox/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
 release_build/dropbox/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
 
-# Generated Licenses HTML
-candroid/src/main/assets/licenses.html
+# OSS License data
+candroid/src/main/res/raw/third_party_license_metadata
+candroid/src/main/res/raw/third_party_licenses

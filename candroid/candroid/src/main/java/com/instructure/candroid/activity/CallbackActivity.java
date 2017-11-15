@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,32 +19,32 @@ package com.instructure.candroid.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-
 import com.instructure.candroid.delegate.APIContract;
-import com.instructure.canvasapi.api.AccountNotificationAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.UserAPI;
-import com.instructure.canvasapi.model.AccountNotification;
-import com.instructure.canvasapi.model.CanvasColor;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.canvasapi.utilities.Masquerading;
-import com.instructure.canvasapi.utilities.UserCallback;
-import com.instructure.loginapi.login.api.GlobalDataSyncAPI;
-import com.instructure.loginapi.login.asynctasks.GlobalDataSyncGetTask;
-import com.instructure.loginapi.login.asynctasks.GlobalDataSyncPostTask;
-import com.instructure.loginapi.login.model.GlobalDataSync;
-import com.instructure.loginapi.login.rating.RatingDialog;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AccountNotificationManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.LaunchDefinitionsManager;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.AccountNotification;
+import com.instructure.canvasapi2.models.CanvasColor;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.LaunchDefinition;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.pandautils.dialogs.RatingDialog;
+import com.instructure.pandautils.utils.AppType;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 
-import retrofit.client.Response;
+import java.util.List;
+
+import retrofit2.Call;
 
 /**
  * This class is responsible for handling any API requests that base activities may require.
@@ -52,57 +52,22 @@ import retrofit.client.Response;
 public abstract class CallbackActivity extends ParentActivity implements
         APIContract {
 
-    protected UserCallback userCallback;
-    protected CanvasCallback<Course[]> coursesCallback;
-    protected CanvasCallback<Course[]> coursesNoCacheCallback;
-    protected CanvasCallback<Enrollment[]> getUserEnrollments;
-    protected CanvasCallback<AccountNotification[]> accountNotificationCallback;
-    protected CanvasCallback<CanvasColor> courseColorsCallback;
+    protected StatusCallback<User> userCallback;
+    protected StatusCallback<List<Enrollment>> getUserEnrollments;
+    protected StatusCallback<List<Course>> coursesCallback;
+    protected StatusCallback<List<Course>> coursesNoCacheCallback;
+    protected StatusCallback<List<AccountNotification>> accountNotificationCallback;
+    protected StatusCallback<CanvasColor> courseColorsCallback;
+    protected StatusCallback<List<LaunchDefinition>> accountLaunchDefinitionsCallback;
 
     protected User mUser;
     protected boolean hasNonTeacherEnrollment = false;
 
-    private boolean isSavedInstanceStateNull = true;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        isSavedInstanceStateNull = (savedInstanceState == null);
-
-        if(isSavedInstanceStateNull) {
-            //Gets and caches the global data
-            new GlobalDataSyncGetTask(this, new GlobalDataSyncGetTask.GlobalDataSyncCallbacks() {
-                @Override
-                public void globalDataResults(GlobalDataSync data) {
-                    if(data != null) {
-                        onProfileBackdropUpdate(data.data);
-                    }
-                }
-            }, GlobalDataSyncAPI.NAMESPACE.MOBILE_CANVAS_USER_BACKDROP_IMAGE).execute();
-
-            if (CanvasRestAdapter.isNetworkAvaliable(getContext())) {
-                new GlobalDataSyncGetTask(this, new GlobalDataSyncGetTask.GlobalDataSyncCallbacks() {
-                    @Override
-                    public void globalDataResults(GlobalDataSync data) {
-                        if (data == null && !isFinishing()) {
-                            showPushNotificationDialog();
-
-                            //Sets a flag on the user to not show this dialog again in the future.
-                            new GlobalDataSyncPostTask(getContext(),
-                                    GlobalDataSyncAPI.NAMESPACE.MOBILE_CANVAS_USER_NOTIFICATION_STATUS_SETUP).execute(
-                                    new GlobalDataSync(Boolean.toString(true)));
-                        }
-                    }
-                }, GlobalDataSyncAPI.NAMESPACE.MOBILE_CANVAS_USER_NOTIFICATION_STATUS_SETUP).execute();
-            }
-        }
-
-        RatingDialog.showRatingDialog(CallbackActivity.this, RatingDialog.APP_NAME.CANDROID);
+        RatingDialog.showRatingDialog(CallbackActivity.this, AppType.CANDROID);
     }
-
-    public abstract void onProfileBackdropUpdate(String url);
-    public abstract void showPushNotificationDialog();
 
     /**
      * Sometimes getUserSelf is not called in a callback (in onCreate) other times its called from a callback's first page
@@ -143,105 +108,106 @@ public abstract class CallbackActivity extends ParentActivity implements
     public void getUserSelf(boolean isWithinAnotherCallback, boolean isCached) {
         setupCallbacks();
         setupListeners();
-        UserAPI.getSelf(userCallback);
-        if (isWithinAnotherCallback) {
-            CourseAPI.getAllFavoriteCoursesChained(coursesCallback, isCached);
-        } else {
-            CourseAPI.getAllFavoriteCourses(coursesCallback);
-        }
+
+        UserManager.getSelf(true, userCallback);
+        CourseManager.getAllFavoriteCourses(true, coursesCallback);
+
         getAccountNotifications(isWithinAnotherCallback, isCached);
+        LaunchDefinitionsManager.getLaunchDefinitions(accountLaunchDefinitionsCallback, !isCached);
     }
 
     // isCached is only used when isWithinAnotherCallback
     public void getAccountNotifications(boolean isWithinAnotherCallback, boolean isCached) {
         if (isWithinAnotherCallback) {
-            AccountNotificationAPI.getAccountNotificationsChained(accountNotificationCallback, isCached);
+            AccountNotificationManager.getAllAccountNotifications(accountNotificationCallback, !isCached);
         } else {
-            AccountNotificationAPI.getAccountNotifications(accountNotificationCallback);
+            AccountNotificationManager.getAccountNotifications(accountNotificationCallback, !isCached);
         }
     }
 
     @Override
     public void setupCallbacks() {
-
-        getUserEnrollments = new CanvasCallback<Enrollment[]>(CallbackActivity.this) {
+        getUserEnrollments = new StatusCallback<List<Enrollment>>() {
             @Override
-            public void firstPage(Enrollment[] enrollments, LinkHeaders linkHeaders, Response response) {
-                if(enrollments != null) {
-                    gotEnrollments(enrollments);
+            public void onResponse(retrofit2.Response<List<Enrollment>> response, LinkHeaders linkHeaders, ApiType type) {
+                if(response.body() != null) {
+                    gotEnrollments(response.body());
                 }
             }
         };
 
-        userCallback = new UserCallback(CallbackActivity.this) {
+        userCallback = new StatusCallback<User>() {
             @Override
-            public void cachedUser(User user) {
+            public void onResponse(retrofit2.Response<User> response, LinkHeaders linkHeaders, ApiType type) {
                 //We don't load from cache on this because it will load the users avatar two times and cause world hunger.
                 //but if we're masquerading we want to, because masquerading can't get user info, so we need to read it from
                 //cache
-                if(Masquerading.isMasquerading(CallbackActivity.this)) {
-                    user(APIHelpers.getCacheUser(CallbackActivity.this), null);
-                } else if(!CanvasRestAdapter.isNetworkAvaliable(CallbackActivity.this)) {
-                    user(user, null);
+                User user = response.body();
+                if(type.isCache()) {
+                    if(ApiPrefs.isMasquerading()) {
+                        setup(ApiPrefs.getUser());
+                    } else if(!APIHelper.hasNetworkConnection()) {
+                        setup(user);
+                    }
+                } else {
+                    setup(user);
                 }
             }
 
-            @Override
-            public void user(User user, Response response) {
+            private void setup(User user) {
                 if (user != null) {
                     mUser = user;
-                    UserAPI.getColors(getApplicationContext(), courseColorsCallback);
-                    UserAPI.getSelfEnrollments(getUserEnrollments);
+                    ApiPrefs.setUser(user);
+                    UserManager.getColors(courseColorsCallback, true);
+                    UserManager.getSelfEnrollments(true, getUserEnrollments);
                     onUserCallbackFinished(mUser);
                 }
             }
         };
 
-        coursesCallback = new CanvasCallback<Course[]>(this) {
+        coursesCallback = new StatusCallback<List<Course>>() {
+
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                for(Course course: courses){
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+
+                for(Course course: response.body()){
                     if(!course.isTeacher()){
                         hasNonTeacherEnrollment = true;
                         break;
                     }
                 }
-                onCourseFavoritesFinished(courses);
+                onCourseFavoritesFinished(response.body());
             }
         };
 
-        coursesNoCacheCallback = new CanvasCallback<Course[]>(this) {
+        coursesNoCacheCallback = new StatusCallback<List<Course>>() {
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                for(Course course: courses){
-                    if(!course.isTeacher()){
-                        hasNonTeacherEnrollment = true;
-                        break;
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type == ApiType.API) {
+                    for (Course course : response.body()) {
+                        if (!course.isTeacher()) {
+                            hasNonTeacherEnrollment = true;
+                            break;
+                        }
                     }
+                    onCourseFavoritesFinished(response.body());
                 }
-                onCourseFavoritesFinished(courses);
-            }
-
-            @Override
-            public void cache(Course[] courses, LinkHeaders linkHeaders, Response response) {
-
             }
         };
 
-        accountNotificationCallback = new CanvasCallback<AccountNotification[]>(this) {
+        accountNotificationCallback = new StatusCallback<List<AccountNotification>>() {
             @Override
-            public void firstPage(AccountNotification[] accountNotificationsArray, LinkHeaders linkHeaders, Response response) {
-                gotNotifications(accountNotificationsArray);
+            public void onResponse(retrofit2.Response<List<AccountNotification>> response, LinkHeaders linkHeaders, ApiType type) {
+                gotNotifications(response.body());
             }
         };
 
-        courseColorsCallback = new CanvasCallback<CanvasColor>(this) {
-
+        courseColorsCallback = new StatusCallback<CanvasColor>() {
             @Override
-            public void firstPage(CanvasColor canvasColor, LinkHeaders linkHeaders, Response response) {
-                if(response.getStatus() == 200) {
+            public void onResponse(retrofit2.Response<CanvasColor> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                if(code == 200) {
                     //Replaces the current cache with the updated fresh one from the api.
-                    CanvasContextColor.addToCache(canvasColor);
+                    CanvasContextColor.addToCache(response.body());
                     //Sends a broadcast so the course grid can refresh it's colors if needed.
                     //When first logging in this will probably get called/return after the courses.
                     Intent intent = new Intent(Const.COURSE_THING_CHANGED);
@@ -252,25 +218,42 @@ public abstract class CallbackActivity extends ParentActivity implements
                 }
             }
         };
+
+        accountLaunchDefinitionsCallback = new StatusCallback<List<LaunchDefinition>>() {
+            @Override
+            public void onResponse(retrofit2.Response<List<LaunchDefinition>> response, LinkHeaders linkHeaders, ApiType type) {
+                if (response.code() == 200) {
+                    for (LaunchDefinition definition : response.body()) {
+                        if ("gauge.instructure.com".equals(definition.domain)) {
+                            gotLaunchDefinitions(definition);
+                            return;
+                        }
+                    }
+                }
+                gotLaunchDefinitions(null);
+            }
+
+            @Override
+            public void onFail(Call<List<LaunchDefinition>> callResponse, Throwable error, retrofit2.Response response) {
+                gotLaunchDefinitions(null);
+            }
+        };
     }
 
-    public abstract void gotEnrollments(Enrollment[] enrollments);
-    public abstract void gotNotifications(AccountNotification[] accountNotifications);
+    public abstract void gotLaunchDefinitions(@Nullable LaunchDefinition launchDefinition);
+    public abstract void gotEnrollments(List<Enrollment> enrollments);
+    public abstract void gotNotifications(List<AccountNotification> accountNotifications);
     public abstract void onUserCallbackFinished(User user);
 
-    public void onCourseFavoritesFinished(Course[] courses) {}
+    public void onCourseFavoritesFinished(List<Course> courses) {}
 
     @Override
     public void setupListeners() {}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // APIStatusDelegate
-    ///////////////////////////////////////////////////////////////////////////
-
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        if(userCallback != null && userCallback.isFinished()) {
-            super.onCallbackFinished(source);
+    public void onCallbackFinished(ApiType type) {
+        if(userCallback != null && !userCallback.isCallInProgress()) {
+            super.onCallbackFinished(type);
         }
     }
 }

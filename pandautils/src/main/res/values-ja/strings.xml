@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">パンダUtils</string>
   <string name="chooseMedia">メディアを選択</string>
   <string name="takeVideo">動画を撮影する</string>
   <string name="noCameraOnDevice">カメラが使用出来ません</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Canvasにアップロードする</string>
   <string name="preparingUpload">アップロードを準備</string>
   <string name="loadingFilesIndeterminate">ファイルをロード中...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">画像の取り込み中にエラーが発生しました。やり直してください。</string>
   <string name="errorTextMissing">テキストを追加してメッセージを送信する</string>
   <string name="fileUploadNotSupported">選択した課題にファイルをアップロードすることができません。</string>
+  <string name="noCourseSelected">コースを選択してください</string>
   <string name="selectCourse">コースを選択</string>
   <string name="selectAssignment">課題を選択</string>
   <string name="loadingAssignments">課題をロード中...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">未読</string>
   <string name="discussion_reply">返信</string>
   <string name="close">閉じる</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas 講師</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas サーベイ</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">私たちはどうですか？</string>
+  <string name="utils_rateUs">どのように私たちを評価しますか？</string>
+  <string name="utils_doBetter">改善する余地はどこにあるでしょう？</string>
+  <string name="utils_sendFeedback">フィードバックを送る</string>
+  <string name="utils_suggestions">Androidへの提案</string>
+  <string name="utils_domain">ドメイン</string>
+  <string name="utils_versionNum">バージョン:</string>
+  <string name="utils_userId">ユーザーID</string>
+  <string name="utils_email">メールアドレス</string>
+  <string name="utils_dontShowAgain">これ以上表示しないでください</string>
+  <string name="utils_installDate">インストール日:</string>
+  <string name="utils_device">デバイス</string>
+  <string name="utils_osVersion">OS バージョン</string>
+  <string name="loading">読み込み中</string>
 </resources>

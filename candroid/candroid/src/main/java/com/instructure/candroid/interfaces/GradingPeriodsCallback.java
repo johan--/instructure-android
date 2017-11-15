@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 package com.instructure.candroid.interfaces;
 
-import com.instructure.canvasapi.model.GradingPeriod;
+import com.instructure.canvasapi2.models.GradingPeriod;
 
 public interface GradingPeriodsCallback {
     void loadAssignmentsForGradingPeriod (long gradingPeriodId, boolean refreshFirst);

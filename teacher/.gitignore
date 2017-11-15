@@ -1,0 +1,60 @@
+# Strings #
+android-parent/src/main/res/values/com_crashlytics_export_strings.xml
+android-parent/crashlytics.properties
+
+# built application files #
+*.apk
+*.ap_
+
+# files for the dex VM #
+*.dex
+
+# Java class files #
+*.class
+
+# generated files #
+bin
+gen
+target
+
+# Local configuration file (sdk path, etc) #
+local.properties
+
+# Windows thumbnail db #
+Thumbs.db
+
+# OSX files
+.DS_Store
+
+# Eclipse project files #
+.classpath
+.project
+
+# Android Studio #
+.idea
+*.iml
+build
+*.iws
+
+# Package Files #
+*.war
+*.ear
+
+# Project Files #
+.gitconfig
+
+# Gradle Files #
+gradle.properties
+.gradle
+
+# Private data
+app/fabric.properties
+private.properties
+
+# OSS License data
+app/src/main/res/raw/third_party_license_metadata
+app/src/main/res/raw/third_party_licenses
+
+# Espresso Data
+app/src/androidTest/java/com/instructure/parentapp/ui/data/**/*
+app/src/androidTest/java/com/instructure/teacher/ui/data/**/*

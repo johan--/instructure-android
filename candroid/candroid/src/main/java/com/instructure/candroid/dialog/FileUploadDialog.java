@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -60,17 +61,17 @@ import com.instructure.candroid.adapter.FileUploadAdapter;
 import com.instructure.candroid.util.AnimationHelpers;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.loginapi.login.util.ProfileUtils;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.models.FileSubmitObject;
 import com.instructure.pandautils.services.FileUploadService;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.FileUploadUtils;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.instructure.pandautils.utils.RequestCodes;
 
 import java.io.File;
@@ -216,17 +217,19 @@ public class FileUploadDialog extends DialogFragment implements FileSourceDialog
             getDialog().getWindow().getAttributes().windowAnimations = R.style.FileUploadDialogAnimation;
             getDialog().getWindow().setWindowAnimations(R.style.FileUploadDialogAnimation);
         }
+
+        handleUriContents();
     }
 
     public void setDialogLifecycleCallback(DialogLifecycleCallback dialogLifecycleCallback) {
         this.dialogLifecycleCallback = dialogLifecycleCallback;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         loadBundleData();
         initProgressDialog();
-        handleUriContents();
 
         adapter = new FileUploadAdapter(getActivity(), canvasContext, files);
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
@@ -333,7 +336,7 @@ public class FileUploadDialog extends DialogFragment implements FileSourceDialog
             intent.setAction(FileUploadService.ACTION_QUIZ_FILE);
         }
         else {
-            bundle = FileUploadService.getAssignmentSubmissionBundle(files, course.getId(), assignment.getId());
+            bundle = FileUploadService.getAssignmentSubmissionBundle(files, course.getId(), assignment);
             intent.setAction(FileUploadService.ACTION_ASSIGNMENT_SUBMISSION);
         }
         intent.putExtras(bundle);
@@ -383,8 +386,11 @@ public class FileUploadDialog extends DialogFragment implements FileSourceDialog
             newFragment.setListener(this);
             newFragment.setCancelable(true);
             //use this so we can call this fragment's onActivityResult function from the dialog
-            newFragment.setTargetFragment(FileUploadDialog.this, 500);
-            newFragment.show(getChildFragmentManager(), FileSourceDialogStyled.TAG);
+            Fragment fileUploadDialog = getFragmentManager().findFragmentByTag(FileUploadDialog.TAG);
+            if(fileUploadDialog != null) {
+                newFragment.setTargetFragment(fileUploadDialog, 500);
+            }
+            newFragment.show(getFragmentManager(), FileSourceDialogStyled.TAG);
         } else {
             new GetUriContentsAsyncTask(getActivity(), submitUri).execute();
         }
@@ -439,8 +445,11 @@ public class FileUploadDialog extends DialogFragment implements FileSourceDialog
                     newFragment.setCancelable(true);
                     newFragment.setListener(FileUploadDialog.this);
                     //use this so we can call this fragment's onActivityResult function from the dialog
-                    newFragment.setTargetFragment(FileUploadDialog.this, 500);
-                    newFragment.show(getChildFragmentManager(), FileSourceDialogStyled.TAG);
+                    Fragment fileUploadDialog = getFragmentManager().findFragmentByTag(FileUploadDialog.TAG);
+                    if(fileUploadDialog != null) {
+                        newFragment.setTargetFragment(FileUploadDialog.this, 500);
+                    }
+                    newFragment.show(getFragmentManager(), FileSourceDialogStyled.TAG);
                 }
             }
         });
@@ -797,7 +806,7 @@ public class FileUploadDialog extends DialogFragment implements FileSourceDialog
     public void loadBundleData(){
         Bundle bundle = getArguments();
 
-        user           = APIHelpers.getCacheUser(getActivity());
+        user           = ApiPrefs.getUser();
         uploadType     = (FileUploadType) bundle.getSerializable(Const.UPLOAD_TYPE);
         canvasContext  = bundle.getParcelable(Const.CANVAS_CONTEXT);
         assignment     = bundle.getParcelable(Const.ASSIGNMENT);

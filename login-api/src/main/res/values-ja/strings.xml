@@ -10,7 +10,6 @@
   <string name="unknownDevice">未知のディバイス</string>
   <string name="errorOccurred">予期しないエラーが発生しました。</string>
   <string name="pageNotFound">ページが見つかりません</string>
-  <string name="okay">Ok</string>
   <string name="confirm">確認</string>
   <string name="cancel">キャンセル</string>
   <string name="help">ヘルプ</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">Canvas Network にサインインしようとしていますか?</string>
   <string name="remove">削除</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">ユーザーID</string>
+  <string name="domain">ドメイン</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">このユーザーを削除しますか？</string>
   <string name="removedForever">再度、このユーザーにサインインして、彼らのコンテンツにアクセスする必要があります。</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">あなたの学校がありませんか？学校のURLを入力するか、ここをタップしてヘルプを利用してください。</string>
   <string name="loginCanvasHelpWithUser">学校のURLを入力するか、ここをタップしてヘルプを利用してください。</string>
   <string name="loginHint">あなたの学校、または地区を検索</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">私たちはどうですか？</string>
-  <string name="rateUs">どのように私たちを評価しますか？</string>
-  <string name="doBetter">どうすれば私たちは向上しますか？</string>
-  <string name="sendFeedback">フィードバックを送る</string>
-  <string name="suggestions">Androidへの提案</string>
-  <string name="domain">ドメイン</string>
-  <string name="versionNum">バージョン:</string>
-  <string name="userId">ユーザーID</string>
-  <string name="email">Ｅメール</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">これ以上表示しないでください</string>
-  <string name="installDate">インストール日:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">レポートＡ問題</string>
   <string name="zendesk_subject">主題</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">デバイス</string>
   <string name="osVersion">OS バージョン</string>
+  <string name="empty_feedback">フィードバックを提出するには、件名と説明は必須です。</string>
 </resources>

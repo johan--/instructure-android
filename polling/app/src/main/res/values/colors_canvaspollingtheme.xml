@@ -17,5 +17,9 @@
   -->
 
 <resources>
-    <color name="canvaspollingtheme_color">#249fcf</color>
+    <color name="canvaspollingtheme_color">#56D9CD</color>
+
+    <color name="color_primary">#249fcf</color>
+    <color name="color_primary_dark">#1c81a8</color>
+    <color name="color_accent">#56D9CD</color>
 </resources>

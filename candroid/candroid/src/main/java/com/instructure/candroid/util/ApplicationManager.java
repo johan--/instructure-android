@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,38 +34,33 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.instructure.candroid.BuildConfig;
-import com.instructure.candroid.adapter.CalendarListRecyclerAdapter;
-import com.instructure.canvasapi.model.CanvasColor;
 import com.google.gson.Gson;
+import com.instructure.candroid.BuildConfig;
 import com.instructure.candroid.R;
 import com.instructure.candroid.fragment.ApplicationSettingsFragment;
-import com.instructure.candroid.widget.BaseRemoteViewsService;
-import com.instructure.canvasapi.api.OAuthAPI;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.canvasapi.utilities.Masquerading;
-import com.instructure.loginapi.login.interfaces.AnalyticsEventHandling;
-import com.instructure.loginapi.login.model.SignedInUser;
-import com.instructure.loginapi.login.util.Utils;
+import com.instructure.candroid.tasks.LogoutAsyncTask;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.UserManager;
+import com.instructure.canvasapi2.models.CanvasColor;
+import com.instructure.canvasapi2.models.CanvasErrorCode;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.Logger;
+import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.Prefs;
-import com.instructure.pandautils.utils.TutorialUtils;
-import com.instructure.pandautils.utils.CanvasContextColor;
 import com.pspdfkit.PSPDFKit;
-import com.pspdfkit.exceptions.PSPDFInitializationFailedException;
+import com.pspdfkit.exceptions.PSPDFKitInitializationFailedException;
 
-import java.util.Date;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class ApplicationManager extends MultiDexApplication implements AnalyticsEventHandling {
 
@@ -163,171 +158,6 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
         invalidateColorsCache();
     }
 
-    /**
-     * Switch out the current signed in user. Temporarily remove credentials. Save them elsewhere so we can repopulate it when necessary.
-     *
-     * @return
-     */
-    public boolean switchUsers() {
-
-        //backup widget background preferences
-        Map<Integer, String> widgetBackgroundMap = BaseRemoteViewsService.getStoredBackgroundPreferences(getApplicationContext());
-        Map<Integer, Boolean> widgetShouldHideDetailsMap = BaseRemoteViewsService.getShouldHideDetailsPreferences(getApplicationContext());
-
-        //Prepare the user to be saved...
-        SignedInUser signedInUser = new SignedInUser();
-        signedInUser.user = APIHelpers.getCacheUser(this);
-        signedInUser.domain = APIHelpers.getDomain(this);
-        signedInUser.protocol = APIHelpers.loadProtocol(this);
-        signedInUser.token = APIHelpers.getToken(this);
-        signedInUser.calendarFilterPrefs = CalendarListRecyclerAdapter.getFilterPrefs(getApplicationContext());
-        signedInUser.lastLogoutDate = new Date();
-
-        //Save Signed In User to sharedPreferences
-        addToPreviouslySignedInUsers(signedInUser);
-
-        //Clear shared preferences, but keep the important stuff.
-        safeClearSharedPreferences();
-
-        //CLear masquerading preferences.
-        clearMasqueradingPreferences();
-
-        //Clear all Shared Preferences.
-        APIHelpers.clearAllData(this);
-
-        //restore widget background preferences
-        BaseRemoteViewsService.restoreWidgetBackgroundPreference(getApplicationContext(), widgetBackgroundMap);
-        BaseRemoteViewsService.restoreWidgetShouldHideDetailsPreference(getApplicationContext(), widgetShouldHideDetailsMap);
-
-        return true;
-    }
-
-
-    /**
-     * Log out the currently signed in user. Permanently remove credential information.
-     *
-     * @return
-     */
-    public boolean logoutUser() {
-
-        //It is possible for multiple APIs to come back 'simultaneously' as HTTP401s causing a logout
-        //if this has already ran, data is already cleared causing null pointer exceptions
-        if (APIHelpers.getToken(this) != null && !APIHelpers.getToken(this).equals("")) {
-
-            //Delete token from server
-            //We don't actually care about this coming back. Fire and forget.
-            CanvasCallback<Response> deleteTokenCallback = new CanvasCallback<Response>(APIHelpers.statusDelegateWithContext(this)) {
-                @Override
-                public void cache(Response response) {
-                }
-
-                @Override
-                public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                }
-            };
-
-            OAuthAPI.deleteToken(deleteTokenCallback);
-            //Remove Signed In User from sharedPreferences
-            SharedPreferences sharedPreferences = getSharedPreferences(OTHER_SIGNED_IN_USERS_PREF_NAME, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.remove(getGlobalUserId(APIHelpers.getDomain(this), APIHelpers.getCacheUser(this)));
-            editor.apply();
-
-            //Clear shared preferences, but keep the important stuff.
-            safeClearSharedPreferences();
-
-            //CLear masquerading preferences.
-            clearMasqueradingPreferences();
-
-            //Clear all Shared Preferences.
-            APIHelpers.clearAllData(this);
-        }
-        return true;
-    }
-
-    public void clearMasqueradingPreferences() {
-        //stop masquerading
-        Masquerading.stopMasquerading(this);
-
-        //clear any shared preferences for the masqueraded user
-        SharedPreferences masq_settings = getSharedPreferences(ApplicationManager.MASQ_PREF_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor masq_editor = masq_settings.edit();
-        masq_editor.clear();
-        masq_editor.apply();
-    }
-
-    public void safeClearSharedPreferences() {
-        //Get the Shared Preferences
-        SharedPreferences settings = getSharedPreferences(ApplicationManager.PREF_NAME, MODE_PRIVATE);
-
-        //Don't make them redo tutorials
-        boolean doneStreamTutorial = settings.getBoolean("stream_tutorial_v2", false);
-        boolean doneConversationListTutorial = settings.getBoolean("conversation_list_tutorial_v2", false);
-        boolean featureSlides = settings.getBoolean("feature_slides_shown", false);
-        String lastDomain = settings.getString("last-domain", "");
-        String UUID = settings.getString("APID", null);
-        int landingPage = settings.getInt(ApplicationSettingsFragment.LANDING_PAGE, 0);
-        boolean drawerLearned = settings.getBoolean(Const.PREF_USER_LEARNED_DRAWER, false);
-        boolean tutorialViewed = settings.getBoolean(Const.TUTORIAL_VIEWED, false);
-        boolean newGroupsViewed = settings.getBoolean(Const.VIEWED_NEW_FEATURE_BANNER, false);
-        boolean showGrades = settings.getBoolean(Const.SHOW_GRADES_ON_CARD, true);
-        boolean pandasFlying = settings.getBoolean(Const.FUN_MODE, false);
-
-        boolean tutorial_1 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.STAR_A_COURSE);
-        boolean tutorial_2 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.COLOR_CHANGING_DIALOG);
-        boolean tutorial_3 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.LANDING_PAGE);
-        boolean tutorial_5 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.MY_COURSES);
-        boolean tutorial_6 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.NOTIFICATION_PREFERENCES);
-        boolean tutorial_9 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.NAVIGATION_SHORTCUTS);
-        boolean tutorial_10 = TutorialUtils.hasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.COURSE_GRADES);
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.clear();
-        editor.apply();
-
-        //Replace the information about tutorials/last domain
-        editor.putBoolean("stream_tutorial_v2", doneStreamTutorial);
-        editor.putBoolean("conversation_list_tutorial_v2", doneConversationListTutorial);
-        editor.putBoolean("feature_slides_shown", featureSlides);
-        editor.putString("last-domain", lastDomain);
-        editor.putInt(ApplicationSettingsFragment.LANDING_PAGE, landingPage);
-        editor.putBoolean(Const.PREF_USER_LEARNED_DRAWER, drawerLearned);
-        editor.putBoolean(Const.TUTORIAL_VIEWED, tutorialViewed);
-        editor.putBoolean(Const.VIEWED_NEW_FEATURE_BANNER, newGroupsViewed);
-        editor.putBoolean(Const.SHOW_GRADES_ON_CARD, showGrades);
-        editor.putBoolean(Const.FUN_MODE, pandasFlying);
-
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.STAR_A_COURSE, tutorial_1);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.COLOR_CHANGING_DIALOG, tutorial_2);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.LANDING_PAGE, tutorial_3);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.MY_COURSES, tutorial_5);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.NOTIFICATION_PREFERENCES, tutorial_6);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.NAVIGATION_SHORTCUTS, tutorial_9);
-        TutorialUtils.setHasBeenViewed(getPrefs(getApplicationContext()), TutorialUtils.TYPE.COURSE_GRADES, tutorial_10);
-
-
-        if (UUID != null) {
-            editor.putString("APID", UUID);
-        }
-
-        editor.apply();
-    }
-
-
-    //Add user to PreviouslySignedInUsers
-    public boolean addToPreviouslySignedInUsers(SignedInUser signedInUser) {
-
-        //Get the JSON.
-        Gson gson = CanvasRestAdapter.getGSONParser();
-        String signedInUserJSON = gson.toJson(signedInUser);
-
-        //Save Signed In User to sharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences(OTHER_SIGNED_IN_USERS_PREF_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getGlobalUserId(APIHelpers.getDomain(this), APIHelpers.getCacheUser(this)), signedInUserJSON);
-        return editor.commit();
-    }
-
     public void setCalendarStartWithMonday(boolean startWeekMonday){
         getPrefs(getApplicationContext()).save(Const.CALENDAR_START_DAY_PREFS, startWeekMonday);
     }
@@ -337,18 +167,8 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
     }
 
     public boolean isUserLoggedIn() {
-        String token = APIHelpers.getToken(this);
+        String token = ApiPrefs.getToken();
         return (token != null && token.length() != 0);
-    }
-
-    public boolean shouldShowGrades() {
-        SharedPreferences settings;
-        if (Masquerading.isMasquerading(this)) {
-            settings = getSharedPreferences(ApplicationManager.MASQ_PREF_NAME, MODE_PRIVATE);
-        } else {
-            settings = getSharedPreferences(ApplicationManager.PREF_NAME, MODE_PRIVATE);
-        }
-        return settings.getBoolean("show_grades", true);
     }
 
     /**
@@ -357,9 +177,6 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
      */
     public static boolean isDownloadManagerAvailable(Context context) {
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-                return false;
-            }
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
             intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
@@ -479,8 +296,8 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
     private void initPSPDFKit() {
         try {
             PSPDFKit.initialize(this, BuildConfig.PSPDFKIT_LICENSE_KEY);
-        } catch (PSPDFInitializationFailedException e) {
-            Utils.e("Current device is not compatible with PSPDFKIT!");
+        } catch (PSPDFKitInitializationFailedException e) {
+            Logger.e("Current device is not compatible with PSPDFKIT!");
         }
     }
 
@@ -578,6 +395,18 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
              //aka system default
             default:
                 return "root";
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    private void onUserNotAuthorized(CanvasErrorCode event) {
+        if(event.getCode() == 401) {
+            UserManager.getSelf(true, new StatusCallback<User>(){
+                @Override
+                public void onFail(Call<User> response, Throwable error) {
+                    new LogoutAsyncTask().execute();
+                }
+            });
         }
     }
 

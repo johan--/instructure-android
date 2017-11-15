@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,16 +22,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.widget.RemoteViews;
+
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InterwebsToApplication;
-import com.instructure.canvasapi.utilities.NumberHelper;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.utilities.APIHelpers;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class GradesViewWidgetService extends BaseRemoteViewsService implements Serializable {
 
@@ -63,7 +65,7 @@ public class GradesViewWidgetService extends BaseRemoteViewsService implements S
 
         @Override
         protected Intent createIntent(Course course){
-            String domain = APIHelpers.getFullDomain(mContext);
+            String domain = ApiPrefs.getFullDomain();
 
             //Construct URL to route to grades page
             String courseUrl = Const.COURSE_URL + course.getId();
@@ -74,9 +76,9 @@ public class GradesViewWidgetService extends BaseRemoteViewsService implements S
         }
 
         @Override
-        public Course[] makeApiCalls(){
+        public List<Course> makeApiCalls(){
             //Get Course List
-           return CourseAPI.getFavCoursesSynchronous(mContext);
+           return CourseManager.getFavoriteCoursesSynchronous(true);
         }
 
         @Override

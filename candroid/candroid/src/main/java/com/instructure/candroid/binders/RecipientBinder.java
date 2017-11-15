@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,21 +20,18 @@ package com.instructure.candroid.binders;
 import android.content.Context;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.RecipientViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Page;
-import com.instructure.canvasapi.model.Recipient;
+import com.instructure.canvasapi2.models.Recipient;
 
 public class RecipientBinder {
     public static void bind(Context context, final RecipientViewHolder holder, final Recipient recipient, final RecipientAdapterToFragmentCallback<Recipient> adapterToFragmentCallback, boolean isSelected) {
         holder.title.setText(recipient.getName());
 
         if(recipient.getRecipientType() == Recipient.Type.group) {
-            holder.userCount.setText(Integer.toString(recipient.getUser_count()));
+            holder.userCount.setText(Integer.toString(recipient.getUserCount()));
         } else {
             holder.userCount.setText("");
         }

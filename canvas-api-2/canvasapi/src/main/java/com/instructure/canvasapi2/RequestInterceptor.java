@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2;
 
 import android.support.annotation.Nullable;
 
+import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 
@@ -51,23 +51,33 @@ public class RequestInterceptor implements Interceptor {
         final String userAgent = ApiPrefs.getUserAgent();
         final String domain = ApiPrefs.getFullDomain();
 
+        /* Nearly all requests are instantiated using RestBuilder and will have been tagged with
+        a RestParams instance. Here we will attempt to retrieve it, but if unsuccessful we will
+        fall back to a new RestParams instance with default values. */
+        RestParams params;
+        if (request.tag() != null && request.tag() instanceof RestParams) {
+            params = (RestParams) request.tag();
+        } else {
+            params = new RestParams.Builder().build();
+        }
+
         //Set the UserAgent
         if(!userAgent.equals("")) {
             builder.addHeader("User-Agent", userAgent);
         }
 
         //Authenticate if possible
-        if(!ApiPrefs.getRestParams().shouldIgnoreToken() && !token.equals("")){
+        if(!params.shouldIgnoreToken() && !token.equals("")){
             builder.addHeader("Authorization", "Bearer " + token);
         }
 
         //Add Accept-Language header for a11y
         builder.addHeader("accept-language", getAcceptedLanguageString());
 
-        if(!APIHelper.hasNetworkConnection() || ApiPrefs.getRestParams().isForceReadFromCache()) {
+        if(!APIHelper.hasNetworkConnection() || params.isForceReadFromCache()) {
             //Offline or only want cached data
             builder.cacheControl(CacheControl.FORCE_CACHE);
-        } else if(ApiPrefs.getRestParams().isForceReadFromNetwork()) {
+        } else if(params.isForceReadFromNetwork()) {
             //Typical from a pull-to-refresh
             builder.cacheControl(CacheControl.FORCE_NETWORK);
         }
@@ -76,7 +86,8 @@ public class RequestInterceptor implements Interceptor {
         // the address of the webpage that linked to the resource being requested
         //Source: https://en.wikipedia.org/wiki/HTTP_referer
         //Institutions need the referrer for a variety of reasons - mostly for restricted content
-        builder.addHeader("Referer", domain);
+        // Strip out non-ascii characters, otherwise addHeader may throw an exception
+        builder.addHeader("Referer", domain.replaceAll("[^\\x20-\\x7e]", ""));
 
         request = builder.build();
 
@@ -86,7 +97,7 @@ public class RequestInterceptor implements Interceptor {
             request = request.newBuilder().url(url).build();
         }
 
-        if(ApiPrefs.getRestParams().usePerPageQueryParam()) {
+        if(params.usePerPageQueryParam()) {
             HttpUrl url = request.url().newBuilder().addQueryParameter("per_page", Integer.toString(ApiPrefs.getPerPageCount())).build();
             request = request.newBuilder().url(url).build();
         }
@@ -94,11 +105,29 @@ public class RequestInterceptor implements Interceptor {
         return chain.proceed(request);
     }
 
-    public String getAcceptedLanguageString() {
-        String language = Locale.getDefault().getLanguage();
-        //This is kinda gross, but Android is terrible and doesn't use the standard for lang strings...
-        String language3 = Locale.getDefault().toString().replace("_", "-");
+    public static String getLocale() {
+        // This is kinda gross, but Android is terrible and doesn't use the standard for lang strings...
+        return Locale.getDefault().toString().replace("_", "-");
+    }
 
-        return language3 + "," + language;
+    public static String getAcceptedLanguageString() {
+        String language = Locale.getDefault().getLanguage();
+        return getLocale() + "," + language;
+    }
+
+    public static String getSessionLocaleString() {
+        String lang = getLocale();
+
+        // Canvas supports Chinese (Traditional) and Chinese (Simplified)
+        if (lang.equalsIgnoreCase("zh-hk") || lang.equalsIgnoreCase("zh-tw") || lang.equalsIgnoreCase("zh-hant-hk") || lang.equalsIgnoreCase("zh-hant-tw")) {
+            lang = "zh-Hant";
+        } else if (lang.equalsIgnoreCase("zh") || lang.equalsIgnoreCase("zh-cn") || lang.equalsIgnoreCase("zh-hans-cn")) {
+            lang = "zh-Hans";
+        } else if (!lang.equalsIgnoreCase("pt-BR") && !lang.equalsIgnoreCase("en-AU") && !lang.equalsIgnoreCase("en-GB")) {
+            // Canvas only supports 3 region tags (not including Chinese), remove any other tags
+            lang = Locale.getDefault().getLanguage();
+        }
+
+        return "?session_locale=" + lang;
     }
 }

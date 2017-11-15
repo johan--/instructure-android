@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
     <color name="silver">#C0C0C0</color>
     <color name="gray">#808080</color>
     <color name="darkGray">#696969</color>
+    <color name="darkerGray">#333</color>
     <color name="olive">#808000</color>
     <color name="purple">#800080</color>
     <color name="maroon">#800000</color>
@@ -223,4 +224,8 @@
     <color name="widget_light_color">#FAFAFA</color>
 
     <color name="utils_editTextColor">#C7CDD1</color>
+    <color name="utils_defaultThumbColor">#EBEDEE</color>
+    <color name="utils_defaultTrackColor">#C7CDD1</color>
+
+    <color name="toolbarColor">#a3000000</color>
 </resources>

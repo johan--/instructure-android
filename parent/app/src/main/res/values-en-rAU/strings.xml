@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Tell us about your favourite parts of the app.</string>
     <string name="sendFeedback">Send Feedback</string>
     <string name="sendMail">Send Email&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domain:</string>
     <string name="help_versionNum">Version:</string>
     <string name="help_userId">User ID:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Only Canvas observers can authenticate in Canvas Parent.</string>
     <string name="open_source">Open Source</string>
     <string name="open_source_details">View open source licences</string>
+
+    <string name="unitedStates">United States of America</string>
+    <string name="theUnitedStates">the United States of America</string>
+    <string name="canada">Canada</string>
+    <string name="ireland">Ireland</string>
+    <string name="australia">Australia</string>
+    <string name="germany">Germany</string>
+    <string name="singapore">Singapore</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Choose student\'s region</string>
+    <string name="selectRegion">Region Picker</string>
+    <string name="unauthorizedRegion">Unauthorised Region</string>
+    <string name="mismatchedRegionMessage">This institution is located outside of your selected region. To add a student at this institution, please use the “Region Picker” option on the login page to create an account in the region of %1$s.</string>
 </resources>

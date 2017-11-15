@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.instructure.candroid.fragment;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -32,8 +31,8 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.model.User;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.models.User;
 
 public class PeopleListFragment extends ParentFragment {
 
@@ -91,5 +90,11 @@ public class PeopleListFragment extends ParentFragment {
     @Override
     public boolean allowBookmarking() {
         return true;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mRecyclerAdapter != null) mRecyclerAdapter.cancel();
     }
 }

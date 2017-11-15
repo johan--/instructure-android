@@ -19,16 +19,22 @@ apply plugin: 'com.android.library'
 apply from: '../private-data/merge-private-data.gradle'
 
 repositories {
-    // Needed for material-dialogs
+    jcenter()
     maven { url "https://jitpack.io" }
+    maven { url 'https://maven.google.com' }
+    flatDir {
+        dirs "../espresso/aars"
+    }
 }
 
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
     }
 }
 
@@ -41,9 +47,6 @@ String isTesting() {
 }
 
 android {
-
-    publishNonDefault true
-
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
@@ -55,11 +58,12 @@ android {
 
         vectorDrawables.useSupportLibrary = true
 
+        /* Add private data */
+        mergePrivateData "login-api"
+
         /* BuildConfig Fields */
         buildConfigField "boolean", "IS_TESTING", isTesting()
 
-        /* Add private data */
-        mergePrivateData "login-api"
         def privateProps = new Properties()
         privateProps.load(new FileInputStream("$projectDir/private.properties"))
         buildConfigField "String", "ZENDESK_DOMAIN", "\"${privateProps.zendeskDomain}\""
@@ -106,18 +110,26 @@ configurations {
 
 dependencies {
     /* Modules */
-    compile project(':canvas-api-2')
-    compile project(':pandautils')
+    compile project(path: ':canvas-api-2', configuration: 'default')
+    compile project(path: ':pandautils', configuration: 'default')
 
     /* Test Dependencies */
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:3.1.4'
+    testCompile 'org.robolectric:robolectric:3.3.2'
 
     /* AndroidTest Dependencies */
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile project(':espresso')
 
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    compile('com.squareup.retrofit2:retrofit:2.2.0') {
+        exclude module: 'okhttp'
+    }
 
+    compile rootProject.ext.supportDependencies.supportAnnotation
+    compile rootProject.ext.supportDependencies.appCompat
+    compile rootProject.ext.supportDependencies.supportLibV13
 }
 
 task copySnickerDoodles(type: Copy) {

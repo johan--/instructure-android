@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,23 +19,24 @@ package com.instructure.candroid.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.instructure.candroid.R;
 
 public class GradeViewHolder extends RecyclerView.ViewHolder {
 
     public TextView title, date, points;
-    public ImageView icon, edit;
+    public ImageView icon, edit, pendingReviewIcon;
 
     public GradeViewHolder(View itemView) {
         super(itemView);
-        title = (TextView)itemView.findViewById(R.id.title);
-        date = (TextView)itemView.findViewById(R.id.date);
-        points = (TextView)itemView.findViewById(R.id.points);
-        icon = (ImageView)itemView.findViewById(R.id.icon);
-        edit = (ImageView)itemView.findViewById(R.id.edit);
+        title = itemView.findViewById(R.id.title);
+        date = itemView.findViewById(R.id.date);
+        points = itemView.findViewById(R.id.points);
+        icon = itemView.findViewById(R.id.icon);
+        edit = itemView.findViewById(R.id.edit);
+        pendingReviewIcon = itemView.findViewById(R.id.pendingReviewIcon);
     }
 
     public static int holderResId(){

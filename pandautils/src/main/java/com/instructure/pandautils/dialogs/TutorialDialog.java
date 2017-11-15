@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class TutorialDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final FragmentActivity activity = (FragmentActivity)getActivity();
+        final FragmentActivity activity = getActivity();
 
         MaterialDialog.Builder builder =
                 new MaterialDialog.Builder(activity)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.instructure.candroid.R;
-import com.instructure.candroid.api.CanvasAPI;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.dialog.FileUploadDialog;
 import com.instructure.candroid.model.FormatHtmlObject;
@@ -58,46 +57,43 @@ import com.instructure.candroid.util.DiscussionEntryHTMLHelper;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.LockInfoHTMLHelper;
 import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.NoNetworkErrorDelegate;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.view.AdvancedViewFlipper;
 import com.instructure.candroid.view.CanvasEditTextView;
 import com.instructure.candroid.view.CanvasLoading;
-import com.instructure.canvasapi.api.DiscussionAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.compatibility_synchronous.DiscussionSynchronousAPI;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.DiscussionEntry;
-import com.instructure.canvasapi.model.DiscussionParticipant;
-import com.instructure.canvasapi.model.DiscussionTopic;
-import com.instructure.canvasapi.model.DiscussionTopicHeader;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.loginapi.login.util.Utils;
-import com.instructure.pandautils.activities.KalturaMediaUploadPicker;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.DiscussionManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.DiscussionEntry;
+import com.instructure.canvasapi2.models.DiscussionParticipant;
+import com.instructure.canvasapi2.models.DiscussionTopic;
+import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.FileUtils;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.pandautils.activities.NotoriousMediaUploadPicker;
 import com.instructure.pandautils.models.FileSubmitObject;
 import com.instructure.pandautils.services.FileUploadService;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.LoaderUtils;
 import com.instructure.pandautils.utils.RequestCodes;
+import com.instructure.pandautils.utils.Utils;
 import com.instructure.pandautils.views.CanvasWebView;
 import com.video.ActivityContentVideoViewClient;
 import com.video.ContentVideoViewClient;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class DetailedDiscussionFragment extends ParentFragment implements
         LoaderManager.LoaderCallbacks<FormatHtmlObject>,
@@ -111,7 +107,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
      First off, Congrats on receiving this assignment, <sarcasm> you are one lucky soul. </sarcasm>.  This is written in hopes to save you a few hours.
 
-     When a user clicks a row in the DiscussionList, {@link #getFullDiscussionHeader()} is called or {@link #parseHeader(DiscussionTopicHeader)} if the header is already loaded.
+     When a user clicks a row in the DiscussionList, {@link #getFullDiscussionHeader()} is called or if the header is already loaded.
 
      For a full discussion {@link #parseDiscussionTopic}
          To determine if a discussions is unread, the API returns an array of discussion IDs. Discussion objects are recursively initiated, and isUnread on the discussion object is set during that process.
@@ -156,7 +152,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     private DiscussionEntry currentEntry;
     private Handler mHandler;
     private final Object LOCK = new Object();
-    private Group[] groups;
+    private List<Group> groups;
 
     private User user;
 
@@ -166,11 +162,11 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     private BroadcastReceiver allUploadsCompleteBroadcastReceiver;
     private boolean needsUnregister;
 
-    private CanvasCallback<DiscussionEntry> sendMessageCanvasCallback;
-    private CanvasCallback<DiscussionTopicHeader> discussionTopicHeaderCanvasCallback;
-    private CanvasCallback<DiscussionTopic> discussionTopicCanvasCallback;
-    private CanvasCallback<Group[]> userGroupsCallback;
-    private CanvasCallback<DiscussionTopicHeader> pinDiscussionCanvasCallback;
+    private StatusCallback<DiscussionEntry> sendMessageCanvasCallback;
+    private StatusCallback<DiscussionTopicHeader> discussionTopicHeaderCanvasCallback;
+    private StatusCallback<DiscussionTopic> discussionTopicCanvasCallback;
+    private StatusCallback<List<Group>> userGroupsCallback;
+    private StatusCallback<DiscussionTopicHeader> pinDiscussionCanvasCallback;
     private CanvasContext mActiveCanvasContext;
 
     private View sendMessageWebView;
@@ -290,19 +286,17 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     }
 
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {
-        super.onCallbackFinished(source);
+    public void onCallbackFinished(ApiType type) {
+        super.onCallbackFinished(type);
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(false);
         }
     }
 
-    @Override
     public void onNoNetwork() {
         if (canvasLoading != null) {
             canvasLoading.displayNoConnection(true);
         }
-        super.onNoNetwork();
     }
 
     @Override
@@ -311,7 +305,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
         setUpCallbacks();
 
-        user = APIHelpers.getCacheUser(getContext());
+        user = ApiPrefs.getUser();
 
         LoaderUtils.restoreLoaderFromBundle(getActivity().getSupportLoaderManager(), savedInstanceState, this, R.id.formatLoaderID);
 
@@ -328,15 +322,8 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     public void createOptionsMenu(Menu menu, MenuInflater inflater) {
         super.createOptionsMenu(menu, inflater);
 
-        if(header != null && getCanvasContext() instanceof Course) {
-            boolean isTeacher = ((Course) getCanvasContext()).isTeacher();
-            if(isTeacher) {
-                inflater.inflate((header.isPinned() ? R.menu.menu_pin_discussion : R.menu.menu_unpin_discussion), menu);
-            }
-        }
-
-        if(header != null && header.getCreator() != null && header.getPermission() != null && user != null) {
-            if(header.getPermission().canUpdate() && header.getCreator().getId() == user.getId()) {
+        if(header != null && header.getAuthor() != null && header.getPermissions() != null && user != null) {
+            if(header.getPermissions().isUpdate() && header.getAuthor().getId() == user.getId()) {
                 //allow discussion post editing
                 inflater.inflate(R.menu.menu_discussion_post_editing, menu);
             }
@@ -349,25 +336,25 @@ public class DetailedDiscussionFragment extends ParentFragment implements
         if(header != null) {
             switch (item.getItemId()) {
                 case R.id.menu_pin:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return true;
                     }
                     if(header.isPinned()) {
-                        DiscussionAPI.pinDiscussion(getCanvasContext(), header.getId(), false, pinDiscussionCanvasCallback);
+                        DiscussionManager.unpinDiscussionTopicHeader(getCanvasContext(), header.getId(), pinDiscussionCanvasCallback);
                     }
                     return true;
                 case R.id.menu_unpin:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return true;
                     }
                     if(!header.isPinned()) {
-                        DiscussionAPI.pinDiscussion(getCanvasContext(), header.getId(), true, pinDiscussionCanvasCallback);
+                        DiscussionManager.pinDiscussionTopicHeader(getCanvasContext(), header.getId(), pinDiscussionCanvasCallback);
                     }
                     return true;
                 case R.id.discussionPostEdit:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         return true;
                     }
@@ -400,7 +387,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
     private void configureMessageView() {
         mCanvasEditTextView = (CanvasEditTextView) mRootView.findViewById(R.id.canvasEditTextView);
-        if(header != null && header.getPermission() != null && !header.getPermission().canAttach()) {
+        if(header != null && header.getPermissions() != null && !header.getPermissions().isAttach()) {
             mCanvasEditTextView.hideLeftImage();
         } else {
             mCanvasEditTextView.setEditTextLeftListener(this);
@@ -440,10 +427,10 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                                 showUploadFileDialog();
                                 break;
                             case 1:
-                                //Use Kaltura
+                                //Use Notorious
                                 String message = mCanvasEditTextView.getText().toString();
-                                Intent intent = KalturaMediaUploadPicker.createIntentForDiscussionReply(getContext(), currentEntry, message, topicID, getCanvasContext());
-                                startActivityForResult(intent, RequestCodes.KALTURA_REQUEST);
+                                Intent intent = NotoriousMediaUploadPicker.createIntentForDiscussionReply(getContext(), currentEntry, message, topicID, getCanvasContext());
+                                startActivityForResult(intent, RequestCodes.NOTORIOUS_REQUEST);
                                 break;
                             default:
                                 break;
@@ -466,11 +453,11 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     private void showUploadFileDialog(){
         //we don't want to remember what was previously there
         mAttachmentsList.clear();
-        Bundle bundle = FileUploadDialog.createDiscussionsBundle(APIHelpers.getCacheUser(getContext()).getShortName(), mAttachmentsList);
-        mUploadFileSourceFragment = FileUploadDialog.newInstance(getChildFragmentManager(),bundle);
+        Bundle bundle = FileUploadDialog.createDiscussionsBundle(ApiPrefs.getUser().getShortName(), mAttachmentsList);
+        mUploadFileSourceFragment = FileUploadDialog.newInstance(getFragmentManager(),bundle);
         mUploadFileSourceFragment.setTargetFragment(this, 1337);
 
-        mUploadFileSourceFragment.show(getChildFragmentManager(), FileUploadDialog.TAG);
+        mUploadFileSourceFragment.show(getFragmentManager(), FileUploadDialog.TAG);
     }
 
     @Override
@@ -514,9 +501,15 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             @Override
             public void onReceive(final Context context, final Intent intent) {
                 if(!isAdded()){return;}
+
+                /* Skip if getUserVisibleHint() is false. This will avoid duplicating the
+                message into other conversations when multiple DetailedDiscussionFragments
+                exist in a started state simultaneously (e.g. in a ViewPager or Modules) */
+                if (!getUserVisibleHint()) return;
+
                 showToast(R.string.filesUploadedSuccessfully);
                 if(intent != null && intent.hasExtra(Const.ATTACHMENTS)) {
-                    ArrayList<Attachment> attachments = (ArrayList<Attachment>) intent.getExtras().get(Const.ATTACHMENTS);
+                    ArrayList<Attachment> attachments = intent.getExtras().getParcelableArrayList(Const.ATTACHMENTS);
                     if (attachments != null && attachments.size() > 0) {
                         String message = "";
                         for (int i = 0; i < attachments.size(); i++) {
@@ -552,7 +545,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     }
 
     public void sendMessage(String reply) {
-        if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+        if(!APIHelper.hasNetworkConnection()) {
             Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -576,9 +569,9 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             mCanvasEditTextView.setRightProgressBarLoading(true);
 
             if (currentEntry.getParent() == null) {
-                DiscussionAPI.postDiscussionEntry(getActiveCanvasContext(), topicID, reply, sendMessageCanvasCallback);
+                DiscussionManager.postToDiscussionTopic(getActiveCanvasContext(), topicID, reply, sendMessageCanvasCallback);
             } else {
-                DiscussionAPI.postDiscussionReply(getActiveCanvasContext(), topicID, currentEntry.getId(), reply, sendMessageCanvasCallback);
+                DiscussionManager.replyToDiscussionEntry(getActiveCanvasContext(), topicID, currentEntry.getId(), reply, sendMessageCanvasCallback);
             }
         }
     }
@@ -722,7 +715,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (!url.equals(fileAssestURL)) {
                 //it's external. Load it in a different webview.
-                if (!RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true)) {
+                if (!RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true)) {
                     InternalWebviewFragment.loadInternalWebView(getActivity(), (Navigation) getActivity(), InternalWebviewFragment.createBundle(getCanvasContext(), url, false));
                 }
                 return true;
@@ -812,7 +805,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
                         //Check if it's a webview.
                         View v = avf.getCurrentView();
-                        if (v instanceof WebView && CanvasRestAdapter.isNetworkAvaliable(v.getContext())) {
+                        if (v instanceof WebView && APIHelper.hasNetworkConnection()) {
                             new MarkAsReadAsyncTask(((WebView) v)).execute(asyncTaskMarked);
                         }
                     }
@@ -848,7 +841,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                                     currentEntry.setUnread(false);
 
                                     View v = avf.getCurrentView();
-                                    if (v instanceof WebView && CanvasRestAdapter.isNetworkAvaliable(v.getContext())) {
+                                    if (v instanceof WebView && APIHelper.hasNetworkConnection()) {
                                         new MarkAsReadAsyncTask(((WebView) v)).execute(currentEntry.getId());
                                     }
                                 }
@@ -908,11 +901,10 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                         }
 
 
-
-                        DiscussionAPI.rateDiscussionEntry(getActiveCanvasContext(), header.getId(), entryId, rating, new CanvasCallback<Response>(DetailedDiscussionFragment.this) {
+                        DiscussionManager.rateDiscussionEntry(getActiveCanvasContext(), header.getId(), entryId, rating, new StatusCallback<Void>() {
                             @Override
-                            public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
-                                if(response.getStatus() == 204) {
+                            public void onResponse(retrofit2.Response<Void> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                                if(code == 204) {
                                     //success, update the like info
                                     if(entry != null) {
                                         if (rating == 0) {
@@ -933,7 +925,6 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                                 }
                             }
                         });
-
                     } catch (Exception E) {
                     }
 
@@ -1029,7 +1020,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
         if (header.getLockInfo() != null) {
             DiscussionWebView dwv = new DiscussionWebView(getActivity());
-            String html = CanvasAPI.getAssetsFile(getActivity(), "html_wrapper.html");
+            String html = FileUtils.getAssetsFile(getActivity(), "html_wrapper.html");
 
             //It's a module lock
             html = html.replace("{$CONTENT$}", LockInfoHTMLHelper.getLockedInfoHTML(header.getLockInfo(), getActivity(), R.string.lockedDiscussionDesc, R.string.lockedAssignmentDescLine2));
@@ -1054,14 +1045,11 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             // Students should be directed to their groups discussion (a student can only be in one group and only StudentEnrollments are allowed to be members of a group).
             if (header.getGroupCategoryId() != null && course != null &&
                     (course.isStudent() && !course.isTeacher() && !course.isTA())) { // Edge case where a teacher is a student in the same course, only want students
-                if (isWithinAnotherCallback) {
-                    GroupAPI.getGroupsForUserChained(userGroupsCallback, isCached);
-                } else {
-                    GroupAPI.getGroupsForUser(userGroupsCallback);
-                }
+
+                GroupManager.getAllGroups(userGroupsCallback, true);
             } else {
                 mActiveCanvasContext = getCanvasContext();
-                getFullDiscussion(mActiveCanvasContext, isWithinAnotherCallback, isCached);
+                getFullDiscussion(mActiveCanvasContext);
             }
         }
     }
@@ -1081,46 +1069,39 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     ///////////////////////////////////////////////////////////////////////////
 
     void getFullDiscussionHeader() {
-        DiscussionAPI.getDetailedDiscussion(getCanvasContext(), topicID, discussionTopicHeaderCanvasCallback);
+        DiscussionManager.getDetailedDiscussion(getCanvasContext(), topicID, discussionTopicHeaderCanvasCallback);
     }
 
     /**
     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
     */
-    void getFullDiscussion(CanvasContext canvasContext, boolean isWithinAnotherCallback, boolean isCached) {
-        if (isWithinAnotherCallback) {
-            DiscussionAPI.getFullDiscussionTopicChained(canvasContext, topicID, discussionTopicCanvasCallback, isCached);
-        } else {
-            DiscussionAPI.getFullDiscussionTopic(canvasContext, topicID, discussionTopicCanvasCallback);
-        }
+    void getFullDiscussion(CanvasContext canvasContext) {
+        DiscussionManager.getFullDiscussionTopic(canvasContext, topicID, true, discussionTopicCanvasCallback);
     }
 
     private void getStudentGroupDiscussionChained(final Group group, boolean isCached) {
-        DiscussionAPI.getStudentGroupDiscussionTopicHeaderChained(group, group.getGroupCategoryId(), new CanvasCallback<DiscussionTopicHeader[]>(DetailedDiscussionFragment.this) {
+        DiscussionManager.getStudentGroupDiscussionTopicHeaderExhaustive(group, group.getGroupCategoryId(), true, new StatusCallback<List<DiscussionTopicHeader>>() {
             @Override
-            public void firstPage(DiscussionTopicHeader[] discussionTopicHeaders, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
+            public void onResponse(retrofit2.Response<List<DiscussionTopicHeader>> response, LinkHeaders linkHeaders, ApiType type) {
                 // The topics are returned in an array. To handle cases where a group is part of
                 // multiple discussions, use the topic that matches our rootTopicId. If there
                 // are no matching topics, just use the first one.
-                if (discussionTopicHeaders.length > 0) {
-                    DiscussionTopicHeader matchingTopic = discussionTopicHeaders[0];
-                    for (DiscussionTopicHeader topic : discussionTopicHeaders) {
+                if (response.body().size() > 0) {
+                    DiscussionTopicHeader matchingTopic = response.body().get(0);
+                    for (DiscussionTopicHeader topic : response.body()) {
                         if (topic.getRootTopicId() == rootTopicId) {
                             matchingTopic = topic;
                             break;
                         }
                     }
                     topicID = matchingTopic.getId();
-                    getFullDiscussion(group, true, APIHelpers.isCachedResponse(response));
+                    getFullDiscussion(group);
                 } else {
                     // There weren't any results, just show the top level discussion
-                    getFullDiscussion(getCanvasContext(), true, APIHelpers.isCachedResponse(response));
+                    getFullDiscussion(getCanvasContext());
                 }
             }
-        }, isCached);
+        });
     }
 
     public void changeActionBarColor() {
@@ -1133,37 +1114,27 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
     public void setUpCallbacks() {
 
-        discussionTopicHeaderCanvasCallback = new CanvasCallback<DiscussionTopicHeader>(this) {
+        discussionTopicHeaderCanvasCallback = new StatusCallback<DiscussionTopicHeader>() {
             @Override
-            public void firstPage(DiscussionTopicHeader discussionTopicHeader, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
-
-                parseHeader(discussionTopicHeader, true, APIHelpers.isCachedResponse(response));
+            public void onResponse(retrofit2.Response<DiscussionTopicHeader> response, LinkHeaders linkHeaders, ApiType type) {
+                parseHeader(response.body(), true, APIHelper.isCachedResponse(response));
             }
         };
 
-
         //We need to use a NoNetworkErrorDelegate because when a Discussion is hidden, we get a 403 forbidden error.
         //We don't want the normal behavior to display a crouton.
-        discussionTopicCanvasCallback = new CanvasCallback<DiscussionTopic>(this, new NoNetworkErrorDelegate()) {
+        discussionTopicCanvasCallback = new StatusCallback<DiscussionTopic>() {
             @Override
-            public void firstPage(DiscussionTopic discussionTopic, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
-
-                parseDiscussionTopic(discussionTopic);
+            public void onResponse(retrofit2.Response<DiscussionTopic> response, LinkHeaders linkHeaders, ApiType type) {
+                parseDiscussionTopic(response.body());
 
                 loadResultsIntoWebview();
             }
 
             @Override
-            public boolean onFailure(RetrofitError error) {
-
+            public void onFail(Call<DiscussionTopic> response, Throwable error, int code) {
                 //If it's not a network error, it failed because it's forbidden.
-                if (error != null && error.getResponse() != null && error.getResponse().getStatus() == 403) {
+                if (code == 403) {
                     //It's currently forbidden.
                     topic = new DiscussionTopic();
                     topic.setForbidden(true);
@@ -1171,25 +1142,18 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                     //It's locked. Load the header anyways.
                     loadResultsIntoWebview();
                 }
-
-                // Make sure failure runs so we log to the appropriate place.
-                return false;
             }
 
-            public void loadResultsIntoWebview() {
+            void loadResultsIntoWebview() {
                 loaderBundle = createLoaderBundle(currentEntry, topic, header);
                 discussionWebView = new DiscussionWebView(getActivity());
                 LoaderUtils.restartLoaderWithBundle(getLoaderManager(), loaderBundle, DetailedDiscussionFragment.this, R.id.formatLoaderID);
             }
         };
 
-        sendMessageCanvasCallback = new CanvasCallback<DiscussionEntry>(this) {
+        sendMessageCanvasCallback = new StatusCallback<DiscussionEntry>() {
             @Override
-            public void firstPage(DiscussionEntry discussionEntry, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
-
+            public void onResponse(retrofit2.Response<DiscussionEntry> response, LinkHeaders linkHeaders, ApiType type) {
                 //Clear the textbox and attachments (if any)
                 mCanvasEditTextView.setText("", false);
                 if(mAttachmentsList.size() > 0){
@@ -1200,29 +1164,27 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                 mCanvasEditTextView.setRightProgressBarLoading(false);
 
 
-                addSentDiscussionEntry(discussionEntry, true, APIHelpers.isCachedResponse(response));
+                addSentDiscussionEntry(response.body(), true, APIHelper.isCachedResponse(response));
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<DiscussionEntry> response, Throwable error) {
                 //enable the send button
                 mCanvasEditTextView.enableRightButton();
                 mCanvasEditTextView.setRightProgressBarLoading(false);
-
-                return super.onFailure(retrofitError);
             }
         };
 
-        userGroupsCallback = new CanvasCallback<Group[]>(this) {
+        userGroupsCallback = new StatusCallback<List<Group>>() {
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
                 if (!apiCheck()) {
                     return;
                 }
 
-                boolean isCached = APIHelpers.isCachedResponse(response);
+                boolean isCached = APIHelper.isCachedResponse(response);
 
-                DetailedDiscussionFragment.this.groups = groups;
+                DetailedDiscussionFragment.this.groups = response.body();
                 if (header != null) {
                     for (Group group : groups) {
                         // a discussion header only has one groupCategoryId and a group can only be in one group category
@@ -1236,20 +1198,16 @@ public class DetailedDiscussionFragment extends ParentFragment implements
                     }
                 }
                 // If the group can't be found, just show the top level group discussion
-                getFullDiscussion(getCanvasContext(), true, isCached);
+                getFullDiscussion(getCanvasContext());
             }
         };
 
-        pinDiscussionCanvasCallback = new CanvasCallback<DiscussionTopicHeader>(this) {
+        pinDiscussionCanvasCallback = new StatusCallback<DiscussionTopicHeader>() {
             @Override
-            public void firstPage(DiscussionTopicHeader topicHeader, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
-
-                if(response.getStatus() == 200) {
-                    header.setPinned(topicHeader.isPinned());
-                    Toast.makeText(getContext(), topicHeader.isPinned() ? R.string.discussion_pinned : R.string.discussion_unpinned, Toast.LENGTH_SHORT).show();
+            public void onResponse(retrofit2.Response<DiscussionTopicHeader> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                if(code == 200) {
+                    header.setPinned(response.body().isPinned());
+                    Toast.makeText(getContext(), response.body().isPinned() ? R.string.discussion_pinned : R.string.discussion_unpinned, Toast.LENGTH_SHORT).show();
                     getSupportActionBar().invalidateOptionsMenu();
                 }
             }
@@ -1272,7 +1230,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             queuedSentDiscussionEntry = discussionEntry;
 
             //Sets the discussion context based on either a group or the course
-            getFullDiscussion(getActiveCanvasContext(), isWithinAnotherCallback, isCached);
+            getFullDiscussion(getActiveCanvasContext());
         } else {
             addDiscussionEntryToCurrent(discussionEntry);
 
@@ -1329,7 +1287,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     }
 
     private static boolean shouldAllowRating(CanvasContext canvasContext, DiscussionTopicHeader header) {
-        if(header.shouldAllowRating()) {
+        if(header.isAllowRating()) {
             if(header.isOnlyGradersCanRate()) {
                 if (canvasContext.getType() == CanvasContext.Type.COURSE) {
                     return ((Course) canvasContext).isTeacher() || ((Course) canvasContext).isTA();
@@ -1355,7 +1313,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             long id = user.getId();
 
             DiscussionParticipant dp = new DiscussionParticipant(id);
-            dp.setAvatarUrl(user.getAvatarURL());
+            dp.setAvatarImageUrl(user.getAvatarUrl());
             dp.setDisplayName(user.getName());
             dp.setHtmlUrl("");
             discussionEntry.setAuthor(dp);
@@ -1389,11 +1347,11 @@ public class DetailedDiscussionFragment extends ParentFragment implements
 
             for (Long id : params) {
                 if (id == 0) {
-                    if (DiscussionSynchronousAPI.markDiscussionReplyAsRead(getActiveCanvasContext(), topicID, getActivity())) {
+                    if (DiscussionManager.markReplyAsReadSynchronously(getActiveCanvasContext(), topicID)) {
                         successful.add(id);
                     }
                 } else {
-                    if (DiscussionSynchronousAPI.markDiscussionEntryAsRead(getActiveCanvasContext(), topicID, id, getActivity())) {
+                    if (DiscussionManager.markDiscussionTopicEntryReadSynchronously(getActiveCanvasContext(), topicID, id)) {
                         successful.add(id);
                     }
                 }
@@ -1490,7 +1448,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
         @Override
         public FormatHtmlObject loadInBackground() {
 
-            String html = CanvasAPI.getAssetsFile(getContext(), "discussion_html_header.html");
+            String html = FileUtils.getAssetsFile(getContext(), "discussion_html_header.html");
 
             final int color = CanvasContextColor.getCachedColor(getContext(), canvasContext);
             final String colorString = CanvasContextColor.getColorStringFromInt(color, true);
@@ -1520,7 +1478,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
             }
 
             html = CanvasWebView.applyWorkAroundForDoubleSlashesAsUrlSource(html);
-            html += CanvasAPI.getAssetsFile(getContext(), "discussion_html_footer.html");
+            html += FileUtils.getAssetsFile(getContext(), "discussion_html_footer.html");
 
             return new FormatHtmlObject(html, null);
         }

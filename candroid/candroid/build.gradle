@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,17 @@
  *
  */
 
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
+apply plugin: 'spoon'
+apply plugin: 'com.google.gms.oss.licenses.plugin'
+
 repositories {
     jcenter()
+    maven { url 'https://maven.google.com' }
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
     maven {
@@ -29,27 +38,26 @@ repositories {
     flatDir {
         dirs '../aars'
     }
+    flatDir {
+        dirs "../../espresso/aars"
+    }
 }
 
 buildscript {
     repositories {
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://jitpack.io' }
+        maven { url 'https://maven.google.com' }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         // https://bintray.com/android/android-tools/com.android.tools.build.gradle/view
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.0.4'
     }
 }
-
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-apply plugin: 'spoon'
-apply plugin: 'com.cookpad.android.licensetools'
 
 // spoon reports have no logs or screenshots due to:
 // https://github.com/square/spoon/issues/302#issuecomment-172625999
@@ -76,20 +84,18 @@ configurations {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':canvas-api')
-    compile project(':login-api')
-    compile project(':libraries:caldroid')
-    compile project(':libraries:chips')
-    compile project(':recyclerview')
-    wearApp project(':wearable')
+    compile project(path: ':login-api-2', configuration: 'default')
+    compile project(path: ':androidcalendar', configuration: 'default')
+    compile project(path: ':chips', configuration: 'default')
+    compile project(path: ':recyclerview', configuration: 'default')
 
     androidTestCompile project(path: ':espresso')
 
     // unit test dependencies src/test
     testCompile "junit:junit:$rootProject.ext.junitVersion"
-    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.robolectric:robolectric:3.1.4'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+    compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
         transitive = true;
     }
     compile('com.github.afollestad.material-dialogs:core:0.8.5.6@aar') {
@@ -98,21 +104,31 @@ dependencies {
     compile rootProject.ext.supportDependencies.recyclerView
     compile rootProject.ext.supportDependencies.cardView
     compile rootProject.ext.supportDependencies.design
-    compile rootProject.ext.supportDependencies.gpsWearable
     compile rootProject.ext.supportDependencies.gcm
     compile rootProject.ext.supportDependencies.analytics
     compile rootProject.ext.supportDependencies.appCompat
+    compile rootProject.ext.supportDependencies.supportAnnotation
 
-    compile 'com.android.support:multidex:1.0.1'
+    /* Kotlin */
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$GLOBAL_KOTLIN_VERSION"
+
+    compile "com.google.android.gms:play-services-oss-licenses:$GLOBAL_PLAY_SERVICES_VERSION"
+    compile "com.android.support:multidex:$GLOBAL_MULTI_DEX_VERSION"
     compile 'org.jsoup:jsoup:1.7.2'
-    compile 'com.makeramen:roundedimageview:2.2.0'
-    compile 'com.nineoldandroids:parent:2.2.0'
-    compile 'com.pspdfkit:pspdfkit:2.9.0'
-    compile 'io.reactivex:rxjava:1.1.9'
-    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.makeramen:roundedimageview:2.3.0'
+    compile 'com.nineoldandroids:parent:2.4.0'
+    compile "com.pspdfkit:pspdfkit:$GLOBAL_PSPDFKIT_VERSION"
     compile 'com.google.api-client:google-api-client-android:1.18.0-rc'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.google.android.exoplayer:exoplayer:r2.1.1'
+
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    compile('com.squareup.retrofit2:retrofit:2.2.0') {
+        exclude module: 'okhttp'
+    }
 }
 
 def appId = "com.instructure.candroid"
@@ -147,6 +163,7 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/rxjava.properties'
         exclude 'LICENSE.txt'
     }
 
@@ -229,7 +246,6 @@ android {
     }
 
     dexOptions {
-        preDexLibraries = false
         javaMaxHeapSize '2g'
     }
 
@@ -239,13 +255,6 @@ android {
 
     dependencies {
     }
-}
-
-/* Check licenses.yml, generate assets/licenses.html during build */
-afterEvaluate {
-  android.applicationVariants.all { variant ->
-      variant.mergeAssets.dependsOn(generateLicensePage)
-  }
 }
 
 apply plugin: 'com.google.gms.google-services'

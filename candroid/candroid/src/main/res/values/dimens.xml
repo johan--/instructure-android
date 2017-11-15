@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -22,24 +22,10 @@
     <integer name="wrap_content">-2</integer>
 
     <!-- MANUALLY MANAGED (Changes value on orientation change) -->
-    <!-- panda -->
-    <dimen name="panda_width">280dp</dimen>
-    <dimen name="panda_height">220dp</dimen>
-    <dimen name="panda_layout_width">300dp</dimen>
-    <dimen name="panda_text_size">20sp</dimen>
 
     <!-- Actionbar -->
     <dimen name="actionbar_course_spinner_primary_text">18sp</dimen>
     <dimen name="actionbar_course_spinner_secondary_text">14sp</dimen>
-
-    <!-- Grades -->
-    <dimen name="grade_grid_column_width">154dp</dimen>
-
-    <!-- Grid -->
-    <dimen name="grid_horizontal_spacing">2dp</dimen>
-
-    <!-- Sliding Pane -->
-    <dimen name="sliding_pane_margin">0dp</dimen>
 
     <dimen name="floatingCardVerticalPadding">0dp</dimen>
     <!-- END MANUALLY MANAGED -->
@@ -50,14 +36,10 @@
 
     <dimen name="profileBackdropHeight">180dp</dimen>
     <dimen name="profileIconSize">68dp</dimen>
-    <dimen name="profileIconTopMargin">8dp</dimen>
 
     <dimen name="welcome_top_margin">20dp</dimen>
     <dimen name="url_sign_in_logo_margin">30dp</dimen>
 
-    <dimen name="grid_column_width">162dp</dimen>
-    <dimen name="grid_vertical_spacing">12dp</dimen>
-    <dimen name="grid_column_height">130dp</dimen>
     <dimen name="grid_column_header_height">85dp</dimen>
     <dimen name="grid_header_text_size">20sp</dimen>
     <dimen name="grid_grade_text_size">17sp</dimen>
@@ -66,22 +48,15 @@
 
     <dimen name="widgetAddingPreviewWidth">200dp</dimen>
 
-    <dimen name="colorDialogPaddingLeft">16dp</dimen>
-    <dimen name="colorDialogPaddingRight">2dp</dimen>
-    <dimen name="colorDialogPaddingBottom">8dp</dimen>
-    <dimen name="colorDialogColorSize">40dp</dimen>
     <dimen name="colorBubbleColorSize">40dp</dimen>
     <dimen name="colorItemMargin">8dp</dimen>
     <dimen name="colorItemPadding">3dp</dimen>
-    <dimen name="colorItemSize">60dp</dimen>
     <dimen name="colorItemMarginLeftRight">6dp</dimen>
 
-    <dimen name="courseItemSpacing">8dp</dimen>
     <dimen name="course_card_height">130dp</dimen>
     <dimen name="course_card_min_width">280dp</dimen>
 
     <dimen name="course_grid_header_text_size">18sp</dimen>
-    <dimen name="course_color_picker_height">250dp</dimen>
 
     <dimen name="floatingCardPandaVerticalPadding">32dp</dimen>
     <dimen name="floatingCardPandaHorizontalPadding">32dp</dimen>
@@ -98,9 +73,6 @@
     <dimen name="welcome_screen_margin">15dp</dimen>
 	<dimen name="welcome_bottom_margin">15dp</dimen>
 
-    <dimen name="popup_height">132dp</dimen>
-    <dimen name="popup_width">207dp</dimen>
-    
     <!-- ListView Styles -->
     <dimen name="zero">0dp</dimen>
     <dimen name="indented">15dp</dimen>
@@ -129,15 +101,8 @@
     <dimen name="gridIconSizeMedium">36dp</dimen>
     <dimen name="gridIconSizeBig">48dp</dimen>
     <dimen name="gridIconSizeSmall">22dp</dimen>
-    <dimen name="listPinIconSize">20dp</dimen>
 
     <dimen name="navigation_drawer_width">310dp</dimen>
-    <dimen name="navigation_drawer_item_height">60dp</dimen>
-
-    <dimen name="grade_grid_horizontal_spacing">16dp</dimen>
-    <dimen name="grade_grid_vertical_spacing">8dp</dimen>
-
-    <dimen name="compound_drawable_padding">16dp</dimen>
 
     <dimen name="actionbar_course_title_width">160dp</dimen>
     <dimen name="actionbar_course_navigation_width">220dp</dimen>
@@ -154,9 +119,6 @@
 
     <dimen name="conversation_list_padding_bottom">56dp</dimen>
 
-    <dimen name="conversation_message_holder_margin">54dp</dimen>
-    <dimen name="conversation_message_holder_marginTop">40dp</dimen>
-    <dimen name="conversation_name_holder_marginTop">20dp</dimen>
     <dimen name="conversation_actionbar_avatar_size">32dp</dimen>
 
     <dimen name="conversation_attachment_indicator_size">23dp</dimen>
@@ -165,7 +127,6 @@
 
     <dimen name="timer_height">30dp</dimen>
 
-    <dimen name="conversation_image_height">160dp</dimen>
     <dimen name="conversation_attachment_height">140dp</dimen>
     <dimen name="conversation_card_min_width">220dp</dimen>
 
@@ -180,6 +141,5 @@
 
     <dimen name="canvas_edit_text_view_padding">8dp</dimen>
     <dimen name="med_padding">8dp</dimen>
-    <dimen name="sm_padding">4dp</dimen>
     <dimen name="standard_margin">16dp</dimen>
 </resources>

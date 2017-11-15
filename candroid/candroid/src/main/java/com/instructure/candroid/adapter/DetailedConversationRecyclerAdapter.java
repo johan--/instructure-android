@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package com.instructure.candroid.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
 import com.instructure.candroid.R;
 import com.instructure.candroid.binders.DetailedConversationBinder;
 import com.instructure.candroid.fragment.DetailedConversationFragment;
@@ -28,25 +29,25 @@ import com.instructure.candroid.holders.DetailedConversationMessageViewHolder;
 import com.instructure.candroid.interfaces.DetailedConversationAdapterToFragmentCallback;
 import com.instructure.candroid.model.MessageAttachment;
 import com.instructure.candroid.model.MessageWithDepth;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.BasicUser;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.model.Message;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.BasicUser;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Message;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import retrofit.client.Response;
 
 public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapter<MessageWithDepth, MessageAttachment, RecyclerView.ViewHolder>  {
 
-    private CanvasCallback<Conversation> mConversationCallback;
+    private StatusCallback<Conversation> mConversationCallback;
     private DetailedConversationFragment.UpdateMessageStateListener mUpdateUnreadCallback;
     private DetailedConversationAdapterToFragmentCallback mAdapterToFragmentCallback;
 
@@ -66,7 +67,7 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
         mConversationID = conversationID;
         mUpdateUnreadCallback = updateUnreadCallback;
         mAdapterToFragmentCallback = adapterToFragmentCallback;
-        mUserId = APIHelpers.getCacheUser(context.getApplicationContext()).getId();
+        mUserId = ApiPrefs.getUser().getId();
         mIsUnread = isUnread;
         setExpandedByDefault(true);
         setChildrenAboveGroup(true);
@@ -107,7 +108,7 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
         return new GroupSortedList.GroupComparatorCallback<MessageWithDepth>() {
             @Override
             public int compare(MessageWithDepth o1, MessageWithDepth o2) {
-                return o1.message.getCreationDate().compareTo(o2.message.getCreationDate());
+                return o1.message.getCreatedAt().compareTo(o2.message.getCreatedAt());
             }
 
             @Override
@@ -127,7 +128,7 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
 
             @Override
             public int getGroupType(MessageWithDepth group) {
-                return isUser(group.message.getAuthorID()) ? DetailedConversationMessageViewHolder.TYPE_RIGHT_TEXT : DetailedConversationMessageViewHolder.TYPE_LEFT_TEXT;
+                return isUser(group.message.getAuthorId()) ? DetailedConversationMessageViewHolder.TYPE_RIGHT_TEXT : DetailedConversationMessageViewHolder.TYPE_LEFT_TEXT;
             }
         };
     }
@@ -157,7 +158,7 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
 
             @Override
             public int getChildType(MessageWithDepth group, MessageAttachment item) {
-                return isUser(group.message.getAuthorID()) ? DetailedConversationAttachmentViewHolder.TYPE_RIGHT_ATTACHMENT : DetailedConversationAttachmentViewHolder.TYPE_LEFT_ATTACHMENT;
+                return isUser(group.message.getAuthorId()) ? DetailedConversationAttachmentViewHolder.TYPE_RIGHT_ATTACHMENT : DetailedConversationAttachmentViewHolder.TYPE_LEFT_ATTACHMENT;
             }
         };
     }
@@ -167,33 +168,26 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
 
     @Override
     public void setupCallbacks() {
-        mConversationCallback = new CanvasCallback<Conversation>(this) {
-            @Override
-            public void cache(Conversation conversation) {
-                unwindConversation(conversation);
-            }
+        mConversationCallback = new StatusCallback<Conversation>() {
 
             @Override
-            public void firstPage(Conversation conversation, LinkHeaders linkHeaders, Response response) {
-                unwindConversation(conversation);
+            public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
+                unwindConversation(response.body());
 
                 if (mIsUnread) {
-                    if (mUpdateUnreadCallback != null && conversation.getWorkflowState() == Conversation.WorkflowState.READ){
-                        mUpdateUnreadCallback.updateMessageState(conversation, Conversation.WorkflowState.READ);
+                    if (mUpdateUnreadCallback != null && response.body().getWorkflowState() == Conversation.WorkflowState.READ){
+                        mUpdateUnreadCallback.updateMessageState(response.body(), Conversation.WorkflowState.READ);
                     }
                 }
-                mAdapterToFragmentCallback.conversationWasFetched(conversation);
+                mAdapterToFragmentCallback.conversationWasFetched(response.body());
                 mAdapterToFragmentCallback.onRefreshFinished();
             }
-
-            @Override
-            public void nextPage(Conversation conversation, LinkHeaders linkHeaders, Response response) {}
         };
     }
 
     @Override
     public void loadFirstPage() {
-        ConversationAPI.getDetailedConversation(mConversationCallback, mConversationID, true);
+        ConversationManager.getConversation(mConversationID, true, mConversationCallback);
     }
 
     @Override
@@ -204,8 +198,8 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
 
         if (c != null) {
             clear();
-            mAllParticipants = c.getAllParticipants();
-            mConversationAudience = c.getAudienceIDs();
+            mAllParticipants = c.getParticipants();
+            mConversationAudience = c.getAudience();
 
             Collections.sort(mConversationAudience);
             createParticipantsMap();
@@ -276,8 +270,8 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
             }
             if(participantsMap.containsKey(participantIds.get(i))) {
                 BasicUser user = participantsMap.get(participantIds.get(i));
-                if(user != null && user.getUsername() != null) {
-                    participants.append(user.getUsername());
+                if(user != null && user.getName() != null) {
+                    participants.append(user.getName());
                 }
             }
         }
@@ -301,7 +295,7 @@ public class DetailedConversationRecyclerAdapter extends ExpandableRecyclerAdapt
         }
 
         mwd.isAllParticipants = areParticipantsListEqual(mConversationAudience, msg.getParticipatingUserIds());
-        mwd.participantsString = getMessageParticipantsString(getContext(), msg.getAuthorID(), msg.getParticipatingUserIds(), mParticipantsMap);
+        mwd.participantsString = getMessageParticipantsString(getContext(), msg.getAuthorId(), msg.getParticipatingUserIds(), mParticipantsMap);
 
         addOrUpdateGroup(mwd);
         int tempOrder = 0;

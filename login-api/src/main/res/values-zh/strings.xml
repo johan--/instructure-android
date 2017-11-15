@@ -10,7 +10,6 @@
   <string name="unknownDevice">不明装置</string>
   <string name="errorOccurred">发生意外错误。</string>
   <string name="pageNotFound">页面未找到。</string>
-  <string name="okay">行、好、对</string>
   <string name="confirm">确认</string>
   <string name="cancel">取消</string>
   <string name="help">帮助</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">试图登录到 Canvas Network？</string>
   <string name="remove">移除</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="userId">用户ID</string>
+  <string name="domain">域名</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">要删除此用户吗？</string>
   <string name="removedForever">您必须再次登录该用户，以访问他们的内容</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">没有看见您的学校吗？输入学校的网址或点击这里寻求帮助。</string>
   <string name="loginCanvasHelpWithUser">输入学校的网址或点击这里寻求帮助。</string>
   <string name="loginHint">寻找您的学校或学区</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">我们做得怎样？</string>
-  <string name="rateUs">您如何评价我们？</string>
-  <string name="doBetter">我们如何能做得更好？</string>
-  <string name="sendFeedback">发送反馈</string>
-  <string name="suggestions">为安卓的建议</string>
-  <string name="domain">域名</string>
-  <string name="versionNum">版本：</string>
-  <string name="userId">用户ID</string>
-  <string name="email">电子邮件</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">不要再显示</string>
-  <string name="installDate">安装日期：</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">报告一个问题</string>
   <string name="zendesk_subject">学科</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">装置</string>
   <string name="osVersion">OS 版本</string>
+  <string name="empty_feedback">须填写主题和描述后才能提交反馈。</string>
 </resources>

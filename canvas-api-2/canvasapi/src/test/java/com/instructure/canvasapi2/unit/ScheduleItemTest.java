@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -42,27 +42,7 @@ public class ScheduleItemTest {
         //can't set a schedule item's id to be a string by any exposed method, so use JSON parsing
         //to test it
         String scheduleItemJSON =
-                "{\n" +
-                    "\"all_day\": true,\n" +
-                    "\"all_day_date\": \"2012-10-17\",\n" +
-                    "\"created_at\": \"2012-10-06T01:09:52Z\",\n" +
-                    "\"end_at\": \"2012-10-17T06:00:00Z\",\n" +
-                    "\"id\": \"assignment_673956\",\n" +
-                    "\"location_address\": null,\n" +
-                    "\"location_name\": null,\n" +
-                    "\"start_at\": \"2012-10-17T06:00:00Z\",\n" +
-                    "\"title\": \"No Class\",\n" +
-                    "\"updated_at\": \"2012-10-06T01:09:52Z\",\n" +
-                    "\"workflow_state\": \"active\",\n" +
-                    "\"description\": null,\n" +
-                    "\"context_code\": \"course_833052\",\n" +
-                    "\"child_events_count\": 0,\n" +
-                    "\"parent_event_id\": null,\n" +
-                    "\"hidden\": false,\n" +
-                    "\"child_events\": [],\n" +
-                    "\"url\": \"https://mobiledev.instructure.com/api/v1/calendar_events/673956\",\n" +
-                    "\"html_url\": \"https://mobiledev.instructure.com/calendar?event_id=673956&include_contexts=course_833052#7b2273686f77223a2267726f75705f636f757273655f383333303532227d\"\n" +
-                "}";
+                "{\n\"all_day\": true,\n\"all_day_date\": \"2012-10-17\",\n\"created_at\": \"2012-10-06T01:09:52Z\",\n\"end_at\": \"2012-10-17T06:00:00Z\",\n\"id\": \"assignment_673956\",\n\"location_address\": null,\n\"location_name\": null,\n\"start_at\": \"2012-10-17T06:00:00Z\",\n\"title\": \"No Class\",\n\"updated_at\": \"2012-10-06T01:09:52Z\",\n\"workflow_state\": \"active\",\n\"description\": null,\n\"context_code\": \"course_833052\",\n\"child_events_count\": 0,\n\"parent_event_id\": null,\n\"hidden\": false,\n\"child_events\": [],\n\"url\": \"https://mobiledev.instructure.com/api/v1/calendar_events/673956\",\n\"html_url\": \"https://mobiledev.instructure.com/calendar?event_id=673956&include_contexts=course_833052#7b2273686f77223a2267726f75705f636f757273655f383333303532227d\"\n}";
 
         GsonBuilder builder = new GsonBuilder();
 
@@ -77,27 +57,7 @@ public class ScheduleItemTest {
         //can't set a schedule item's id to be a string by any exposed method, so use JSON parsing
         //to test it
         String scheduleItemJSON =
-                "{\n" +
-                    "\"all_day\": true,\n" +
-                    "\"all_day_date\": \"2012-10-17\",\n" +
-                    "\"created_at\": \"2012-10-06T01:09:52Z\",\n" +
-                    "\"end_at\": \"2012-10-17T06:00:00Z\",\n" +
-                    "\"id\": \"assignment_673956\",\n" +
-                    "\"location_address\": null,\n" +
-                    "\"location_name\": null,\n" +
-                    "\"start_at\": \"2012-10-17T06:00:00Z\",\n" +
-                    "\"title\": \"No Class\",\n" +
-                    "\"updated_at\": \"2012-10-06T01:09:52Z\",\n" +
-                    "\"workflow_state\": \"active\",\n" +
-                    "\"description\": null,\n" +
-                    "\"context_code\": \"course_833052\",\n" +
-                    "\"child_events_count\": 0,\n" +
-                    "\"parent_event_id\": null,\n" +
-                    "\"hidden\": false,\n" +
-                    "\"child_events\": [],\n" +
-                    "\"url\": \"https://mobiledev.instructure.com/api/v1/calendar_events/673956\",\n" +
-                    "\"html_url\": \"https://mobiledev.instructure.com/calendar?event_id=673956&include_contexts=course_833052#7b2273686f77223a2267726f75705f636f757273655f383333303532227d\"\n" +
-                "}";
+                "{\n\"all_day\": true,\n\"all_day_date\": \"2012-10-17\",\n\"created_at\": \"2012-10-06T01:09:52Z\",\n\"end_at\": \"2012-10-17T06:00:00Z\",\n\"id\": \"assignment_673956\",\n\"location_address\": null,\n\"location_name\": null,\n\"start_at\": \"2012-10-17T06:00:00Z\",\n\"title\": \"No Class\",\n\"updated_at\": \"2012-10-06T01:09:52Z\",\n\"workflow_state\": \"active\",\n\"description\": null,\n\"context_code\": \"course_833052\",\n\"child_events_count\": 0,\n\"parent_event_id\": null,\n\"hidden\": false,\n\"child_events\": [],\n\"url\": \"https://mobiledev.instructure.com/api/v1/calendar_events/673956\",\n\"html_url\": \"https://mobiledev.instructure.com/calendar?event_id=673956&include_contexts=course_833052#7b2273686f77223a2267726f75705f636f757273655f383333303532227d\"\n}";
 
         GsonBuilder builder = new GsonBuilder();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import android.widget.CompoundButton;
 import com.instructure.candroid.holders.NotificationPreferencesViewHolder;
 import com.instructure.candroid.interfaces.NotifyChecked;
 import com.instructure.candroid.model.NotificationSubCategory;
-import com.instructure.canvasapi.api.NotificationPreferencesAPI;
+import com.instructure.canvasapi2.managers.NotificationPreferencesManager;
 
 public class NotificationPreferenceBinder {
 
@@ -31,7 +31,7 @@ public class NotificationPreferenceBinder {
             return;
         }
         holder.text1.setText(item.title);
-        holder.checkbox.setChecked(!item.frequency.equalsIgnoreCase(NotificationPreferencesAPI.NEVER));
+        holder.checkbox.setChecked(!item.frequency.equalsIgnoreCase(NotificationPreferencesManager.NEVER));
         holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

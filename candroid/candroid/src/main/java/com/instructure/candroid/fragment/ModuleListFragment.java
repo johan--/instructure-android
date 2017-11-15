@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.ModuleProgressionUtility;
 import com.instructure.candroid.util.ModuleUtility;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.ModuleItem;
-import com.instructure.canvasapi.model.ModuleObject;
-import com.instructure.canvasapi.model.Tab;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.ModuleItem;
+import com.instructure.canvasapi2.models.ModuleObject;
+import com.instructure.canvasapi2.models.Tab;
 
 import java.util.ArrayList;
 

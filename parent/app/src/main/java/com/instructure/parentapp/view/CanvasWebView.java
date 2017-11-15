@@ -31,6 +31,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.FileUtils;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.parentapp.util.StringUtilities;
 import com.instructure.parentapp.video.ContentVideoViewClient;
@@ -231,12 +232,17 @@ public class CanvasWebView extends WebView {
 
             // Handle the embedded webview case (Its not within the InternalWebViewFragment)
             if (mCanvasEmbeddedWebViewCallback != null && mCanvasEmbeddedWebViewCallback.shouldLaunchInternalWebViewFragment(url)) {
-                String contentTypeGuess = URLConnection.guessContentTypeFromName(url);
+                String contentTypeGuess;
+                try {
+                    contentTypeGuess = URLConnection.guessContentTypeFromName(url);
+                } catch (StringIndexOutOfBoundsException e) {
+                    contentTypeGuess = null;
+                }
                 // null when type can't be determined, launchInternalWebView anyway
                 // When contentType has 'application', it typically means it's a pdf or some type of document that needs to be downloaded,
                 //   so allow the embedded webview to open the url, which will trigger the DownloadListener. If for some reason the content can
                 //   be loaded in the webview, the content will just load in the embedded webview (which isn't ideal, but in majority of cases it won't happen).
-                if (contentTypeGuess == null || (contentTypeGuess != null && !contentTypeGuess.contains("application"))) {
+                if (contentTypeGuess == null || (!contentTypeGuess.contains("application"))) {
                     mCanvasEmbeddedWebViewCallback.launchInternalWebViewFragment(url);
                     return true;
                 }
@@ -304,7 +310,7 @@ public class CanvasWebView extends WebView {
      * @return
      */
     public String formatHTML(String content, String title) {
-        String html = APIHelper.getAssetsFile(getContext(), "html_wrapper.html");
+        String html = FileUtils.getAssetsFile(getContext(), "html_wrapper.html");
 
         content = CanvasWebView.applyWorkAroundForDoubleSlashesAsUrlSource(content);
 

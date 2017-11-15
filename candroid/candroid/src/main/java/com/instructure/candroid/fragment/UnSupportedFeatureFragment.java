@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Tab;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Tab;
 import com.instructure.pandautils.utils.Const;
 
 public class UnSupportedFeatureFragment extends OrientationChangeFragment {

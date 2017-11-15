@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,12 +19,14 @@ package com.instructure.candroid.model;
 
 import android.content.Context;
 import android.os.Parcel;
+
 import com.instructure.candroid.interfaces.OpenableMedia;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.CanvasComparable;
-import com.instructure.canvasapi.model.MediaComment;
-import com.instructure.canvasapi.model.Message;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.CanvasComparable;
+import com.instructure.canvasapi2.models.MediaComment;
+import com.instructure.canvasapi2.models.Message;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+
 import java.util.Date;
 
 public class MessageAttachment extends CanvasComparable<MessageWithDepth> implements OpenableMedia {
@@ -78,7 +80,7 @@ public class MessageAttachment extends CanvasComparable<MessageWithDepth> implem
         if(isAttachment){
             return attachment.getThumbnailUrl();
         } else {
-            return APIHelpers.getFullDomain(context) + "/media_objects/" + mediaComment.getMediaId() + "/thumbnail?height=180&width=180";
+            return ApiPrefs.getFullDomain() + "/media_objects/" + mediaComment.getMediaId() + "/thumbnail?height=180&width=180";
         }
     }
 
@@ -86,9 +88,9 @@ public class MessageAttachment extends CanvasComparable<MessageWithDepth> implem
     @Override
     public String getMimeType() {
         if(isAttachment){
-            return attachment.getMimeType();
+            return attachment.getContentType();
         }else{
-            return mediaComment.getMimeType();
+            return mediaComment.getContentType();
         }
     }
 
@@ -106,7 +108,7 @@ public class MessageAttachment extends CanvasComparable<MessageWithDepth> implem
         if(isAttachment){
             return attachment.getUrl();
         }else{
-            return APIHelpers.getFullDomain(context) + "/media_objects/" + mediaComment.getMediaId() + "/thumbnail?height=480&width=480";
+            return ApiPrefs.getFullDomain() + "/media_objects/" + mediaComment.getMediaId() + "/thumbnail?height=480&width=480";
         }
     }
 
@@ -115,7 +117,7 @@ public class MessageAttachment extends CanvasComparable<MessageWithDepth> implem
         if(isAttachment){
             return attachment.getFilename();
         }else{
-            return mediaComment.getFileName();
+            return mediaComment.get_fileName();
         }
     }
 
@@ -129,7 +131,7 @@ public class MessageAttachment extends CanvasComparable<MessageWithDepth> implem
         if(isAttachment()){
             return attachment.getComparisonString();
         }else{
-            return mediaComment.getComparisonString();
+            return mediaComment.getDisplayName();
         }
     }
 

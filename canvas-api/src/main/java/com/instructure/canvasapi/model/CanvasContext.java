@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> implement
     public static final String HOME_ASSIGNMENTS = "assignments";
     public static final String HOME_SYLLABUS = "syllabus";
 
-    public static enum Type {
+    public enum Type {
         GROUP, COURSE, USER, SECTION, UNKNOWN;
 
         public static boolean isGroup(CanvasContext canvasContext) {
@@ -114,9 +114,8 @@ public abstract class CanvasContext extends CanvasModel<CanvasContext> implement
 
         CanvasContext that = (CanvasContext) o;
 
-        if (getType() != that.getType() || getId() != that.getId()) return false;
+        return !(getType() != that.getType() || getId() != that.getId());
 
-        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////

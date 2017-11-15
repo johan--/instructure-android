@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -128,8 +128,6 @@
   <string name="toDoNoDueDate">無截至日期</string>
   <string name="dueAt">截止於</string>
   <string name="toDoDue">到期日</string>
-  <string name="toDoNeedsGrading">需要評分</string>
-  <string name="toDoNeedGrading">需要評分</string>
   <string name="myFiles">文檔</string>
   <string name="settings">設置</string>
   <string name="name">名字</string>
@@ -142,11 +140,7 @@
   <string name="domain">域名</string>
   <string name="sendFeedback">發送反饋</string>
   <string name="sendMail">發送電郵……</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">編輯</string>
-  <string name="singleItem">項目</string>
-  <string name="multipleItems">項目</string>
   <string name="archive">存檔</string>
   <string name="moveToInbox">移到收件箱</string>
   <string name="markAsUnread">標記為未讀</string>
@@ -450,8 +444,8 @@
   <string name="could_not_find_course">獲取關於本項目的課程時發生錯誤。</string>
   <string name="could_not_find_group">獲取關於本項目的群組時出現錯誤。</string>
   <string name="selectBackground">選擇一種背景</string>
-  <string name="kalturaSubmissionInProgress">提交文檔……檢查通知欄的更新信息。</string>
-  <string name="kalturaSubmissionSuccessful">完成文檔提交</string>
+  <string name="notoriousSubmissionInProgress">提交文檔……檢查通知欄的更新信息。</string>
+  <string name="notoriousSubmissionSuccessful">完成文檔提交</string>
   <string name="poll_title">您前來Canvas想做什麼？</string>
   <string name="poll_warning">有一個項目未被選中。</string>
   <string name="poll_item_1">檢查我的評分</string>
@@ -538,7 +532,6 @@
   <string name="enterAnswer">輸入答案</string>
   <string name="resumeQuiz">繼續測試</string>
   <string name="allowed_attempts">允許的嘗試次數</string>
-  <string name="question_count">問題</string>
   <string name="viewQuestions">檢視問題</string>
   <string name="unlimited">無限制</string>
   <string name="viewResults">檢視答案</string>
@@ -553,7 +546,6 @@
   <string name="flagged">已標記</string>
   <string name="areYouSure">您確定要提交該測驗嗎？</string>
   <string name="submitQuiz">是否提交測驗？</string>
-  <string name="unansweredQuizQuestions" formatted="false">您有 %d 未回答%s 的問題。\n 您確定需要提交該測驗?</string>
   <string name="takeQuizAgain">再次測試</string>
   <string name="autoSubmitting">自動提交測驗……</string>
   <string name="submitReasonTimedQuiz">測驗已提交，因為時間限制已到。</string>

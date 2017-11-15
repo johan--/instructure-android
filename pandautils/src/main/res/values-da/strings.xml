@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Vælg medie</string>
   <string name="takeVideo">Tag video</string>
   <string name="noCameraOnDevice">Intet kamera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Uploading til Canvas</string>
   <string name="preparingUpload">Forbereder upload</string>
   <string name="loadingFilesIndeterminate">Loading filer...</string>
-  <string name="fileUploadSuccess">Upload succesfuld</string>
+  <string name="fileUploadSuccess">Upload vellykket.</string>
   <string name="noNetwork">Netværk ikke tilgængelig - prøve venligst igen senere</string>
   <string name="uploadMessage">\"Igangværende upload. Tjek notifikationer for uploadstatus.</string>
   <string name="mediaUpload">Medie upload</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Der var en fejl med at få fotoet. Prøv venligst igen.</string>
   <string name="errorTextMissing">Tilføj tekst for at sende en besked</string>
   <string name="fileUploadNotSupported">Du kan ikke uploade filer tili den valgte opgave.</string>
+  <string name="noCourseSelected">Vælg et fag</string>
   <string name="selectCourse">Vælg et kursus</string>
   <string name="selectAssignment">Vælg en opgave</string>
   <string name="loadingAssignments">Indlæser opgaver...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Ulæst</string>
   <string name="discussion_reply">Svar</string>
   <string name="close">Luk</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Teacher</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Canvas Polls</string>
+  <string name="utils_speedgrader">SpeedGrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Hvordan klarer vi os?</string>
+  <string name="utils_rateUs">Hvordan vil du vurdere os?</string>
+  <string name="utils_doBetter">Hvad kan vi gøre bedre?</string>
+  <string name="utils_sendFeedback">Send feedback</string>
+  <string name="utils_suggestions">Forslag for Android</string>
+  <string name="utils_domain">Domæne</string>
+  <string name="utils_versionNum">Version:</string>
+  <string name="utils_userId">Bruger-id</string>
+  <string name="utils_email">E-mail</string>
+  <string name="utils_dontShowAgain">Vis ikke igen</string>
+  <string name="utils_installDate">Installationsdato:</string>
+  <string name="utils_device">Enhed</string>
+  <string name="utils_osVersion">OS-version</string>
+  <string name="loading">Indlæser</string>
 </resources>

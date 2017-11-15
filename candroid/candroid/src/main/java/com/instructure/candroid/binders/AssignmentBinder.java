@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,21 +18,17 @@
 package com.instructure.candroid.binders;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.instructure.candroid.R;
 import com.instructure.candroid.holders.AssignmentViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Submission;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class AssignmentBinder extends BaseBinder {
@@ -56,7 +52,7 @@ public class AssignmentBinder extends BaseBinder {
         long courseId = assignment.getCourseId();
         int color = CanvasContextColor.getCachedColor(context, CanvasContext.makeContextId(CanvasContext.Type.COURSE, courseId));
 
-        Submission submission = assignment.getLastSubmission();
+        Submission submission = assignment.getSubmission();
 
         if(assignment.isMuted()){
             //mute that score
@@ -70,8 +66,8 @@ public class AssignmentBinder extends BaseBinder {
         final int drawable = getAssignmentIcon(assignment);
         holder.icon.setImageDrawable(CanvasContextColor.getColoredDrawable(context, drawable, color));
 
-        if (assignment.getDueDate() != null) {
-            holder.date.setText(DateHelpers.createPrefixedDateTimeString(context, R.string.toDoDue, assignment.getDueDate()));
+        if (assignment.getDueAt() != null) {
+            holder.date.setText(DateHelper.createPrefixedDateTimeString(context, R.string.toDoDue, assignment.getDueAt()));
         } else {
             holder.date.setText(context.getResources().getString(R.string.toDoNoDueDate));
         }

@@ -26,6 +26,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 
 import com.instructure.loginapi.login.R;
+import com.instructure.pandautils.utils.ThemePrefs;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class NoInternetConnectionDialog extends AppCompatDialogFragment {
@@ -47,7 +48,7 @@ public class NoInternetConnectionDialog extends AppCompatDialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#008EE2"));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ThemePrefs.getButtonColor());
             }
         });
 

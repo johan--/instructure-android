@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">Panda Utils</string>
   <string name="chooseMedia">Kōwhiri pāpāho</string>
   <string name="takeVideo">Tangohia ataata</string>
   <string name="noCameraOnDevice">No Kāmera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Tukuatu ki Kanaweti</string>
   <string name="preparingUpload">Teuteu tukunga</string>
   <string name="loadingFilesIndeterminate">Uta Kōnae ...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">He ko he hapa whiwhi i te whakaahua. Koa ngana anō.</string>
   <string name="errorTextMissing">Tāpiri ētahi kuputuhi ki te tuku he karere</string>
   <string name="fileUploadNotSupported">e kore e taea e koe te tukuake kōnae ki te taumahi tīpakohia.</string>
+  <string name="noCourseSelected">Tēnā tīpako he akoranga</string>
   <string name="selectCourse">Tīpakohia te akoranga</string>
   <string name="selectAssignment">Tīpakohia te taumahi</string>
   <string name="loadingAssignments">uta Ngā Whakatakanga ...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Kaore i pānuihia</string>
   <string name="discussion_reply">Whakautu</string>
   <string name="close">Katia</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Kaiako</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Ngā Canvas Pōti</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">e pēhea ana tātou?</string>
+  <string name="utils_rateUs">Ka pēhea tō auau i a mātou÷</string>
+  <string name="utils_doBetter">Me pēhea e whakapiki ake ai te mahi ei mātou</string>
+  <string name="utils_sendFeedback">Tukua Urupare</string>
+  <string name="utils_suggestions">He whakāro pūaki mo Android</string>
+  <string name="utils_domain">Rohe</string>
+  <string name="utils_versionNum">Putanga:</string>
+  <string name="utils_userId">Kaiwhakamahi ID</string>
+  <string name="utils_email">Īmēra</string>
+  <string name="utils_dontShowAgain">Kaua e whakaatu anō</string>
+  <string name="utils_installDate">Rā Tāuta:</string>
+  <string name="utils_device">pūrere</string>
+  <string name="utils_osVersion">OS Putanga</string>
+  <string name="loading">Uta ana</string>
 </resources>

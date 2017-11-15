@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,27 +25,26 @@ import com.instructure.candroid.holders.CourseGradeViewHolder;
 import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.MGPUtils;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.TabAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.TabManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class CourseGradeRecyclerAdapter extends BaseListRecyclerAdapter<CanvasContext, CourseGradeViewHolder> {
 
     private CourseAdapterToFragmentCallback mAdapterToFragmentCallback;
-    private CanvasCallback<Course[]> mFavoriteCoursesCallback;
+    private StatusCallback<List<Course>> mFavoriteCoursesCallback;
     private Map<CanvasContext, Boolean> mGradesTabVisibilityStatus = new HashMap<>();
 
     public CourseGradeRecyclerAdapter(Activity context, CourseAdapterToFragmentCallback adapterToFragmentCallback) {
@@ -83,17 +82,18 @@ public class CourseGradeRecyclerAdapter extends BaseListRecyclerAdapter<CanvasCo
 
     @Override
     public void setupCallbacks() {
-        mFavoriteCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mFavoriteCoursesCallback = new StatusCallback<List<Course>>() {
 
             @Override
-            public void cache(Course[] courses, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                List<Course> courses = response.body();
                 if (size() == 0) {
                     for (final Course course : courses) {
-                        TabAPI.getTabs(course, new CanvasCallback<Tab[]>(CourseGradeRecyclerAdapter.this) {
+                        TabManager.getTabs(course, new StatusCallback<List<Tab>>() {
                             @Override
-                            public void cache(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
+                            public void onResponse(retrofit2.Response<List<Tab>> response, LinkHeaders linkHeaders, ApiType type) {
                                 boolean gradesTabExists = false;
-                                for (Tab tab : tabs) {
+                                for (Tab tab : response.body()) {
                                     //we need to check if the tab exists and hidden is false
                                     if(Tab.GRADES_ID.equals(tab.getTabId()) && !tab.isHidden()) {
                                         gradesTabExists = true;
@@ -103,37 +103,30 @@ public class CourseGradeRecyclerAdapter extends BaseListRecyclerAdapter<CanvasCo
                                 mGradesTabVisibilityStatus.put(course, gradesTabExists);
                                 add(course);
                             }
-
-                            @Override
-                            public void firstPage(Tab[] tabs, LinkHeaders linkHeaders, Response response) {
-                                cache(tabs, linkHeaders, response);
-                            }
-                        });
+                        }, false);
                     }
                 }
-            }
 
-            @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                Analytics.trackEnrollment((Activity)getContext(), courses);
-                Analytics.trackDomain((Activity)getContext());
-                setNextUrl(linkHeaders.nextURL);
-                cache(courses, linkHeaders, response);
+                if(type == ApiType.API) {
+                    Analytics.trackEnrollment((Activity)getContext(), courses);
+                    Analytics.trackDomain((Activity)getContext());
+                    setNextUrl(linkHeaders.nextUrl);
+                }
                 mAdapterToFragmentCallback.onRefreshFinished();
+
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
-                if (retrofitError.getResponse() != null && !APIHelpers.isCachedResponse(retrofitError.getResponse()) || !CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            public void onFail(Call<List<Course>> callResponse, Throwable error, retrofit2.Response response) {
+                if (response != null && !APIHelper.isCachedResponse(response) || !APIHelper.hasNetworkConnection()) {
                     getAdapterToRecyclerViewCallback().setIsEmpty(true);
                 }
-                return super.onFailure(retrofitError);
             }
         };
     }
 
     @Override
     public void loadData() {
-        CourseAPI.getAllFavoriteCourses(mFavoriteCoursesCallback);
+        CourseManager.getAllFavoriteCourses(true, mFavoriteCoursesCallback);
     }
 }

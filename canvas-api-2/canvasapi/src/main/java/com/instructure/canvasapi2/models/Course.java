@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ package com.instructure.canvasapi2.models;
 import android.os.Parcel;
 
 import com.google.gson.annotations.SerializedName;
+import com.instructure.canvasapi2.utils.APIHelper;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Date;
 import java.util.List;
 
 
@@ -93,8 +94,16 @@ public class Course extends CanvasContext implements Comparable<CanvasContext>{
         return startAt;
     }
 
+    public Date getStartDate() {
+        return APIHelper.stringToDate(startAt);
+    }
+
     public String getEndAt() {
         return endAt;
+    }
+
+    public Date getEndDate() {
+        return APIHelper.stringToDate(endAt);
     }
 
     public String getSyllabusBody() {
@@ -309,11 +318,23 @@ public class Course extends CanvasContext implements Comparable<CanvasContext>{
         return false;
     }
 
+    public boolean isDesigner() {
+        if (enrollments == null){
+            return false;
+        }
+        for(Enrollment enrollment : enrollments) {
+            if(enrollment.isDesigner()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public double getCurrentScore() {
         if (currentScore == null) {
             for (Enrollment enrollment : enrollments) {
                 if (enrollment.isStudent() || enrollment.isObserver()) {
-                    if(enrollment.isMultipleGradingPeriodsEnabled()) {
+                    if(enrollment.isMultipleGradingPeriodsEnabled() && enrollment.getCurrentPeriodComputedCurrentScore() != null) {
                         currentScore = enrollment.getCurrentPeriodComputedCurrentScore();
                     } else {
                         currentScore = enrollment.getCurrentScore();
@@ -331,7 +352,7 @@ public class Course extends CanvasContext implements Comparable<CanvasContext>{
             checkedCurrentGrade = true;
             for (Enrollment enrollment : enrollments) {
                 if (enrollment.isStudent() || enrollment.isObserver()) {
-                    if (enrollment.isMultipleGradingPeriodsEnabled()) {
+                    if (enrollment.isMultipleGradingPeriodsEnabled() && enrollment.getCurrentPeriodComputedCurrentGrade() != null) {
                         currentGrade = enrollment.getCurrentPeriodComputedCurrentGrade();
                     } else {
                         currentGrade = enrollment.getCurrentGrade();

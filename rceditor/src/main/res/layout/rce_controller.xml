@@ -15,14 +15,17 @@
   ~     limitations under the License.
   ~
   -->
+
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="?android:actionBarSize"
+    android:layout_height="@dimen/rce_item_height"
     android:background="@android:color/white"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:scrollbars="none">
+    android:scrollbars="none"
+    android:importantForAccessibility="yes"
+    android:contentDescription="@string/rce_scrollInstructions">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -109,11 +112,11 @@
             android:contentDescription="@string/rce_contentDescription_insert_bullets"
             app:srcCompat="@drawable/vd_rce_format_list_bulleted"/>
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/action_insert_numbers"-->
-            <!--style="@style/RCE_Item"-->
-            <!--android:contentDescription="@string/rce_contentDescription_insert_numbers"-->
-            <!--app:srcCompat="@drawable/vd_rce_format_list_numbered"/>-->
+        <ImageButton
+            android:id="@+id/action_insert_numbers"
+            style="@style/RCE_Item"
+            android:contentDescription="@string/rce_contentDescription_insert_numbers"
+            app:srcCompat="@drawable/vd_rce_format_list_numbered"/>
 
         <!--<ImageButton-->
             <!--android:id="@+id/action_blockquote"-->

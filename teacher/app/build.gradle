@@ -1,0 +1,318 @@
+/*
+ * Copyright (C) 2017 - present  Instructure, Inc.
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.oss.licenses.plugin'
+apply plugin: 'kotlin-kapt'
+
+def coverageEnabled = project.hasProperty('coverage')
+
+if (coverageEnabled) {
+    apply plugin: 'jacoco-android'
+    apply from: 'jacoco.gradle'
+}
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    maven { url "https://maven.google.com" }
+    maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
+    maven {
+        credentials {
+            username pspdfMavenUser
+            password pspdfMavenPass
+        }
+        url 'https://customers.pspdfkit.com/maven/'
+    }
+    flatDir {
+        dirs "../../espresso/aars"
+    }
+}
+
+buildscript {
+
+    repositories {
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://maven.google.com" }
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
+        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.0.4'
+        if (project.hasProperty('coverage')) {
+            // https://github.com/arturdm/jacoco-android-gradle-plugin
+            // note: if there are issues with the unit tests, try rm -rf .gradle
+            classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
+        }
+    }
+}
+
+android {
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        testInstrumentationRunner 'com.instructure.teacher.ui.utils.TeacherInstructureRunner'
+        testInstrumentationRunnerArguments disableAnalytics: 'true'
+
+        /* BuildConfig fields */
+        buildConfigField "boolean", "IS_TESTING", "false"
+        buildConfigField "boolean", "IS_ROBO_TESTING", "false"
+        buildConfigField "String", "ROBO_USER_TOKEN", "\"\""
+        buildConfigField "String", "ROBO_USER_DOMAIN", "\"\""
+        buildConfigField "String", "ROBO_USER_JSON", "\"\""
+
+        /* Release Versions */
+        buildConfigField "boolean", "POINT_ONE", "true"
+        buildConfigField "boolean", "POINT_TWO", "true"
+        buildConfigField "boolean", "POINT_THREE", "true"
+        buildConfigField "boolean", "POINT_FOUR", "true"
+        buildConfigField "boolean", "POINT_FIVE", "true"
+        buildConfigField "boolean", "POINT_SIX", "true"
+        buildConfigField "boolean", "POINT_SEVEN", "true"
+        buildConfigField "boolean", "POINT_EIGHT", "true"
+        buildConfigField "boolean", "POINT_NINE", "true"
+
+        /* Add private data */
+        addManifestPlaceholders([
+                fabricApiKey:"$fabricApiKey"
+        ])
+
+        buildConfigField "String", "PSPDFKIT_LICENSE_KEY", "\"$pspdfkitLicenseKey\""
+    }
+
+    flavorDimensions "icecream"
+    productFlavors {
+
+        dev {
+            dimension "icecream"
+        }
+
+        prod {
+            dimension "icecream"
+        }
+
+        qa {
+            dimension "icecream"
+            buildConfigField "boolean", "IS_TESTING", "true"
+        }
+
+        robo {
+            dimension "icecream"
+            buildConfigField "boolean", "IS_ROBO_TESTING", "true"
+            buildConfigField "String", "ROBO_USER_TOKEN", "\"$roboTestUserToken\""
+            buildConfigField "String", "ROBO_USER_DOMAIN", "\"$roboTestDomain\""
+            buildConfigField "String", "ROBO_USER_JSON", "\"$roboUser\""
+        }
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled = coverageEnabled
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            minifyEnabled false
+            shrinkResources false
+            // Disable fabric build ID generation for debug builds
+            ext.enableCrashlytics = false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            buildConfigField "boolean", "POINT_ONE", "true"
+            buildConfigField "boolean", "POINT_TWO", "true"
+            buildConfigField "boolean", "POINT_THREE", "true"
+            buildConfigField "boolean", "POINT_FOUR", "true"
+            buildConfigField "boolean", "POINT_FIVE", "true"
+            buildConfigField "boolean", "POINT_SIX", "false"
+            buildConfigField "boolean", "POINT_SEVEN", "false"
+            buildConfigField "boolean", "POINT_EIGHT", "false"
+            buildConfigField "boolean", "POINT_NINE", "false"
+
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+        // Required for Espresso.
+        exclude 'META-INF/maven/com.google.guava/guava/pom.properties'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.xml'
+    }
+}
+
+
+dependencies {
+    /* Modules */
+    compile project(path: ':login-api-2', configuration: 'default')
+    compile project(path: ':blueprint', configuration: 'default')
+    compile project(path: ':recyclerview', configuration: 'default')
+    compile project(path: ':libraries:chips', configuration: 'default')
+    compile project(path: ':canvas-api-2', configuration: 'default')
+    compile project(path: ':rceditor', configuration: 'default')
+    compile project(path: ':pandautils', configuration: 'default')
+    compile project(path: ':camerakit', configuration: 'default')
+    androidTestCompile project(':dataseedingapi')
+
+    /* Support libs */
+    compile rootProject.ext.supportDependencies.appCompat
+    compile rootProject.ext.supportDependencies.supportLibV13
+    compile rootProject.ext.supportDependencies.cardView
+    compile rootProject.ext.supportDependencies.design
+    compile rootProject.ext.supportDependencies.percentLayout
+    compile rootProject.ext.supportDependencies.vector
+    compile rootProject.ext.supportDependencies.supportAnnotation
+    compile rootProject.ext.supportDependencies.percent
+    compile rootProject.ext.supportDependencies.palette
+
+    /* Kotlin */
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$GLOBAL_KOTLIN_VERSION"
+
+    /* Material Design */
+    compile 'com.github.rey5137:material:1.2.2'
+
+    /* Butter Knife */
+    compile 'com.jakewharton:butterknife:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    /* EventBus */
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+
+    /* Networking */
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile('com.squareup.retrofit2:retrofit:2.2.0') {
+        exclude module: 'okhttp'
+    }
+
+    /* Crashlytics */
+    compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
+        transitive = true
+    }
+
+    /* OkHttp Idling Resource */
+    compile('com.jakewharton.espresso:okhttp3-idling-resource:1.0.0') {
+        exclude module: 'espresso-idling-resource'
+    }
+
+    /* Test Dependencies */
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.3.2'
+    testCompile 'org.robolectric:shadows-multidex:3.3.2'
+    testCompile 'org.mockito:mockito-core:2.7.22'
+
+    /* AndroidTest Dependencies */
+    androidTestCompile project(path: ':espresso')
+    androidTestCompile 'junit:junit:4.12'
+    compile('com.crashlytics.sdk.android:answers:1.3.12@aar') {
+        transitive = true
+    }
+
+    /* Sliding Panel */
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
+
+    /* Media handling */
+    compile 'com.google.android.exoplayer:exoplayer:r2.4.4'
+    compile 'com.github.chrisbanes:PhotoView:2.0.0'
+
+    /* PSPDFKit Dependencies */
+    compile "com.pspdfkit:pspdfkit:4.0.2"
+    compile 'com.jakewharton:disklrucache:2.0.2'
+
+    /* Flexbox Layout */
+    compile 'com.google.android:flexbox:0.2.6'
+    compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
+
+    compile "com.google.android.gms:play-services-oss-licenses:$GLOBAL_PLAY_SERVICES_VERSION"
+
+    /* PaperParce l */
+    compile 'nz.bradcampbell:paperparcel:2.0.2'
+    compile 'nz.bradcampbell:paperparcel-kotlin:2.0.2'
+    kapt 'nz.bradcampbell:paperparcel-compiler:2.0.2'
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+if (coverageEnabled) {
+    // ./gradlew -Pcoverage firebaseJacoco
+    task firebaseJacoco(type: JacocoReport) {
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports for Firebase test lab."
+
+        def productFlavor = 'qa'
+        def buildType = 'debug'
+
+        classDirectories = fileTree(
+                dir: "${project.buildDir}/intermediates/classes/${productFlavor}/${buildType}",
+                excludes: ['**/R.class',
+                           '**/R$*.class',
+                           '**/*$ViewInjector*.*',
+                           '**/*$ViewBinder*.*',
+                           '**/BuildConfig.*',
+                           '**/Manifest*.*']
+        )
+
+        // project.buildDir is /android-uno/parent/app/build
+        sourceDirectories = files(['src/main/java'] + android.sourceSets[productFlavor].java.srcDirs)
+        executionData = files("${project.buildDir}/firebase.ec")
+
+        reports {
+            // default path: /android-uno/parent/app/build/reports/jacoco/firebaseJacoco/html/
+            html.enabled true
+            csv.enabled  false
+            xml.enabled  false
+        }
+    }
+}

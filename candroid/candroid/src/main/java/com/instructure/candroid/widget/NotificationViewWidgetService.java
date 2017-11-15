@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,19 +26,23 @@ import android.widget.RemoteViews;
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.NotificationWidgetRouter;
 import com.instructure.candroid.util.StringUtilities;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.api.StreamAPI;
-import com.instructure.canvasapi.model.*;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.DateHelpers;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.StreamManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.StreamItem;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class NotificationViewWidgetService extends BaseRemoteViewsService implements Serializable {
@@ -72,37 +76,32 @@ public class NotificationViewWidgetService extends BaseRemoteViewsService implem
         }
 
         @Override
-        protected StreamItem[] makeApiCalls() {
+        protected List<StreamItem> makeApiCalls() {
             // get courses, data and to do items
-            Course[] courses = CourseAPI.getAllCoursesSynchronous(mContext);
-            Group[] groups = GroupAPI.getAllGroupsSynchronous(mContext);
+            List<Course> courses = CourseManager.getCoursesSynchronous(true);
+            List<Group> groups = GroupManager.getGroupsSynchronous(true);
 
             if(courses == null || groups == null){
                 return null;
             }
 
-            Map<Long, Course> courseMap = CourseAPI.createCourseMap(courses);
-            Map<Long, Group> groupMap = GroupAPI.createGroupMap(groups);
-
-
+            Map<Long, Course> courseMap = CourseManager.createCourseMap(courses);
+            Map<Long, Group> groupMap = GroupManager.createGroupMap(groups);
 
             ArrayList<StreamItem> streamItemArrayList;
-            StreamItem[] streamItemsArray = StreamAPI.getUserStreamSynchronous(mContext, numberToReturn);
+            List<StreamItem> streamItemList = StreamManager.getUserStreamSynchronous(numberToReturn, true);
             //If the API returns a null array we need to return a non-null array or we will have NP crash later.
-            if(streamItemsArray == null){
-                return new StreamItem[0];
+            if(streamItemList == null){
+                return new ArrayList<>();
             }
-            streamItemArrayList = new ArrayList<StreamItem>(Arrays.asList(streamItemsArray));
+            streamItemArrayList = new ArrayList<>(streamItemList);
 
             Collections.sort(streamItemArrayList);
             Collections.reverse(streamItemArrayList);
-            StreamItem[] streamItems = new StreamItem[streamItemArrayList.size()];
 
-           streamItems = streamItemArrayList.toArray(streamItems);
+            populateActivityStreamAdapter(courseMap, groupMap, streamItemArrayList);
 
-            populateActivityStreamAdapter(courseMap, groupMap, streamItems);
-
-            return streamItems;
+            return streamItemArrayList;
         }
 
         @Override
@@ -149,7 +148,7 @@ public class NotificationViewWidgetService extends BaseRemoteViewsService implem
             if (streamItem.getContextType() == CanvasContext.Type.COURSE && streamItem.getCanvasContext() != null) {
                 courseAndDate = streamItem.getCanvasContext().getSecondaryName() + " ";
             }
-            courseAndDate += DateHelpers.getDateTimeString(mContext, streamItem.getUpdatedAtDate());
+            courseAndDate += DateHelper.getDateTimeString(mContext, streamItem.getUpdatedAtDate());
             row.setTextViewText(R.id.course_and_date, courseAndDate);
 
             row.setOnClickFillInIntent(R.id.widget_root, createIntent(streamItem));
@@ -207,7 +206,7 @@ public class NotificationViewWidgetService extends BaseRemoteViewsService implem
 
         }
 
-        public void populateActivityStreamAdapter(Map<Long, Course> courseMap, Map<Long, Group> groupMap, StreamItem[] streamItems) {
+        public void populateActivityStreamAdapter(Map<Long, Course> courseMap, Map<Long, Group> groupMap, List<StreamItem> streamItems) {
             // wait until both calls return;
             if (courseMap == null || groupMap == null || streamItems == null) {
                 return;
@@ -219,9 +218,9 @@ public class NotificationViewWidgetService extends BaseRemoteViewsService implem
                 // load conversations if needed
                 if (streamItem.getType() == StreamItem.Type.CONVERSATION) {
 
-                    Conversation conversation = ConversationAPI.getDetailedConversationSynchronous(mContext, streamItem.getConversationId());
+                    Conversation conversation = ConversationManager.getConversationSynchronous(streamItem.getConversationId(), true);
 
-                    streamItem.setConversation(mContext, conversation, APIHelpers.getCacheUser(mContext).getId(), mContext.getResources().getString(R.string.monologue));
+                    streamItem.setConversation(mContext, conversation, ApiPrefs.getUser().getId(), mContext.getResources().getString(R.string.monologue));
 
                 }
             }

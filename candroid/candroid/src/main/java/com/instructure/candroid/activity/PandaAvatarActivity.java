@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import android.widget.Toast;
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.LoggingUtility;
 import com.instructure.candroid.util.PandaDrawables;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
+import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 
@@ -119,21 +119,21 @@ public class PandaAvatarActivity extends ParentActivity {
         if(item != null) {
             switch (item.getItemId()) {
                 case R.id.menu_item_save_image:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         break;
                     }
                     saveImageAsPNG(true, Color.TRANSPARENT);
                     break;
                 case R.id.menu_item_set_avatar:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         break;
                     }
                     setAsAvatar();
                     break;
                 case R.id.menu_item_share:
-                    if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                    if(!APIHelper.hasNetworkConnection()) {
                         Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                         break;
                     }

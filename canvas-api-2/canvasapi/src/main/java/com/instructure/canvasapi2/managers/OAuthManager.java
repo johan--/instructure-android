@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.OAuthAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
+import com.instructure.canvasapi2.models.AuthenticatedSession;
 import com.instructure.canvasapi2.models.OAuthToken;
 
 
@@ -48,5 +49,14 @@ public class OAuthManager {
                 .withForceReadFromNetwork(true)
                 .build();
         OAuthAPI.getToken(adapter, params, clientID, clientSecret, oAuthRequest, callback);
+    }
+
+    public static void getAuthenticatedSession(String targetUrl, StatusCallback<AuthenticatedSession> callback) {
+        RestBuilder adapter = new RestBuilder(callback);
+        RestParams params = new RestParams.Builder()
+                .withForceReadFromCache(false)
+                .withForceReadFromNetwork(true)
+                .build();
+        OAuthAPI.getAuthenticatedSession(targetUrl, params, adapter, callback);
     }
 }

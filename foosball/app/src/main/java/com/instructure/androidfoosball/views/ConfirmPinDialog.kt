@@ -33,7 +33,7 @@ import com.instructure.androidfoosball.R
 import com.instructure.androidfoosball.ktmodels.User
 import com.instructure.androidfoosball.utils.bind
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.sdk21.listeners.onClick
 
 class ConfirmPinDialog(
         context: Context,
@@ -56,6 +56,7 @@ class ConfirmPinDialog(
     private val mPinDisplay by bind<TextView>(R.id.pin_display)
     private val mPinPad by bind<PinPad>(R.id.pin_pad)
     private val mBackspace by bind<View>(R.id.backspace)
+    private val mUserName by bind<TextView>(R.id.userName)
 
     private var onPinHashCreated: (String) -> Unit = { updateUserPinHash(it) }
 
@@ -63,6 +64,7 @@ class ConfirmPinDialog(
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_confirm_pin)
         setupListeners()
+        mUserName.text = user.name
         if (createNewPin) createPin() else confirmPin()
     }
 

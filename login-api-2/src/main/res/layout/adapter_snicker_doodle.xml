@@ -15,6 +15,7 @@
   ~     limitations under the License.
   ~
   -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,16 +25,18 @@
     android:minHeight="?android:listPreferredItemHeight"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
     android:clickable="true">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         tools:text="mobiledev.instructure.com"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textStyle="bold"
         android:textSize="20sp"/>
 
@@ -41,8 +44,10 @@
         android:id="@+id/subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         tools:text="mrice+student"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textSize="16sp"/>
 
 </LinearLayout>

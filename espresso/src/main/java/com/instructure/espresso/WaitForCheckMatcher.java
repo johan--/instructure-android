@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.hamcrest.Matcher;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
+import static android.support.test.espresso.core.internal.deps.guava.base.Preconditions.checkNotNull;
 
 public class WaitForCheckMatcher<T> extends BaseMatcher<T> {
     private static final EspressoLog log = new EspressoLog(WaitForCheckMatcher.class);

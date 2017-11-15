@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -60,24 +60,20 @@ import android.widget.Toast;
 import com.instructure.candroid.BuildConfig;
 import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.CourseNavigationAdapter;
-import com.instructure.candroid.asynctask.LogoutAsyncTask;
-import com.instructure.candroid.asynctask.SwitchUsersAsync;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.dialog.AccountNotificationDialog;
 import com.instructure.candroid.dialog.HelpDialogStyled;
 import com.instructure.candroid.fragment.AnnouncementListFragment;
 import com.instructure.candroid.fragment.ApplicationSettingsFragment;
-import com.instructure.candroid.fragment.AssignmentFragment;
-import com.instructure.candroid.fragment.AssignmentListFragment;
 import com.instructure.candroid.fragment.BookmarksFragment;
 import com.instructure.candroid.fragment.CalendarListViewFragment;
 import com.instructure.candroid.fragment.CourseGridFragment;
 import com.instructure.candroid.fragment.DetailedConversationFragment;
 import com.instructure.candroid.fragment.DetailedDiscussionFragment;
 import com.instructure.candroid.fragment.DiscussionListFragment;
-import com.instructure.candroid.fragment.EditAssignmentDetailsFragment;
 import com.instructure.candroid.fragment.GradesGridFragment;
 import com.instructure.candroid.fragment.InboxFragment;
+import com.instructure.candroid.fragment.LTIWebViewFragment;
 import com.instructure.candroid.fragment.MessageListFragment;
 import com.instructure.candroid.fragment.NotificationListFragment;
 import com.instructure.candroid.fragment.ParentFragment;
@@ -85,7 +81,9 @@ import com.instructure.candroid.fragment.ProfileFragment;
 import com.instructure.candroid.fragment.ToDoListFragment;
 import com.instructure.candroid.interfaces.OnEventUpdatedCallback;
 import com.instructure.candroid.model.PushNotification;
-import com.instructure.candroid.service.PushService;
+import com.instructure.candroid.receivers.PushExternalReceiver;
+import com.instructure.candroid.tasks.LogoutAsyncTask;
+import com.instructure.candroid.tasks.SwitchUsersAsyncTask;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.FragUtils;
@@ -93,62 +91,53 @@ import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.util.TabHelper;
 import com.instructure.candroid.view.ActionbarCourseSpinner;
 import com.instructure.candroid.view.SpinnerInteractionListener;
-import com.instructure.canvasapi.api.BookmarkAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.UnreadCountAPI;
-import com.instructure.canvasapi.model.AccountNotification;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.Bookmark;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.model.UnreadConversationCount;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.LinkHeaders;
-import com.instructure.canvasapi.utilities.Masquerading;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.BookmarkManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.UnreadCountManager;
+import com.instructure.canvasapi2.models.AccountNotification;
+import com.instructure.canvasapi2.models.Bookmark;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.LaunchDefinition;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.models.UnreadConversationCount;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
+import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.canvasapi2.utils.NumberHelper;
-import com.instructure.loginapi.login.OAuthWebLogin;
 import com.instructure.loginapi.login.api.zendesk.utilities.ZendeskDialogStyled;
-import com.instructure.loginapi.login.dialog.GenericDialogStyled;
-import com.instructure.loginapi.login.materialdialogs.CustomDialog;
-import com.instructure.loginapi.login.model.SignedInUser;
-import com.instructure.loginapi.login.util.ProfileUtils;
-import com.instructure.loginapi.login.util.Utils;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
+import com.instructure.pandautils.utils.ProfileUtils;
 import com.instructure.pandautils.utils.TutorialUtils;
-import com.instructure.pandautils.views.RippleView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class NavigationActivity extends BaseRouterActivity implements
         View.OnClickListener,
         Navigation,
         ProfileFragment.OnProfileChangedCallback,
-        EditAssignmentDetailsFragment.OnAssignmentDetailsChanged,
         DetailedDiscussionFragment.UpdateUnreadListener,
         DetailedConversationFragment.UpdateMessageStateListener,
         ZendeskDialogStyled.ZendeskDialogResultListener,
         OnEventUpdatedCallback,
         MessageListFragment.OnUnreadCountInvalidated,
-        AccountNotificationDialog.OnAnnouncementCountInvalidated,
-        GenericDialogStyled.GenericDialogListener {
+        AccountNotificationDialog.OnAnnouncementCountInvalidated {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
     protected static final String COURSE_NAVIGATION_POSITION = "course_navigation_position";
@@ -164,10 +153,7 @@ public class NavigationActivity extends BaseRouterActivity implements
     private RelativeLayout userContainer;
     private LinearLayout navMenuContainer;
     private RelativeLayout previousUsersWrapper;
-    private LinearLayout previousUsersContainer;
     private ImageView expandCollapse;
-    private GenericDialogStyled genericDialogStyled;
-    private SignedInUser userToRemove;
     private EditText mDialogEditText;
     private LinearLayout mNavigationShortcutContainer;
     private ProgressBar mNavigationShortcutProgressBar;
@@ -175,7 +161,6 @@ public class NavigationActivity extends BaseRouterActivity implements
     private boolean mUserLearnedDrawer;
     protected NavigationPosition mCurrentSelectedPosition = NavigationPosition.COURSES;
     private int mLastActionbarColor = Integer.MAX_VALUE;
-    private CustomDialog logoutWarningDialog;
     private ImageView mCourseShortcutDropdown;
     private RelativeLayout mExpandRippleView;
 
@@ -186,7 +171,7 @@ public class NavigationActivity extends BaseRouterActivity implements
 
     private ActionbarCourseSpinner mActionbarSpinner;
 
-    private AccountNotification[] accountNotifications;
+    private List<AccountNotification> accountNotifications;
 
     private ScrollView mScrollView;
 
@@ -265,7 +250,7 @@ public class NavigationActivity extends BaseRouterActivity implements
             try{
                 getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }catch(Exception e){
-                Utils.e("Exception Occurred in NavigationActivity onNewIntent while attempting to clear the backstack.");
+                Logger.e("Exception Occurred in NavigationActivity onNewIntent while attempting to clear the backstack.");
             }
         }
 
@@ -288,20 +273,8 @@ public class NavigationActivity extends BaseRouterActivity implements
                 }
 
                 String html_url = extras.getString(PushNotification.HTML_URL, "");
-                final String from = extras.getString(PushNotification.FROM, "");
-                final String alert = extras.getString(PushNotification.ALERT, "");
-                final String collapse_key = extras.getString(PushNotification.COLLAPSE_KEY, "");
-                final String user_id = extras.getString(PushNotification.USER_ID, "");
 
-                Utils.d("======================================");
-                Utils.d("APP PUSH html_url: " + html_url);
-                Utils.d("APP PUSH from: " + from);
-                Utils.d("APP PUSH alert: " + alert);
-                Utils.d("APP PUSH collapse_key: " + collapse_key);
-                Utils.d("APP PUSH user_id: " + user_id);
-                Utils.d("======================================");
-
-                if(!RouterUtils.canRouteInternally(this, html_url, APIHelpers.getDomain(getApplicationContext()), true)) {
+                if(!RouterUtils.canRouteInternally(this, html_url, ApiPrefs.getDomain(), true)) {
                     routeFragment(FragUtils.getFrag(NotificationListFragment.class, this), Navigation.NavigationPosition.NOTIFICATIONS);
                 }
             }
@@ -309,14 +282,14 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     private boolean hasUnreadPushNotification(Bundle extras) {
-        if(extras != null && extras.containsKey(PushService.NEW_PUSH_NOTIFICATION)) {
-            return extras.getBoolean(PushService.NEW_PUSH_NOTIFICATION, false);
+        if(extras != null && extras.containsKey(PushExternalReceiver.NEW_PUSH_NOTIFICATION)) {
+            return extras.getBoolean(PushExternalReceiver.NEW_PUSH_NOTIFICATION, false);
         }
         return false;
     }
 
     private void setPushNotificationAsRead() {
-        getIntent().putExtra(PushService.NEW_PUSH_NOTIFICATION, false);
+        getIntent().putExtra(PushExternalReceiver.NEW_PUSH_NOTIFICATION, false);
         PushNotification.clearPushHistory(getApplicationContext());
     }
 
@@ -337,7 +310,7 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     @Override
-    public void onCourseFavoritesFinished(Course[] courses) {
+    public void onCourseFavoritesFinished(List<Course> courses) {
         if(courses == null || mNavigationShortcutContainer == null) {
             return;
         }
@@ -346,7 +319,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         if(isExpanded) {
             mNavigationShortcutContainer.removeAllViewsInLayout();
             LayoutInflater inflater = getLayoutInflater();
-            if(courses.length == 0) {
+            if(courses.size() == 0) {
                 View viewToAdd = inflater.inflate(R.layout.course_shortcuts_emptyview, null);
                 mNavigationShortcutContainer.addView(viewToAdd);
                 mNavigationShortcutProgressBar.setVisibility(View.GONE);
@@ -368,14 +341,14 @@ public class NavigationActivity extends BaseRouterActivity implements
     @Override
     public void redrawNavigationShortcuts() {
         mNavigationShortcutProgressBar.setVisibility(View.VISIBLE);
-        CourseAPI.getAllFavoriteCourses(coursesCallback);
+        CourseManager.getAllFavoriteCourses(true, coursesCallback);
     }
 
     @Override
     public void courseNameChanged(CanvasContext canvasContext) {
         getCourseNavigationAdapter().updateCanvasContext(canvasContext);
         mNavigationShortcutProgressBar.setVisibility(View.VISIBLE);
-        CourseAPI.getAllFavoriteCourses(coursesNoCacheCallback);
+        CourseManager.getAllFavoriteCourses(true, coursesNoCacheCallback);
     }
 
     private void addNavigationShortcutToContainer(LayoutInflater inflater, final CanvasContext canvasContext) {
@@ -450,7 +423,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                 public void run() {
                     mDrawerLayout.openDrawer(mScrollView);
                 }
-            }, Utils.mAnimationDelayExtended);
+            }, 230);
 
         }
         mDrawerLayout.post(new Runnable() {
@@ -496,80 +469,6 @@ public class NavigationActivity extends BaseRouterActivity implements
     // DRAWER SETUP
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void onPositivePressed() {
-        OAuthWebLogin.removeFromPreviouslySignedInUsers(userToRemove, NavigationActivity.this);
-
-        if(genericDialogStyled != null){
-            genericDialogStyled.dismiss();
-        }
-
-        //reload the previous users
-        addPreviousUsersToContainers();
-    }
-
-    @Override public void onNegativePressed() {
-        if(genericDialogStyled != null){
-            genericDialogStyled.dismiss();
-        }
-    }
-
-    private void addPreviousUsersToContainers() {
-        ArrayList<SignedInUser> signedInUsers = OAuthWebLogin.getPreviouslySignedInUsers(NavigationActivity.this);
-        String currentGlobalID = OAuthWebLogin.getGlobalUserId(APIHelpers.getDomain(NavigationActivity.this), APIHelpers.getCacheUser(NavigationActivity.this));
-
-        previousUsersContainer.removeAllViews();
-
-        for(final SignedInUser signedInUser : signedInUsers) {
-            if(signedInUser.user != null) {
-                String globalID = OAuthWebLogin.getGlobalUserId(signedInUser.domain, signedInUser.user);
-
-                //we don't want to add the current user to the list
-                if (currentGlobalID.equals(globalID)) {
-                    continue;
-                }
-                //inflate the view
-                View view = getLayoutInflater().inflate(R.layout.signed_in_user, null);
-
-                //set the view's data with the signedInUser's info
-                ((TextView) view.findViewById(R.id.name)).setText(signedInUser.user.getShortName());
-                ((TextView) view.findViewById(R.id.domain)).setText(signedInUser.domain);
-                CircleImageView avatar = (CircleImageView) view.findViewById(R.id.avatar);
-                ImageView delete = (ImageView) view.findViewById(R.id.delete);
-                delete.setImageDrawable(NavigationActivity.this.getResources().getDrawable(R.drawable.ic_cv_login_x));
-                RippleView deleteContainer = (RippleView) view.findViewById(R.id.deleteContainer);
-
-                ProfileUtils.configureAvatarView(this, signedInUser.user, avatar);
-
-                deleteContainer.setOnRippleCompleteListener(new RippleView.OnRippleCompleteListener() {
-                    @Override
-                    public void onComplete(RippleView rippleView) {
-                        //  Make sure they actually want to delete that user.
-                        userToRemove = signedInUser;
-                        genericDialogStyled = GenericDialogStyled.newInstance(
-                                com.instructure.loginapi.login.R.string.removeUser,
-                                com.instructure.loginapi.login.R.string.removedForever,
-                                com.instructure.loginapi.login.R.string.confirm,
-                                com.instructure.loginapi.login.R.string.cancel,
-                                com.instructure.loginapi.login.R.drawable.ic_cv_information_light,
-                                NavigationActivity.this);
-                        genericDialogStyled.show(getSupportFragmentManager(), "Delete confirmation");
-                    }
-                });
-
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new SwitchUsersAsync(NavigationActivity.this, signedInUser).execute();
-                    }
-                });
-
-                //add the user view to the container (LinearLayout)
-                previousUsersContainer.addView(view);
-            }
-        }
-    }
-
     private void bindViews() {
         RelativeLayout profileLayout = (RelativeLayout)findViewById(R.id.profileLayout);
         mHeaderImage = (ImageView)findViewById(R.id.headerImage);
@@ -579,7 +478,6 @@ public class NavigationActivity extends BaseRouterActivity implements
         userContainer = (RelativeLayout)findViewById(R.id.userNameContainer);
         navMenuContainer = (LinearLayout)findViewById(R.id.navMenuContainer);
         previousUsersWrapper = (RelativeLayout)findViewById(R.id.previousUsersWrapper);
-        previousUsersContainer = (LinearLayout)findViewById(R.id.previousUsersContainer);
         expandCollapse = (ImageView)findViewById(R.id.expand_collapse);
         findViewById(R.id.logout).setOnClickListener(this);
         profileLayout.setOnClickListener(this);
@@ -592,7 +490,6 @@ public class NavigationActivity extends BaseRouterActivity implements
                     expandCollapse.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate));
                     navMenuContainer.setVisibility(View.GONE);
                     previousUsersWrapper.setVisibility(View.VISIBLE);
-                    addPreviousUsersToContainers();
                 } else {
                     expandCollapse.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate_back));
                     previousUsersWrapper.setVisibility(View.GONE);
@@ -620,18 +517,12 @@ public class NavigationActivity extends BaseRouterActivity implements
         bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
         final View grades = findViewById(R.id.grades);
         bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
-        final View speedgrader = findViewById(R.id.speedgrader);
-        bindNavItems(speedgrader, imageColor, R.drawable.ic_speedgrader, R.string.speedgrader);
+        final View gauge = findViewById(R.id.gauge);
+        bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);
         final View settings = findViewById(R.id.settings);
         bindNavItems(settings, imageColor, R.drawable.ic_settings_black_36dp, R.string.settings);
         final View help = findViewById(R.id.help);
         bindNavItems(help, imageColor, R.drawable.ic_help_black_36dp, R.string.help);
-
-        ImageView logoutIcon = (ImageView)findViewById(R.id.logoutIcon);
-        logoutIcon.setImageDrawable(ColorUtils.colorIt(imageColor, logoutIcon.getDrawable()));
-
-        ImageView addAccountIcon = (ImageView)findViewById(R.id.addAccountIcon);
-        addAccountIcon.setImageDrawable(ColorUtils.colorIt(imageColor, addAccountIcon.getDrawable()));
 
         //check to see if we should show the tutorial
         final ImageView pulseNavigationShortcut = (ImageView)findViewById(R.id.pulseNavigationShortcut);
@@ -642,8 +533,6 @@ public class NavigationActivity extends BaseRouterActivity implements
         userContainer.setClickable(true);
 
         findViewById(R.id.addAccount).setOnClickListener(this);
-        String backgroundImageUrl = ProfileFragment.getImageBackgroundUrl(getApplicationContext());
-        onProfileBackdropUpdate(backgroundImageUrl);
 
         mCourseShortcutDropdown.setImageDrawable(ColorUtils.colorIt(imageColor, mCourseShortcutDropdown.getDrawable()));
         boolean expandedState = ApplicationManager.getPrefs(getContext()).load(Const.NAVIGATION_SHORTCUTS_EXPANDED, false);
@@ -665,7 +554,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                 if (!expandedState) {
                     mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate));
                     mNavigationShortcutProgressBar.setVisibility(View.VISIBLE);
-                    CourseAPI.getAllFavoriteCourses(coursesCallback);
+                    CourseManager.getAllFavoriteCourses(true, coursesCallback);
                 } else {
                     mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate_back));
                     mNavigationShortcutContainer.removeAllViewsInLayout();
@@ -677,27 +566,18 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     @Override
-    public void onProfileBackdropUpdate(String url) {
-        ProfileFragment.loadBackdropImage(getApplicationContext(), url, mHeaderImage);
+    public void gotEnrollments(List<Enrollment> enrollments) {
+
     }
 
     @Override
-    public void gotEnrollments(Enrollment[] enrollments) {
-        final View speedgrader = findViewById(R.id.speedgrader);
-        if(speedgrader != null) {
-            boolean isTeacherSomewhere = false;
-            if(enrollments.length > 0) {
-                for(Enrollment enrollment : enrollments) {
-                    if(enrollment.isTeacher()) {
-                        isTeacherSomewhere = true;
-                        break;
-                    }
-                }
+    public void gotLaunchDefinitions(@Nullable LaunchDefinition launchDefinition) {
+        final View gauge = findViewById(R.id.gauge);
+        if(gauge != null) {
+            if(launchDefinition != null) {
+                gauge.setTag(launchDefinition);
             }
-
-            speedgrader.setVisibility
-                    (Utils.isSpeedGraderInstalled(getContext()) || isTeacherSomewhere ?
-                            View.VISIBLE : View.GONE);
+            gauge.setVisibility(launchDefinition != null ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -712,13 +592,13 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     @Override
-    public void gotNotifications(AccountNotification[] accountNotificationsArray) {
+    public void gotNotifications(List<AccountNotification> accountNotificationsArray) {
         TextView unreadCountIndicator = (TextView) findViewById(R.id.navMenuUnreadCountAnnouncements);
         View unreadCountWrapper = findViewById(R.id.unreadCountWrapperAnnouncements);
-        if(accountNotificationsArray.length > 0) {
+        if(accountNotificationsArray.size() > 0) {
             findViewById(R.id.account_notifications).setVisibility(View.VISIBLE);
             accountNotifications = accountNotificationsArray;
-            unreadCountIndicator.setText(NumberHelper.formatInt(accountNotificationsArray.length));
+            unreadCountIndicator.setText(NumberHelper.formatInt(accountNotificationsArray.size()));
             unreadCountWrapper.setVisibility(View.VISIBLE);
             ColorUtils.colorIt(getResources().getColor(R.color.navigationImageColor), unreadCountIndicator.getBackground());
         } else {
@@ -760,7 +640,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         }
 
         if(item.getItemId() == R.id.bookmark) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -794,7 +674,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                         addFragment(FragUtils.getFrag(ProfileFragment.class, NavigationActivity.this), NavigationPosition.PROFILE);
                         break;
                     case R.id.account_notifications:
-                        AccountNotificationDialog.show(NavigationActivity.this, new ArrayList<>(Arrays.asList(accountNotifications)));
+                        AccountNotificationDialog.show(NavigationActivity.this, new ArrayList<>(accountNotifications));
                         break;
                     case R.id.courses:
                         clearBackStack(CourseGridFragment.class);
@@ -816,8 +696,13 @@ public class NavigationActivity extends BaseRouterActivity implements
                         clearBackStack(CalendarListViewFragment.class);
                         addFragment(FragUtils.getFrag(CalendarListViewFragment.class, NavigationActivity.this), NavigationPosition.CALENDAR);
                         break;
-                    case R.id.speedgrader:
-                        Utils.openApplication(getApplicationContext(), com.instructure.loginapi.login.util.Const.SPEEDGRADER_PACKAGE_NAME);
+                    case R.id.gauge:
+                        LaunchDefinition launchDefinition = (LaunchDefinition) v.getTag();
+                        if(launchDefinition != null) {
+                            String ltiUrl = launchDefinition.placements.globalNavigation.url;
+                            Bundle bundle = LTIWebViewFragment.createBundle(ApiPrefs.getUser(), ltiUrl, getString(R.string.gauge), true);
+                            addFragment(FragUtils.getFrag(LTIWebViewFragment.class, bundle));
+                        }
                         break;
                     case R.id.logout:
                         logoutWarning();
@@ -831,7 +716,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                         HelpDialogStyled.show(NavigationActivity.this, hasNonTeacherEnrollment);
                         break;
                     case R.id.addAccount:
-                        new SwitchUsersAsync(NavigationActivity.this).execute();
+                        new SwitchUsersAsyncTask().execute();
                         break;
                     case R.id.bookmarks:
                         addFragment(FragUtils.getFrag(BookmarksFragment.class, NavigationActivity.this), NavigationPosition.BOOKMARKS);
@@ -841,7 +726,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                         break;
                 }
             }
-        }, Utils.mAnimationDelay);
+        }, 230);
 
         closeNavigationDrawer();
     }
@@ -908,11 +793,6 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     @Override
-    public void onProfileBackgroundImageChanged(String url) {
-        onProfileBackdropUpdate(url);
-    }
-
-    @Override
     public void updateMessageState(Conversation conversation, Conversation.WorkflowState state) {
         InboxFragment listFragment = (InboxFragment)getSupportFragmentManager().findFragmentByTag(InboxFragment.class.getName());
         if(listFragment != null){
@@ -948,7 +828,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         if (user == null) { return; }
 
         mUserName.setText(user.getShortName());
-        mUserEmail.setText(user.getEmail());
+        mUserEmail.setText(user.getPrimaryEmail());
 
         if (mUserProfilePic == null) {
             return;
@@ -967,7 +847,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         try {
             getSupportFragmentManager().popBackStack();
         } catch (Exception e){
-            Utils.e("Unable to pop curent fragment." +e);
+            Logger.e("Unable to pop curent fragment." +e);
         }
     }
 
@@ -1004,10 +884,10 @@ public class NavigationActivity extends BaseRouterActivity implements
 
     private void addFragmentToSomething(final ParentFragment fragment, final int inAnimation, final int outAnimation, @Nullable final Integer transitionId, @Nullable final View sharedElement, boolean ignoreDebounce) {
         if(fragment == null) {
-            Utils.e("FAILED TO addFragmentToSomething with null fragment...");
+            Logger.e("FAILED TO addFragmentToSomething with null fragment...");
             return;
         } else if(!ignoreDebounce && !addFragmentEnabled){
-            Utils.e("FAILED TO addFragmentToSomething. Too many fragment transactions...");
+            Logger.e("FAILED TO addFragmentToSomething. Too many fragment transactions...");
             return;
         }
 
@@ -1060,7 +940,7 @@ public class NavigationActivity extends BaseRouterActivity implements
             //Tracks the flow of screens in Google Analytics
             Analytics.trackAppFlow(NavigationActivity.this, fragment);
         } catch (IllegalStateException e) {
-            Utils.e("Could not commit fragment transaction: " + e);
+            Logger.e("Could not commit fragment transaction: " + e);
         }
     }
 
@@ -1082,31 +962,24 @@ public class NavigationActivity extends BaseRouterActivity implements
     }
 
     private void logoutWarning(){
-        CustomDialog.Builder builder = new CustomDialog.Builder(getContext(), getString(R.string.logout_warning), getString(R.string.logout_yes));
-        builder.negativeText(getString(R.string.logout_no));
-
-        logoutWarningDialog = builder.build();
-
-        logoutWarningDialog.show();
-
-        logoutWarningDialog.setClickListener(new CustomDialog.ClickListener() {
-            @Override
-            public void onConfirmClick() {
-                new LogoutAsyncTask(NavigationActivity.this, "").execute();
-            }
-
-            @Override
-            public void onCancelClick() {
-                logoutWarningDialog.dismiss();
-            }
-        });
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.logout_warning)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        new LogoutAsyncTask().execute();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .create()
+                .show();
     }
 
     private void getUnreadCount() {
-        UnreadCountAPI.getUnreadConversationCount(new CanvasCallback<UnreadConversationCount>(NavigationActivity.this) {
-
+        UnreadCountManager.getUnreadConversationCount(new StatusCallback<UnreadConversationCount>() {
             @Override
-            public void firstPage(UnreadConversationCount unreadConversationCount, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<UnreadConversationCount> response, LinkHeaders linkHeaders, ApiType type) {
+                UnreadConversationCount unreadConversationCount = response.body();
                 if (unreadConversationCount.getUnreadCount() != null) {
                     TextView unreadCountIndicator = (TextView) findViewById(R.id.navMenuUnreadCount);
                     View unreadCountWrapper = findViewById(R.id.unreadCountWrapperMessages);
@@ -1119,7 +992,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                     }
                 }
             }
-        });
+        }, true);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1201,7 +1074,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         try {
             getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         } catch (Exception e) {
-            Utils.e("COULD NOT CLEAR BACKSTACK AND EXECUTE PENDING TRANSACTIONS. " + e);
+            Logger.e("COULD NOT CLEAR BACKSTACK AND EXECUTE PENDING TRANSACTIONS. " + e);
         }
     }
 
@@ -1293,7 +1166,7 @@ public class NavigationActivity extends BaseRouterActivity implements
             try {
                 dialog.dismiss();
             } catch (IllegalStateException e) {
-                Utils.e("Committing a transaction after activities saved state was called: " + e);
+                Logger.e("Committing a transaction after activities saved state was called: " + e);
             }
         }
     }
@@ -1358,19 +1231,6 @@ public class NavigationActivity extends BaseRouterActivity implements
     @Override
     public void invalidateUnreadCount() {
         getUnreadCount();
-    }
-
-    @Override
-    public void onAssignmentDetailsChanged(Assignment assignment) {
-        AssignmentListFragment listFragment = (AssignmentListFragment)getSupportFragmentManager().findFragmentByTag(AssignmentListFragment.class.getName());
-        AssignmentFragment detailFragment = (AssignmentFragment)getSupportFragmentManager().findFragmentByTag(AssignmentFragment.class.getName());
-
-        if(listFragment != null){
-            listFragment.updatedAssignment(assignment);
-        }
-        if (detailFragment != null) {
-            detailFragment.updatedAssignment(assignment);
-        }
     }
 
     @Override
@@ -1465,7 +1325,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         if (isNavigationContextCourse) {
             setupActionbarSpinnerForCourse(actionBar, getCourseNavigationAdapter(), canvasContext, parentFragment);
         } else {
-            if (Masquerading.isMasquerading(getContext())) {
+            if (ApiPrefs.isMasquerading()) {
                 actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.masqueradeRed)));
             }
             actionBar.setSubtitle(null);
@@ -1614,19 +1474,18 @@ public class NavigationActivity extends BaseRouterActivity implements
                     if(mDialogEditText != null) {
                         String name = mDialogEditText.getText().toString();
                         if (!TextUtils.isEmpty(name)) {
-                            BookmarkAPI.createBookmark(new Bookmark(name, url, 0), new CanvasCallback<Bookmark>(NavigationActivity.this) {
+                            BookmarkManager.createBookmark(new Bookmark(name, url, 0), new StatusCallback<Bookmark>() {
                                 @Override
-                                public void firstPage(Bookmark bookmarks, LinkHeaders linkHeaders, Response response) {
-                                    if (response.getStatus() == 200) {
+                                public void onResponse(retrofit2.Response<Bookmark> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                                    if (code == 200) {
                                         Analytics.trackBookmarkCreated(NavigationActivity.this);
                                         Toast.makeText(getContext(), R.string.bookmarkAddedSuccess, Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
                                 @Override
-                                public boolean onFailure(RetrofitError retrofitError) {
+                                public void onFail(Call<Bookmark> response, Throwable error, int code) {
                                     Toast.makeText(getContext(), R.string.bookmarkAddedFailure, Toast.LENGTH_SHORT).show();
-                                    return super.onFailure(retrofitError);
                                 }
                             });
                         } else {
@@ -1637,12 +1496,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                     }
                 }
             });
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.setNegativeButton(R.string.cancel, null);
             builder.setView(R.layout.dialog_bookmark);
             builder.setCancelable(true);
 
@@ -1658,31 +1512,6 @@ public class NavigationActivity extends BaseRouterActivity implements
             }
         } else {
             Toast.makeText(getContext(), R.string.bookmarkAddedFailure, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void showPushNotificationDialog() {
-        final User user = APIHelpers.getCacheUser(getContext());
-        if(user != null && com.instructure.pandautils.utils.Utils.isNetworkAvailable(getApplicationContext())) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.notification_pref_dialog_title)
-                    .setMessage(R.string.notification_pref_dialog_message)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Analytics.trackAppFlow(NavigationActivity.this, NotificationPreferencesActivity.class);
-                            Intent intent = new Intent(getApplicationContext(), NotificationPreferencesActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.putExtra(Const.NOTIFICATION_PREFS_ROUTE_TO_PUSH, true);
-                            startActivity(intent);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .show();
         }
     }
 

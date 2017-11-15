@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2;
 
 import android.support.annotation.NonNull;
@@ -25,7 +24,6 @@ import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.canvasapi2.utils.Logger;
-import com.instructure.canvasapi2.utils.RetrofitCounter;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -36,19 +34,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public abstract class StatusCallback<DATA> implements Callback<DATA> {
 
     private boolean mIsApiCallInProgress = false;
     private LinkHeaders mLinkHeaders = null;
     private ArrayList<Call<DATA>> mCalls = new ArrayList<>();
+    private boolean mIsCanceled = false;
 
     public StatusCallback() {}
 
     @Override
     final public void onResponse(final Call<DATA> data, final Response<DATA> response) {
         mIsApiCallInProgress = true;
-        RetrofitCounter.decrement();
         if(response != null && response.isSuccessful()) {
             publishHeaderResponseResults(response, response.raw(), APIHelper.parseLinkHeaderResponse(response.headers()));
         } else if(response != null && response.code() == 504) {
@@ -63,7 +60,7 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
                     EventBus.getDefault().post(new CanvasErrorCode(response.code(), response.errorBody().string()));
                 } catch (IOException e) {}
             } else {
-                onFail(data, new Throwable("StatusCallback: Unknown Code Error"));
+                onFail(data, new Throwable("StatusCallback: Unknown Code Error"), null);
             }
             //No response or no data
             onCallbackFinished(ApiType.API);
@@ -73,19 +70,17 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
     @Override
     final public void onFailure(Call<DATA> data, Throwable t) {
         mIsApiCallInProgress = false;
-        RetrofitCounter.decrement();
         if(data.isCanceled() || "Canceled".equals(t.getMessage())) {
             Logger.d("StatusCallback: callback(s) were cancelled");
             onCancelled();
         } else {
             Logger.e("StatusCallback: Failure: " + t.getMessage());
-            onFail(data, t);
+            onFail(data, t, null);
         }
     }
 
     final public void onCallbackStarted() {
         mIsApiCallInProgress = true;
-        RetrofitCounter.increment();
         onStarted();
     }
 
@@ -115,7 +110,8 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
         onFail(response, error);
     }
     public void onFail(Call<DATA> callResponse, Throwable error, Response response) {
-        onFail(callResponse, error, response.code());
+        if(response == null) onFail(callResponse, error, 0);
+        else onFail(callResponse, error, response.code());
     }
     public void onCancelled(){}
     public void onStarted(){}
@@ -132,6 +128,14 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
             onResponse(response, linkHeaders, ApiType.API, okResponse.code());
             onCallbackFinished(ApiType.API);
         }
+    }
+
+    public boolean moreCallsExist() {
+        return moreCallsExist(getLinkHeaders());
+    }
+
+    public boolean isFirstPage() {
+        return isFirstPage(getLinkHeaders());
     }
 
     public static boolean moreCallsExist(@Nullable LinkHeaders...headers) {
@@ -164,6 +168,7 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
         clearLinkHeaders();
         cancel();
         clearCalls();
+        mIsCanceled = false;
     }
 
     public void clearCalls() {
@@ -171,18 +176,23 @@ public abstract class StatusCallback<DATA> implements Callback<DATA> {
     }
 
     public Call<DATA> addCall(Call<DATA> call) {
+        if (!call.isCanceled()) mIsCanceled = true;
         mCalls.add(call);
         return call;
     }
 
     public void cancel() {
+        mIsCanceled = true;
         for(Call<DATA> call : mCalls) {
             call.cancel();
         }
     }
 
+    public boolean isCanceled() {
+        return mIsCanceled;
+    }
+
     public static void cancelAllCalls() {
-        // TODO: Figure out how to decrement RetrofitCounter accordingly
         CanvasRestAdapter.cancelAllCalls();
     }
 }

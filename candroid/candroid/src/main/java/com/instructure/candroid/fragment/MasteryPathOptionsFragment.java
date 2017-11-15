@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,17 +30,16 @@ import com.instructure.candroid.adapter.MasteryPathOptionsRecyclerAdapter;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
-import com.instructure.canvasapi.api.ModuleAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentSet;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.MasteryPathAssignment;
-import com.instructure.canvasapi.model.MasteryPathSelectResponse;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.ModuleManager;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.AssignmentSet;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.MasteryPathAssignment;
+import com.instructure.canvasapi2.models.MasteryPathSelectResponse;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
-
-import retrofit.client.Response;
 
 
 public class MasteryPathOptionsFragment extends ParentFragment {
@@ -51,7 +50,7 @@ public class MasteryPathOptionsFragment extends ParentFragment {
     private MasteryPathOptionsRecyclerAdapter mRecyclerAdapter;
     private MasteryPathAssignment[] mAssignments;
     private AssignmentSet mAssignmentSet;
-    private CanvasCallback<MasteryPathSelectResponse> mSelectOptionCallback;
+    private StatusCallback<MasteryPathSelectResponse> mSelectOptionCallback;
     private long mModuleObjectId;
     private long mModuleItemId;
 
@@ -89,7 +88,7 @@ public class MasteryPathOptionsFragment extends ParentFragment {
         mSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ModuleAPI.selectMasteryPath(getCanvasContext(),mModuleObjectId, mModuleItemId, mAssignmentSet.getId(), mSelectOptionCallback);
+                ModuleManager.selectMasteryPath(getCanvasContext(),mModuleObjectId, mModuleItemId, mAssignmentSet.getId(), mSelectOptionCallback);
             }
         });
 
@@ -112,9 +111,9 @@ public class MasteryPathOptionsFragment extends ParentFragment {
 
 
     private void setupCallbacks() {
-        mSelectOptionCallback = new CanvasCallback<MasteryPathSelectResponse>(this) {
+        mSelectOptionCallback = new StatusCallback<MasteryPathSelectResponse>() {
             @Override
-            public void firstPage(MasteryPathSelectResponse selectResponse, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<MasteryPathSelectResponse> response, LinkHeaders linkHeaders, ApiType type) {
                 //we have successfully selected the module. Now go back and refresh the list
                 Navigation navigation = getNavigation();
                 ModuleListFragment moduleListFragment = null;

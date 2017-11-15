@@ -60,8 +60,8 @@ can be omitted.
 The [android-parent-espresso](https://www.bitrise.io/app/2724be0b444b271e/workflow/editor)
 job on Bitrise is responsible for running the android parent espresso tests.
 
-           ENV | Description
-           --- | ---
+ENV | Description
+--- | ---
 GCLOUD_USER    | Google cloud user
 GCLOUD_PROJECT | Google cloud project name
 GCLOUD_KEY     | Google cloud key base64 encoded (`base64 gcloudkey.json | pbcopy`).

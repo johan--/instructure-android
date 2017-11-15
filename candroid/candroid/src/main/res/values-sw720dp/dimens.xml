@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,6 @@
 
 <resources>
     <!-- MANUALLY MANAGED (Changes value on orientation change) -->
-    <!-- panda -->
-    <dimen name="panda_width">320dp</dimen>
-    <dimen name="panda_layout_width">340dp</dimen>
-
-    <!-- Grades -->
-    <dimen name="grade_grid_column_width">240dp</dimen>
-
-    <!-- Grid -->
-    <dimen name="grid_column_width">270dp</dimen>
 
     <dimen name="calendar_vertical_grid_spacing">32dp</dimen>
     <dimen name="calendar_text_size">16sp</dimen>

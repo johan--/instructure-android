@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">LoginAPI</string>
   <string name="hello_world">Hallo Ihr!</string>
   <string name="action_settings">Einstellungen</string>
   <string name="mobileVerifyGeneral">Diese App ist für die Verwendung nicht autorisiert</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">UnbekanntesGerät</string>
   <string name="errorOccurred">Ein unerwarteter Fehler ist aufgetreten.</string>
   <string name="pageNotFound">Seite nicht gefunden.</string>
-  <string name="okay">OK</string>
   <string name="confirm">Bestätigen</string>
   <string name="cancel">Abbrechen</string>
   <string name="help">Hilfe</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">Sie versuchen sich im Canvas Network anzumelden?</string>
   <string name="remove">Entfernen</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">Maskieren</string>
+  <string name="userId">Benutzer-ID</string>
+  <string name="domain">Domain</string>
+  <string name="masqueradingUserId">Benutzer-ID maskieren</string>
+  <string name="masqueradingUserDomain">Domäne maskieren</string>
+  <string name="masqueradingBegin">Maskieren beginnen</string>
+  <string name="masqueradingStop">Maskieren beenden</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Diesen Benutzer entfernen?</string>
   <string name="removedForever">Sie müssen Sie bei diesem Benutzer erneut anmelden, um Zugriff auf seinen Content haben zu können.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Sie finden Ihre Schule nicht? Geben Sie die URL der Schule ein oder gehen Sie hierhin für Hilfe.</string>
   <string name="loginCanvasHelpWithUser">Geben Sie die URL der Schule ein oder gehen Sie hierhin für Hilfe.</string>
   <string name="loginHint">Ihre Schule oder Sprengel finden</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Wie sieht\'s aus?</string>
-  <string name="rateUs">Wie würden Sie uns bewerten?</string>
-  <string name="doBetter">Was können wir verbessern?</string>
-  <string name="sendFeedback">Feedback abschicken</string>
-  <string name="suggestions">Vorschläge für Android</string>
-  <string name="domain">Domain</string>
-  <string name="versionNum">Version:</string>
-  <string name="userId">Benutzer-ID</string>
-  <string name="email">E-Mail</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Nicht nochmal zeigen</string>
-  <string name="installDate">Installierungsdatum:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Ein Problem melden</string>
   <string name="zendesk_subject">Thema</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Geräte</string>
   <string name="osVersion">BS-Version</string>
+  <string name="previousLoginTitle">Frühere Anmeldungen</string>
+  <string name="canvasNetworks">Canvas-Netzwerke</string>
+  <string name="findMySchool">Meine Schule suchen</string>
+  <string name="appTypeTeacher">Dozent</string>
+  <string name="appTypeStudent">Student</string>
+  <string name="appTypeParent">Elternteil</string>
+  <string name="canvasLowerCase">Canvas</string>
+  <string name="whatsYourSchoolName">Wie heißt Ihre Schule?</string>
+  <string name="next">Weiter</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Vorherigen Benutzer entfernen</string>
+  <string name="accountDomainFooter">Findest du deine Schule nicht? Geben Sie den vollständigen URL der Schule ein.</string>
+  <string name="accountDomainFooterLink">Tippen Sie hier, um Hilfe zu erhalten.</string>
+  <string name="login_noInternetConnectionTitle">Keine Internetverbindung</string>
+  <string name="login_noInternetConnectionMessage">Diese Aktion erfordert eine Internetverbindung.</string>
+  <string name="empty_feedback">Ein Betreff und eine Beschreibung sind erforderlich, um ein Feedback zu geben.</string>
+  <string name="versionNum">Versionsnummer</string>
+  <string name="scrollInstructions">Blättern, um alle Details zu sehen</string>
 </resources>

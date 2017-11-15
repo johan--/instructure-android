@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.instructure.canvasapi2.managers;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.instructure.canvasapi2.AppManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.DiscussionAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
@@ -29,6 +28,11 @@ import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.DiscussionEntry;
 import com.instructure.canvasapi2.models.DiscussionTopic;
 import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.models.post_models.DiscussionEntryPostBody;
+import com.instructure.canvasapi2.models.post_models.DiscussionTopicPostBody;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -41,42 +45,90 @@ public class DiscussionManager extends BaseManager {
 
     private static boolean mTesting = false;
 
-    private static boolean mIsAnnouncement = false;
+    public static void getDiscussions(final boolean forceNetwork, final long contextId, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if (isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
 
-    public static void createCourseDiscussion(long contextId, DiscussionTopicHeader newDiscussionHeader, @Nullable MultipartBody.Part attachment, StatusCallback<DiscussionTopicHeader> callback) {
+            DiscussionAPI.getDiscussions(contextId, adapter, callback, params);
+        }
+    }
+
+    public static boolean markReplyAsReadSynchronously(CanvasContext canvasContext, long topicId) {
+        if (isTesting() || mTesting) {
+            // TODO
+            return true;
+        } else {
+            RestBuilder adapter = new RestBuilder();
+            RestParams params = new RestParams.Builder().build();
+            return DiscussionAPI.markReplyAsReadSynchronous(canvasContext, topicId, adapter, params);
+        }
+    }
+
+    public static void createDiscussion(CanvasContext canvasContext, DiscussionTopicHeader newDiscussionHeader, @Nullable MultipartBody.Part attachment, StatusCallback<DiscussionTopicHeader> callback) {
         if (isTesting() || mTesting) {
             // TODO
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
-                    .withPerPageQueryParam(StatusCallback.isFirstPage(callback.getLinkHeaders()))
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
                     .build();
 
-            DiscussionAPI.createCourseDiscussion(adapter, params, contextId, newDiscussionHeader, attachment, callback);
+            DiscussionAPI.createDiscussion(adapter, params, canvasContext, newDiscussionHeader, attachment, callback);
         }
     }
 
-    public static void getDiscussionTopicHeaders(long contextId, boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+    public static void editDiscussionTopic(CanvasContext canvasContext, long discussionHeaderId, DiscussionTopicPostBody discussionTopicPostBody, StatusCallback<DiscussionTopicHeader> callback) {
+        if (isTesting() || mTesting) {
+            // TODO
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.editDiscussionTopic(canvasContext, discussionHeaderId, discussionTopicPostBody, adapter, callback, params);
+        }
+    }
+
+    public static void getAllDiscussionTopicHeaders(final long contextId, final boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            StatusCallback<List<DiscussionTopicHeader>> depaginatedCallback = new ExhaustiveListCallback<DiscussionTopicHeader>(callback) {
+                @Override
+                public void getNextPage(@NotNull StatusCallback<List<DiscussionTopicHeader>> callback, @NotNull String nextUrl, boolean isCached) {
+                    DiscussionAPI.getNextPage(nextUrl, adapter, callback, params);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            DiscussionAPI.getFirstPageDiscussionTopicHeaders(contextId, adapter, depaginatedCallback, params);
+        }
+    }
+
+    public static void getFullDiscussionTopic(CanvasContext canvasContext, long topicId, boolean forceNetwork, StatusCallback<DiscussionTopic> callback) {
+
         if(isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
             RestParams params = new RestParams.Builder()
                     .withForceReadFromNetwork(forceNetwork)
-                    .withPerPageQueryParam(StatusCallback.isFirstPage(callback.getLinkHeaders()))
                     .build();
-
-            DiscussionAPI.getDiscussionTopicHeaders(contextId, adapter, callback, params);
-        }
-    }
-
-    public static void getFullDiscussionTopic(CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopic> callback) {
-
-        if(isTesting() || mTesting) {
-            //TODO:
-        } else {
-            RestBuilder adapter = new RestBuilder(callback);
-            DiscussionAPI.getFullDiscussionTopic(adapter, canvasContext, topicId, callback, new RestParams.Builder().build());
+            DiscussionAPI.getFullDiscussionTopic(adapter, canvasContext, topicId, callback, params);
         }
     }
 
@@ -120,14 +172,14 @@ public class DiscussionManager extends BaseManager {
     }
 
     @Nullable
-    public static Response<Void> markDiscussionTopicEntryReadSynchronously(CanvasContext canvasContext, long topicId, long entryId) {
+    public static boolean markDiscussionTopicEntryReadSynchronously(CanvasContext canvasContext, long topicId, long entryId) {
         if(isTesting() || mTesting) {
             //TODO:
+            return true;
         } else {
             RestBuilder adapter = new RestBuilder();
             return DiscussionAPI.markDiscussionTopicEntryReadSynchronously(adapter, canvasContext, topicId, entryId, new RestParams.Builder().build());
         }
-        return null;
     }
 
     public static void markAllDiscussionTopicEntriesRead(CanvasContext canvasContext, long topicId, StatusCallback<Void> callback) {
@@ -150,12 +202,15 @@ public class DiscussionManager extends BaseManager {
         return null;
     }
 
-    public static void getDiscussionEntries(CanvasContext canvasContext, long topicId, StatusCallback<List<DiscussionEntry>> callback) {
+    public static void getDiscussionEntries(CanvasContext canvasContext, long topicId, boolean forceNetwork, StatusCallback<List<DiscussionEntry>> callback) {
         if(isTesting() || mTesting) {
             //TODO:
         } else {
             RestBuilder adapter = new RestBuilder(callback);
-            RestParams params = new RestParams.Builder().withPerPageQueryParam(true).build();
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(true)
+                    .withForceReadFromNetwork(forceNetwork)
+                    .build();
 
             DiscussionAPI.getDiscussionEntries(adapter, canvasContext, topicId, callback, params);
         }
@@ -180,6 +235,17 @@ public class DiscussionManager extends BaseManager {
             RestParams params = new RestParams.Builder().build();
 
             DiscussionAPI.replyToDiscussionEntryWithAttachment(adapter, canvasContext, topicId, entryId, message, attachment, callback, params);
+        }
+    }
+
+    public static void updateDiscussionEntry(CanvasContext canvasContext, long topicId, long entryId, DiscussionEntryPostBody updatedEntry, StatusCallback<DiscussionEntry> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder().build();
+
+            DiscussionAPI.updateDiscussionEntry(adapter, canvasContext, topicId, entryId, updatedEntry, callback, params);
         }
     }
 
@@ -271,12 +337,22 @@ public class DiscussionManager extends BaseManager {
                     .withShouldIgnoreToken(false)
                     .build();
 
-            DiscussionAPI.deleteDiscussion(adapter, canvasContext, topicId, callback, params);
+            DiscussionAPI.deleteDiscussionTopicHeader(adapter, canvasContext, topicId, callback, params);
         }
     }
 
-    public boolean isAnnouncement() {
-        return mIsAnnouncement;
+    public static void deleteDiscussionEntry(@NonNull CanvasContext canvasContext, long topicId, long entryId, StatusCallback<Void> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.deleteDiscussionEntry(adapter, canvasContext, topicId, entryId, callback, params);
+        }
     }
 
     public static void getDetailedDiscussionAirwolf(String airwolfDomain, String parentId, String studentId, String courseId, String discussionTopicId, StatusCallback<DiscussionTopicHeader> callback) {
@@ -293,6 +369,104 @@ public class DiscussionManager extends BaseManager {
                     .build();
 
             DiscussionAPI.getDetailedDiscussionAirwolf(adapter, parentId, studentId, courseId, discussionTopicId, callback, params);
+        }
+    }
+
+    public static void getFirstPagePinnedDiscussions(@NonNull CanvasContext canvasContext, final boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            DiscussionAPI.getFirstPagePinnedDiscussions(canvasContext, adapter, callback, params);
+        }
+    }
+
+    public static void getAllPinnedDiscussions(@NonNull CanvasContext canvasContext, final boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(false)
+                    .build();
+
+            StatusCallback<List<DiscussionTopicHeader>> depaginatedCallback = new ExhaustiveListCallback<DiscussionTopicHeader>(callback) {
+                @Override
+                public void getNextPage(@NotNull StatusCallback<List<DiscussionTopicHeader>> callback, @NotNull String nextUrl, boolean isCached) {
+                    DiscussionAPI.getNextPage(nextUrl, adapter, callback, params);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            DiscussionAPI.getFirstPagePinnedDiscussions(canvasContext, adapter, depaginatedCallback, params);
+        }
+    }
+
+    public static void getStudentGroupDiscussionTopicHeaderExhaustive(@NonNull CanvasContext canvasContext, final long rootTopicId, final boolean forceNetwork, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            final RestBuilder adapter = new RestBuilder(callback);
+            final RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            StatusCallback<List<DiscussionTopicHeader>> depaginatedCallback = new ExhaustiveListCallback<DiscussionTopicHeader>(callback) {
+                @Override
+                public void getNextPage(@NotNull StatusCallback<List<DiscussionTopicHeader>> callback, @NotNull String nextUrl, boolean isCached) {
+                    DiscussionAPI.getNextPage(nextUrl, adapter, callback, params);
+                }
+            };
+            adapter.setStatusCallback(depaginatedCallback);
+            DiscussionAPI.getFirstPageStudentGroupDiscussionTopicHeader(canvasContext, rootTopicId, depaginatedCallback, adapter, params);
+        }
+    }
+
+    public static void getFilteredDiscussionTopic(final boolean forceNetwork, @NonNull CanvasContext canvasContext, @NonNull String searchTerm, StatusCallback<List<DiscussionTopicHeader>> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withForceReadFromNetwork(forceNetwork)
+                    .withPerPageQueryParam(true)
+                    .build();
+
+            DiscussionAPI.getFilteredDiscussionTopic(canvasContext, searchTerm, callback, adapter, params);
+        }
+    }
+
+    public static void updateDiscussionTopic(CanvasContext canvasContext, long topicId, @NonNull String title, @NonNull String message, boolean threaded, boolean isPublished, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.updateDiscussionTopic(adapter, canvasContext, topicId, title, message, threaded, isPublished, callback, params);
+        }
+    }
+
+    public static void createDiscussion(@NonNull CanvasContext canvasContext, @NonNull String title, @NonNull String message, boolean isThreaded, boolean isAnnouncement, boolean isPublished, StatusCallback<DiscussionTopicHeader> callback) {
+        if(isTesting() || mTesting) {
+            //TODO:
+        } else {
+            RestBuilder adapter = new RestBuilder(callback);
+            RestParams params = new RestParams.Builder()
+                    .withPerPageQueryParam(false)
+                    .withShouldIgnoreToken(false)
+                    .build();
+
+            DiscussionAPI.createDiscussion(adapter, params, canvasContext, title, message, isThreaded, isAnnouncement, isPublished, callback);
         }
     }
 }

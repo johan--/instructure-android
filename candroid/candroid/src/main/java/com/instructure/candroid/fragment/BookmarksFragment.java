@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,14 +35,13 @@ import com.instructure.candroid.decorations.DividerDecoration;
 import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.BookmarkAPI;
-import com.instructure.canvasapi.model.Bookmark;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.BookmarkManager;
+import com.instructure.canvasapi2.models.Bookmark;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.CanvasContextColor;
-
-import retrofit.client.Response;
 
 public class BookmarksFragment extends OrientationChangeFragment {
 
@@ -153,16 +152,13 @@ public class BookmarksFragment extends OrientationChangeFragment {
                 if(!TextUtils.isEmpty(text)) {
                     Bookmark bookmarkCopy = copyBookmark(bookmark);
                     bookmarkCopy.setName(text);
-                    BookmarkAPI.update(bookmarkCopy, new CanvasCallback<Bookmark>(mRecyclerAdapter) {
+                    BookmarkManager.updateBookmark(bookmarkCopy, new StatusCallback<Bookmark>() {
                         @Override
-                        public void cache(Bookmark bookmarks) {
-                        }
-
-                        @Override
-                        public void firstPage(Bookmark bookmark1, LinkHeaders linkHeaders, Response response) {
-                            if (response.getStatus() == 200 && apiCheck()) {
-                                bookmark1.setCourseId(bookmark.getCourseId());
-                                mRecyclerAdapter.add(bookmark1);
+                        public void onResponse(retrofit2.Response<Bookmark> response, LinkHeaders linkHeaders, ApiType type) {
+                            if (response.code() == 200 && apiCheck()) {
+                                Bookmark newBookmark = response.body();
+                                newBookmark.setCourseId(bookmark.getCourseId());
+                                mRecyclerAdapter.add(newBookmark);
                                 showToast(R.string.bookmarkUpdated);
                             }
                         }
@@ -185,6 +181,7 @@ public class BookmarksFragment extends OrientationChangeFragment {
         Bookmark bookmarkCopy = new Bookmark();
         bookmarkCopy.setCourseId(bookmark.getCourseId());
         bookmarkCopy.setName(bookmark.getName());
+        bookmarkCopy.setUrl(bookmark.getUrl());
         bookmarkCopy.setId(bookmark.getId());
         bookmarkCopy.setPosition(bookmark.getPosition());
         return bookmarkCopy;
@@ -203,16 +200,18 @@ public class BookmarksFragment extends OrientationChangeFragment {
         builder.callback(new MaterialDialog.ButtonCallback() {
             @Override
             public void onPositive(MaterialDialog dialog) {
-                BookmarkAPI.deleteBookmark(bookmark, new CanvasCallback<Bookmark>(mRecyclerAdapter) {
+                BookmarkManager.deleteBookmark(bookmark.getId(), new StatusCallback<Bookmark>() {
                     @Override
-                    public void cache(Bookmark bookmarks) {}
-
-                    @Override
-                    public void firstPage(Bookmark bookmark, LinkHeaders linkHeaders, Response response) {
-                        if (apiCheck() && response.getStatus() == 200) {
+                    public void onResponse(retrofit2.Response<Bookmark> response, LinkHeaders linkHeaders, ApiType type) {
+                        if (apiCheck() && response.code() == 200) {
                             mRecyclerAdapter.remove(bookmark);
                             showToast(R.string.bookmarkDeleted);
                         }
+                    }
+
+                    @Override
+                    public void onFinished(ApiType type) {
+                        mRecyclerAdapter.onCallbackFinished();
                     }
                 });
                 super.onPositive(dialog);

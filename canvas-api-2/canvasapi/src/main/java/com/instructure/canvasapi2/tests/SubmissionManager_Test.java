@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -83,5 +83,22 @@ public class SubmissionManager_Test {
                 .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
                 .addHeader("content-type", "application/json")
                 .build();
+    }
+
+    public static void postSubmissionComment(long courseId, long assignmentId, long userId, String commentText, boolean isGroupMessage, StatusCallback<Submission> callback) {
+        //TODO:
+        Response response = new Response.Builder()
+                .request(new Request.Builder().url("https://test.com").build())
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        Submission submission = new Submission();
+
+        retrofit2.Response<Submission> response1 = retrofit2.Response.success(submission, response);
+        callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
     }
 }

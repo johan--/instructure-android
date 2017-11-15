@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -38,11 +38,11 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.adapter.MultiSelectRecyclerAdapter;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.FragUtils;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
+import com.instructure.canvasapi2.apis.ConversationAPI;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 
@@ -175,7 +175,7 @@ public class InboxFragment extends OrientationChangeFragment {
         composeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -213,8 +213,8 @@ public class InboxFragment extends OrientationChangeFragment {
     // Helpers
     ///////////////////////////////////////////////////////////////////////////
     @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source){
-        if(source.isAPI()) {
+    public void onCallbackFinished(ApiType type){
+        if(type.isAPI()) {
             hideProgressBar();
         }
     }

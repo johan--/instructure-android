@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,9 +27,12 @@ public class PermissionUtils {
 
     public static final int PERMISSION_REQUEST_CODE = 78;
     public static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 98;
+    public static final int READ_FILE_PERMISSION_REQUEST_CODE = 108;
 
     public static final String LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
     public static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    public static final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+
     public static final String CAMERA = Manifest.permission.CAMERA;
     public static final String RECORD_AUDIO = Manifest.permission.RECORD_AUDIO;
 

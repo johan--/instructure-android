@@ -15,11 +15,8 @@
  */
 package com.instructure.canvasapi2.utils
 
-import android.content.Context
 import android.webkit.URLUtil
-import com.instructure.canvasapi2.StatusCallback
 import com.instructure.canvasapi2.builders.RestBuilder
-import com.instructure.canvasapi2.builders.RestParams
 import com.instructure.canvasapi2.models.CanvasTheme
 import com.instructure.canvasapi2.models.User
 import java.io.File
@@ -47,16 +44,13 @@ object ApiPrefs : PrefManager(PREFERENCE_FILE_NAME) {
     var userAgent by StringPref("", "user_agent")
 
     @JvmStatic
-    var restParams: RestParams = RestParams.Builder().build()
-
-    @JvmStatic
     var perPageCount = 100
 
     @JvmStatic
     var theme: CanvasTheme? by GsonPref(CanvasTheme::class.java, null)
 
     /* Non-masquerading Prefs */
-    private var originalDomain by StringPref("", "domain")
+    internal var originalDomain by StringPref("", "domain")
     private var originalUser: User? by GsonPref(User::class.java, null, "user")
 
     /* Masquerading Prefs */
@@ -64,8 +58,8 @@ object ApiPrefs : PrefManager(PREFERENCE_FILE_NAME) {
     var isMasquerading by BooleanPref()
     @JvmStatic
     var masqueradeId by LongPref(-1L)
-    private var masqueradeDomain by StringPref()
-    private var masqueradeUser: User? by GsonPref(User::class.java, null, "masq-user")
+    internal var masqueradeDomain by StringPref()
+    internal var masqueradeUser: User? by GsonPref(User::class.java, null, "masq-user")
 
     @JvmStatic
     var domain: String
@@ -77,10 +71,18 @@ object ApiPrefs : PrefManager(PREFERENCE_FILE_NAME) {
 
     @JvmStatic
     val fullDomain: String
-        get() = when {
-            domain.isBlank() || protocol.isBlank() -> ""
-            URLUtil.isHttpUrl(domain) || URLUtil.isHttpsUrl(domain) -> domain
-            else -> "$protocol://$domain"
+        get() = if(isMasquerading)  {
+            when {
+                masqueradeDomain.isBlank() || protocol.isBlank() -> ""
+                URLUtil.isHttpUrl(masqueradeDomain) || URLUtil.isHttpsUrl(masqueradeDomain) -> masqueradeDomain
+                else -> "$protocol://$masqueradeDomain"
+            }
+        } else {
+            when {
+                domain.isBlank() || protocol.isBlank() -> ""
+                URLUtil.isHttpUrl(domain) || URLUtil.isHttpsUrl(domain) -> domain
+                else -> "$protocol://$domain"
+            }
         }
 
     @JvmStatic
@@ -90,42 +92,23 @@ object ApiPrefs : PrefManager(PREFERENCE_FILE_NAME) {
             if (isMasquerading) masqueradeUser = newUser else originalUser = newUser
         }
 
-    override fun onClearPrefs() {}
+    /* Notorious Prefs */
+    @JvmStatic
+    var notoriousDomain by StringPref()
 
     @JvmStatic
-    fun stopMasquerading(context: Context) {
-        isMasquerading = false
-        masqueradeId = -1L
-
-        // TODO for masquerade
-        //val cacheDir = File(context.filesDir, "cache")
-        //FileUtilities.deleteAllFilesInDirectory(cacheDir)
-        //CanvasRestAdapter.deleteCache()
-    }
+    var notoriousToken by StringPref()
 
     @JvmStatic
-    fun startMasquerading(masqId: Long, masqueradeUser: StatusCallback<User>, domain: String?) {
-        isMasquerading = true
-        masqueradeId = masqId
+    val fullNotoriousDomain: String
+        get() = when {
+            notoriousDomain.isBlank() || protocol.isBlank() -> ""
+                URLUtil.isHttpUrl(notoriousDomain) || URLUtil.isHttpsUrl(notoriousDomain) -> domain
+                else -> "$protocol://$notoriousDomain"
+            }
 
-        //Check to see if they're trying to switch domain as site admin
-        if (!domain.isNullOrBlank()) this.domain = domain!!
-
-        // TODO for masquerade
-        //val cacheDir = File(context.filesDir, "cache")
-        //FileUtilities.deleteAllFilesInDirectory(cacheDir)
-        //CanvasRestAdapter.deleteHttpCache()
-        //UserAPI.getUserByIdNoCache(masqueradeId, masqueradeUser)
-    }
-
-    /** Appends the masquerade ID to the provided URL (if currently masquerading) */
     @JvmStatic
-    fun addMasqueradeId(url: String): String {
-        if (!isMasquerading) return url
-        val queryChar = if ('?' in url) '&' else '?'
-        return "$url${queryChar}as_user_id=$masqueradeId"
-    }
-
+    var airwolfDomain by StringPref("", "airwolf_domain")
 
     /**
      * clearAllData is required for logout.
@@ -144,5 +127,4 @@ object ApiPrefs : PrefManager(PREFERENCE_FILE_NAME) {
         val cacheDir = File(ContextKeeper.appContext.filesDir, FileUtils.FILE_DIRECTORY)
         return FileUtils.deleteAllFilesInDirectory(cacheDir)
     }
-
 }

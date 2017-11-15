@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -42,16 +42,16 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.interfaces.OnEventUpdatedCallback;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.CalendarEventAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.ScheduleItem;
-import com.instructure.canvasapi.model.User;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.ScheduleItem;
+import com.instructure.canvasapi2.models.User;
+import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.video.ActivityContentVideoViewClient;
@@ -59,8 +59,6 @@ import com.instructure.pandautils.views.CanvasWebView;
 
 import java.util.Date;
 import java.util.List;
-
-import retrofit.client.Response;
 
 public class CalendarEventFragment extends ParentFragment {
     // view variables
@@ -76,8 +74,8 @@ public class CalendarEventFragment extends ParentFragment {
     private ScheduleItem scheduleItem;
     private long scheduleItemId;
 
-    private CanvasCallback<ScheduleItem> scheduleItemCallback;
-    private CanvasCallback<ScheduleItem> mDeleteItemCallback;
+    private StatusCallback<ScheduleItem> scheduleItemCallback;
+    private StatusCallback<ScheduleItem> mDeleteItemCallback;
 
     private OnEventUpdatedCallback mOnEventUpdatedCallback;
 
@@ -123,7 +121,7 @@ public class CalendarEventFragment extends ParentFragment {
         super.onActivityCreated(savedInstanceState);
         setUpCallback();
         if (scheduleItem == null) {
-            CalendarEventAPI.getCalendarEvent(scheduleItemId, scheduleItemCallback);
+            CalendarEventManager.getCalendarEvent(scheduleItemId, scheduleItemCallback, true);
         } else {
             populateViews();
         }
@@ -133,7 +131,7 @@ public class CalendarEventFragment extends ParentFragment {
     public void createOptionsMenu(Menu menu, MenuInflater inflater) {
         super.createOptionsMenu(menu, inflater);
         //If this is an event on the user's personal calendar, give them the option to delete it
-        if(scheduleItem != null && scheduleItem.getContextId() == APIHelpers.getCacheUser(getContext()).getId()){
+        if(scheduleItem != null && scheduleItem.getContextId() == ApiPrefs.getUser().getId()){
             inflater.inflate(R.menu.calendar_event_menu, menu);
         }
     }
@@ -142,7 +140,7 @@ public class CalendarEventFragment extends ParentFragment {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_delete:
-                if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+                if(!APIHelper.hasNetworkConnection()) {
                     Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -242,12 +240,12 @@ public class CalendarEventFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
         });
     }
@@ -261,17 +259,17 @@ public class CalendarEventFragment extends ParentFragment {
 
         if(scheduleItem.isAllDay()) {
             date1.setText(getString(R.string.allDayEvent));
-            date2.setText(getFullDateString(scheduleItem.getEndDate()));
+            date2.setText(getFullDateString(scheduleItem.getEndAt()));
         } else {
             //Setup the calendar event start/end times
-            if(scheduleItem.getStartDate() != null && scheduleItem.getEndDate() != null && scheduleItem.getStartDate().getTime() != scheduleItem.getEndDate().getTime()) {
+            if(scheduleItem.getStartAt() != null && scheduleItem.getEndAt() != null && scheduleItem.getStartAt().getTime() != scheduleItem.getEndAt().getTime()) {
                 //Our date times are different so we display two strings
-                date1.setText(getFullDateString(scheduleItem.getEndDate()));
-                String startTime = DateHelpers.getFormattedTime(getContext(), scheduleItem.getStartDate());
-                String endTime = DateHelpers.getFormattedTime(getContext(), scheduleItem.getEndDate());
+                date1.setText(getFullDateString(scheduleItem.getEndAt()));
+                String startTime = DateHelper.getFormattedTime(getContext(), scheduleItem.getStartAt());
+                String endTime = DateHelper.getFormattedTime(getContext(), scheduleItem.getEndAt());
                 date2.setText(startTime + " - " + endTime);
             } else {
-                date1.setText(getFullDateString(scheduleItem.getStartDate()));
+                date1.setText(getFullDateString(scheduleItem.getStartAt()));
                 date2.setVisibility(View.INVISIBLE);
             }
         }
@@ -310,26 +308,26 @@ public class CalendarEventFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     public void setUpCallback() {
-        scheduleItemCallback = new CanvasCallback<ScheduleItem>(this) {
+        scheduleItemCallback = new StatusCallback<ScheduleItem>() {
             @Override
-            public void firstPage(ScheduleItem scheduleItem, LinkHeaders linkHeaders, Response response) {
-                if (scheduleItem != null) {
-                    CalendarEventFragment.this.scheduleItem = scheduleItem;
+            public void onResponse(retrofit2.Response<ScheduleItem> response, LinkHeaders linkHeaders, ApiType type) {
+                if (response.body() != null) {
+                    CalendarEventFragment.this.scheduleItem = response.body();
                     populateViews();
                 }
             }
         };
 
-        mDeleteItemCallback = new CanvasCallback<ScheduleItem>(this) {
+        mDeleteItemCallback = new StatusCallback<ScheduleItem>() {
             @Override
-            public void firstPage(ScheduleItem scheduleItem, LinkHeaders linkHeaders, Response response) {
-                if(!apiCheck()){
+            public void onResponse(retrofit2.Response<ScheduleItem> response, LinkHeaders linkHeaders, ApiType type) {
+                if (!apiCheck()) {
                     return;
                 }
                 showToast(R.string.eventSuccessfulDeletion);
                 //Refresh Calendar
-                if(mOnEventUpdatedCallback != null && scheduleItem != null){
-                    mOnEventUpdatedCallback.onEventSaved(scheduleItem, true);
+                if (mOnEventUpdatedCallback != null && response.body() != null) {
+                    mOnEventUpdatedCallback.onEventSaved(response.body(), true);
                 }
                 getActivity().onBackPressed();
             }
@@ -383,6 +381,6 @@ public class CalendarEventFragment extends ParentFragment {
     }
 
     private void deleteEvent(){
-        CalendarEventAPI.deleteCalendarEvent(scheduleItem.getId(), "", mDeleteItemCallback);
+        CalendarEventManager.deleteCalendarEvent(scheduleItem.getId(), "", mDeleteItemCallback);
     }
 }

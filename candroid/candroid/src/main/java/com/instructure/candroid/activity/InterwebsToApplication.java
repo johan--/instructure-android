@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -27,17 +27,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 
-
 import com.instructure.candroid.R;
 import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.pandautils.utils.Const;
 import com.instructure.candroid.util.LoggingUtility;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.utilities.APIHelpers;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.pandautils.utils.Const;
 
 
 public class InterwebsToApplication extends Activity {
@@ -73,12 +68,12 @@ public class InterwebsToApplication extends Activity {
         //Do some logging
         LoggingUtility.Log(this, Log.WARN, data.toString());
 
-        String token = APIHelpers.getToken(this);
+        String token = ApiPrefs.getToken();
 
         boolean signedIn = (token != null && token.length() != 0);
-        String domain = APIHelpers.getDomain(InterwebsToApplication.this);
+        String domain = ApiPrefs.getDomain();
         if (!signedIn) {
-            Intent intent = LoginActivity.createIntent(this, host, data, LoginActivity.class);
+            Intent intent = LoginActivity.Companion.createIntent(this);
             startActivity(intent);
             finish();
             return;

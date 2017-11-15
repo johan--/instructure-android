@@ -10,7 +10,6 @@
   <string name="unknownDevice">Artefacto desconocido</string>
   <string name="errorOccurred">Ha ocurrido un error inesperado.</string>
   <string name="pageNotFound">Página no encontrada.</string>
-  <string name="okay">OK</string>
   <string name="confirm">Confirmar</string>
   <string name="cancel">Cancelar</string>
   <string name="help">Ayuda</string>
@@ -18,6 +17,8 @@
   <string name="signIntoCanvasNetwork">¿Está intentando acceder a Canvas Network? </string>
   <string name="remove">Remover</string>
   <string name="exampleURLSimple">myschool.instructure.com </string>
+  <string name="userId">ID del usuario</string>
+  <string name="domain">Dominio </string>
   <!--Multiple User Sign in-->
   <string name="removeUser">¿Remover este usuario?</string>
   <string name="removedForever">Va a tener que iniciar sesión en este usuario de nuevo para acceder a su contenido.</string>
@@ -44,20 +45,6 @@
   <string name="loginCanvasHelp">¿No ve su escuela? Introduzca la URL de la escuela o pulse aquí para obtener ayuda.</string>
   <string name="loginCanvasHelpWithUser">Introduzca la URL de la escuela o pulse aquí para obtener ayuda.</string>
   <string name="loginHint">Encuentre su escuela o distrito</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">¿Cómo está?</string>
-  <string name="rateUs">¿Cómo nos calificaría?</string>
-  <string name="doBetter">¿En qué podemos mejorar?</string>
-  <string name="sendFeedback">Enviar los comentarios</string>
-  <string name="suggestions">Sugerencias para Android</string>
-  <string name="domain">Dominio </string>
-  <string name="versionNum">Versión: </string>
-  <string name="userId">ID del usuario</string>
-  <string name="email">Correo electrónico</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">No mostrar nuevamente</string>
-  <string name="installDate">Instalar fecha</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Reportar un problema</string>
   <string name="zendesk_subject">Asunto</string>
@@ -87,4 +74,5 @@
   <!--String for submitting tickets-->
   <string name="device">Artefacto</string>
   <string name="osVersion">Versión OS</string>
+  <string name="empty_feedback">Es necesario un tema y una descripción para enviar comentarios.</string>
 </resources>

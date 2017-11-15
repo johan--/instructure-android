@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.instructure.androidpolling.app.fragments;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public abstract class PaginatedExpandableListFragment<G extends Comparable<? sup
         implements ExpandableListDelegate<G, I>, PaginatedListInterface {
 
     // views
-    private SwipeRefreshLayout swipeRefreshLayout;
+    protected SwipeRefreshLayout swipeRefreshLayout;
     private ExpandableListView expandableListView;
     private LinearLayout footer;
     private LinearLayout emptyView;
@@ -74,7 +75,7 @@ public abstract class PaginatedExpandableListFragment<G extends Comparable<? sup
         return expandableListView;
     }
 
-    public LayoutInflater getLayoutInflater() {
+    public LayoutInflater layoutInflater() {
         if(layoutInflater == null){
             layoutInflater = LayoutInflater.from(getActivity());
         }
@@ -149,7 +150,6 @@ public abstract class PaginatedExpandableListFragment<G extends Comparable<? sup
     public int getRootLayoutCode() {
         return R.layout.swipe_refresh_expandable_layout;
     }
-
 
     @Override
     public int getEmptyViewLayoutCode() {
@@ -339,7 +339,7 @@ public abstract class PaginatedExpandableListFragment<G extends Comparable<? sup
         hasActivityBeenCreated = true;
         hasLoadedFirstPage = false;
         setupListeners();
-        getActivity().getActionBar().setTitle(getTitle());
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getTitle());
         setupCallbacks();
         loadData();
     }
@@ -369,7 +369,11 @@ public abstract class PaginatedExpandableListFragment<G extends Comparable<? sup
 
     private void setupViews(View rootView) {
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setColorScheme(R.color.polling_aqua, R.color.polling_green, R.color.polling_purple, R.color.canvaspollingtheme_color);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.polling_aqua,
+                R.color.polling_green,
+                R.color.polling_purple,
+                R.color.canvaspollingtheme_color);
         expandableListView = (ExpandableListView)swipeRefreshLayout.findViewById(R.id.expandableListView);
         expandableListView.setEmptyView(emptyView);
         //add the empty view to the rootview. you can only add one item to a swipeRefreshLayout, so I wrapped that in a frameLayout so we add the

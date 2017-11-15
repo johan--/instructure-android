@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -22,7 +23,7 @@
 
     <!--Content Descriptions-->
     <string name="canvasLogo">Canvas Logo</string>
-    <string name="app_name">Canvas</string>
+    <string name="app_name" translatable="false">Canvas Student</string>
     <string name="enterURL">Enter your Canvas URL:</string>
     <string name="exampleURLSimple">myschool.instructure.com</string>
     <string name="signIntoCanvasNetwork">Trying to sign into Canvas Network?</string>
@@ -72,7 +73,7 @@
     <string name="assignmentTabGrade">Grade</string>
     <string name="assignmentLocked">Locked</string>
     <string name="assignments">Assignments</string>
-    <string name="freeFormRubricPoints" formatted="false">%s / %s</string>
+    <string name="freeFormRubricPoints" formatted="false">%s / %s pts</string>
     <string name="noRubric">There is no rubric for this assignment.</string>
     <string name="noDescription">There is no description for this assignment</string>
     <string name="noAssignmentsInGroup">No Assignments in this group</string>
@@ -80,6 +81,7 @@
     <string name="droppedAssignment">This assignment is dropped and will not be considered in the total calculation</string>
     <string name="excused">EX</string>
     <string name="mutedText">Grades are unavailable because the instructor is working on them.</string>
+    <string name="rubricRangePointsText" formatted="false">&#160;to &gt; %s pts</string>
 
     <!-- Assignment editing -->
     <string name="points">Points\u0020</string>
@@ -156,8 +158,6 @@
     <string name="domain">Domain</string>
     <string name="sendFeedback">Send Feedback</string>
     <string name="sendMail">Send Email&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="edit">Edit</string>
     <plurals name="item_count">
         <item quantity="one">%d item</item>
@@ -547,8 +547,8 @@
 
     <string name="selectBackground">Select a backdrop</string>
 
-    <string name="kalturaSubmissionInProgress">Submitting files&#8230; Check notification bar for updates.</string>
-    <string name="kalturaSubmissionSuccessful">Finished submitting file</string>
+    <string name="notoriousSubmissionInProgress">Submitting files&#8230; Check notification bar for updates.</string>
+    <string name="notoriousSubmissionSuccessful">Finished submitting file</string>
 
     <string name="poll_title">What did you come to Canvas to do?</string>
     <string name="poll_warning">An item has not been selected.</string>
@@ -593,6 +593,7 @@
     <string name="share">Share</string>
 
     <string name="speedgrader">SpeedGrader</string>
+    <string name="gauge">Gauge</string>
 
     <string name="contentDescriptionSuperPanda">Super Panda Image</string>
     <string name="newFeatureTitle">Mobile Notifications</string>
@@ -609,8 +610,16 @@
 
     <string name="accountNotifications">Announcements</string>`
     <string name="addAccount">Add Account</string>
+
+    <string name="changeUser">Change User</string>
+
+    <string name="no_data_connection">Please check your data connection and try again.</string>
     
     <!--Notification Preferences-->
+
+    <string name="notification_primary_inbox_title">Canvas Notification</string>
+    <string name="notification_channel_name_primary">General Canvas Notifications</string>
+    <string name="notification_channel_description_primary">Further configuration of notifications can be done within the Canvas Notification Preferences section.</string>
 
     <string name="notification_cat_course_activities">Course Activities</string>
     <string name="notification_cat_discussions">Discussions</string>
@@ -686,6 +695,7 @@
     <string name="submitReasonTimedQuiz">Submitted the quiz because time limit was up.</string>
     <string name="submitReasonLockAt">Submitted the quiz because the lock at date was reached.</string>
     <string name="quizSubmittedSuccessfully">Quiz submitted successfully.</string>
+    <string name="quizSubmittedFailure">Quiz could not be submitted at this time.</string>
     <string name="almostDue">Almost Due!</string>
     <string name="almostDueMsg">The due date is almost here. Submit now to prevent your quiz from being marked late?</string>
     <string name="timeLimit">Time Limit</string>
@@ -742,6 +752,8 @@
     <string name="choice_position">Choice %d</string>
     <string name="updating_module_info">Updating module information&#8230;</string>
     <string name="arc">Arc</string>
+    <string name="pending_review">Pending review</string>
+    <string name="totalPoints">%s pts</string>
 
     <!-- File Strings -->
     <array name="file_size_units">

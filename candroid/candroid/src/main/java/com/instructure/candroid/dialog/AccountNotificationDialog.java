@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -44,22 +44,20 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.instructure.candroid.R;
 import com.instructure.candroid.activity.InternalWebViewActivity;
-import com.instructure.canvasapi.api.AccountNotificationAPI;
-import com.instructure.canvasapi.model.AccountNotification;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AccountNotificationManager;
+import com.instructure.canvasapi2.models.AccountNotification;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 
-import retrofit.client.Response;
 
-
-public class AccountNotificationDialog extends DialogFragment implements APIStatusDelegate {
+public class AccountNotificationDialog extends DialogFragment {
 
     public static final String TAG = "accountNotificationDialog";
     public static final String ACCOUNT_NOTIFICATIONS = "accountNotifications";
@@ -67,7 +65,7 @@ public class AccountNotificationDialog extends DialogFragment implements APIStat
     private ListView listView;
     private ArrayList<AccountNotification> accountNotifications;
     private AccountNotificationAdapter adapter;
-    private CanvasCallback<AccountNotification> accountNotificationCanvasCallback;
+    private StatusCallback<AccountNotification> accountNotificationCanvasCallback;
     private OnAnnouncementCountInvalidated onAnnouncementCountInvalidated;
 
     public interface OnAnnouncementCountInvalidated {
@@ -123,19 +121,14 @@ public class AccountNotificationDialog extends DialogFragment implements APIStat
     }
 
     private void setupCallback() {
-        accountNotificationCanvasCallback = new CanvasCallback<AccountNotification>(this) {
+        accountNotificationCanvasCallback = new StatusCallback<AccountNotification>() {
             @Override
-            public void cache(AccountNotification accountNotification) {
-
-            }
-
-            @Override
-            public void firstPage(AccountNotification accountNotification, LinkHeaders linkHeaders, Response response) {
-                if(onAnnouncementCountInvalidated != null) {
+            public void onResponse(retrofit2.Response<AccountNotification> response, LinkHeaders linkHeaders, ApiType type) {
+                if (onAnnouncementCountInvalidated != null) {
                     onAnnouncementCountInvalidated.invalidateAnnouncementCount();
                 }
-                adapter.removeItem(accountNotification);
-                if(accountNotifications.size() == 0) {
+                adapter.removeItem(response.body());
+                if (accountNotifications.size() == 0) {
                     //if we don't have any more notifications just close the dialog
                     dismiss();
                 }
@@ -200,8 +193,8 @@ public class AccountNotificationDialog extends DialogFragment implements APIStat
 
 
                                 //math images don't start with a protocol, so if it doesn't assume it's the user's domain
-                                if(!source.startsWith("http") && !source.startsWith(APIHelpers.getFullDomain(getActivity()))) {
-                                    source = APIHelpers.getFullDomain(getActivity()) + source;
+                                if(!source.startsWith("http") && !source.startsWith(ApiPrefs.getFullDomain())) {
+                                    source = ApiPrefs.getFullDomain() + source;
                                 }
                                 Picasso.with(getActivity()).load(source).into(new Target() {
                                     @Override
@@ -246,7 +239,7 @@ public class AccountNotificationDialog extends DialogFragment implements APIStat
                     //remove the notification from the user's dashboard
                     holder.close.setEnabled(false); // debounce the close button to avoid unnecessary api calls. remove item is called in the deletion callback.
 
-                    AccountNotificationAPI.deleteAccountNotification(notification.getId(), accountNotificationCanvasCallback);
+                    AccountNotificationManager.deleteAccountNotification(notification.getId(), accountNotificationCanvasCallback);
                 }
             });
 
@@ -326,22 +319,5 @@ public class AccountNotificationDialog extends DialogFragment implements APIStat
         }
 
         return source.subSequence(0, i+1);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    // For APIStatusDelegate
-    ////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onCallbackStarted() {}
-
-    @Override
-    public void onCallbackFinished(CanvasCallback.SOURCE source) {}
-
-    @Override
-    public void onNoNetwork() {}
-
-    @Override
-    public Context getContext() {
-        return getActivity();
     }
 }

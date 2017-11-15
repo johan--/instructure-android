@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -180,6 +180,25 @@ public class QuizManager_Test {
         QuizSubmissionResponse quizSubmissionResponse = new QuizSubmissionResponse();
         quizSubmissionResponse.setQuizSubmissions(quizSubmissions);
         retrofit2.Response<QuizSubmissionResponse> response1 = retrofit2.Response.success(quizSubmissionResponse, response);
+        callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
+    }
+
+    public static void getAllQuizSubmissions(StatusCallback<List<QuizSubmission>> callback) {
+        Response response = new Response.Builder()
+                .code(200)
+                .message("todo")
+                .protocol(Protocol.HTTP_1_0)
+                .body(ResponseBody.create(MediaType.parse("application/json"), "todo".getBytes()))
+                .addHeader("content-type", "application/json")
+                .build();
+
+        List<QuizSubmission> quizSubmissions = new ArrayList<>();
+
+        QuizSubmission quizSubmission = new QuizSubmission();
+        quizSubmission.setQuizId(456321L);
+
+        quizSubmissions.add(quizSubmission);
+        retrofit2.Response<List<QuizSubmission>> response1 = retrofit2.Response.success(quizSubmissions, response);
         callback.onResponse(response1, new LinkHeaders(), ApiType.CACHE);
     }
 }

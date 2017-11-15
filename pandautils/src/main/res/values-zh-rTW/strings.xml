@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
   -->
 
 <resources>
-  <string name="app_name">PandaUtils選項</string>
   <string name="chooseMedia">選擇媒體</string>
   <string name="takeVideo">錄製視頻</string>
   <string name="noCameraOnDevice">無攝像頭</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">上傳到Canvas</string>
   <string name="preparingUpload">準備上傳</string>
   <string name="loadingFilesIndeterminate">載入文檔……</string>

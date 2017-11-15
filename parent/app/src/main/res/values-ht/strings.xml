@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Di nou kisa w pi renmen nan app la</string>
     <string name="sendFeedback">Voye Kòmantè</string>
     <string name="sendMail">Voye Imèl&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domèn:</string>
     <string name="help_versionNum">Vèsyon:</string>
     <string name="help_userId">Non Itilizatè:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Sèlman obsèvatè Canvas ki ka otantifye nan Canvas Parent.</string>
     <string name="open_source">Open Source</string>
     <string name="open_source_details">Afiche lisans open source</string>
+
+    <string name="unitedStates">Etazini Damerik</string>
+    <string name="theUnitedStates">Etazini Damerik</string>
+    <string name="canada">Kanada</string>
+    <string name="ireland">Iland</string>
+    <string name="australia">Ostrali</string>
+    <string name="germany">Almay</string>
+    <string name="singapore">Sengapou</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Chwazi rejyon elèv</string>
+    <string name="selectRegion">Seleksyonè Rejyon</string>
+    <string name="unauthorizedRegion">Rejyon non Otorize</string>
+    <string name="mismatchedRegionMessage">Enstitisyon sa a pa nan rejyon ou te seleksyone yo. Pou ajoute yon elèv nan enstitisyon sa a, tanpri itilize opsyon "Seleksyonè Rejyon" ki nan paj koneksyon an pou ka kreye yon kont nan rejyon %1$s.</string>
 </resources>

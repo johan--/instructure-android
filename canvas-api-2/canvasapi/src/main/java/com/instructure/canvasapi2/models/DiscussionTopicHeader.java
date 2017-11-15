@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -107,6 +107,11 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
     @SerializedName("context_code")
     private String contextCode;
 
+    private boolean subscribed;
+
+    @SerializedName("lock_at")
+    private Date lockAt;
+
     @Override
     public long getId() {
         return id;
@@ -177,6 +182,7 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         return title;
     }
 
+    @Nullable
     public String getMessage() {
         return message;
     }
@@ -190,10 +196,12 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         return postedAt;
     }
 
+    @Nullable
     public Date getDelayedPostAt() {
         return delayedPostAt;
     }
 
+    @Nullable
     public Date getLastReplyAt() {
         return lastReplyAt;
     }
@@ -298,6 +306,8 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         return sortByRating;
     }
 
+    public boolean isSubscribed() { return subscribed; }
+
     public ReadState getStatus() {
         if("read".equals(readState)) {
             return ReadState.READ;
@@ -312,6 +322,10 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         return contextCode;
     }
 
+    public Date getLockAt() {
+        return lockAt;
+    }
+
     //endregion
 
     //region Setters
@@ -322,6 +336,16 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
 
     public void setDiscussionType(String discussionType) {
         this.discussionType = discussionType;
+    }
+
+    public void setType(DiscussionType type) {
+        if(type == DiscussionType.SIDE_COMMENT) {
+            this.discussionType = "side_comment";
+        } else if(type == DiscussionType.THREADED) {
+            this.discussionType = "threaded";
+        } else {
+            this.discussionType = "unknown";
+        }
     }
 
     public void setTitle(String title) {
@@ -344,6 +368,10 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         this.delayedPostAt = DateHelper.stringToDate(delayedPostAt);
     }
 
+    public void setDelayedPostAtDate(Date delayedPostAt) {
+        this.delayedPostAt = delayedPostAt;
+    }
+
     public void setLastReplyAt(String lastReplyAt) {
         this.lastReplyAt = DateHelper.stringToDate(lastReplyAt);
     }
@@ -353,7 +381,16 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
     }
 
     public void setDiscussionSubentryCount(int discussionSubentryCount) {
-        this.discussionSubentryCount = discussionSubentryCount;
+        discussionSubentryCount = discussionSubentryCount;
+    }
+
+    public void incrementDiscussionSubentryCount() {
+        discussionSubentryCount += 1;
+    }
+
+    public void decrementDiscussionSubentryCount() {
+        discussionSubentryCount -= 1;
+        if(discussionSubentryCount < 0) { discussionSubentryCount = 0; }
     }
 
     public void setReadState(String readState) {
@@ -460,6 +497,16 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         this.contextCode = contextCode;
     }
 
+    public void setSubscribed(boolean subscribed) { this.subscribed = subscribed; }
+
+
+    public void setLockAt(String lockAt) {
+        this.lockAt = DateHelper.stringToDate(lockAt);
+    }
+
+    public void setLockAtDate(Date lockAt) {
+        this.lockAt = lockAt;
+    }
     //endregion
 
     //region Parcelable
@@ -508,6 +555,8 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         dest.writeByte(this.onlyGradersCanRate ? (byte) 1 : (byte) 0);
         dest.writeByte(this.sortByRating ? (byte) 1 : (byte) 0);
         dest.writeString(this.contextCode);
+        dest.writeByte(this.subscribed ? (byte) 1 : (byte) 0);
+        dest.writeLong(this.lockAt != null ? this.lockAt.getTime() : -1);
     }
 
     protected DiscussionTopicHeader(Parcel in) {
@@ -549,6 +598,9 @@ public class DiscussionTopicHeader extends CanvasModel<DiscussionTopicHeader> {
         this.onlyGradersCanRate = in.readByte() != 0;
         this.sortByRating = in.readByte() != 0;
         this.contextCode = in.readString();
+        this.subscribed = in.readByte() != 0;
+        long tmpLockAt = in.readLong();
+        this.lockAt = tmpLockAt == -1 ? null : new Date(tmpLockAt);
     }
 
     public static final Creator<DiscussionTopicHeader> CREATOR = new Creator<DiscussionTopicHeader>() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 package com.instructure.candroid.fragment;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,20 +27,19 @@ import com.instructure.candroid.R;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.LockInfoHTMLHelper;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.api.PageAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Page;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.PageManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Page;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.views.CanvasWebView;
 
 import java.util.HashMap;
 import java.util.Locale;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
+import retrofit2.Call;
 
 public class PageDetailsFragment extends InternalWebviewFragment {
 
@@ -49,7 +47,7 @@ public class PageDetailsFragment extends InternalWebviewFragment {
     private String pageName;
 
     // asyncTasks
-    private CanvasCallback<Page> pageCallback;
+    private StatusCallback<Page> pageCallback;
 
     private Page page;
 
@@ -84,9 +82,9 @@ public class PageDetailsFragment extends InternalWebviewFragment {
         setUpCallBack();
 
         if (pageName == null || pageName.equals(Page.FRONT_PAGE_NAME)) {
-            PageAPI.getFrontPage(getCanvasContext(), pageCallback);
+            PageManager.getFrontPage(getCanvasContext(), true, pageCallback);
         } else {
-            PageAPI.getDetailedPage(getCanvasContext(), pageName, pageCallback);
+            PageManager.getPageDetails(getCanvasContext(), pageName, true, pageCallback);
         }
     }
 
@@ -140,15 +138,16 @@ public class PageDetailsFragment extends InternalWebviewFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     public void setUpCallBack(){
-        pageCallback = new CanvasCallback<Page>(this) {
+        pageCallback = new StatusCallback<Page>() {
+
             @Override
-            public void firstPage(Page page, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<Page> response, LinkHeaders linkHeaders, ApiType type) {
                 if(!apiCheck()){
-                    return;                 
+                    return;
                 }
 
                 getActivity().supportInvalidateOptionsMenu();
-                PageDetailsFragment.this.page = page;
+                page = response.body();
 
                 if(page.getLockInfo() != null) {
                     String lockedMessage = LockInfoHTMLHelper.getLockedInfoHTML(page.getLockInfo(),getActivity(), R.string.lockedPageDesc, R.string.lockedAssignmentDescLine2);
@@ -166,12 +165,11 @@ public class PageDetailsFragment extends InternalWebviewFragment {
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError){
-                Response response = retrofitError.getResponse();
-                if (response != null && response.getStatus() >= 400 && response.getStatus() < 500 && pageName != null && pageName.equals(Page.FRONT_PAGE_NAME)) {
+            public void onFail(Call<Page> response, Throwable error, int code) {
+                if (response != null && code >= 400 && code < 500 && pageName != null && pageName.equals(Page.FRONT_PAGE_NAME)) {
 
                     String context;
-                    if(getCanvasContext().getType() == CanvasContext.Type.COURSE){
+                    if (getCanvasContext().getType() == CanvasContext.Type.COURSE) {
                         context = getString(R.string.course);
                     } else {
                         context = getString(R.string.group);
@@ -184,12 +182,8 @@ public class PageDetailsFragment extends InternalWebviewFragment {
                     context = context.toLowerCase(Locale.getDefault());
 
                     loadHtml("file:///android_asset/", getResources().getString(R.string.noPagesInContext) + " " + context, "text/html", "utf-8", null);
-
-                    return true;
                 }
-                return false;
             }
-
         };
     }
 

@@ -128,8 +128,6 @@
   <string name="domain">Domain</string>
   <string name="sendFeedback">Send feedback</string>
   <string name="sendMail">Send email…</string>
-  <string name="mobileSupportEmailAddress">obilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Edit</string>
   <plurals name="item_count">
     <item quantity="one">%d item</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">There was an error getting the course for this item.</string>
   <string name="could_not_find_group">There was an error getting the group for this item.</string>
   <string name="selectBackground">Select a backdrop</string>
-  <string name="kalturaSubmissionInProgress">Submitting files… Check notification bar for updates.</string>
-  <string name="kalturaSubmissionSuccessful">Finished submitting file</string>
+  <string name="notoriousSubmissionInProgress">Submitting files… Check notification bar for updates.</string>
+  <string name="notoriousSubmissionSuccessful">Finished submitting file</string>
   <string name="poll_title">What did you come to Canvas to do?</string>
   <string name="poll_warning">No item has been selected.</string>
   <string name="poll_item_1">Check my marks</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Share</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super panda image</string>
   <string name="newFeatureTitle">Mobile notifications</string>
   <string name="newFeatureMsg">To receive mobile push notifications, go to Canvas Settings &gt; Notifications &gt; Select \'For all devices\'</string>

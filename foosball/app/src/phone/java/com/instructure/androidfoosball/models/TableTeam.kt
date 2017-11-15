@@ -19,17 +19,12 @@
 
 package com.instructure.androidfoosball.models
 
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
-import java.util.*
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-@PaperParcel
+@Parcelize
 class TableTeam(
         var averageWinRate: Float = 0f,
         var customName: String = "",
         var users: List<User> = listOf()
-) : PaperParcelable {
-    companion object {
-        @JvmField val CREATOR = PaperParcelTableTeam.CREATOR
-    }
-}
+) : Parcelable

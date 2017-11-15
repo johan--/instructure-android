@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import android.view.View;
  * It must implement Comparable so the adapter can sort the rows
  */
 public interface ListDelegate<I> {
-    public View getRowViewForItem(I item, View convertView, int position);
-    public int getViewTypeCount();
-    public int getItemViewType(int position, I item);
-    public void showFirstItem(I item);
-    public boolean isShowFirstItem();
+    View getRowViewForItem(I item, View convertView, int position);
+    int getViewTypeCount();
+    int getItemViewType(int position, I item);
+    void showFirstItem(I item);
+    boolean isShowFirstItem();
 }

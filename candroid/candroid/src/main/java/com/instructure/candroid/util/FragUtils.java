@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import com.instructure.candroid.fragment.NotificationListFragment;
 import com.instructure.candroid.fragment.ParentFragment;
 import com.instructure.candroid.fragment.ProfileFragment;
 import com.instructure.candroid.fragment.ToDoListFragment;
-import com.instructure.canvasapi.model.CanvasContext;
+import com.instructure.canvasapi2.models.CanvasContext;
 
 public class FragUtils {
     public static <Type extends ParentFragment> Type getFrag(Class<Type> cls, FragmentActivity activity, CanvasContext canvasContext) {

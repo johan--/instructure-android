@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ package com.instructure.canvasapi.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+import com.instructure.canvasapi.utilities.APIHelpers;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +41,8 @@ public class User extends CanvasContext{
     private String primary_email;
     private String sortable_name;
     private String bio;
+    @SerializedName("last_login")
+    private String lastLogin;
 
     private List<Enrollment> enrollments = new ArrayList<Enrollment>();
 
@@ -125,6 +130,9 @@ public class User extends CanvasContext{
     }
 
     public String getBio() { return bio; }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
     // User Permissions - defaults to false, returned with UserAPI.getSelfWithPermissions()
     public boolean canUpdateAvatar(){
@@ -154,6 +162,19 @@ public class User extends CanvasContext{
         }
         return stringArrayEnrollments;
     }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public void setLastLogin(Date date) {
+        lastLogin = APIHelpers.dateToString(date);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
     ///////////////////////////////////////////////////////////////////////////
@@ -189,10 +210,7 @@ public class User extends CanvasContext{
         }
 
         User other = (User) obj;
-        if (id != other.id) {
-            return false;
-        }
-        return true;
+        return id == other.id;
     }
 
     @Override

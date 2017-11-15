@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package com.instructure.candroid.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -42,14 +43,10 @@ import com.instructure.candroid.util.LockInfoHTMLHelper;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
 import com.instructure.candroid.view.ViewUtils;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentGroup;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.video.ActivityContentVideoViewClient;
 import com.instructure.pandautils.views.CanvasWebView;
 
@@ -59,14 +56,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit.client.Response;
-
 public class AssignmentDetailsFragment extends ParentFragment {
 
     // views
     private CanvasWebView canvasWebView;
     private Course course;
-    private View divider;
     private TextView notification;
     private View notificationContainer;
     private ImageButton notificationDismiss;
@@ -75,9 +69,7 @@ public class AssignmentDetailsFragment extends ParentFragment {
     private TextView dueDateView;
     private TextView submissionDateView;
 
-    private LinearLayout assignmentDetails; // Teacher view
     private TextView pointsPossible;
-    private TextView assignmentGroup;
     private TextView gradingType;
     private TextView turnInTypeSelected;
     private LinearLayout onlineSubmissionTypeLayout;
@@ -85,7 +77,6 @@ public class AssignmentDetailsFragment extends ParentFragment {
     // model data
     private Assignment assignment; // keep assignment logic within populateAssignmentDetails method, otherwise assignment could be null
 
-    private CanvasCallback<AssignmentGroup[]> canvasCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -115,7 +106,7 @@ public class AssignmentDetailsFragment extends ParentFragment {
     public void updateSubmissionDate(Date submissionDate) {
         String submitDate = getString(R.string.assignmentLastSubmission) + ": " + getString(R.string.assignmentNoSubmission);
         if (submissionDate != null) {
-            submitDate = DateHelpers.createPrefixedDateTimeString(getContext(), R.string.assignmentLastSubmission, submissionDate);
+            submitDate = DateHelper.createPrefixedDateTimeString(getContext(), R.string.assignmentLastSubmission, submissionDate);
         }
         submissionDateView.setText(submitDate);
     }
@@ -166,21 +157,18 @@ public class AssignmentDetailsFragment extends ParentFragment {
         initViews(rootView);
         setListeners();
 
-        setCanvasCallback();
         return rootView;
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void initViews(View rootView) {
-        assignmentDetails = (LinearLayout) rootView.findViewById(R.id.assignmentDetailsLayout);
         pointsPossible = (TextView) rootView.findViewById(R.id.pointsPossible);
-        assignmentGroup = (TextView) rootView.findViewById(R.id.assignmentGroup);
         gradingType = (TextView) rootView.findViewById(R.id.gradingType);
         turnInTypeSelected = (TextView) rootView.findViewById(R.id.submissionTypeSelected);
         onlineSubmissionTypeLayout = (LinearLayout) rootView.findViewById(R.id.onlineSubmissionTypes);
         notification = (TextView) rootView.findViewById(R.id.notificationText);
         notificationContainer = rootView.findViewById(R.id.notificationTextContainer);
         notificationDismiss = (ImageButton) rootView.findViewById(R.id.notificationTextDismiss);
-        divider = rootView.findViewById(R.id.divider);
         assignmentTitleView = (TextView) rootView.findViewById(R.id.textViewAssignmentTitle);
         dueDateView = (TextView) rootView.findViewById(R.id.textViewDueDate);
         submissionDateView = (TextView) rootView.findViewById(R.id.textViewSubmissionDate);
@@ -244,12 +232,12 @@ public class AssignmentDetailsFragment extends ParentFragment {
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(getActivity()), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(getActivity(), url, APIHelpers.getDomain(getActivity()), true);
+                RouterUtils.canRouteInternally(getActivity(), url, ApiPrefs.getDomain(), true);
             }
         });
 
@@ -280,17 +268,6 @@ public class AssignmentDetailsFragment extends ParentFragment {
         return map;
     }
 
-    private void populateTeacherAssignmentDetails(AssignmentGroup[] assignmentGroups) {
-        if (assignment == null) {
-            return;
-        }
-        for (AssignmentGroup group : assignmentGroups) {
-            if (group.getId() == assignment.getAssignmentGroupId()) {
-                assignmentGroup.setText(group.getName());
-            }
-
-        }
-    }
 
     /**
      * Updates each view with its corresponding assignment data.
@@ -302,22 +279,12 @@ public class AssignmentDetailsFragment extends ParentFragment {
         if (assignment == null) {
             return;
         }
-        // anything that relies on intent data belongs here
-        if (course != null && course.isTeacher()) {
-            if (isWithinAnotherCallback) {
-                AssignmentAPI.getAssignmentGroupsListChained(course.getId(), canvasCallback, isCached);
-            } else {
-                AssignmentAPI.getAssignmentGroupsList(course.getId(), canvasCallback);
-            }
-            assignmentDetails.setVisibility(View.VISIBLE);
-            divider.setVisibility(View.VISIBLE);
-        }
 
         assignmentTitleView.setText(assignment.getName());
 
         // Due Date
-        if (assignment.getDueDate() != null) {
-            String dueDate = DateHelpers.createPrefixedDateTimeString(getContext(), R.string.assignmentDue, assignment.getDueDate());
+        if (assignment.getDueAt() != null) {
+            String dueDate = DateHelper.createPrefixedDateTimeString(getContext(), R.string.assignmentDue, assignment.getDueAt());
             dueDateView.setVisibility(View.VISIBLE);
             dueDateView.setTypeface(null, Typeface.ITALIC);
             dueDateView.setText(dueDate);
@@ -331,8 +298,8 @@ public class AssignmentDetailsFragment extends ParentFragment {
             submissionDateView.setVisibility(View.INVISIBLE);
         } else {
             submissionDateView.setVisibility(View.VISIBLE);
-            if (assignment.getLastSubmission() != null) {
-                updateSubmissionDate(assignment.getLastSubmission().getSubmitDate());
+            if (assignment.getSubmission() != null) {
+                updateSubmissionDate(assignment.getSubmission().getSubmittedAt());
             }
         }
         pointsPossible.setText("" + assignment.getPointsPossible());
@@ -375,10 +342,10 @@ public class AssignmentDetailsFragment extends ParentFragment {
         String description;
         if (assignment.isLocked()) {
             description = LockInfoHTMLHelper.getLockedInfoHTML(assignment.getLockInfo(), getActivity(), R.string.lockedAssignmentDesc, R.string.lockedAssignmentDescLine2);
-        } else if (assignment.getlockAtDate() != null && assignment.getlockAtDate().before(Calendar.getInstance(Locale.getDefault()).getTime())) {
+        } else if (assignment.getLockAt() != null && assignment.getLockAt().before(Calendar.getInstance(Locale.getDefault()).getTime())) {
             //if an assignment has an available from and until field and it has expired (the current date is after "until" it will have a lock explanation,
             //but no lock info because it isn't locked as part of a module
-            description = assignment.getLock_explanation();
+            description = assignment.getLockExplanation();
         } else {
             description = assignment.getDescription();
         }
@@ -421,26 +388,6 @@ public class AssignmentDetailsFragment extends ParentFragment {
                 notificationContainer.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Setup CanvasCallback
-    ///////////////////////////////////////////////////////////////////////////
-
-    public void setCanvasCallback() {
-        canvasCallback = new CanvasCallback<AssignmentGroup[]>(this) {
-            @Override
-            public void firstPage(AssignmentGroup[] assignmentGroups, LinkHeaders linkHeaders, Response response) {
-                if (!apiCheck()) {
-                    return;
-                }
-
-                //[] of fresh data.
-                if (course.isTeacher()) {
-                    populateTeacherAssignmentDetails(assignmentGroups);
-                }
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////

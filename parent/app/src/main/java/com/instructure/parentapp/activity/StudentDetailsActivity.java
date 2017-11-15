@@ -38,6 +38,7 @@ import com.instructure.canvasapi2.models.Alert;
 import com.instructure.canvasapi2.models.AlertThreshold;
 import com.instructure.canvasapi2.models.Student;
 import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
@@ -54,10 +55,8 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class StudentDetailsActivity extends BaseParentActivity implements StudentThresholdDialog.StudentThresholdChanged {
 
     private static final int GRADE_ABOVE = 1;
@@ -115,7 +114,7 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
         setupViews();
 
         AlertThresholdManager.getAlertThresholdsForStudent(
-                APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 getStudent().getParentId(),
                 getStudent().getStudentId(),
                 mAlertThresholdCallback
@@ -158,8 +157,8 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
 
         Picasso.with(StudentDetailsActivity.this)
                 .load(getStudent().getAvatarUrl())
-                .placeholder(R.drawable.ic_cv_user_dark)
-                .error(R.drawable.ic_cv_user_dark)
+                .placeholder(R.drawable.ic_cv_user)
+                .error(R.drawable.ic_cv_user)
                 .fit()
                 .into(avatar);
 
@@ -482,13 +481,13 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
         String thresholdId = getThresholdIdByAlertType(alertType);
         if(!thresholdId.equals("-1")) {
             AlertThresholdManager.deleteAlertThreshold(
-                    APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     getStudent().getParentId(),
                     thresholdId,
-                    new StatusCallback<ResponseBody>(){
+                    new StatusCallback<ResponseBody>() {
                         @Override
-                        public void onResponse(retrofit2.Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
-                            if(!APIHelper.isCachedResponse(response)) {
+                        public void onResponse(Response<ResponseBody> response, LinkHeaders linkHeaders, ApiType type) {
+                            if (!APIHelper.isCachedResponse(response)) {
                                 switch (alertType) {
                                     case COURSE_GRADE_LOW:
                                         mHasGradeBelowThreshold = false;
@@ -548,12 +547,13 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
         String thresholdId = getThresholdIdByAlertType(alertType);
         if(!thresholdId.equals("-1")) {
             AlertThresholdManager.updateAlertThreshold(
-                    APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     getStudent().getParentId(),
                     thresholdId,
                     Alert.alertTypeToAPIString(alertType),
                     newThreshold,
-                    new StatusCallback<AlertThreshold>(){});
+                    new StatusCallback<AlertThreshold>() {
+                    });
         }
     }
 
@@ -563,14 +563,14 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
         String thresholdId = getThresholdIdByAlertType(alertType);
         if(!thresholdId.equals("-1")) {
             AlertThresholdManager.updateAlertThreshold(
-                    APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     getStudent().getParentId(),
                     thresholdId,
                     Alert.alertTypeToAPIString(alertType),
-                    new StatusCallback<AlertThreshold>(){
+                    new StatusCallback<AlertThreshold>() {
                         @Override
-                        public void onResponse(retrofit2.Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
-                            if(!APIHelper.isCachedResponse(response)) {
+                        public void onResponse(Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
+                            if (!APIHelper.isCachedResponse(response)) {
                                 enableSwitches(alertType);
                             }
                         }
@@ -590,14 +590,14 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
         AnalyticUtils.trackButtonPressed(AnalyticUtils.MODIFY_THRESHOLD);
 
         AlertThresholdManager.createAlertThreshold(
-                APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 getStudent().getParentId(),
                 getStudent().getStudentId(),
                 Alert.alertTypeToAPIString(alertType),
-                new StatusCallback<AlertThreshold>(){
+                new StatusCallback<AlertThreshold>() {
                     @Override
-                    public void onResponse(retrofit2.Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
-                        if(!APIHelper.isCachedResponse(response)) {
+                    public void onResponse(Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
+                        if (!APIHelper.isCachedResponse(response)) {
                             mAlertThresholds.add(response.body());
                             enableSwitches(alertType);
                         }
@@ -617,14 +617,14 @@ public class StudentDetailsActivity extends BaseParentActivity implements Studen
 
 
         AlertThresholdManager.createAlertThreshold(
-                APIHelper.getAirwolfDomain(StudentDetailsActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 getStudent().getParentId(),
                 getStudent().getStudentId(),
                 Alert.alertTypeToAPIString(alertType),
                 threshold,
-                new StatusCallback<AlertThreshold>(){
+                new StatusCallback<AlertThreshold>() {
                     @Override
-                    public void onResponse(retrofit2.Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
+                    public void onResponse(Response<AlertThreshold> response, LinkHeaders linkHeaders, ApiType type) {
                         mAlertThresholds.add(response.body());
                     }
                 }

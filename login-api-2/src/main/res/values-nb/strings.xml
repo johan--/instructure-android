@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">InnloggingsAPI</string>
   <string name="hello_world">Hallo verden!</string>
   <string name="action_settings">Innstillinger</string>
   <string name="mobileVerifyGeneral">Denne appen er ikke godkjent for bruk</string>
@@ -10,7 +9,6 @@
   <string name="unknownDevice">UkjentEnhet</string>
   <string name="errorOccurred">En uventet feil oppstod.</string>
   <string name="pageNotFound">Siden finnes ikke.</string>
-  <string name="okay">Ok</string>
   <string name="confirm">Bekrefte</string>
   <string name="cancel">Avbryt</string>
   <string name="help">Hjelp</string>
@@ -18,6 +16,13 @@
   <string name="signIntoCanvasNetwork">Prøve å logge på Canvas Network?</string>
   <string name="remove">Fjerne</string>
   <string name="exampleURLSimple">myschool.instructure.com</string>
+  <string name="masquerade">Maskerade</string>
+  <string name="userId">Bruker-ID</string>
+  <string name="domain">Domene</string>
+  <string name="masqueradingUserId">Maskerade bruker-ID</string>
+  <string name="masqueradingUserDomain">Maskerade domene</string>
+  <string name="masqueradingBegin">Start forkledning</string>
+  <string name="masqueradingStop">Stopp forkledning</string>
   <!--Multiple User Sign in-->
   <string name="removeUser">Fjerne denne brukeren?</string>
   <string name="removedForever">Du må logge inn på denne brukeren på nytt for å få tilgang til innholdet deres.</string>
@@ -44,20 +49,6 @@
   <string name="loginCanvasHelp">Ser du ikke skolen din? Skriv inn skolens URL eller tappe her for hjelp.</string>
   <string name="loginCanvasHelpWithUser">Skriv in skolens URL eller tappe her for hjelp.</string>
   <string name="loginHint">Finn din skole eller distrikt</string>
-  <!--Rating Dialog-->
-  <string name="howAreWeDoing">Hvordan klarer vi oss?</string>
-  <string name="rateUs">Hvordan ville du vurdert oss?</string>
-  <string name="doBetter">Hva kan vi gjøre bedre</string>
-  <string name="sendFeedback">Send tilbakemelding</string>
-  <string name="suggestions">Forslag for Android</string>
-  <string name="domain">Domene</string>
-  <string name="versionNum">Versjon</string>
-  <string name="userId">Bruker-ID</string>
-  <string name="email">E-post</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
-  <string name="dontShowAgain">Ikke vis igjen</string>
-  <string name="installDate">Installasjonsdato:</string>
   <!--Zendesk Dialog-->
   <string name="zendesk_reportAProblem">Rapporter et problem</string>
   <string name="zendesk_subject">Emne</string>
@@ -87,4 +78,22 @@
   <!--String for submitting tickets-->
   <string name="device">Enhet</string>
   <string name="osVersion">OS-versjon</string>
+  <string name="previousLoginTitle">Tidligere innlogginger</string>
+  <string name="canvasNetworks">Canvas nettverk</string>
+  <string name="findMySchool">Finne skolen min</string>
+  <string name="appTypeTeacher">Lærer</string>
+  <string name="appTypeStudent">Student</string>
+  <string name="appTypeParent">Forelder</string>
+  <string name="canvasLowerCase">canvas</string>
+  <string name="whatsYourSchoolName">Hva er skolens navn?</string>
+  <string name="next">Neste</string>
+  <string name="schoolInstructureCom">school.instructure.com</string>
+  <string name="contentDescription_removePreviousUser">Fjerne forrige bruker</string>
+  <string name="accountDomainFooter">Finner du ikke skolen din? Prøv å skrive hele skolens URL.</string>
+  <string name="accountDomainFooterLink">Trykk her for hjelp.</string>
+  <string name="login_noInternetConnectionTitle">Ingen Internett-tilkobling</string>
+  <string name="login_noInternetConnectionMessage">Denne handlingen krever Internett-tilkobling.</string>
+  <string name="empty_feedback">Et emne og en beskrivelse må sende inn tilbakemelding.</string>
+  <string name="versionNum">Versjon nummer</string>
+  <string name="scrollInstructions">Rull for å se detaljer</string>
 </resources>

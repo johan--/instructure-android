@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.instructure.canvasapi2.models;
 
 import android.os.Parcel;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 
@@ -30,6 +32,8 @@ public class QuizSubmissionAnswer extends CanvasModel<QuizSubmissionAnswer> {
     private String html;
     private String comments;
     private int weight;
+    @SerializedName("blank_id")
+    private String blankId;
 
     @Override
     public long getId() {
@@ -72,6 +76,14 @@ public class QuizSubmissionAnswer extends CanvasModel<QuizSubmissionAnswer> {
         this.weight = weight;
     }
 
+    public String getBlankId() {
+        return blankId;
+    }
+
+    public void setBlankId(String blankId) {
+        this.blankId = blankId;
+    }
+
     @Override
     public Date getComparisonDate() {
         return null;
@@ -99,6 +111,7 @@ public class QuizSubmissionAnswer extends CanvasModel<QuizSubmissionAnswer> {
         dest.writeString(this.html);
         dest.writeString(this.comments);
         dest.writeInt(this.weight);
+        dest.writeString(this.blankId);
     }
 
     public QuizSubmissionAnswer() {
@@ -110,6 +123,7 @@ public class QuizSubmissionAnswer extends CanvasModel<QuizSubmissionAnswer> {
         this.html = in.readString();
         this.comments = in.readString();
         this.weight = in.readInt();
+        this.blankId = in.readString();
     }
 
     public static final Creator<QuizSubmissionAnswer> CREATOR = new Creator<QuizSubmissionAnswer>() {

@@ -125,4 +125,24 @@
         <item name="android:background">@drawable/parent_et_bg</item>
         <item name="android:textAlignment">viewStart</item>
     </style>
+
+    <style name="TextInputLabel" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="LoginTextAsButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/login_textButton</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
 </resources>

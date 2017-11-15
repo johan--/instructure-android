@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -215,31 +215,19 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
     ///////////////////////////////////////////////////////////////////////////
 
     public boolean isStudent() {
-        if (type.equalsIgnoreCase("student") || type.equalsIgnoreCase("studentenrollment")) {
-            return true;
-        }
-        return false;
+        return type.equalsIgnoreCase("student") || type.equalsIgnoreCase("studentenrollment");
     }
 
     public boolean isTeacher() {
-        if (type.equalsIgnoreCase("teacher") || type.equalsIgnoreCase("teacherenrollment")) {
-            return true;
-        }
-        return false;
+        return type.equalsIgnoreCase("teacher") || type.equalsIgnoreCase("teacherenrollment");
     }
 
     public boolean isObserver() {
-        if (type.equalsIgnoreCase("observer") || type.equalsIgnoreCase("observerenrollment")) {
-            return true;
-        }
-        return false;
+        return type.equalsIgnoreCase("observer") || type.equalsIgnoreCase("observerenrollment");
     }
 
     public boolean isTA() {
-        if (type.equalsIgnoreCase("ta") || type.equalsIgnoreCase("taenrollment")) {
-            return true;
-        }
-        return false;
+        return type.equalsIgnoreCase("ta") || type.equalsIgnoreCase("taenrollment");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,9 +251,8 @@ public class Enrollment extends CanvasModel<Enrollment> implements Parcelable {
 
         Enrollment that = (Enrollment) o;
 
-        if (!type.equals(that.type)) return false;
+        return type.equals(that.type);
 
-        return true;
     }
 
     @Override

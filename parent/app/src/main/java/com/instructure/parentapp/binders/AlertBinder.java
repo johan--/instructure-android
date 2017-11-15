@@ -35,9 +35,6 @@ import com.instructure.parentapp.interfaces.AdapterToFragmentBadgeCallback;
 
 import java.util.List;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class AlertBinder extends BaseBinder {
 
     public static void bind(

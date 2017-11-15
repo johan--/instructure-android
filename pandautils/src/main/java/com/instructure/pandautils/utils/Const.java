@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class Const {
     public static final String CALENDAR_EVENT_START_DATE = "calendarEventStartDate";
     public static final String CANVAS_CONTEXT = "canvasContext";
     public static final String CANVAS_LOGIN = "canvas_login";
-    public static final String CANVAS_USER_GUIDES = "https://community.canvaslms.com/community/answers/guides/";
+    public static final String CANVAS_USER_GUIDES = "https://community.canvaslms.com/community/answers/guides/mobile-guide/content?filterID=contentstatus%5Bpublished%5D~category%5Btable-of-contents%5D";
     public static final String CHANGED = "changed";
     public static final String CHILD_POSITION = "childPosition";
     public static final String CLASS_NAME = "className";
@@ -166,6 +166,7 @@ public class Const {
     public static final String WIDGET = "fromWidget";
     public static final String COURSE_URL = "/courses/";
     public static final String GRADE_URL = "/grades";
+    public static final String SESSIONLESS_LAUNCH = "sessionlessLaunch";
     //Broadcast
     public static final String REFRESH = "refresh";
     public static final String SUBMISSION_COMMENT_SUBMITTED = "submission-comment-submitted";
@@ -193,6 +194,7 @@ public class Const {
     public static final String CONTENT_TYPE = "contentType";
     public static final String PATH = "path";
     public static final String SIZE = "size";
+    public static final String DELETE = "delete";
     public static final String LOADER_ID = "loaderID";
     public static final String LOADER_BUNDLE = "loaderBundle";
     public static final String OPEN_MEDIA_LOADER_BUNDLE = "openMediaLoaderBundle";
@@ -237,6 +239,9 @@ public class Const {
     public static final String URL_PARAMS = "url_params";
     public static final String URL_QUERY_PARAMS = "url_query_params";
 
+    public static final String ACTION_MEDIA_UPLOAD_SUCCESS = "com.instructure.speedgrader.SPEED_GRADER_MEDIA_COMMENT_UPDATE";
+    public static final String CLOAKMAN_TO_COMMENT_VIEW = "cloakmanToCommentView";
+
     //Data loss
     public static final String DATA_LOSS_COMPOSE_NEW_MESSAGE = "dataLossComposeNewMessage";
     public static final String DATA_LOSS_ADD_SUBMISSION = "dataLossAddSubmission";
@@ -280,11 +285,6 @@ public class Const {
     public static final String FILENAME = "fileName";
     public static final String COURSE_ID = "courseId";
 
-    public static final String WEAR_NOTIFICATIONS = "wear_notifications";
-    public static final String WEAR_REMINDER = "wear_reminder";
-    public static final String WEAR_REMINDER_HOUR = "wear_reminder_hour";
-    public static final String WEAR_REMINDER_MIN = "wear_reminder_minute";
-
     public static final String MAP = "map";
     public static final String COURSE_THING_CHANGED = "courseTHINGChangedBroadcast";
 
@@ -312,4 +312,11 @@ public class Const {
     public static final String FILE_PROVIDER_AUTHORITY = ".provider";
     public static final String POINTS = "points";
 
+    public static final String OPTIONS = "options";
+    public static final String MEDIA_FILE_PATH = "media_file_path";
+    public static final String SUBMISSION_COMMENT_LIST = "submission_comment_list";
+    public static final String PAGE_ID = "PAGE_ID";
+    public static final String ACTION_MEDIA_UPLOAD_FAIL = "com.instructure.action.NOTORIOUS_UPLOAD_ERROR";
+    public static final String ERROR = "UPLOAD_ERROR";
+    public static final String IS_SUBMISSION = "isSubmission";
 }

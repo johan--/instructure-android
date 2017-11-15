@@ -18,7 +18,7 @@ package com.instructure.espresso;
 
 import android.util.Log;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
+import static android.support.test.espresso.core.internal.deps.guava.base.Preconditions.checkNotNull;
 
 /**
  * Wrapper for android.util.log

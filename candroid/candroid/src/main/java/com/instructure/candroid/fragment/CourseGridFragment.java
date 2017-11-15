@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,10 @@ import com.instructure.candroid.holders.CourseViewHolder;
 import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.candroid.util.ApplicationManager;
 import com.instructure.candroid.util.TabHelper;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.utils.Const;
@@ -163,7 +163,7 @@ public class CourseGridFragment extends ParentFragment {
             mRecyclerAdapter.setShowGrades(!showGrades);
             return true;
         } else if(item.getItemId() == R.id.selectFavorites) {
-            if(!CanvasRestAdapter.isNetworkAvaliable(getContext())) {
+            if(!APIHelper.hasNetworkConnection()) {
                 Toast.makeText(getContext(), getContext().getString(R.string.notAvailableOffline), Toast.LENGTH_SHORT).show();
                 return true;
             }

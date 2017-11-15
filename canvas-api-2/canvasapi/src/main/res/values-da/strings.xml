@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">Online URL</string>
   <string name="canvasAPI_mediaRecording">Medieoptagelse</string>
   <string name="canvasAPI_attendance">Fremmøde</string>
+  <string name="quiz_scoring_policy_highest">Højeste</string>
+  <string name="quiz_scoring_policy_average">Gennemsnitlig</string>
+  <string name="quiz_scoring_policy_latest">Seneste</string>
+  <string name="no">Nej</string>
+  <string name="always">Altid</string>
+  <string name="graded_quiz">Bedømt quiz</string>
+  <string name="practice_quiz">Øvelsesquiz</string>
+  <string name="graded_survey">Bedømt spørgeundersøgelse</string>
+  <string name="ungraded_survey">Ikke bedømt spørgeundersøgelse</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.DiscussionEntry;
 import com.instructure.canvasapi2.models.DiscussionTopic;
 import com.instructure.canvasapi2.models.DiscussionTopicHeader;
+import com.instructure.canvasapi2.models.post_models.DiscussionEntryPostBody;
+import com.instructure.canvasapi2.models.post_models.DiscussionTopicPostBody;
+import com.instructure.canvasapi2.utils.APIHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,23 +51,45 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
-
 public class DiscussionAPI {
 
     interface DiscussionInterface {
-        @Multipart
-        @POST("courses/{contextId}/discussion_topics")
-        Call<DiscussionTopicHeader> createCourseDiscussion(
+
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}/read")
+        Call<Void> markDiscussionReplyAsRead(
+                @Path("contextType") String contextType,
                 @Path("contextId") long contextId,
-                @Part("title") String title,
-                @Part("message") String message,
+                @Path("topicId") long topicId);
+
+        @Multipart
+        @POST("{contextType}/{contextId}/discussion_topics")
+        Call<DiscussionTopicHeader> createCourseDiscussion(
+                @Path("contextType") String contextType,
+                @Path("contextId") long contextId,
+                @Part("title") RequestBody title,
+                @Part("message") RequestBody message,
                 @Part("is_announcement") boolean isAnnouncement,
-                @Part("delayed_post_at") String delayedPostAt,
+                @Part("delayed_post_at") RequestBody delayedPostAt,
                 @Part("published") boolean isPublished,
+                @Part("discussion_type") RequestBody discussionType,
+                @Part("require_initial_post") boolean isUsersMustPost,
+                @Part("lock_at") RequestBody lockAt,
                 @Part MultipartBody.Part attachment);
 
-        @GET("courses/{contextId}/discussion_topics")
+        @POST("{contextType}/{contextId}/discussion_topics/")
+        Call<DiscussionTopicHeader> createNewDiscussion(@Path("contextType") String contextType, @Path("contextId") long courseId, @Query("title") String title, @Query("message")String message, @Query("is_announcement")int announcement, @Query("published") int published, @Query("discussion_type")String discussionType);
+
+        @GET("courses/{contextId}/discussion_topics?override_assignment_dates=true&include[]=all_dates&include[]=overrides")
         Call<List<DiscussionTopicHeader>> getFirstPageDiscussionTopicHeaders(@Path("contextId") long contextId);
+
+        @GET("{contextType}/{contextId}/discussion_topics?scope=pinned")
+        Call<List<DiscussionTopicHeader>> getFirstPagePinnedDiscussions(@Path("contextType") String contextType, @Path("contextId") long courseId);
+
+        @GET("{contextType}/{contextId}/discussion_topics")
+        Call<List<DiscussionTopicHeader>> getFirstPageStudentGroupDiscussionTopicHeader(@Path("contextType") String contextType, @Path("contextId") long courseId, @Query("root_topic_id") long rootTopicId);
+
+        @GET("{contextType}/{contextId}/discussion_topics")
+        Call<List<DiscussionTopicHeader>> getFilteredDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long courseId, @Query("search_term") String searchTerm);
 
         @GET("{contextType}/{contextId}/discussion_topics/{topicId}")
         Call<DiscussionTopicHeader> getDetailedDiscussion(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId);
@@ -73,7 +98,7 @@ public class DiscussionAPI {
         Call<List<DiscussionEntry>> getDiscussionEntries(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId);
 
         @GET("{contextType}/{contextId}/discussion_topics/{topicId}/view")
-        Call<DiscussionTopic> getFullDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId);
+        Call<DiscussionTopic> getFullDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId, @Query("include_new_entries") int includeNewEntries);
 
         @POST("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}/rating")
         Call<Void> rateDiscussionEntry(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId, @Path("entryId") long entryId, @Query("rating") int rating);
@@ -92,6 +117,9 @@ public class DiscussionAPI {
 
         @DELETE("{contextType}/{contextId}/discussion_topics/{topicId}")
         Call<Void> deleteDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long courseId, @Path("topicId") long topicId);
+
+        @DELETE("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}")
+        Call<Void> deleteDiscussionEntry(@Path("contextType") String contextType, @Path("contextId") long courseId, @Path("topicId") long topicId, @Path("entryId") long entryId);
 
         @Multipart
         @POST("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}/replies")
@@ -118,6 +146,19 @@ public class DiscussionAPI {
         @GET
         Call<List<DiscussionEntry>> getNextPageEntries(@Url String nextUrl);
 
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}/entries/{entryId}")
+        Call<DiscussionEntry> updateDiscussionEntry(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId, @Path("entryId") long entryId, @Body DiscussionEntryPostBody entry);
+
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}")
+        Call<DiscussionTopicHeader> updateDiscussionTopic(@Path("contextType") String contextType, @Path("contextId") long contextId, @Path("topicId") long topicId, @Query("title") String title, @Query("message")String message, @Query("published") int isPublished, @Query("discussionType")String discussionType);
+
+        @PUT("{contextType}/{contextId}/discussion_topics/{topicId}")
+        Call<DiscussionTopicHeader> editDiscussionTopic(
+                @Path("contextType") String contextType,
+                @Path("contextId") long contextId,
+                @Path("topicId") long topicId,
+                @Body DiscussionTopicPostBody body);
+
         //region Airwolf
 
         @GET("canvas/{parentId}/{studentId}/courses/{courseId}/discussion_topics/{discussionTopicId}")
@@ -126,21 +167,69 @@ public class DiscussionAPI {
         //endregion
     }
 
-    public static void createCourseDiscussion(@NonNull RestBuilder adapter, @NonNull RestParams params, long courseId, DiscussionTopicHeader newDiscussionHeader, @Nullable MultipartBody.Part attachment, StatusCallback<DiscussionTopicHeader> callback) {
+    public static boolean markReplyAsReadSynchronous(
+            @NonNull CanvasContext canvasContext,
+            long topicId,
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params) {
+        Call<Void> call = adapter
+                .build(DiscussionInterface.class, params)
+                .markDiscussionReplyAsRead(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId);
+        try {
+            Response response = call.execute();
+            return response.isSuccessful();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+
+
+    public static void createDiscussion(@NonNull RestBuilder adapter,
+                                        @NonNull RestParams params,
+                                        CanvasContext canvasContext,
+                                        DiscussionTopicHeader newDiscussionHeader,
+                                        @Nullable MultipartBody.Part attachment,
+                                        StatusCallback<DiscussionTopicHeader> callback) {
         callback.addCall(adapter.build(DiscussionInterface.class, params)
                 .createCourseDiscussion(
-                        courseId,
-                        newDiscussionHeader.getTitle(),
-                        newDiscussionHeader.getMessage(),
+                        CanvasContext.getApiContext(canvasContext),
+                        canvasContext.getId(),
+                        APIHelper.makeRequestBody(newDiscussionHeader.getTitle()),
+                        APIHelper.makeRequestBody(newDiscussionHeader.getMessage()),
                         newDiscussionHeader.isAnnouncement(),
-                        newDiscussionHeader.getDelayedPostAt() == null ? null : newDiscussionHeader.getDelayedPostAt().toString(),
+                        newDiscussionHeader.getDelayedPostAt() == null ? null : APIHelper.makeRequestBody(newDiscussionHeader.getDelayedPostAt().toString()),
                         newDiscussionHeader.isPublished(),
+                        APIHelper.makeRequestBody(newDiscussionHeader.getDiscussionType()),
+                        newDiscussionHeader.isRequireInitialPost(),
+                        newDiscussionHeader.getLockAt() == null ? null : APIHelper.makeRequestBody(newDiscussionHeader.getLockAt().toString()),
                         attachment
                 )).enqueue(callback);
 
     }
 
-    public static void getDiscussionTopicHeaders(long contextId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+    public static void createDiscussion(@NonNull RestBuilder adapter,
+                                           @NonNull RestParams params,
+                                           CanvasContext canvasContext,
+                                           @NonNull String title,
+                                           @NonNull String message,
+                                           boolean isThreaded,
+                                           boolean isAnnouncement,
+                                           boolean isPublished,
+                                           StatusCallback<DiscussionTopicHeader> callback) {
+        String type = "";
+        if (isThreaded)
+            type = "threaded";
+        else
+            type = "side_comment";
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+        int announcement = APIHelper.booleanToInt(isAnnouncement);
+        int publish = APIHelper.booleanToInt(isPublished);
+        callback.addCall(adapter.build(DiscussionInterface.class, params).createNewDiscussion(contextType, canvasContext.getId(), title, message, announcement, publish, type)).enqueue(callback);
+    }
+
+
+    public static void getDiscussions(long contextId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
             callback.addCall(adapter.build(DiscussionInterface.class, params).getFirstPageDiscussionTopicHeaders(contextId)).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
@@ -148,9 +237,32 @@ public class DiscussionAPI {
         }
     }
 
+    public static void getFirstPageDiscussionTopicHeaders(long contextId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getFirstPageDiscussionTopicHeaders(contextId)).enqueue(callback);
+    }
+
+    public static void getFirstPagePinnedDiscussions(@NonNull CanvasContext canvasContext, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getFirstPagePinnedDiscussions(contextType, canvasContext.getId())).enqueue(callback);
+    }
+
+    public static void getFirstPageStudentGroupDiscussionTopicHeader(@NonNull CanvasContext canvasContext, long rootTopicId, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestBuilder adapter, @NonNull RestParams params) {
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getFirstPageStudentGroupDiscussionTopicHeader(contextType, canvasContext.getId(), rootTopicId)).enqueue(callback);
+    }
+
+    public static void getFilteredDiscussionTopic(@NonNull CanvasContext canvasContext, @NonNull String searchTerm, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestBuilder adapter, @NonNull RestParams params) {
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getFilteredDiscussionTopic(contextType, canvasContext.getId(), searchTerm)).enqueue(callback);
+    }
+
+    public static void getNextPage(String nextUrl, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<DiscussionTopicHeader>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getNextPage(nextUrl)).enqueue(callback);
+    }
+
     public static void getFullDiscussionTopic(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopic> callback, @NonNull RestParams params) {
         final String contextType = CanvasContext.getApiContext(canvasContext);
-        callback.addCall(adapter.build(DiscussionInterface.class, params).getFullDiscussionTopic(contextType, canvasContext.getId(), topicId)).enqueue(callback);
+        callback.addCall(adapter.build(DiscussionInterface.class, params).getFullDiscussionTopic(contextType, canvasContext.getId(), topicId, 1)).enqueue(callback);
     }
 
     public static void getDetailedDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
@@ -175,6 +287,25 @@ public class DiscussionAPI {
         MultipartBody.Part attachmentPart = MultipartBody.Part.createFormData("attachment", attachment.getName(), requestFile);
 
         callback.addCall(adapter.build(DiscussionInterface.class, params).postDiscussionReplyWithAttachment(contextType, canvasContext.getId(), topicId, entryId, messagePart, attachmentPart)).enqueue(callback);
+    }
+
+    public static void updateDiscussionEntry(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, long entryId, DiscussionEntryPostBody updatedEntry, StatusCallback<DiscussionEntry> callback, @NonNull RestParams params) {
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+
+        callback.addCall(adapter.buildSerializeNulls(DiscussionInterface.class, params).updateDiscussionEntry(contextType, canvasContext.getId(), topicId, entryId, updatedEntry)).enqueue(callback);
+    }
+
+    public static void updateDiscussionTopic(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, String title, String message, boolean threaded, boolean isPublished, StatusCallback<DiscussionTopicHeader> callback, @NonNull RestParams params) {
+        final String contextType = CanvasContext.getApiContext(canvasContext);
+
+        String type = "";
+        if (threaded)
+            type = "threaded";
+        else
+            type = "side_comment";
+
+
+        callback.addCall(adapter.buildSerializeNulls(DiscussionInterface.class, params).updateDiscussionTopic(contextType, canvasContext.getId(), topicId, title, message, APIHelper.booleanToInt(isPublished), type)).enqueue(callback);
     }
 
     public static void postToDiscussionTopic(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, String message, StatusCallback<DiscussionEntry> callback, @NonNull RestParams params) {
@@ -230,12 +361,13 @@ public class DiscussionAPI {
     }
 
     @Nullable
-    public static Response<Void> markDiscussionTopicEntryReadSynchronously(@NonNull RestBuilder adapter, @NonNull CanvasContext canvasContext, long topicId, long entryId, @NonNull RestParams params) {
+    public static boolean markDiscussionTopicEntryReadSynchronously(@NonNull RestBuilder adapter, @NonNull CanvasContext canvasContext, long topicId, long entryId, @NonNull RestParams params) {
         final String contextType = CanvasContext.getApiContext(canvasContext);
         try {
-            return adapter.build(DiscussionInterface.class, params).markDiscussionTopicEntryRead(contextType, canvasContext.getId(), topicId, entryId).execute();
+            Response<Void> response = adapter.build(DiscussionInterface.class, params).markDiscussionTopicEntryRead(contextType, canvasContext.getId(), topicId, entryId).execute();
+            return response.isSuccessful();
         } catch (IOException e) {
-            return null;
+            return false;
         }
     }
 
@@ -277,7 +409,15 @@ public class DiscussionAPI {
         callback.addCall(adapter.build(DiscussionInterface.class, params).lockDiscussion(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, false, "")).enqueue(callback);
     }
 
-    public static void deleteDiscussion(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<Void> callback, @NonNull RestParams params) {
+    public static void deleteDiscussionTopicHeader(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, StatusCallback<Void> callback, @NonNull RestParams params) {
         callback.addCall(adapter.build(DiscussionInterface.class, params).deleteDiscussionTopic(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId)).enqueue(callback);
+    }
+
+    public static void editDiscussionTopic(@NonNull CanvasContext canvasContext, long topicId, DiscussionTopicPostBody body, RestBuilder adapter, final StatusCallback<DiscussionTopicHeader> callback, RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).editDiscussionTopic(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, body)).enqueue(callback);
+    }
+
+    public static void deleteDiscussionEntry(@NonNull RestBuilder adapter, CanvasContext canvasContext, long topicId, long entryId, StatusCallback<Void> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(DiscussionInterface.class, params).deleteDiscussionEntry(CanvasContext.getApiContext(canvasContext), canvasContext.getId(), topicId, entryId)).enqueue(callback);
     }
 }

@@ -24,6 +24,7 @@ import android.support.annotation.RestrictTo;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.webkit.WebView;
 
 import jp.wasabeef.richeditor.RichEditor;
@@ -52,6 +53,24 @@ public class RCETextEditor extends RichEditor {
         loadCSS("rce_style.css");
     }
 
+    private void checkForMathTags(String content) {
+        // If this html that we're about to load has a math tag and isn't just an image we want to parse it with MathJax.
+        // This is the version that web currently uses (the 2.7.1 is the version number) and this is the check that they do to
+        // decide if they'll run the MathJax script on the webview
+        if(content.contains("<math") && !content.contains("<img class='equation_image'")) {
+
+            String jsCSSImport = "(function() {" +
+                    "    var head  = document.getElementsByTagName(\"head\")[0];" +
+                    "    var script  = document.createElement(\"script\");" +
+                    "    script.type= 'text/javascript';" +
+                    "    script.src= \"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML\";" +
+                    "    head.appendChild(script);" +
+                    "}) ();";
+            exec("javascript:" + jsCSSImport + "");
+
+        }
+    }
+
     private String formatHTML(String contents, String title) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (0 != (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
@@ -59,7 +78,9 @@ public class RCETextEditor extends RichEditor {
             }
         }
 
+
         contents = applyWorkAroundForDoubleSlashesAsUrlSource(contents);
+        checkForMathTags(contents);
 
         //Note: loading with a base url for the referrer does not work.
 
@@ -89,6 +110,15 @@ public class RCETextEditor extends RichEditor {
             this.setContentDescription(simplifyHTML(Html.fromHtml(contentDescription, Html.FROM_HTML_MODE_LEGACY)));
         } else {
             this.setContentDescription(simplifyHTML(Html.fromHtml(contentDescription)));
+        }
+    }
+
+    public String getAccessibilityContentDescription() {
+        CharSequence charSequence = getContentDescription();
+        if(charSequence == null) {
+            return "";
+        } else {
+            return charSequence.toString();
         }
     }
 
@@ -124,5 +154,17 @@ public class RCETextEditor extends RichEditor {
     @Nullable
     public String getHtml() {
         return RCEUtils.sanitizeHTML(super.getHtml());
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        requestDisallowInterceptTouchEvent(true);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+        requestDisallowInterceptTouchEvent(!clampedY);
     }
 }

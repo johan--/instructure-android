@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,25 +30,24 @@ import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.candroid.model.CourseToggleHeader;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.api.GroupAPI;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.CanvasModel;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Group;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.CanvasModel;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.Const;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import retrofit.client.Response;
 
 public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggleHeader, CanvasContext, RecyclerView.ViewHolder>{
 
@@ -66,8 +65,8 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
     private CourseToggleHeader mCourseHeader;
 
     //callbacks
-    private CanvasCallback<Course[]> mAllCoursesCallback;
-    private CanvasCallback<Group[]> mGroupsCallback;
+    private StatusCallback<List<Course>> mAllCoursesCallback;
+    private StatusCallback<List<Group>> mGroupsCallback;
     private ArrayList<Course> mCourseList = new ArrayList<>();
 
     private boolean mShowGrades = false;
@@ -185,8 +184,8 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
 
     @Override
     public void loadData() {
-        CourseAPI.getAllCourses(mAllCoursesCallback);
-        GroupAPI.getAllGroups(mGroupsCallback);
+        CourseManager.getCourses(true, mAllCoursesCallback);
+        GroupManager.getAllGroups(mGroupsCallback, true);
     }
 
     @Override
@@ -204,27 +203,26 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
 
     @Override
     public void setupCallbacks() {
-        mAllCoursesCallback = new CanvasCallback<Course[]>(this) {
+        mAllCoursesCallback = new StatusCallback<List<Course>>() {
             @Override
-            public void firstPage(Course[] courses, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(ALL_COURSES_ID, new ArrayList<CanvasContext>(Arrays.asList(courses)));
+            public void onResponse(retrofit2.Response<List<Course>> response, LinkHeaders linkHeaders, ApiType type) {
+                ArrayList<Course> courses = new ArrayList<>(response.body());
+                mCallbackSyncHash.put(ALL_COURSES_ID, new ArrayList<CanvasContext>(courses));
                 mCallbackSyncHash.put(FAV_COURSES_ID, getFavoritesFromAllCourses(courses));
-                boolean isCache = APIHelpers.isCachedResponse(response);
-                syncCallbacks(isCache ? SOURCE.CACHE : SOURCE.API);
-                if (!isCache) {
+                syncCallbacks();
+                if (type.isAPI()) {
                     Analytics.trackDomain((Activity) getContext());
                     Analytics.trackEnrollment((Activity) getContext(), courses);
                 }
             }
         };
 
-        mGroupsCallback = new CanvasCallback<Group[]>(this) {
+        mGroupsCallback = new StatusCallback<List<Group>>() {
             @Override
-            public void firstPage(Group[] groups, LinkHeaders linkHeaders, Response response) {
-                mCallbackSyncHash.put(ALL_GROUPS_ID, new ArrayList<CanvasContext>(Arrays.asList(groups)));
-                mCallbackSyncHash.put(FAV_GROUPS_ID, getFavoritesFromAllGroups(groups));
-                boolean isCache = APIHelpers.isCachedResponse(response);
-                syncCallbacks(isCache ? SOURCE.CACHE : SOURCE.API);
+            public void onResponse(retrofit2.Response<List<Group>> response, LinkHeaders linkHeaders, ApiType type) {
+                mCallbackSyncHash.put(ALL_GROUPS_ID, new ArrayList<CanvasContext>(response.body()));
+                mCallbackSyncHash.put(FAV_GROUPS_ID, getFavoritesFromAllGroups(response.body()));
+                syncCallbacks();
             }
         };
     }
@@ -267,7 +265,7 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
         super.refresh();
     }
 
-    private void syncCallbacks(CanvasCallback.SOURCE source) {
+    private void syncCallbacks() {
         if(!allDataAvailable()) {
             return;
         }
@@ -276,7 +274,7 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
         mAdapterToFragmentCallback.onRefreshFinished();
     }
 
-    private ArrayList<CanvasContext> getFavoritesFromAllCourses(Course[] courses) {
+    private ArrayList<CanvasContext> getFavoritesFromAllCourses(List<Course> courses) {
         ArrayList<CanvasContext> favs = new ArrayList<>();
         for(CanvasContext canvasContext : courses) {
             if(((Course)canvasContext).isFavorite()) {
@@ -287,7 +285,7 @@ public class CourseRecyclerAdapter extends ExpandableRecyclerAdapter<CourseToggl
         return favs;
     }
 
-    private ArrayList<CanvasContext> getFavoritesFromAllGroups(Group[] groups) {
+    private ArrayList<CanvasContext> getFavoritesFromAllGroups(List<Group> groups) {
         ArrayList<CanvasContext> favs = new ArrayList<>();
         for(CanvasContext canvasContext : groups) {
             if(((Group)canvasContext).isFavorite()) {

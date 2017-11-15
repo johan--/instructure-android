@@ -1,25 +1,46 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+
 package com.instructure.pandautils.utils
 
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.support.annotation.ColorInt
 import android.support.annotation.DimenRes
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.TextInputLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
-import android.support.v7.widget.AppCompatCheckBox
-import android.support.v7.widget.AppCompatEditText
-import android.support.v7.widget.AppCompatSpinner
-import android.support.v7.widget.Toolbar
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.*
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ScaleXSpan
 import android.view.View
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.ProgressBar
 import com.instructure.pandautils.R
 
 object ViewStyler {
@@ -54,9 +75,37 @@ object ViewStyler {
     }
 
     @JvmStatic
+    fun themeRadioButton(context: Context, radioButton: AppCompatRadioButton, @ColorInt brand: Int) {
+        val defaultColor = ContextCompat.getColor(context, R.color.utils_editTextColor)
+        radioButton.supportButtonTintList = makeColorStateList(defaultColor, brand)
+        radioButton.highlightColor = ThemePrefs.increaseAlpha(defaultColor)
+    }
+
+    @JvmStatic
     fun themeSpinner(context: Context, spinner: AppCompatSpinner, @ColorInt brand: Int) {
         val defaultColor = ContextCompat.getColor(context, R.color.utils_editTextColor)
         spinner.supportBackgroundTintList = makeColorStateList(defaultColor, brand)
+    }
+
+    @JvmStatic
+    fun themeSwitch(context: Context, switch: SwitchCompat, @ColorInt brand: Int = ThemePrefs.brandColor) {
+        val thumbColor = brand
+
+        // trackColor is the thumbColor with 30% transparency (77)
+        val trackColor = Color.argb(77, Color.red(thumbColor), Color.green(thumbColor), Color.blue(thumbColor))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // setting the thumb color
+            switch.thumbDrawable.setTintList(ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(thumbColor, ContextCompat.getColor(context, R.color.utils_defaultThumbColor)))
+            )
+
+            // setting the track color
+            switch.trackDrawable.setTintList(ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(trackColor, ContextCompat.getColor(context, R.color.utils_defaultTrackColor))))
+        }
     }
 
     @JvmStatic
@@ -106,16 +155,39 @@ object ViewStyler {
     }
 
     @JvmStatic
+    fun themeProgressBar(progressBar: ProgressBar, @ColorInt brand: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            progressBar.indeterminateTintList = makeColorStateList(brand, brand)
+        }
+    }
+
+    @JvmStatic
     fun themeCheckBox(context: Context, checkBox: AppCompatCheckBox, @ColorInt brand: Int) {
         val defaultColor = ContextCompat.getColor(context, R.color.utils_editTextColor)
         checkBox.supportButtonTintList = makeColorStateList(defaultColor, brand)
         checkBox.highlightColor = ThemePrefs.increaseAlpha(defaultColor)
     }
 
-            @JvmStatic
+    @JvmStatic
+    fun themeFAB(fab: FloatingActionButton, @ColorInt brand: Int) {
+        fab.backgroundTintList = makeColorStateList(brand, ThemePrefs.darker(brand))
+        fab.setImageDrawable(ColorUtils.colorIt(Color.WHITE, fab.drawable))
+    }
+
+    @JvmStatic
+    fun themeButton(button: Button) {
+        val drawable = button.background
+        drawable.mutate().colorFilter = PorterDuffColorFilter(ThemePrefs.buttonColor, PorterDuff.Mode.SRC_ATOP)
+        button.background = drawable
+        button.setTextColor(ThemePrefs.buttonTextColor)
+    }
+
+    @JvmStatic
     fun setStatusBarDark(activity: Activity, @ColorInt color: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             activity.window.statusBarColor = ThemePrefs.darker(color)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             var flags = activity.window.decorView.systemUiVisibility
             flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
             activity.window.decorView.systemUiVisibility = flags
@@ -127,7 +199,16 @@ object ViewStyler {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.dim_lighter_gray)
             activity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity.window.statusBarColor = ContextCompat.getColor(activity, R.color.darkerGray)
         }
+    }
+
+    @JvmStatic
+    fun colorImageView(imageView: ImageView, color: Int) {
+        val drawable = imageView.drawable ?: return
+        drawable.mutate().colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+        imageView.setImageDrawable(drawable)
     }
 
     private fun makeColorStateList(defaultColor: Int, brand: Int) = generateColorStateList(
@@ -174,4 +255,18 @@ object ViewStyler {
 
         return builder
     }
+}
+
+fun SwitchCompat.applyTheme(@ColorInt color: Int = ThemePrefs.brandColor) {
+    ViewStyler.themeSwitch(context, this, color)
+}
+
+fun AlertDialog.Builder.showThemed() {
+    val dialog = create()
+    dialog.setOnShowListener {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(ThemePrefs.buttonColor)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(ThemePrefs.buttonColor)
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(ThemePrefs.buttonColor)
+    }
+    dialog.show()
 }

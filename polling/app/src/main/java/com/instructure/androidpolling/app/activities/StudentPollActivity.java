@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,16 +25,10 @@ import android.os.Parcelable;
 import com.instructure.androidpolling.app.R;
 import com.instructure.androidpolling.app.fragments.StudentPollFragment;
 import com.instructure.androidpolling.app.util.Constants;
-import com.instructure.canvasapi.model.Poll;
-import com.instructure.canvasapi.model.PollSession;
+import com.instructure.canvasapi2.models.Poll;
+import com.instructure.canvasapi2.models.PollSession;
 
 public class StudentPollActivity extends PollListActivity {
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // LifeCycle Overrides
-    ///////////////////////////////////////////////////////////////////////////
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +57,7 @@ public class StudentPollActivity extends PollListActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, firstFragment).commit();
         }
-
     }
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Intent
-    ///////////////////////////////////////////////////////////////////////////
 
     public static Intent createIntent(Context context, Poll poll, PollSession pollSession, boolean hasSubmitted) {
         Intent intent = new Intent(context, StudentPollActivity.class);

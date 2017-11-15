@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import retrofit2.http.Url;
 public class AssignmentAPI {
 
     interface AssignmentInterface {
-        @GET("courses/{courseId}/assignments/{assignmentId}?include[]=submission&include[]=rubric_assessment&needs_grading_count_by_section=true&all_dates=true&include[]=overrides")
+        @GET("courses/{courseId}/assignments/{assignmentId}?include[]=submission&include[]=rubric_assessment&needs_grading_count_by_section=true&override_assignment_dates=true&all_dates=true&include[]=overrides")
         Call<Assignment> getAssignment(@Path("courseId") long courseId, @Path("assignmentId") long assignmentId);
 
         @GET("courses/{courseId}/assignment_groups/{assignmentGroupId}")
@@ -52,10 +52,16 @@ public class AssignmentAPI {
                 @Path("assignmentGroupId") long assignmentId);
 
         @GET("courses/{courseId}/assignment_groups?include[]=assignments&include[]=discussion_topic&include[]=submission&override_assignment_dates=true&include[]=all_dates&include[]=overrides")
-        Call<List<AssignmentGroup>> getAssignmentGroupListWithAssignments(@Path("courseId") long courseId);
+        Call<List<AssignmentGroup>> getFirstPageAssignmentGroupListWithAssignments(@Path("courseId") long courseId);
+
+        @GET
+        Call<List<AssignmentGroup>> getNextPageAssignmentGroupListWithAssignments(@Url String nextUrl);
 
         @GET("courses/{courseId}/assignment_groups?include[]=assignments&include[]=discussion_topic&include[]=submission&override_assignment_dates=true&include[]=all_dates&include[]=overrides")
-        Call<List<AssignmentGroup>> getAssignmentGroupListWithAssignmentsForGradingPeriod(@Path("courseId") long courseId, @Query("grading_period_id") long gradingPeriodId);
+        Call<List<AssignmentGroup>> getFirstPageAssignmentGroupListWithAssignmentsForGradingPeriod(@Path("courseId") long courseId, @Query("grading_period_id") long gradingPeriodId, @Query("scope_assignments_to_student") boolean scopeToStudent);
+
+        @GET
+        Call<List<AssignmentGroup>> getNextPageAssignmentGroupListWithAssignmentsForGradingPeriod(@Url String nextUrl);
 
         @GET
         Call<List<AssignmentGroup>> getNextPage(@Url String nextUrl);
@@ -76,7 +82,7 @@ public class AssignmentAPI {
         @GET
         Call<List<GradeableStudent>> getNextPageGradeableStudents(@Url String nextUrl);
 
-        @GET("courses/{courseId}/assignments/{assignmentId}/submissions?include[]=rubric_assessment&include[]=submission_history")
+        @GET("courses/{courseId}/assignments/{assignmentId}/submissions?include[]=rubric_assessment&include[]=submission_history&include[]=submission_comments&include[]=group")
         Call<List<Submission>> getFirstPageSubmissionsForAssignment(@Path("courseId") long courseId, @Path("assignmentId") long assignmentId);
 
         @GET
@@ -101,29 +107,44 @@ public class AssignmentAPI {
         callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignment(courseId, assignmentId)).enqueue(callback);
     }
 
-
     public static void getAssignmentGroup(long courseId, long assignmentGroupId, RestBuilder adapter, StatusCallback<AssignmentGroup> callback, RestParams params) {
         callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignmentGroup(courseId, assignmentGroupId)).enqueue(callback);
     }
 
-    public static void getAssignmentGroupsWithAssignments(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback, @NonNull RestParams params) {
-        if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignmentGroupListWithAssignments(courseId)).enqueue(callback);
-        } else if (callback.getLinkHeaders() != null && StatusCallback.moreCallsExist(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(AssignmentInterface.class, params).getNextPage(callback.getLinkHeaders().nextUrl)).enqueue(callback);
-        }
+    public static void getFirstPageAssignmentGroupsWithAssignments(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(AssignmentInterface.class, params).getFirstPageAssignmentGroupListWithAssignments(courseId)).enqueue(callback);
     }
 
-    public static void getAssignmentGroupsWithAssignmentsForGradingPeriod(long courseId, RestBuilder adapter, StatusCallback<List<AssignmentGroup>> callback, RestParams params, long gradingPeriodId) {
-        if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(AssignmentInterface.class, params).getAssignmentGroupListWithAssignmentsForGradingPeriod(courseId, gradingPeriodId)).enqueue(callback);
-        } else if (callback.getLinkHeaders() != null && StatusCallback.moreCallsExist(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(AssignmentInterface.class, params).getNextPage(callback.getLinkHeaders().nextUrl)).enqueue(callback);
-        }
+    public static void getNextPageAssignmentGroupsWithAssignments(boolean forceNetwork, @NonNull String nextUrl, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(AssignmentInterface.class, params).getNextPageAssignmentGroupListWithAssignments(nextUrl)).enqueue(callback);
     }
 
-    public static void editAssignment(long courseId, long assignmentId, AssignmentPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Assignment> callback, RestParams params){
-        callback.addCall(adapter.buildSerializeNulls(AssignmentInterface.class, params).editAssignment(courseId, assignmentId, body)).enqueue(callback);
+    public static void getFirstPageAssignmentGroupsWithAssignmentsForGradingPeriod(long courseId, long gradingPeriodId, boolean scopeToStudent, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(AssignmentInterface.class, params).getFirstPageAssignmentGroupListWithAssignmentsForGradingPeriod(courseId, gradingPeriodId, scopeToStudent)).enqueue(callback);
+    }
+
+    public static void getNextPageAssignmentGroupsWithAssignmentsForGradingPeriod(boolean forceNetwork, @NonNull String nextUrl, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<AssignmentGroup>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(AssignmentInterface.class, params).getNextPageAssignmentGroupListWithAssignmentsForGradingPeriod(nextUrl)).enqueue(callback);
+    }
+
+    public static void editAssignment(long courseId, long assignmentId, AssignmentPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Assignment> callback, RestParams params, boolean serializeNulls){
+        if (serializeNulls) {
+            callback.addCall(adapter.buildSerializeNulls(AssignmentInterface.class, params).editAssignment(courseId, assignmentId, body)).enqueue(callback);
+        } else {
+            callback.addCall(adapter.build(AssignmentInterface.class, params).editAssignment(courseId, assignmentId, body)).enqueue(callback);
+        }
     }
 
     public static void editAssignmentAllowNullValues(long courseId, long assignmentId, AssignmentPostBodyWrapper body, RestBuilder adapter, final StatusCallback<Assignment> callback, RestParams params){

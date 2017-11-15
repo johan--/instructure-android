@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">Panda hjälpmedel</string>
   <string name="chooseMedia">Välj Media</string>
   <string name="takeVideo">Spela in Video</string>
   <string name="noCameraOnDevice">Ingen Kamera</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Laddar upp till Canvas</string>
   <string name="preparingUpload">Förbereder uppladdning</string>
   <string name="loadingFilesIndeterminate">Laddar filer...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Ett fel inträffade när fotot hämtades. Försök igen.</string>
   <string name="errorTextMissing">Lägg till lite text för att skicka ett meddelande</string>
   <string name="fileUploadNotSupported">Du kan inte ladda upp filer till den valda uppgiften.</string>
+  <string name="noCourseSelected">Välj en kurs</string>
   <string name="selectCourse">Välj en kurs</string>
   <string name="selectAssignment">Välj en uppgift</string>
   <string name="loadingAssignments">Laddar uppgifter...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Oläst</string>
   <string name="discussion_reply">Svara</string>
   <string name="close">Stäng</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas lärare</string>
+  <string name="utils_canvasParent">Canvas förälder</string>
+  <string name="utils_polls">Canvas omröstningar</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Hur går det?</string>
+  <string name="utils_rateUs">Vilket betyg skulle du ge oss?</string>
+  <string name="utils_doBetter">Vad kan vi förbättra?</string>
+  <string name="utils_sendFeedback">Skicka återkoppling</string>
+  <string name="utils_suggestions">Förslag för Android</string>
+  <string name="utils_domain">Domän</string>
+  <string name="utils_versionNum">Version:</string>
+  <string name="utils_userId">Användar-ID</string>
+  <string name="utils_email">E-post</string>
+  <string name="utils_dontShowAgain">Visa inte igen</string>
+  <string name="utils_installDate">Installationsdatum:</string>
+  <string name="utils_device">Enhet</string>
+  <string name="utils_osVersion">Operativsystemets version</string>
+  <string name="loading">Laddar</string>
 </resources>

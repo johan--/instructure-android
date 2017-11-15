@@ -88,7 +88,7 @@ class NfcReadActivity : AppCompatActivity() {
         val db = FirebaseDatabase.getInstance().reference
         db.child("tables").child(tableId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val table = dataSnapshot.getValue(Table::class.java)
+                val table = dataSnapshot.getValue(Table::class.java)!!
 
                 val colorString: String
                 val teamColor: Int

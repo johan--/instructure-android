@@ -1,17 +1,17 @@
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, version 3 of the License.
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
  *
  */
 @file:Suppress("unused")
@@ -23,6 +23,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.support.annotation.ColorRes
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
@@ -107,7 +108,7 @@ abstract class PrefManager(prefFileName: String) {
      * NOTE: properties preserved during the [safeClearPrefs] process will be unaffected by any
      * changes made during the execution of this function.
      */
-    abstract protected fun onClearPrefs()
+    open protected fun onClearPrefs() {}
 
     /**
      * Clears this PrefManager's backing [SharedPreferences] file. This is only guaranteed to clear
@@ -185,6 +186,21 @@ class StringPref(defaultValue: String = "", keyName: String? = null) : Pref<Stri
     override fun onClear() {}
     override fun SharedPreferences.getValue(key: String, default: String): String = getString(key, default)
     override fun Editor.setValue(key: String, value: String): Editor = putString(key, value)
+}
+
+/**
+ * [Pref] delegate for [String] properties. May only be used in [PrefManager] implementations.
+ *
+ * @param defaultValue The optional value returned for the property when no value has been set
+ * internally. Defaults to an empty String.
+ * @param keyName The optional key name under which the property value will be stored. Defaults
+ * to the property name. This is useful when converting other [SharedPreferences] implementations
+ * to [PrefManager] and the required key name does not match the desired property name.
+ */
+class NStringPref(defaultValue: String? = null, keyName: String? = null) : Pref<String?>(defaultValue, keyName) {
+    override fun onClear() {}
+    override fun SharedPreferences.getValue(key: String, default: String?): String? = getString(key, default)
+    override fun Editor.setValue(key: String, value: String?): Editor = putString(key, value)
 }
 
 /**
@@ -272,7 +288,7 @@ class ColorPref(@ColorRes defaultValue: Int, keyName: String? = null) : Pref<Int
  * to the property name. This is useful when converting other [SharedPreferences] implementations
  * to [PrefManager] and the required key name does not match the desired property name.
  */
-class GsonPref<T : Any>(
+class GsonPref<T>(
         val klazz: Class<T>,
         defaultValue: T? = null,
         keyName: String? = null
@@ -296,6 +312,40 @@ class GsonPref<T : Any>(
         } else {
             putString(key, Gson().toJson(value) ?: return this)
         }
+        return this
+    }
+}
+
+/**
+ * [Pref] delegate for a list of arbitrary, nullable properties to be stored in SharedPreferences
+ * as a serialized string using Gson. May only be used in [PrefManager] implementations.
+ *
+ * @param defaultValue (Optional) A default value to use until this property has been set.
+ * @param keyName The optional key name under which the property value will be stored. Defaults
+ * to the property name. This is useful when converting other [SharedPreferences] implementations
+ * to [PrefManager] and the required key name does not match the desired property name.
+ */
+class GsonListPref<T>(
+        val klazz: Class<T>,
+        defaultValue: List<T> = emptyList(),
+        keyName: String? = null
+) : Pref<List<T>>(defaultValue, keyName) {
+
+    private var cachedObject: List<T>? = null
+
+    override fun onClear() { cachedObject = null }
+
+    override fun SharedPreferences.getValue(key: String, default: List<T>): List<T> {
+        if (cachedObject == null) {
+            val type = TypeToken.getParameterized(List::class.java, klazz).type
+            cachedObject = Gson().fromJson<List<T>>(getString(key, null), type)
+        }
+        return cachedObject ?: default
+    }
+
+    override fun Editor.setValue(key: String, value: List<T>): SharedPreferences.Editor {
+        cachedObject = value
+        putString(key, Gson().toJson(value) ?: return this)
         return this
     }
 }
@@ -325,6 +375,38 @@ class NonNullGsonPref<T : Any>(defaultValue: T, keyName: String? = null) : Pref<
     override fun Editor.setValue(key: String, value: T): SharedPreferences.Editor {
         cachedObject = value
         putString(key, Gson().toJson(value))
+        return this
+    }
+}
+
+/**
+ * [Pref] delegate for a Map<String, Boolean> to be stored in SharedPreferences as a serialized
+ * string using Gson. May only be used in [PrefManager] implementations.
+ *
+ * @param defaultValue (Optional) A default value to use until this property has been set.
+ * @param keyName The optional key name under which the property value will be stored. Defaults
+ * to the property name. This is useful when converting other [SharedPreferences] implementations
+ * to [PrefManager] and the required key name does not match the desired property name.
+ */
+class BooleanMapPref(
+        defaultValue: HashMap<String, Boolean> = hashMapOf(),
+        keyName: String? = null
+) : Pref<HashMap<String, Boolean>>(defaultValue, keyName) {
+
+    private var cachedObject: HashMap<String, Boolean>? = null
+
+    override fun onClear() { cachedObject = null }
+
+    override fun SharedPreferences.getValue(key: String, default: HashMap<String, Boolean>): HashMap<String, Boolean> {
+        if (cachedObject == null) {
+            cachedObject = Gson().fromJson(getString(key, null), default::class.java)
+        }
+        return cachedObject ?: default
+    }
+
+    override fun Editor.setValue(key: String, value: HashMap<String, Boolean>): Editor {
+        cachedObject = value
+        putString(key, Gson().toJson(value) ?: return this)
         return this
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.holders.CourseViewHolder;
 import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.PandaRecyclerView;
 
 public class GradesGridFragment extends OrientationChangeFragment {
@@ -106,7 +106,7 @@ public class GradesGridFragment extends OrientationChangeFragment {
      *Used to create url for RouterUtils
      */
     private String constructUrl(long id, Context context){
-        return "https://" + APIHelpers.getDomain(context) + "/courses/" + id + "/grades";
+        return "https://" + ApiPrefs.getDomain() + "/courses/" + id + "/grades";
     }
 
     @Override

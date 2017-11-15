@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present  Instructure, Inc.
+  ~ Copyright (C) 2016 - present Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
             android:layout_height="45dp"
             android:layout_marginRight="8dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_launcher"
+            android:src="@mipmap/ic_launcher"
             android:visibility="invisible"/>
 
         <TextView
@@ -129,53 +129,10 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/courseFilesContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/myFilesContainer"
-                    android:minHeight="45dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:visibility="gone">
-
-                    <CheckedTextView
-                        android:id="@+id/courseFilesCheckBox"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:gravity="center_vertical"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:text="@string/uploadCourseFiles"
-                        android:visibility="visible"
-                        android:checked="false"
-                        android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-                        android:drawableStart="?android:attr/listChoiceIndicatorSingle"
-                        android:drawableRight="@null"
-                        android:drawableEnd="@null"
-                        android:checkMark="@null"/>
-
-                    <Spinner
-                        android:id="@+id/teacherCourseSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="45dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/courseFilesCheckBox"
-                        android:enabled="false"/>
-                </RelativeLayout>
-
-                <RelativeLayout
                     android:id="@+id/assignmentContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/courseFilesContainer"
+                    android:layout_below="@+id/myFilesContainer"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
                     android:minHeight="45dp"

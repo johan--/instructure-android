@@ -42,11 +42,16 @@ public class EnrollmentAPI {
     public static final String OBSERVER_ENROLLMENT = "ObserverEnrollment";
 
     interface EnrollmentInterface {
-
-        @GET("courses/{courseId}/enrollments?include[]=avatar_url")
-        Call<List<Enrollment>> getEnrollmentsForCourse(
+        @GET("courses/{courseId}/enrollments?include[]=avatar_url&state[]=active")
+        Call<List<Enrollment>> getFirstPageEnrollmentsForCourse (
                 @Path("courseId") long courseId,
                 @Query("type[]") String enrollmentType);
+
+        @GET("courses/{courseId}/enrollments?user_id")
+        Call<List<Enrollment>> getFirstPageEnrollmentsForUserInCourse (
+                @Path("courseId") long courseId,
+                @Query("user_id") long userId,
+                @Query("type[]") String[] enrollmentTypes);
 
         @GET
         Call<List<Enrollment>> getNextPage(@Url String nextUrl);
@@ -57,13 +62,50 @@ public class EnrollmentAPI {
             @NonNull RestBuilder adapter,
             @NonNull RestParams params,
             long courseId,
-            @NonNull String enrollmentType,
+            String enrollmentType,
             @NonNull StatusCallback<List<Enrollment>> callback){
 
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(EnrollmentInterface.class, params).getEnrollmentsForCourse(courseId, enrollmentType)).enqueue(callback);
+            callback.addCall(adapter.build(EnrollmentInterface.class, params)
+                    .getFirstPageEnrollmentsForCourse(courseId, enrollmentType)).enqueue(callback);
         } else if (callback.getLinkHeaders() != null && StatusCallback.moreCallsExist(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(EnrollmentInterface.class, params).getNextPage(callback.getLinkHeaders().nextUrl)).enqueue(callback);
+            callback.addCall(adapter.build(EnrollmentInterface.class, params)
+                    .getNextPage(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
     }
+
+    public static void getFirstPageEnrollmentsForCourse(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params,
+            long courseId,
+            @NonNull String enrollmentType,
+            @NonNull StatusCallback<List<Enrollment>> callback){
+            callback.addCall(adapter.build(EnrollmentInterface.class, params)
+                    .getFirstPageEnrollmentsForCourse(courseId, enrollmentType)).enqueue(callback);
+    }
+
+    public static void getFirstPageEnrollmentsForUserInCourse(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params,
+            long courseId, long userId,
+            @NonNull StatusCallback<List<Enrollment>> callback){
+
+        String[] enrollmentTypes = new String[] { "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment" };
+
+        callback.addCall(adapter.build(EnrollmentInterface.class, params)
+                .getFirstPageEnrollmentsForUserInCourse(courseId, userId, enrollmentTypes)).enqueue(callback);
+    }
+
+    public static void getNextPageEnrollments(boolean forceNetwork, String nextUrl, RestBuilder adapter, StatusCallback<List<Enrollment>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(EnrollmentInterface.class, params)
+                .getNextPage(nextUrl)).enqueue(callback);
+    }
+
+
 }

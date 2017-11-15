@@ -1,0 +1,47 @@
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.google.com' }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://maven.google.com' }
+    }
+    dependencies {
+        // https://bintray.com/android/android-tools/com.android.tools.build.gradle/view
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile rootProject.ext.supportDependencies.appCompat
+    compile rootProject.ext.supportDependencies.supportLibV13
+}

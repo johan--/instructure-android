@@ -83,7 +83,7 @@ dependencies {
     compile project(':login-api')
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.github.afollestad.material-dialogs:core:0.8.5.6@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+    compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
         transitive = true;
     }
     compile 'de.hdodenhof:circleimageview:1.2.2'

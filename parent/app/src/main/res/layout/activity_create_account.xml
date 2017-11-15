@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016 - present  Instructure, Inc.
   ~
   ~     This program is free software: you can redistribute it and/or modify
@@ -15,114 +14,167 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   ~
   -->
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/parent_bg_gradient"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <android.support.percent.PercentFrameLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="0dp"
+        app:theme="@style/ToolBarStyleDark"
+        tools:ignore="UnusedAttribute" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:importantForAccessibility="no"
+        android:focusable="false"
+        android:focusableInTouchMode="false">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:importantForAccessibility="no"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
             android:orientation="vertical"
-            app:layout_widthPercent="90%">
+            tools:ignore="UselessParent">
 
-            <ImageView
-                android:id="@+id/logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/canvas_logo"
-                android:paddingTop="48dp"
-                android:src="@drawable/vd_parent_logo" />
-
-            <EditText
-                android:id="@+id/email"
-                style="@style/Base.Widget.AppCompat.EditText.LoginEditText"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/firstNameWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginTop="32dp"
-                android:hint="@string/email"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:inputType="textEmailAddress"
-                android:padding="8dp" />
+                android:textColorHint="@color/login_textButton"
+                app:hintTextAppearance="@style/TextInputLabel"
+                android:labelFor="@+id/firstName"
+                android:importantForAccessibility="no">
 
-            <EditText
-                android:id="@+id/first_name"
-                style="@style/Base.Widget.AppCompat.EditText.LoginEditText"
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/firstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/firstName"
+                    android:inputType="textPersonName"
+                    android:textCursorDrawable="@null"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:contentDescription="@string/firstName"
+                    android:nextFocusDown="@+id/lastName"
+                    android:importantForAccessibility="yes"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/lastNameWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:hint="@string/firstName"
-                android:inputType="textPersonName"
-                android:padding="8dp" />
+                android:textColorHint="@color/login_textButton"
+                app:hintTextAppearance="@style/TextInputLabel"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/lastName"
+                android:importantForAccessibility="no">
 
-            <EditText
-                android:id="@+id/last_name"
-                style="@style/Base.Widget.AppCompat.EditText.LoginEditText"
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/lastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/lastName"
+                    android:inputType="textPersonName"
+                    android:textCursorDrawable="@null"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:contentDescription="@string/lastName"
+                    android:nextFocusDown="@+id/email"
+                    android:importantForAccessibility="yes"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/emailWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:hint="@string/lastName"
-                android:inputType="textPersonName"
-                android:padding="8dp" />
+                android:textColorHint="@color/login_textButton"
+                app:hintTextAppearance="@style/TextInputLabel"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/email"
+                android:importantForAccessibility="no">
 
-            <EditText
-                android:id="@+id/createAccountPassword"
-                style="@style/Base.Widget.AppCompat.EditText.LoginEditText"
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/emailAddress"
+                    android:inputType="textEmailAddress"
+                    android:textCursorDrawable="@null"
+                    android:contentDescription="@string/emailAddress"
+                    android:nextFocusDown="@+id/createAccountPassword"
+                    android:importantForAccessibility="yes"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/passwordWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:hint="@string/password"
-                android:padding="8dp" />
+                android:textColorHint="@color/login_textButton"
+                app:hintTextAppearance="@style/TextInputLabel"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/createAccountPassword"
+                android:importantForAccessibility="no">
 
-            <EditText
-                android:id="@+id/createAccountPasswordConfirm"
-                style="@style/Base.Widget.AppCompat.EditText.LoginEditText"
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/createAccountPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:textCursorDrawable="@null"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:contentDescription="@string/password"
+                    android:nextFocusDown="@+id/createAccountPasswordConfirm"
+                    android:importantForAccessibility="yes"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/passwordConfirmationWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:hint="@string/confirmPassword"
-                android:imeOptions="actionGo"
-                android:padding="8dp" />
+                android:textColorHint="@color/login_textButton"
+                app:hintTextAppearance="@style/TextInputLabel"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/createAccountPasswordConfirm"
+                android:importantForAccessibility="no">
 
-            <Button
-                android:id="@+id/next"
-                style="@style/Base.TextAppearance.AppCompat.Button.LoginButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/next" />
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/createAccountPasswordConfirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirmPassword"
+                    android:imeOptions="actionGo"
+                    android:inputType="textPassword"
+                    android:textCursorDrawable="@null"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:contentDescription="@string/confirmPassword"
+                    android:nextFocusDown="@+id/createAccount"
+                    android:importantForAccessibility="yes"/>
+
+            </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
 
-    </android.support.percent.PercentFrameLayout>
+    </FrameLayout>
 
-</ScrollView>
+</RelativeLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2.apis;
 
 import android.support.annotation.NonNull;
@@ -22,11 +21,15 @@ import android.support.annotation.NonNull;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
+import com.instructure.canvasapi2.models.CanvasContextPermission;
 import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
 import com.instructure.canvasapi2.models.Favorite;
 import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.models.Group;
 import com.instructure.canvasapi2.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,12 +46,15 @@ import retrofit2.http.Url;
 
 public class CourseAPI {
 
-    static final String ACTIVE_ENROLLMENT_STATE = "active";
+    private static final String ACTIVE_ENROLLMENT_STATE = "active";
 
     interface CoursesInterface {
 
         @GET("courses/{courseId}?include[]=term&include[]=permissions&include[]=license&include[]=is_public&include[]=needs_grading_count&include[]=course_image")
         Call<Course> getCourse(@Path("courseId") long courseId);
+
+        @GET("courses/{courseId}?include[]=syllabus_body&include[]=term&include[]=license&include[]=is_public&include[]=permissions")
+        Call<Course> getCourseWithSyllabus(@Path("courseId") long courseId);
 
         @GET("courses/{courseId}?include[]=term&include[]=permissions&include[]=license&include[]=is_public&include[]=needs_grading_count&include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image")
         Call<Course> getCourseWithGrade(@Path("courseId") long courseId);
@@ -71,9 +77,9 @@ public class CourseAPI {
                 @Path("courseId") long courseId);
 
         @GET("courses/{courseId}/students")
-        Call<List<User>> getCourseStudents(@Path("courseId") long courseId);
+        Call<List<User>> getFirstPageCourseStudents(@Path("courseId") long courseId);
 
-        @GET("courses/{courseId}/users/{studentId}")
+        @GET("courses/{courseId}/users/{studentId}?include[]=avatar_url&include[]=enrollments&include[]=inactive_enrollments&include[]=current_grading_period_scores&include[]=email")
         Call<User> getCourseStudent(@Path("courseId") long courseId, @Path("studentId") long studentId);
 
         @GET
@@ -88,8 +94,25 @@ public class CourseAPI {
         @PUT("courses/{course_id}")
         Call<Course> updateCourse(@Path("course_id") long courseId, @QueryMap Map<String, String> params);
 
-        //region Airwolf
+        @GET("courses/{courseId}/groups?include[]=users")
+        Call<List<Group>> getFirstPageGroups(@Path("courseId") long courseId);
 
+        @GET
+        Call<List<Group>> getNextPageGroups(@Url String nextUrl);
+
+        @GET("courses/{courseId}/permissions")
+        Call<CanvasContextPermission> getCoursePermissions(@Path("courseId") long courseId, @Query("permissions[]") List<String> requestedPermissions);
+
+        @GET("courses?include[]=term&include[]=total_scores&include[]=license&include[]=is_public&include[]=permissions")
+        List<Course> getAllCoursesSynchronous(@Query("page") int page);
+
+        @GET("users/self/favorites/courses?include[]=term&include[]=total_scores&include[]=license&include[]=is_public&include[]=permissions")
+        List<Course> getFavCoursesSynchronous(@Query("page") int page);
+
+        @GET("courses/{courseId}/enrollments")
+        Call<List<Enrollment>> getEnrollmentsForGradingPeriod(@Path("courseId") long courseId, @Query("grading_period_id") long gradingPeriodId);
+
+        //region Airwolf
         @GET("canvas/{parentId}/{studentId}/courses?include[]=total_scores&include[]=syllabus_body&include[]=current_grading_period_scores")
         Call<List<Course>> getCoursesForUserAirwolf(
                 @Path("parentId") String parentId,
@@ -115,12 +138,40 @@ public class CourseAPI {
         callback.addCall(adapter.build(CoursesInterface.class, params).getFavoriteCourses()).enqueue(callback);
     }
 
+    public static void getFirstPageFavoriteCourses(@NonNull RestBuilder adapter, @NonNull StatusCallback<List<Course>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getFavoriteCourses()).enqueue(callback);
+    }
+
+    public static void getNextPageFavoriteCourses(boolean forceNetwork, String nextUrl, RestBuilder adapter, StatusCallback<List<Course>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(CoursesInterface.class, params).next(nextUrl)).enqueue(callback);
+    }
+
     public static void getCourses(@NonNull RestBuilder adapter, @NonNull StatusCallback<List<Course>> callback, @NonNull RestParams params) {
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
             callback.addCall(adapter.build(CoursesInterface.class, params).getFirstPageCourses()).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             callback.addCall(adapter.build(CoursesInterface.class, params).next(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
+    }
+
+    public static void getFirstPageCourses(@NonNull RestBuilder adapter, @NonNull StatusCallback<List<Course>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getFirstPageCourses()).enqueue(callback);
+    }
+
+    public static void getNextPageCourses(boolean forceNetwork, String nextUrl, RestBuilder adapter, StatusCallback<List<Course>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(CoursesInterface.class, params).next(nextUrl)).enqueue(callback);
     }
 
     // TODO: Set up pagination when API is fixed. API currently sends pagination data in body instead of headers
@@ -130,6 +181,10 @@ public class CourseAPI {
 
     public static void getCourse(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<Course> callback, @NonNull RestParams params) {
         callback.addCall(adapter.build(CoursesInterface.class, params).getCourse(courseId)).enqueue(callback);
+    }
+
+    public static void getCourseWithSyllabus(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<Course> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getCourseWithSyllabus(courseId)).enqueue(callback);
     }
 
     public static void getCoursesByEnrollmentType(@NonNull RestBuilder adapter, @NonNull StatusCallback<List<Course>> callback, @NonNull RestParams params, String type) {
@@ -142,10 +197,24 @@ public class CourseAPI {
 
     public static void getCourseStudents(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<User>> callback, @NonNull RestParams params) {
         if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
-            callback.addCall(adapter.build(CoursesInterface.class, params).getCourseStudents(courseId)).enqueue(callback);
-        } else if (callback.getLinkHeaders() != null && StatusCallback.moreCallsExist(callback.getLinkHeaders())){
+            callback.addCall(adapter.build(CoursesInterface.class, params).getFirstPageCourseStudents(courseId)).enqueue(callback);
+        } else if (callback.getLinkHeaders() != null && StatusCallback.moreCallsExist(callback.getLinkHeaders())) {
             callback.addCall(adapter.build(CoursesInterface.class, params).getNextPageStudents(callback.getLinkHeaders().nextUrl)).enqueue(callback);
         }
+    }
+
+    public static void getFirstPageCourseStudents(long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<User>> callback, @NonNull RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getFirstPageCourseStudents(courseId)).enqueue(callback);
+    }
+
+    public static void getNextPageCourseStudents(boolean forceNetwork, String nextUrl, RestBuilder adapter, StatusCallback<List<User>> callback) {
+        RestParams params = new RestParams.Builder()
+                .withShouldIgnoreToken(false)
+                .withPerPageQueryParam(true)
+                .withForceReadFromNetwork(forceNetwork)
+                .build();
+
+        callback.addCall(adapter.build(CoursesInterface.class, params).getNextPageStudents(nextUrl)).enqueue(callback);
     }
 
     public static void getCourseStudent(long courseId, long studentId, @NonNull RestBuilder adapter, @NonNull StatusCallback<User> callback, @NonNull RestParams params) {
@@ -153,26 +222,40 @@ public class CourseAPI {
     }
 
     public static void addCourseToFavorites(final long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<Favorite> callback, @NonNull RestParams params) {
-
         callback.addCall(adapter.build(CoursesInterface.class, params).addCourseToFavorites(courseId)).enqueue(callback);
     }
 
     public static void removeCourseFromFavorites(final long courseId, @NonNull RestBuilder adapter, @NonNull StatusCallback<Favorite> callback, @NonNull RestParams params) {
-
         callback.addCall(adapter.build(CoursesInterface.class, params).removeCourseFromFavorites(courseId)).enqueue(callback);
     }
 
     /**
      * Updates a course
+     *
      * @param courseId The id for the course
-     * @param params A map of the fields to change and the values they will change to
+     * @param params   A map of the fields to change and the values they will change to
      */
     public static void updateCourse(long courseId, Map<String, String> queryParams, @NonNull RestBuilder adapter, @NonNull StatusCallback<Course> callback, @NonNull RestParams params) {
         callback.addCall(adapter.build(CoursesInterface.class, params).updateCourse(courseId, queryParams)).enqueue(callback);
     }
 
-    //region airwolf
+    public static void getFirstPageGroups(long courseId, RestBuilder adapter, StatusCallback<List<Group>> callback, RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getFirstPageGroups(courseId)).enqueue(callback);
+    }
 
+    public static void getNextPageGroups(String nextUrl, RestBuilder adapter, StatusCallback<List<Group>> callback, RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getNextPageGroups(nextUrl)).enqueue(callback);
+    }
+
+    public static void getCoursePermissions(long courseId, List<String> requestedPermissions, RestBuilder adapter, StatusCallback<CanvasContextPermission> callback, RestParams params) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getCoursePermissions(courseId, requestedPermissions)).enqueue(callback);
+    }
+
+    public static void getEnrollmentsForGradingPeriod(long courseId, long gradingPeriodId, RestBuilder adapter, RestParams params, StatusCallback<List<Enrollment>> callback) {
+        callback.addCall(adapter.build(CoursesInterface.class, params).getEnrollmentsForGradingPeriod(courseId, gradingPeriodId)).enqueue(callback);
+    }
+
+    //region airwolf
     public static void getCoursesForUserAirwolf(
             @NonNull String parentId,
             @NonNull String studentId,
@@ -213,5 +296,75 @@ public class CourseAPI {
                 .getCourseWithGradeAirwolf(parentId, studentId, courseId)).enqueue(callback);
     }
 
+    public static List<Course> getAllCoursesSynchronous(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params) {
+        //If not able to parse (no network for example), this will crash. Handle that case.
+        try {
+            ArrayList<Course> allCourses = new ArrayList<>();
+            int page = 1;
+            long firstItemId = -1;
+
+            //for(ever) loop. break once we've run outta stuff;
+            for (; ; ) {
+                List<Course> courses = adapter.build(CoursesInterface.class, params).getAllCoursesSynchronous(page);
+                page++;
+
+                //This is all or nothing. We don't want partial data.
+                if (courses == null) {
+                    return null;
+                } else if (courses.size() == 0) {
+                    break;
+                } else if (courses.get(0).getId() == firstItemId) {
+                    break;
+                } else {
+                    firstItemId = courses.get(0).getId();
+
+                    allCourses.addAll(courses);
+                }
+            }
+
+            return allCourses;
+
+        } catch (Exception E) {
+            return null;
+        }
+    }
+
+    public static List<Course> getFavCoursesSynchronous(
+            @NonNull RestBuilder adapter,
+            @NonNull RestParams params) {
+
+        //If not able to parse (no network for example), this will crash. Handle that case.
+        try {
+            ArrayList<Course> favoriteCourses = new ArrayList<>();
+            int page = 1;
+            long firstItemId = -1;
+
+            //for(ever) loop. break once we've run outta stuff;
+            for (; ; ) {
+                List<Course> courses = adapter.build(CoursesInterface.class, params).getFavCoursesSynchronous(page);
+                page++;
+
+                //This is all or nothing. We don't want partial data.
+                if (courses == null) {
+                    return null;
+                } else if (courses.size() == 0) {
+                    break;
+                } else if (courses.get(0).getId() == firstItemId) {
+                    break;
+                } else {
+                    firstItemId = courses.get(0).getId();
+
+                    favoriteCourses.addAll(courses);
+                }
+            }
+
+            return favoriteCourses;
+
+        } catch (Exception E) {
+            return null;
+        }
+    }
     //endregion
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  *     limitations under the License.
  *
  */
-
 package com.instructure.canvasapi2.models;
 
 import android.os.Parcelable;
@@ -24,7 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-public abstract class CanvasComparable<T extends CanvasComparable> implements Comparable<T>, Parcelable, Serializable {
+public abstract class CanvasComparable<T extends CanvasComparable<T>> implements Comparable<T>, Parcelable, Serializable {
 
     public long getId() {
         return -1;
@@ -42,12 +41,12 @@ public abstract class CanvasComparable<T extends CanvasComparable> implements Co
             return 0;
         }
 
-        int dateResult = CanvasComparable.<Date>compare(getComparisonDate(), comparable.getComparisonDate());
+        int dateResult = CanvasComparable.compare(getComparisonDate(), comparable.getComparisonDate());
         if (dateResult != 0) {
             return dateResult;
         }
 
-        int stringResult = CanvasComparable.<String>compare(getComparisonString(), comparable.getComparisonString());
+        int stringResult = CanvasComparable.compare(getComparisonString(), comparable.getComparisonString());
         if (stringResult != 0) {
             return stringResult;
         }

@@ -128,8 +128,6 @@
   <string name="domain">Domaine</string>
   <string name="sendFeedback">Envoyer un avis</string>
   <string name="sendMail">Envoyer un courriel...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Modifier</string>
   <plurals name="item_count">
     <item quantity="one">%d élément</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Une erreur est survenue lors de l\'obtention du cours pour cet élément.</string>
   <string name="could_not_find_group">Une erreur est survenue lors de l\'obtention du groupe pour cet élément.</string>
   <string name="selectBackground">Choisir un arrière-plan</string>
-  <string name="kalturaSubmissionInProgress">Soumission des fichiers en cours... Vérifier la barre de notification pour les mises à jour.</string>
-  <string name="kalturaSubmissionSuccessful">La soumission du fichier est terminée</string>
+  <string name="notoriousSubmissionInProgress">Soumission des fichiers en cours... Vérifier la barre de notification pour les mises à jour.</string>
+  <string name="notoriousSubmissionSuccessful">La soumission du fichier est terminée</string>
   <string name="poll_title">Qu\'êtes-vous venu faire sur Canvas ?</string>
   <string name="poll_warning">Un élément n\'a pas été sélectionné.</string>
   <string name="poll_item_1">Vérifier mes notes</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">PandaAvatars</string>
   <string name="share">Partager</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Image de super panda</string>
   <string name="newFeatureTitle">Notifications mobiles</string>
   <string name="newFeatureMsg">Pour recevoir des notifications mobile \'push\', veuillez vous rendre sur la page des paramètres Canvas &gt; Notifications &gt; Et y choisir \"Pour tous les appareils\"</string>

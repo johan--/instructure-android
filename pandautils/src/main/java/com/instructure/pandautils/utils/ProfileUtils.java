@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.TypedValue;
 
 import com.instructure.canvasapi2.models.User;
 import com.instructure.pandautils.R;
@@ -39,7 +41,13 @@ public class ProfileUtils {
 
     public static final String noPictureURL = "images/dotted_pic.png";
     public static final String noPictureURLAlternate = "images%2Fmessages%2Favatar-50.png";
+    public static final String noPictureURLAlternateDecoded = "images/messages/avatar-50.png";
     public static final String noPictureURLGroup = "images/messages/avatar-group-50.png";
+
+    public static boolean shouldLoadAltAvatarImage(String avatarURL) {
+        if(avatarURL == null || avatarURL.length() == 0) return true;
+        return avatarURL.contains(noPictureURL) || avatarURL.contains(noPictureURLAlternate);
+    }
 
     public static String getUserInitials(User user){
         return getUserInitials(user.getShortName());
@@ -47,7 +55,7 @@ public class ProfileUtils {
 
     public static String getUserInitials(String name){
         if(name == null){
-            return "";
+            return "?";
         }
 
         name = name.trim();
@@ -58,7 +66,7 @@ public class ProfileUtils {
         }else if (nameArr.length > 0 && nameArr[0].length() > 0){//else First = F
             return nameArr[0].substring(0, 1).toUpperCase(Locale.getDefault());
         }else{
-            return ""; // use default picture
+            return "?"; // use default picture
         }
     }
 
@@ -233,6 +241,28 @@ public class ProfileUtils {
                 .textColor(Color.WHITE)
                 .endConfig()
                 .buildRound(initials, color);
+
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    public static Bitmap getInitialsAvatarBitMap(Context context, final String username, final int backgroundColor, final int textColor, final int borderColor) {
+        final String initials = ProfileUtils.getUserInitials(username);
+        TextDrawable drawable = TextDrawable.builder()
+                .beginConfig()
+                .height(context.getResources().getDimensionPixelSize(R.dimen.avatar_size))
+                .width(context.getResources().getDimensionPixelSize(R.dimen.avatar_size))
+                .toUpperCase()
+                .textColor(textColor)
+                .useFont(Typeface.DEFAULT_BOLD)
+                .withBorderColor(borderColor)
+                .withBorder((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1F, context.getResources().getDisplayMetrics()))
+                .endConfig()
+                .buildRound(initials, backgroundColor);
 
         Canvas canvas = new Canvas();
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);

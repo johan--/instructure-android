@@ -29,9 +29,13 @@ data class RubricCriterion(
         @SerializedName("long_description")
         var longDescription: String? = null,
         var points: Double = 0.0,
-        var ratings: MutableList<RubricCriterionRating> = ArrayList()
+        var ratings: MutableList<RubricCriterionRating> = ArrayList(),
+        @SerializedName("criterion_use_range")
+        var criterionUseRange: Boolean = false
 ) : PaperParcelable {
+
     companion object {
+        @Suppress("unresolved_reference")
         @JvmField val CREATOR = PaperParcelRubricCriterion.CREATOR
     }
 }

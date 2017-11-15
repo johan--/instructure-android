@@ -17,12 +17,14 @@
 
 package com.instructure.canvasapi2.managers;
 
+import android.support.annotation.NonNull;
+
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.GroupCategoriesAPI;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Group;
-import com.instructure.canvasapi2.utils.DepaginatedCallback;
+import com.instructure.canvasapi2.utils.ExhaustiveListCallback;
 
 import java.util.List;
 
@@ -41,12 +43,12 @@ public class GroupCategoriesManager extends BaseManager {
                     .withShouldIgnoreToken(false)
                     .build();
             final RestBuilder adapter = new RestBuilder(callback);
-            StatusCallback<List<Group>> depaginatedCallback = new DepaginatedCallback<>(callback, new DepaginatedCallback.PageRequestCallback<Group>() {
+            StatusCallback<List<Group>> depaginatedCallback = new ExhaustiveListCallback<Group>(callback) {
                 @Override
-                public void getNextPage(DepaginatedCallback<Group> callback, String nextUrl, boolean isCached) {
+                public void getNextPage(@NonNull StatusCallback<List<Group>> callback, @NonNull String nextUrl, boolean isCached) {
                     GroupCategoriesAPI.getNextPageGroups(nextUrl, adapter, callback, params);
                 }
-            });
+            };
             adapter.setStatusCallback(depaginatedCallback);
             GroupCategoriesAPI.getFirstPageGroupsInCategory(categoryId, adapter, depaginatedCallback, params);
         }

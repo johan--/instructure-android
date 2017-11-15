@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -59,17 +59,18 @@ import com.instructure.candroid.interfaces.QuizPostNumerical;
 import com.instructure.candroid.interfaces.QuizSubmit;
 import com.instructure.candroid.interfaces.QuizToggleFlagState;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.Attachment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.QuizQuestion;
-import com.instructure.canvasapi.model.QuizSubmission;
-import com.instructure.canvasapi.model.QuizSubmissionQuestion;
-import com.instructure.canvasapi.model.QuizSubmissionQuestionResponse;
-import com.instructure.canvasapi.model.QuizSubmissionResponse;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.models.Attachment;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.QuizQuestion;
+import com.instructure.canvasapi2.models.QuizSubmission;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
+import com.instructure.canvasapi2.models.QuizSubmissionQuestionResponse;
+import com.instructure.canvasapi2.models.QuizSubmissionResponse;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.views.CanvasWebView;
@@ -80,8 +81,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import retrofit.client.Response;
-
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerAdapter<QuizSubmissionQuestion, RecyclerView.ViewHolder> {
 
@@ -143,21 +145,15 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
 
         flagStateCallback = new QuizToggleFlagState() {
             @Override
-            public void toggleFlagged(boolean setFlagged, long questionId) {
-                QuizAPI.putFlagQuizQuestion(quizSubmission, questionId, setFlagged, new CanvasCallback<Response>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-                    @Override
-                    public void cache(Response response, LinkHeaders linkHeaders, Response response2) {}
-
-                    @Override
-                    public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {}
-                });
+            public void toggleFlagged(boolean flagQuestion, long questionId) {
+                QuizManager.putFlagQuizQuestion(quizSubmission, questionId, flagQuestion, true, new StatusCallback<ResponseBody>() {});
             }
         };
 
         webViewClientCallback = new CanvasWebView.CanvasWebViewClientCallback() {
             @Override
             public void openMediaFromWebView(String mime, String url, String filename) {
-                RouterUtils.canRouteInternally(context, url, APIHelpers.getDomain(context), true);
+                RouterUtils.canRouteInternally(context, url, ApiPrefs.getDomain(), true);
             }
 
             @Override
@@ -172,12 +168,12 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
 
             @Override
             public void routeInternallyCallback(String url) {
-                RouterUtils.canRouteInternally(context, url, APIHelpers.getDomain(context), true);
+                RouterUtils.canRouteInternally(context, url, ApiPrefs.getDomain(), true);
             }
 
             @Override
             public boolean canRouteInternallyDelegate(String url) {
-                return RouterUtils.canRouteInternally(null, url, APIHelpers.getDomain(context), false);
+                return RouterUtils.canRouteInternally(null, url, ApiPrefs.getDomain(), false);
             }
         };
 
@@ -315,12 +311,12 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
             SubmitButtonBinder.bind((SubmitButtonViewHolder)holder, getContext(), canvasContext, QuizSubmissionQuestionListRecyclerAdapter.this, new QuizSubmit() {
                 @Override
                 public void submitQuiz() {
-                    QuizAPI.postQuizSubmit(canvasContext, quizSubmission, new CanvasCallback<QuizSubmissionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-                        @Override
-                        public void cache(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {}
+
+                    QuizManager.postQuizSubmit(canvasContext, quizSubmission, true, new StatusCallback<QuizSubmissionResponse>() {
 
                         @Override
-                        public void firstPage(QuizSubmissionResponse quizSubmissionResponse, LinkHeaders linkHeaders, Response response) {
+                        public void onResponse(Response<QuizSubmissionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                            if(type == ApiType.CACHE) return;
                             // Submitted!
                             Toast.makeText(getContext(), R.string.quizSubmittedSuccessfully, Toast.LENGTH_SHORT).show();
 
@@ -330,6 +326,11 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
                             if(fragment instanceof QuizStartFragment) {
                                 ((QuizStartFragment)fragment).updateQuizInfo();
                             }
+                        }
+
+                        @Override
+                        public void onFail(Call<QuizSubmissionResponse> callResponse, Throwable error, Response response) {
+                            Toast.makeText(getContext(), R.string.quizSubmittedFailure, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -374,14 +375,7 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
             public void postEssay(long questionId, String answer) {
                 addAnsweredQuestion(questionId);
 
-                QuizAPI.postQuizQuestionEssay(quizSubmission, answer, questionId, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-                    @Override
-                    public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-
-
-                    @Override
-                    public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-                });
+                QuizManager.postQuizQuestionEssay(quizSubmission, answer, questionId, true, new StatusCallback<QuizSubmissionQuestionResponse>() {});
             }
         });
     }
@@ -392,13 +386,7 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
             @Override
             public void postAnswer(final long questionId, long answerId) {
                 addAnsweredQuestion(questionId);
-                QuizAPI.postQuizQuestionMultiChoice(quizSubmission, answerId, questionId, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-                    @Override
-                    public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-
-                    @Override
-                    public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-                });
+                QuizManager.postQuizQuestionMultiChoice(quizSubmission, answerId, questionId, true, new StatusCallback<QuizSubmissionQuestionResponse>() {});
             }
         }, flagStateCallback);
     }
@@ -444,14 +432,7 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
                 addAnsweredQuestion(questionId);
 
                 //note: this is the same as the essay question on purpose. Numerical is just text.
-                QuizAPI.postQuizQuestionEssay(quizSubmission, answer, questionId, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-                    @Override
-                    public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-
-
-                    @Override
-                    public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-                });
+                QuizManager.postQuizQuestionEssay(quizSubmission, answer, questionId, true, new StatusCallback<QuizSubmissionQuestionResponse>() {});
             }
         });
     }
@@ -461,13 +442,15 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
         QuizMultipleDropdownBinder.bind(holder, baseItem, courseColor, position, shouldLetAnswer, getContext(), embeddedWebViewCallback, webViewClientCallback, new QuizPostMultipleDropdown() {
             @Override
             public void postMultipleDropdown(final long questionId, HashMap<String, Long> answers) {
-                QuizAPI.postQuizQuestionMultipleDropdown(quizSubmission, questionId, answers, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
+
+                QuizManager.postQuizQuestionMultipleDropdown(quizSubmission, questionId, answers, true, new StatusCallback<QuizSubmissionQuestionResponse>() {
 
                     @Override
-                    public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
+                    public void onResponse(Response<QuizSubmissionQuestionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                        if(type == ApiType.CACHE) return;
 
-                    @Override
-                    public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {
+                        QuizSubmissionQuestionResponse quizSubmissionQuestionResponse = response.body();
+
                         if (quizSubmissionQuestionResponse.getQuizSubmissionQuestions() != null) {
                             for (QuizSubmissionQuestion question : quizSubmissionQuestionResponse.getQuizSubmissionQuestions()) {
                                 if (baseItem.getId() == question.getId()) {
@@ -498,13 +481,7 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
     }
 
     private void postQuizQuestionMultiAnswer(final long questionId, final ArrayList<Long> answers) {
-        QuizAPI.postQuizQuestionMultiAnswer(quizSubmission, questionId, answers, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-            @Override
-            public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-
-            @Override
-            public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
-        });
+        QuizManager.postQuizQuestionMultiAnswer(quizSubmission, questionId, answers, true, new StatusCallback<QuizSubmissionQuestionResponse>() {});
     }
 
     private void addMatchingQuestion(final QuizSubmissionQuestion baseItem, QuizMatchingViewHolder holder, int position, int courseColor) {
@@ -514,13 +491,13 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
             @Override
             public void postMatching(final long questionId, HashMap<Long, Integer> answers) {
 
-                QuizAPI.postQuizQuestionMatching(quizSubmission, questionId, answers, new CanvasCallback<QuizSubmissionQuestionResponse>(QuizSubmissionQuestionListRecyclerAdapter.this) {
-
+                QuizManager.postQuizQuestionMatching(quizSubmission, questionId, answers, true, new StatusCallback<QuizSubmissionQuestionResponse>(){
                     @Override
-                    public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {}
+                    public void onResponse(Response<QuizSubmissionQuestionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                        if(type == ApiType.CACHE) return;
 
-                    @Override
-                    public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {
+                        final QuizSubmissionQuestionResponse quizSubmissionQuestionResponse = response.body();
+
                         if (quizSubmissionQuestionResponse.getQuizSubmissionQuestions() != null) {
                             for (QuizSubmissionQuestion question : quizSubmissionQuestionResponse.getQuizSubmissionQuestions()) {
                                 if (baseItem.getId() == question.getId()) {
@@ -580,16 +557,11 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
     }
 
     private void postQuizQuestionFileUpload(final long questionId, final long attachmentId){
-        QuizAPI.postQuizQuestionFileUpload(quizSubmission, attachmentId, questionId, new CanvasCallback<QuizSubmissionQuestionResponse>(this) {
+        QuizManager.postQuizQuestionFileUpload(canvasContext, quizSubmission, attachmentId, questionId, true, new StatusCallback<QuizSubmissionQuestionResponse>() {
             @Override
-            public void firstPage(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {
-                addAnsweredQuestion(questionId);
+            public void onResponse(retrofit2.Response<QuizSubmissionQuestionResponse> response, LinkHeaders linkHeaders, ApiType type) {
+                if(type.isAPI()) addAnsweredQuestion(questionId);
             }
-
-            @Override
-            public void cache(QuizSubmissionQuestionResponse quizSubmissionQuestionResponse, LinkHeaders linkHeaders, Response response) {
-            }
-
         });
     }
 
@@ -618,13 +590,6 @@ public class QuizSubmissionQuestionListRecyclerAdapter extends BaseListRecyclerA
         }
         return 0;
     }
-
-    @Override
-    public void contextReady() {
-
-    }
-
-
 
     @Override
     public int getItemViewType(int position) {

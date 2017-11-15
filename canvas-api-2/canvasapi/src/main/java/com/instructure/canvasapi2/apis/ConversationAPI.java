@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.builders.RestParams;
 import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.ApiType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +44,10 @@ import rx.Observable;
 
 public class ConversationAPI {
 
+    public static final String CONVERSATION_MARK_UNREAD = "mark_as_unread";
+
     public enum ConversationScope { ALL,UNREAD,ARCHIVED,STARRED,SENT }
-    private static String conversationScopeToString(ConversationScope scope){
+    public static String conversationScopeToString(ConversationScope scope){
         if(scope == ConversationScope.UNREAD) {
             return "unread";
         } else if (scope == ConversationScope.STARRED) {
@@ -56,23 +60,13 @@ public class ConversationAPI {
         return "";
     }
 
-    public enum WorkflowState {READ,UNREAD,ARCHIVED}
-
-    private static String conversationStateToString(WorkflowState state){
-        if(state == WorkflowState.UNREAD) {
-            return "unread";
-        } else if (state == WorkflowState.READ) {
-            return "read";
-        } else if (state == WorkflowState.ARCHIVED) {
-            return "archived";
-        }
-        return "";
-    }
-
     interface ConversationsInterface {
 
         @GET("conversations/?interleave_submissions=1")
         Call<List<Conversation>> getConversations(@Query("scope") String scope);
+
+        @GET("conversations/?interleave_submissions=1")
+        Call<List<Conversation>> getConversationsFiltered(@Query("scope") String scope, @Query("filter") String canvasContextFilter);
 
         @GET
         Call<List<Conversation>> getNextPage(@Url String nextURL);
@@ -84,7 +78,7 @@ public class ConversationAPI {
         Observable<Response<List<Conversation>>> getNextPageConversations(@Url String nextURL);
 
         @POST("conversations?group_conversation=true")
-        Call<List<Conversation>> createConversation(@Query("recipients[]") List<String> recipients, @Query("body") String message, @Query("subject") String subject, @Query("context_code") String contextCode, @Query("attachment_ids[]") long[] attachmentIds, @Query("bulk_message") int isGroup);
+        Call<List<Conversation>> createConversation(@Query("recipients[]") List<String> recipients, @Query("body") String message, @Query("subject") String subject, @Query("context_code") String contextCode, @Query("attachment_ids[]") long[] attachmentIds, @Query("bulk_message") int isBulk);
 
         @GET("conversations/{conversationId}")
         Call<Conversation> getConversation(@Path("conversationId") long conversationId);
@@ -100,6 +94,19 @@ public class ConversationAPI {
 
         @POST("conversations/{conversationId}/add_message?group_conversation=true")
         Call<Conversation> addMessage(@Path("conversationId") long conversationId, @Query("recipients[]") List<String> recipientIds, @Query("body") String body, @Query("included_messages[]") long[] includedMessageIds, @Query("attachment_ids[]") long[] attachmentIds);
+
+        @PUT("conversations")
+        Call<Void> markConversationAsUnread(@Query("conversation_ids[]") long conversationId, @Query("event") String conversationEvent);
+
+        @GET("conversations/{conversationId}?interleave_submissions=1")
+        Conversation getConversationSynchronous(@Path("conversationId") long conversationId);
+
+        @POST("conversations/{id}/add_message")
+        Call<Conversation> addMessageToConversationSynchronous(@Path("id")long conversationId, @Query("body")String message, @Query("attachment_ids[]") List<Long> attachments);
+
+        @POST("conversations?group_conversation=true")
+        Call<List<Conversation>> createConversationWithAttachmentSynchronous(@Query("recipients[]") List<String> recipients, @Query("body") String message, @Query("subject") String subject, @Query("context_code") String contextCode, @Query("bulk_message") int isGroup, @Query("attachment_ids[]") List<Long> attachments);
+
     }
 
     public static void getConversation(@NonNull RestBuilder adapter, @NonNull StatusCallback<Conversation> callback, @NonNull RestParams params, long conversationId) {
@@ -111,18 +118,31 @@ public class ConversationAPI {
             adapter.build(ConversationsInterface.class, params).getConversations(conversationScopeToString(scope)).enqueue(callback);
         } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
             adapter.build(ConversationsInterface.class, params).getNextPage(callback.getLinkHeaders().nextUrl).enqueue(callback);
+        } else {
+            callback.onCallbackFinished(ApiType.API);
         }
     }
 
-    public static void createConversation(@NonNull RestBuilder adapter, @NonNull RestParams params, ArrayList<String> userIDs, String message, String subject, String contextId, long[] attachmentIds, boolean isGroup, StatusCallback<List<Conversation>> callback) {
-        //The message has to be sent to somebody.
-        if(userIDs.size() == 0){ return; }
-
-        callback.addCall(adapter.build(ConversationsInterface.class, params).createConversation(userIDs, message, subject, contextId, attachmentIds, isGroup ? 0 : 1)).enqueue(callback);
+    public static void getConversationsFiltered(@NonNull ConversationScope scope, @NonNull String canvasContextFilter, @NonNull RestBuilder adapter, @NonNull StatusCallback<List<Conversation>> callback, @NonNull RestParams params) {
+        if (StatusCallback.isFirstPage(callback.getLinkHeaders())) {
+            adapter.build(ConversationsInterface.class, params).getConversationsFiltered(conversationScopeToString(scope), canvasContextFilter).enqueue(callback);
+        } else if (StatusCallback.moreCallsExist(callback.getLinkHeaders()) && callback.getLinkHeaders() != null) {
+            adapter.build(ConversationsInterface.class, params).getNextPage(callback.getLinkHeaders().nextUrl).enqueue(callback);
+        } else {
+            callback.onCallbackFinished(ApiType.API);
+        }
     }
 
-    public static void updateConversation(@NonNull RestBuilder adapter, @NonNull StatusCallback<Conversation> callback, @NonNull RestParams params, long conversationId, @Nullable WorkflowState workflowState, @Nullable Boolean starred) {
-        callback.addCall(adapter.build(ConversationsInterface.class, params).updateConversation(conversationId, conversationStateToString(workflowState), starred)).enqueue(callback);
+    public static void createConversation(@NonNull RestBuilder adapter, @NonNull RestParams params, ArrayList<String> userIDs, String message, String subject, String contextId, long[] attachmentIds, boolean isBulk, StatusCallback<List<Conversation>> callback) {
+        //The message has to be sent to somebody.
+        if(userIDs.size() == 0){ return; }
+        // "true" has to be hardcoded for group_conversations, see the base url above at the interface.
+        // isBulk is what we use to differentiate between sent individually vs as a group
+        callback.addCall(adapter.build(ConversationsInterface.class, params).createConversation(userIDs, message, subject, contextId, attachmentIds, isBulk ? 1 : 0)).enqueue(callback);
+    }
+
+    public static void updateConversation(@NonNull RestBuilder adapter, @NonNull StatusCallback<Conversation> callback, @NonNull RestParams params, long conversationId, @Nullable Conversation.WorkflowState workflowState, @Nullable Boolean starred) {
+        callback.addCall(adapter.build(ConversationsInterface.class, params).updateConversation(conversationId, Conversation.getWorkflowStateAPIString(workflowState), starred)).enqueue(callback);
     }
 
     public static void deleteConversation(@NonNull RestBuilder adapter, @NonNull StatusCallback<Conversation> callback, @NonNull RestParams params, long conversationId) {
@@ -137,4 +157,27 @@ public class ConversationAPI {
         callback.addCall(adapter.build(ConversationsInterface.class, params).addMessage(conversationId, recipientIds, message, includedMessageIds, attachmentIds)).enqueue(callback);
     }
 
+    public static void markConversationAsUnread(@NonNull RestBuilder adapter, @NonNull StatusCallback<Void> callback, @NonNull RestParams params, long conversationId, String conversationEvent) {
+        callback.addCall(adapter.build(ConversationsInterface.class, params).markConversationAsUnread(conversationId, conversationEvent)).enqueue(callback);
+    }
+
+    public static Response<Conversation> getConversationSynchronous(@NonNull RestBuilder adapter, @NonNull RestParams params, long conversationId) throws IOException {
+        return adapter.build(ConversationsInterface.class, params).getConversation(conversationId).execute();
+    }
+
+    public static Response<Conversation> addMessageToConversationSynchronous(@NonNull RestBuilder adapter, @NonNull RestParams params, long conversationId, String messageBody, List<Long> attachmentIds) throws IOException {
+
+        return adapter.build(ConversationsInterface.class, params).addMessageToConversationSynchronous(conversationId, messageBody, attachmentIds).execute();
+    }
+
+    public static @Nullable List<Conversation> createConversationWithAttachmentSynchronous(@NonNull RestBuilder adapter, @NonNull RestParams params, List<String> userIDs, String message, String subject, String contextId, boolean isGroup, List<Long> attachmentIds) throws IOException {
+        //The message has to be sent to somebody.
+        if(userIDs.isEmpty()) return null;
+
+        try {
+            return adapter.build(ConversationsInterface.class, params).createConversationWithAttachmentSynchronous(userIDs, message, subject, contextId, isGroup ? 0 : 1, attachmentIds).execute().body();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

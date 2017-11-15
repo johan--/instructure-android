@@ -1,19 +1,22 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.1.2'
+    /* Global constants */
+    apply from: '../gradle/global.gradle'
 
     apply from: '../private-data/merge-private-data.gradle'
     mergePrivateData "candroid"
 
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath "com.android.tools.build:gradle:$GLOBAL_GRADLE_TOOLS_VERSION"
         classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'com.cookpad.android.licensetools:license-tools-plugin:0.21.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:oss-licenses:$GLOBAL_OSS_LICENSES_PLUGIN_VERSION"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$GLOBAL_KOTLIN_VERSION"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -30,22 +33,23 @@ versioneye {
 allprojects {
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.google.com' }
     }
 }
 
 ext {
     junitVersion = '4.12'
-    compileSdkVersion = 25
-    buildToolsVersion = '25.0.2'
+    compileSdkVersion = GLOBAL_COMPILE_SDK
+    buildToolsVersion = GLOBAL_BUILD_TOOLS_VERSION
+    targetSdkVersion = GLOBAL_TARGET_SDK
+    minSdkVersion = 19
 
-    targetSdkVersion = 25
-    minSdkVersion = 17
+    versionCode = 164
+    versionName = '5.7.10'
 
-    versionCode = 159
-    versionName = '5.7.5'
-
-    supportLibraryVersion = '25.2.0'
-    googlePlayServicesVersion = '10.0.1'
+    supportLibraryVersion = GLOBAL_SUPPORT_LIBRARY_VERSION
+    googlePlayServicesVersion = GLOBAL_PLAY_SERVICES_VERSION
 
     supportDependencies = [
             design:            "com.android.support:design:$supportLibraryVersion",
@@ -53,10 +57,9 @@ ext {
             appCompat:         "com.android.support:appcompat-v7:$supportLibraryVersion",
             supportAnnotation: "com.android.support:support-annotations:$supportLibraryVersion",
             cardView:          "com.android.support:cardview-v7:$supportLibraryVersion",
-            gpsWearable:       "com.google.android.gms:play-services-wearable:$googlePlayServicesVersion",
             supportLibV13:     "com.android.support:support-v13:$supportLibraryVersion",
             gcm:               "com.google.android.gms:play-services-gcm:$googlePlayServicesVersion",
             analytics:         "com.google.android.gms:play-services-analytics:$googlePlayServicesVersion",
-            vector: "com.android.support:support-vector-drawable:${supportLibraryVersion}",
+            vector:            "com.android.support:support-vector-drawable:${supportLibraryVersion}",
     ]
 }

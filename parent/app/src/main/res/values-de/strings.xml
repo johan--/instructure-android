@@ -93,8 +93,6 @@
     <string name="shareYourLoveDetails">Sagen Sie uns, was Sie an der App besonders mögen</string>
     <string name="sendFeedback">Feedback abschicken</string>
     <string name="sendMail">E-Mail senden&#8230;</string>
-    <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-    <string name="supportEmailAddress">support@instructure.com</string>
     <string name="help_domain">Domain:</string>
     <string name="help_versionNum">Version:</string>
     <string name="help_userId">Benutzer-ID:</string>
@@ -163,4 +161,24 @@
     <string name="onlyCanvasObservers">Nur Canvas-Beobachter können im übergeordneten Canvas bestätigen.</string>
     <string name="open_source">Open Source</string>
     <string name="open_source_details">Open-Source-Lizenzen anzeigen</string>
+
+    <string name="unitedStates">USA</string>
+    <string name="theUnitedStates">die Vereinigten Staaten von Amerika</string>
+    <string name="canada">Kanada</string>
+    <string name="ireland">Irland</string>
+    <string name="australia">Australien</string>
+    <string name="germany">Deutschland</string>
+    <string name="singapore">Singapur</string>
+    <array name="regions">
+        <item name="unitedStates">@string/unitedStates</item>
+        <item name="canada">@string/canada</item>
+        <item name="ireland">@string/ireland</item>
+        <item name="australia">@string/australia</item>
+        <item name="germany">@string/germany</item>
+        <item name="singapore">@string/singapore</item>
+    </array>
+    <string name="selectChildRegion">Die Region des Studenten auswählen</string>
+    <string name="selectRegion">Regionsauswahl</string>
+    <string name="unauthorizedRegion">Unbefugte Region</string>
+    <string name="mismatchedRegionMessage">Diese Institution befindet sich außerhalb der ausgewählten Region. Um einen Studenten an dieser Institution hinzuzufügen, verwenden Sie bitte die Option „Regionsauswahl“ auf der Anmeldeseite, um ein neues Konto in der Region von %1$s zu erstellen.</string>
 </resources>

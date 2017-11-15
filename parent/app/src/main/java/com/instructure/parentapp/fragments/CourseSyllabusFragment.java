@@ -26,13 +26,13 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
 
-import com.instructure.canvasapi.utilities.CanvasRestAdapter;
+import com.instructure.canvasapi2.RequestInterceptor;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.ScheduleItem;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandautils.utils.Const;
@@ -42,9 +42,6 @@ import com.instructure.parentapp.util.RouterUtils;
 import com.instructure.parentapp.video.ActivityContentVideoViewClient;
 import com.instructure.parentapp.view.CanvasWebView;
 
-/**
- * Copyright (c) 2016 Instructure. All rights reserved.
- */
 public class CourseSyllabusFragment extends ParentFragment {
 
     // view variables
@@ -99,7 +96,7 @@ public class CourseSyllabusFragment extends ParentFragment {
             public void launchInternalWebViewFragment(String url) {
                 //create and add the InternalWebviewFragment to deal with the link they clicked
                 InternalWebviewFragment internalWebviewFragment = new InternalWebviewFragment();
-                internalWebviewFragment.setArguments(InternalWebviewFragment.createBundle(url + CanvasRestAdapter.getSessionLocaleString(), "", null, mStudent));
+                internalWebviewFragment.setArguments(InternalWebviewFragment.createBundle(url + RequestInterceptor.getSessionLocaleString(), "", null, mStudent));
 
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.setCustomAnimations(R.anim.slide_from_bottom, android.R.anim.fade_out, R.anim.none, R.anim.slide_to_bottom);
@@ -175,7 +172,7 @@ public class CourseSyllabusFragment extends ParentFragment {
 
         if (mSyllabus == null || mSyllabus.getDescription() == null) {
             CourseManager.getCourseWithSyllabusAirwolf(
-                    APIHelper.getAirwolfDomain(getContext()),
+                    ApiPrefs.getAirwolfDomain(),
                     ApplicationManager.getParentId(getContext()),
                     mStudent.getStudentId(),
                     mCourse.getId(),

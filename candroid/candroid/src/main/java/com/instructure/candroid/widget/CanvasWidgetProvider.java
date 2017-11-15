@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,35 +18,28 @@
 package com.instructure.candroid.widget;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.RemoteViews;
+import android.widget.Toast;
 
+import com.instructure.candroid.R;
 import com.instructure.candroid.activity.WidgetSetupActivity;
 import com.instructure.candroid.util.Analytics;
 import com.instructure.candroid.util.ApplicationManager;
 
 public abstract class CanvasWidgetProvider extends AppWidgetProvider {
 
+    public static int cycleBit = 100;
+
+
     public static final String REFRESH_ALL = "com.instructure.candroid.widget.allwidget.REFRESH";
 
-    /*
-    *Returns simple name for Google Analytics
-     */
-    public abstract String getWidgetSimpleName();
-
-    /*
-    * Returns string for broadcast receivers
-     */
-    public abstract String getRefreshString();
-
-    /*
-    *  Returns the Intent for the CanvasWidgetService that applies to the individual widget
-     */
-    public abstract Intent getWidgetServiceIntent(Context context);
-
+    //region Broadcast Callbacks
     @Override
     public void onEnabled(Context context) {
         if(context instanceof Activity) {
@@ -56,20 +49,6 @@ public abstract class CanvasWidgetProvider extends AppWidgetProvider {
         updateWidgetList(context);
     }
 
-    @Override
-    public void onDisabled(Context context) {
-        super.onDisabled(context);
-
-        context.stopService(getWidgetServiceIntent(context));
-    }
-
-    public static void updateWidget(Context context, String action) {
-        Intent intent = new Intent();
-        intent.setAction(action);
-
-        context.sendBroadcast(intent);
-
-    }
     /**
      * Called when the widget is added to the home screen.
      *
@@ -83,13 +62,10 @@ public abstract class CanvasWidgetProvider extends AppWidgetProvider {
         if(context == null || appWidgetManager == null || appWidgetIds.length == 0) {return;}
 
         for(int id : appWidgetIds) {
-            //Start a service so that we can update the Widget on orientation changes
-            Intent intent = getWidgetServiceIntent(context);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-
-            context.startService(intent);
+            AppWidgetManager manager = AppWidgetManager.getInstance(context);
+            RemoteViews remoteViews = buildUpdate(manager, id, context);
+            pushWidgetUpdate(remoteViews, id, context);
         }
-
     }
 
     /**
@@ -110,6 +86,47 @@ public abstract class CanvasWidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
     }
 
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        for(int id : appWidgetIds) {
+            ApplicationManager.getPrefs(context).remove(WidgetSetupActivity.WIDGET_BACKGROUND_PREFIX + id);
+        }
+
+        super.onDeleted(context, appWidgetIds);
+    }
+
+    //endregion
+
+    protected void pushWidgetUpdate(RemoteViews remoteViews, int widgetId, Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        manager.updateAppWidget(widgetId, remoteViews);
+    }
+
+
+    public RemoteViews buildUpdate(AppWidgetManager appWidgetManager, int widgetId, Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_homescreen);
+        final int textColor = BaseRemoteViewsService.getWidgetTextColor(widgetId, context.getApplicationContext());
+        setWidgetDependentViews(context, remoteViews, widgetId, textColor);
+
+        //Setup Refresh
+
+        PendingIntent pendingRefreshIntent = PendingIntent.getBroadcast(context, getRefreshIntentID(), getRefreshIntent(context), PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.widget_refresh, pendingRefreshIntent);
+
+        appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.contentList);
+        return remoteViews;
+    }
+
+
+
+    public static void updateWidget(Context context, String action) {
+        Intent intent = new Intent();
+        intent.setAction(action);
+
+        context.sendBroadcast(intent);
+
+    }
+
     /**
      * Invalidates the collection list on the widget,
      * and makes it re-pull data from the api.
@@ -125,12 +142,17 @@ public abstract class CanvasWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    @Override
-    public void onDeleted(Context context, int[] appWidgetIds) {
-        for(int id : appWidgetIds) {
-            ApplicationManager.getPrefs(context).remove(WidgetSetupActivity.WIDGET_BACKGROUND_PREFIX + id);
-        }
+    /*
+   *Returns simple name for Google Analytics
+    */
+    public abstract String getWidgetSimpleName();
 
-        super.onDeleted(context, appWidgetIds);
-    }
+    /*
+    * Returns string for broadcast receivers
+     */
+    public abstract String getRefreshString();
+
+    protected abstract void setWidgetDependentViews(Context context, RemoteViews remoteViews, int widgetId, int textColor);
+    protected abstract int getRefreshIntentID();
+    protected abstract Intent getRefreshIntent(Context context);
 }

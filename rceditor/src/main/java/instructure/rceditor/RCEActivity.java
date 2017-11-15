@@ -18,14 +18,18 @@ package instructure.rceditor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import static instructure.rceditor.RCEConst.BUTTON_COLOR;
 import static instructure.rceditor.RCEConst.HTML_ACCESSIBILITY_TITLE;
 import static instructure.rceditor.RCEConst.HTML_CONTENT;
 import static instructure.rceditor.RCEConst.HTML_TITLE;
+import static instructure.rceditor.RCEConst.THEME_COLOR;
 
 public class RCEActivity extends AppCompatActivity implements RCEFragment.RCEFragmentCallbacks {
 
@@ -45,7 +49,9 @@ public class RCEActivity extends AppCompatActivity implements RCEFragment.RCEFra
             mFragment.loadArguments(
                     getIntent().getStringExtra(HTML_CONTENT),
                     getIntent().getStringExtra(HTML_TITLE),
-                    getIntent().getStringExtra(HTML_ACCESSIBILITY_TITLE)
+                    getIntent().getStringExtra(HTML_ACCESSIBILITY_TITLE),
+                    getIntent().getIntExtra(THEME_COLOR, Color.BLACK),
+                    getIntent().getIntExtra(BUTTON_COLOR, Color.BLACK)
             );
         }
         super.onAttachFragment(fragment);
@@ -67,11 +73,19 @@ public class RCEActivity extends AppCompatActivity implements RCEFragment.RCEFra
         }
     }
 
-    public static Intent createIntent(Context context, String html, String title, String accessibilityTitle) {
+    public static Intent createIntent(
+            Context context,
+            String html,
+            String title,
+            String accessibilityTitle,
+            @ColorInt int themeColor,
+            @ColorInt int buttonColor) {
         Intent intent = new Intent(context, RCEActivity.class);
         intent.putExtra(HTML_CONTENT, html);
         intent.putExtra(HTML_TITLE, title);
         intent.putExtra(HTML_ACCESSIBILITY_TITLE, accessibilityTitle);
+        intent.putExtra(THEME_COLOR, themeColor);
+        intent.putExtra(BUTTON_COLOR, buttonColor);
         return intent;
     }
 }

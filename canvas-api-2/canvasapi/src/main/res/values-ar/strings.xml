@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">عنوان URL عبر الإنترنت</string>
   <string name="canvasAPI_mediaRecording">تسجيل الوسائط</string>
   <string name="canvasAPI_attendance">الحضور</string>
+  <string name="quiz_scoring_policy_highest">الأعلى</string>
+  <string name="quiz_scoring_policy_average">متوسط</string>
+  <string name="quiz_scoring_policy_latest">الأدنى</string>
+  <string name="no">لا</string>
+  <string name="always">دائمًا</string>
+  <string name="graded_quiz">اختبار موجز تم تقييم درجاته</string>
+  <string name="practice_quiz">أداء الاختبار الموجز</string>
+  <string name="graded_survey">استطلاع تم تقييم درجاته</string>
+  <string name="ungraded_survey">استطلاع لم يتم تقييم درجاته</string>
 </resources>

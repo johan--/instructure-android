@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,33 +29,31 @@ import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.holders.QuizViewHolder;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.StringUtilities;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.api.QuizAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Quiz;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.DateHelpers;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.QuizManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Quiz;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.DateHelper;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
-import java.util.HashMap;
+import java.util.List;
 
-import retrofit.client.Response;
+import retrofit2.Response;
 
 public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Quiz, RecyclerView.ViewHolder>{
 
-    private HashMap<Long, Assignment> mAssignmentsByQuizId;
-    private Quiz[] mQuizzes;
+    private List<Quiz> mQuizzes;
     private CanvasContext mCanvasContext;
 
-    private CanvasCallback<Quiz[]> mQuizzesCallback;
-    private CanvasCallback<Assignment[]> mAssignmentsCallback;
+    private StatusCallback<List<Quiz>> mQuizzesCallback;
     private AdapterToFragmentCallback<Quiz> mAdapterToFragmentCallback;
     private int mCourseColor;
+
 
     public QuizListRecyclerAdapter(Context context, CanvasContext canvasContext, AdapterToFragmentCallback<Quiz> adapterToFragmentCallback) {
         super(context, String.class, Quiz.class);
@@ -81,62 +79,42 @@ public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Q
 
     @Override
     public void setupCallbacks() {
-        mQuizzesCallback = new CanvasCallback<Quiz[]>(this) {
+        mQuizzesCallback = new StatusCallback<List<Quiz>>() {
 
             @Override
-            public void firstPage(Quiz[] quizzes, LinkHeaders linkHeaders, Response response) {
-                setNextUrl(linkHeaders.nextURL);
-                mQuizzes = quizzes;
+            public void onResponse(Response<List<Quiz>> response, LinkHeaders linkHeaders, ApiType type) {
+                setNextUrl(linkHeaders.nextUrl);
+                mQuizzes = response.body();
                 populateAdapter();
-            }
-        };
-
-        mAssignmentsCallback = new CanvasCallback<Assignment[]>(this) {
-            private void addAssignmentsToMap(Assignment[] assignments) {
-                mAssignmentsByQuizId = new HashMap<>();
-                for (Assignment assignment : assignments) {
-                    if (assignment.getQuizId() > 0) {
-                        mAssignmentsByQuizId.put(assignment.getQuizId(), assignment);
-                    }
-                }
             }
 
             @Override
-            public void firstPage(Assignment[] assignments, LinkHeaders linkHeaders, Response response) {
-                addAssignmentsToMap(assignments);
-                populateAdapter();
+            public void onFinished(ApiType type) {
+                if (mAdapterToFragmentCallback != null) mAdapterToFragmentCallback.onRefreshFinished();
             }
         };
     }
 
     @Override
     public void resetData() {
-        mAssignmentsByQuizId = null;
         mQuizzes = null;
         super.resetData();
     }
 
     private void populateAdapter() {
-        // wait until the assignments callback is done
-        if (mQuizzes == null || mAssignmentsByQuizId == null) {
-            return;
-        }
-
         String assignmentQuizzes = getContext().getString(R.string.assignmentQuizzes);
         String surveys = getContext().getString(R.string.surveys);
         String gradedSurveys = getContext().getString(R.string.gradedSurveys);
         String practiceQuizzes = getContext().getString(R.string.practiceQuizzes);
 
         for (Quiz quiz : mQuizzes) {
-            quiz.setAssignment(mAssignmentsByQuizId.get(quiz.getId()));
-
-            if (quiz.getType().equals(Quiz.TYPE_ASSIGNMENT)) {
+            if (quiz.getQuizType().equals(Quiz.TYPE_ASSIGNMENT)) {
                 addOrUpdateItem(assignmentQuizzes, quiz);
-            } else if (quiz.getType().equals(Quiz.TYPE_SURVEY)) {
+            } else if (quiz.getQuizType().equals(Quiz.TYPE_SURVEY)) {
                 addOrUpdateItem(surveys, quiz);
-            } else if (quiz.getType().equals(Quiz.TYPE_GRADED_SURVEY)) {
+            } else if (quiz.getQuizType().equals(Quiz.TYPE_GRADED_SURVEY)) {
                 addOrUpdateItem(gradedSurveys, quiz);
-            } else if (quiz.getType().equals(Quiz.TYPE_PRACTICE)) {
+            } else if (quiz.getQuizType().equals(Quiz.TYPE_PRACTICE)) {
                 addOrUpdateItem(practiceQuizzes, quiz);
             }
 
@@ -154,13 +132,12 @@ public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Q
 
     @Override
     public void loadFirstPage() {
-        QuizAPI.getFirstPageQuizzes(mCanvasContext, mQuizzesCallback);
-        AssignmentAPI.getAssignmentsList(mCanvasContext.getId(), mAssignmentsCallback);
+        QuizManager.getFirstPageQuizList(mCanvasContext, false, mQuizzesCallback);
     }
 
     @Override
     public void loadNextPage(String nextURL) {
-        QuizAPI.getNextPageQuizzes(nextURL, mQuizzesCallback);
+        QuizManager.getNextPageQuizList(nextURL, false, mQuizzesCallback);
     }
 
     @Override
@@ -179,11 +156,6 @@ public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Q
         } else {
             return QuizViewHolder.holderResId();
         }
-    }
-
-    @Override
-    public void contextReady() {
-
     }
 
     @Override
@@ -276,8 +248,8 @@ public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Q
 
     private String getDateString(Quiz quiz){
         String dateString;
-        if (quiz.getAssignment() != null && quiz.getAssignment().getDueDate() != null) {
-            dateString = DateHelpers.createPrefixedDateTimeString(getContext(), R.string.dueAt, quiz.getAssignment().getDueDate());
+        if (quiz.getDueAt() != null) {
+            dateString = DateHelper.createPrefixedDateTimeString(getContext(), R.string.dueAt, quiz.getDueAt());
         } else {
             dateString = null;
         }
@@ -289,8 +261,8 @@ public class QuizListRecyclerAdapter extends ExpandableRecyclerAdapter<String, Q
     }
 
     private int compareQuiz(Quiz q1, Quiz q2){
-        if (q1.getAssignment() != null && q1.getAssignment().getDueDate() != null && q2.getAssignment() != null && q2.getAssignment().getDueDate() != null) {
-            return q1.getAssignment().getDueDate().compareTo(q2.getAssignment().getDueDate());
+        if (q1.getAssignmentId() > 0 && q1.getDueAt() != null && q2.getAssignmentId() > 0 && q2.getDueAt() != null) {
+            return q1.getDueAt().compareTo(q2.getDueAt());
         } else {
             return q1.getTitle().toLowerCase().compareTo(q2.getTitle().toLowerCase());
         }

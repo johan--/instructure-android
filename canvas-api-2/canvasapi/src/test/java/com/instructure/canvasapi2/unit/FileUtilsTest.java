@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -93,37 +93,37 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void kalturaCodeFromMimeType_null() {
-        assertEquals("0", FileUtils.kalturaCodeFromMimeType(null));
+    public void notoriousCodeFromMimeType_null() {
+        assertEquals("0", FileUtils.notoriousCodeFromMimeType(null));
     }
 
     @Test
-    public void kalturaCodeFromMimeType_video() {
-        assertEquals("1", FileUtils.kalturaCodeFromMimeType("video/mp4"));
+    public void notoriousCodeFromMimeType_video() {
+        assertEquals("1", FileUtils.notoriousCodeFromMimeType("video/mp4"));
     }
 
     @Test
-    public void kalturaCodeFromMimeType_audio() {
-        assertEquals("5", FileUtils.kalturaCodeFromMimeType("audio/mp3"));
+    public void notoriousCodeFromMimeType_audio() {
+        assertEquals("5", FileUtils.notoriousCodeFromMimeType("audio/mp3"));
     }
 
     @Test
-    public void kalturaCodeFromMimeType_invalid() {
-        assertEquals("0", FileUtils.kalturaCodeFromMimeType("pdf"));
+    public void notoriousCodeFromMimeType_invalid() {
+        assertEquals("0", FileUtils.notoriousCodeFromMimeType("pdf"));
     }
 
     @Test
-    public void mediaTypeFromKalturaCode_video() {
-        assertEquals("video", FileUtils.mediaTypeFromKalturaCode(1));
+    public void mediaTypeFromNotoriousCode_video() {
+        assertEquals("video", FileUtils.mediaTypeFromNotoriousCode(1));
     }
 
     @Test
-    public void mediaTypeFromKalturaCode_audio() {
-        assertEquals("audio", FileUtils.mediaTypeFromKalturaCode(5));
+    public void mediaTypeFromNotoriousCode_audio() {
+        assertEquals("audio", FileUtils.mediaTypeFromNotoriousCode(5));
     }
 
     @Test
-    public void mediaTypeFromKalturaCode_other() {
-        assertEquals("", FileUtils.mediaTypeFromKalturaCode(123));
+    public void mediaTypeFromNotoriousCode_other() {
+        assertEquals("", FileUtils.mediaTypeFromNotoriousCode(123));
     }
 }

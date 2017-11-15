@@ -41,7 +41,7 @@ import com.instructure.canvasapi2.managers.AssignmentManager;
 import com.instructure.canvasapi2.managers.CalendarEventManager;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.DiscussionManager;
-import com.instructure.canvasapi2.managers.FilesFoldersManager;
+import com.instructure.canvasapi2.managers.FileFolderManager;
 import com.instructure.canvasapi2.models.AccountNotification;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.CanvasContext;
@@ -50,7 +50,7 @@ import com.instructure.canvasapi2.models.DiscussionTopicHeader;
 import com.instructure.canvasapi2.models.FileFolder;
 import com.instructure.canvasapi2.models.ScheduleItem;
 import com.instructure.canvasapi2.models.Student;
-import com.instructure.canvasapi2.utils.APIHelper;
+import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.canvasapi2.utils.Logger;
@@ -71,7 +71,7 @@ import com.instructure.parentapp.util.StringUtilities;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class BaseRouterActivity extends BaseParentActivity {
+public abstract class BaseRouterActivity extends BaseParentActivity {
 
     // region OpenMediaAsyncTaskLoader
     private Bundle openMediaBundle;
@@ -154,19 +154,19 @@ public class BaseRouterActivity extends BaseParentActivity {
             long assignmentId = Long.parseLong(route.getParamsHash().get("assignment_id"));
 
             AssignmentManager.getAssignmentAirwolf(
-                    APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     student.getParentId(),
                     student.getStudentId(),
                     Long.toString(canvasContext.getId()),
                     Long.toString(assignmentId),
-                    new StatusCallback<Assignment>(){
+                    new StatusCallback<Assignment>() {
                         @Override
-                        public void onResponse(retrofit2.Response<Assignment> response, LinkHeaders linkHeaders, ApiType type) {
+                        public void onResponse(Response<Assignment> response, LinkHeaders linkHeaders, ApiType type) {
                             assignmentHelper(response.body());
                         }
 
                         private void assignmentHelper(Assignment assignment) {
-                            if(assignment != null) {
+                            if (assignment != null) {
                                 startActivity(DetailViewActivity.createIntent(BaseRouterActivity.this, DetailViewActivity.DETAIL_FRAGMENT.ASSIGNMENT, assignment, canvasContext.getName(), student));
                                 overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
                             }
@@ -174,7 +174,7 @@ public class BaseRouterActivity extends BaseParentActivity {
 
                         @Override
                         public void onFail(Call<Assignment> response, Throwable error, int code) {
-                            if(code == 404) {
+                            if (code == 404) {
                                 Toast.makeText(BaseRouterActivity.this, R.string.could_not_route_assignment, Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -186,14 +186,14 @@ public class BaseRouterActivity extends BaseParentActivity {
             long announcementId = Long.parseLong(route.getParamsHash().get("announcement_id"));
 
             DiscussionManager.getDetailedDiscussionAirwolf(
-                    APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     student.getParentId(),
                     student.getStudentId(),
                     Long.toString(canvasContext.getId()),
                     Long.toString(announcementId),
-                    new StatusCallback<DiscussionTopicHeader>(){
+                    new StatusCallback<DiscussionTopicHeader>() {
                         @Override
-                        public void onResponse(retrofit2.Response<DiscussionTopicHeader> response, LinkHeaders linkHeaders, ApiType type) {
+                        public void onResponse(Response<DiscussionTopicHeader> response, LinkHeaders linkHeaders, ApiType type) {
                             startActivity(DetailViewActivity.createIntent(BaseRouterActivity.this, DetailViewActivity.DETAIL_FRAGMENT.ANNOUNCEMENT, response.body(), canvasContext.getName(), student));
                             overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
                         }
@@ -209,13 +209,13 @@ public class BaseRouterActivity extends BaseParentActivity {
             long eventId = Long.parseLong(route.getParamsHash().get("event_id"));
 
             CalendarEventManager.getCalendarEventAirwolf(
-                    APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+                    ApiPrefs.getAirwolfDomain(),
                     student.getParentId(),
                     student.getStudentId(),
                     Long.toString(eventId),
-                    new StatusCallback<ScheduleItem>(){
+                    new StatusCallback<ScheduleItem>() {
                         @Override
-                        public void onResponse(retrofit2.Response<ScheduleItem> response, LinkHeaders linkHeaders, ApiType type) {
+                        public void onResponse(Response<ScheduleItem> response, LinkHeaders linkHeaders, ApiType type) {
                             startActivity(DetailViewActivity.createIntent(BaseRouterActivity.this, DetailViewActivity.DETAIL_FRAGMENT.EVENT, response.body(), student));
                             overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
                         }
@@ -246,7 +246,7 @@ public class BaseRouterActivity extends BaseParentActivity {
         String notificationId = route.getParamsHash().get("notification_id");
 
         AccountNotificationManager.getAccountNotificationForStudentAirwolf(
-                APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 ApplicationManager.getParentId(BaseRouterActivity.this),
                 student.getStudentId(),
                 notificationId,
@@ -255,7 +255,7 @@ public class BaseRouterActivity extends BaseParentActivity {
 
                     @Override
                     public void onResponse(Response<AccountNotification> accountNotificationResponse, LinkHeaders linkHeaders, ApiType type) {
-                        if(accountNotificationResponse != null && accountNotificationResponse.body() != null) {
+                        if (accountNotificationResponse != null && accountNotificationResponse.body() != null) {
                             startActivity(DetailViewActivity.createIntent(BaseRouterActivity.this, DetailViewActivity.DETAIL_FRAGMENT.ACCOUNT_NOTIFICATION, accountNotificationResponse.body(), student));
                             overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out);
                         }
@@ -265,13 +265,13 @@ public class BaseRouterActivity extends BaseParentActivity {
 
     private void getCourseForRouting(long id, final RouterUtils.Route route, final Student student) {
         CourseManager.getCourseWithGradeAirwolf(
-                APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+                ApiPrefs.getAirwolfDomain(),
                 ApplicationManager.getParentId(BaseRouterActivity.this),
                 student.getStudentId(),
                 id,
-                new StatusCallback<Course>(){
+                new StatusCallback<Course>() {
                     @Override
-                    public void onResponse(retrofit2.Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
+                    public void onResponse(Response<Course> response, LinkHeaders linkHeaders, ApiType type) {
                         if (response.body() == null) {
                             Toast.makeText(BaseRouterActivity.this, getString(R.string.could_not_route_course), Toast.LENGTH_SHORT).show();
                         } else {
@@ -404,13 +404,13 @@ public class BaseRouterActivity extends BaseParentActivity {
         final CanvasContext canvasContext = CanvasContext.getGenericContext(CanvasContext.Type.COURSE, courseId, "");
         Logger.d("handleSpecificFile()");
 
-        FilesFoldersManager.getFileFolderFromURLAirwolf(
-                APIHelper.getAirwolfDomain(BaseRouterActivity.this),
+        FileFolderManager.getFileFolderFromURLAirwolf(
+                ApiPrefs.getAirwolfDomain(),
                 "files/" + fileID,
-                new StatusCallback<FileFolder>(){
+                new StatusCallback<FileFolder>() {
                     @Override
-                    public void onResponse(retrofit2.Response<FileFolder> response, LinkHeaders linkHeaders, ApiType type, int code) {
-                        if(type == ApiType.API) {
+                    public void onResponse(Response<FileFolder> response, LinkHeaders linkHeaders, ApiType type, int code) {
+                        if (type == ApiType.API) {
                             FileFolder fileFolder = response.body();
                             if (fileFolder == null || code == 404) {
                                 Toast.makeText(BaseRouterActivity.this, R.string.fileNoLongerExists, Toast.LENGTH_LONG).show();
@@ -426,7 +426,7 @@ public class BaseRouterActivity extends BaseParentActivity {
 
                     @Override
                     public void onFail(Call<FileFolder> response, Throwable error, int code) {
-                        if(code == 404) {
+                        if (code == 404) {
                             Toast.makeText(BaseRouterActivity.this, R.string.fileNoLongerExists, Toast.LENGTH_LONG).show();
                         }
                     }

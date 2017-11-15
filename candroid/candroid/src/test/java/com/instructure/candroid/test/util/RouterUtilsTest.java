@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, version 3 of the License.
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
  *
  */
 
@@ -43,9 +43,9 @@ import com.instructure.candroid.fragment.SyllabusFragment;
 import com.instructure.candroid.fragment.UnSupportedTabFragment;
 import com.instructure.candroid.util.Param;
 import com.instructure.candroid.util.RouterUtils;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.APIHelpers;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.APIHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +94,7 @@ public class RouterUtilsTest extends InstrumentationTestCase {
     }
 
     private RouterUtils.Route callGetInternalRoute(String url) {
-        //String domain = APIHelpers.getDomain(RuntimeEnvironment.application);
+        //String domain = APIHelper.getDomain(RuntimeEnvironment.application);
         return RouterUtils.getInternalRoute(url, "mobiledev.instructure.com");
     }
 
@@ -478,7 +478,7 @@ public class RouterUtilsTest extends InstrumentationTestCase {
 
     @Test
     public void testCreateBookmarkCourse() {
-        APIHelpers.setDomain(RuntimeEnvironment.application.getApplicationContext(), "mobiledev.instructure.com");
+        APIHelper.setDomain(RuntimeEnvironment.application.getApplicationContext(), "mobiledev.instructure.com");
         HashMap<String, String> replacementParams = new HashMap<>();
         replacementParams.put(Param.COURSE_ID, "123");
         replacementParams.put(Param.QUIZ_ID, "456");
@@ -492,7 +492,7 @@ public class RouterUtilsTest extends InstrumentationTestCase {
 
     @Test
     public void testCreateBookmarkGroups() {
-        APIHelpers.setDomain(RuntimeEnvironment.application.getApplicationContext(), "mobiledev.instructure.com");
+        APIHelper.setDomain(RuntimeEnvironment.application.getApplicationContext(), "mobiledev.instructure.com");
         HashMap<String, String> replacementParams = new HashMap<>();
         replacementParams.put(Param.COURSE_ID, "123");
         replacementParams.put(Param.QUIZ_ID, "456");

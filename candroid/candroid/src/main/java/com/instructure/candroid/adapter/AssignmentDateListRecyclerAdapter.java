@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,27 +30,28 @@ import com.instructure.candroid.holders.EmptyViewHolder;
 import com.instructure.candroid.holders.ExpandableViewHolder;
 import com.instructure.candroid.interfaces.AdapterToAssignmentsCallback;
 import com.instructure.candroid.interfaces.GradingPeriodsCallback;
-import com.instructure.canvasapi.api.AssignmentAPI;
-import com.instructure.canvasapi.api.CourseAPI;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentGroup;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.Enrollment;
-import com.instructure.canvasapi.model.GradingPeriod;
-import com.instructure.canvasapi.model.GradingPeriodResponse;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.AssignmentManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.AssignmentGroup;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Enrollment;
+import com.instructure.canvasapi2.models.GradingPeriod;
+import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.util.GroupSortedList;
 import com.instructure.pandarecycler.util.Types;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
 
 public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter<AssignmentGroup, Assignment, RecyclerView.ViewHolder> implements GradingPeriodsCallback {
 
@@ -64,10 +65,10 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
     private AssignmentGroup mUpcoming;
     private AssignmentGroup mUndated;
     private AssignmentGroup mPast;
-    private HashMap<Long, Submission> mSubmissions = new HashMap<>();
     private AdapterToAssignmentsCallback mAdapterToAssignmentsCallback;
-    private CanvasCallback<AssignmentGroup[]> mAssignmentGroupCallback;
-    private CanvasCallback<GradingPeriodResponse> mGradingPeriodsCallback;
+    private StatusCallback<List<AssignmentGroup>> mAssignmentGroupCallback;
+    private StatusCallback<GradingPeriodResponse> mGradingPeriodsCallback;
+
     private GradingPeriod mCurrentGradingPeriod;
 
     /* For testing purposes only */
@@ -76,7 +77,7 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
     }
 
     public AssignmentDateListRecyclerAdapter(Context context, CanvasContext canvasContext,
-        CanvasCallback<GradingPeriodResponse> canvasCallback,
+        StatusCallback<GradingPeriodResponse> canvasCallback,
         AdapterToAssignmentsCallback adapterToAssignmentsCallback) {
         super(context, AssignmentGroup.class, Assignment.class);
         mCanvasContext = canvasContext;
@@ -93,18 +94,18 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
 
     @Override
     public void setupCallbacks() {
-        mAssignmentGroupCallback = new CanvasCallback<AssignmentGroup[]>(this) {
+        mAssignmentGroupCallback = new StatusCallback<List<AssignmentGroup>>() {
+
             @Override
-            public void firstPage(AssignmentGroup[] assignmentGroups, LinkHeaders linkHeaders, Response response) {
-                addAndSortAssignments(assignmentGroups);
+            public void onResponse(retrofit2.Response<List<AssignmentGroup>> response, LinkHeaders linkHeaders, ApiType type) {
+                addAndSortAssignments(response.body());
                 mAdapterToAssignmentsCallback.onRefreshFinished();
                 mAdapterToAssignmentsCallback.setTermSpinnerState(true);
             }
 
             @Override
-            public boolean onFailure(RetrofitError retrofitError) {
+            public void onFail(Call<List<AssignmentGroup>> callResponse, Throwable error, retrofit2.Response response) {
                 mAdapterToAssignmentsCallback.setTermSpinnerState(true);
-                return super.onFailure(retrofitError);
             }
         };
 
@@ -156,7 +157,7 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
                     mCurrentGradingPeriod.setTitle(enrollment.getCurrentGradingPeriodTitle());
                     //request the grading period objects and make the assignment calls
                     //This callback is fulfilled in the grade list fragment.
-                    CourseAPI.getGradingPeriodsForCourse(course.getId(), mGradingPeriodsCallback);
+                    CourseManager.getGradingPeriodsForCourse(mGradingPeriodsCallback, course.getId(), true);
                     //Then we go ahead and load up the assignments for the current period
                     loadAssignmentsForGradingPeriod(mCurrentGradingPeriod.getId(), false);
                     return;
@@ -205,18 +206,14 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
             resetData();
         }
 
-        //Scope assignments if its for a student, both calls are still filtered by grading period
-        if(((Course)mCanvasContext).isStudent()){
-            AssignmentAPI.getAssignmentGroupsListScoped(mCanvasContext.getId(), gradingPeriodID, true, mAssignmentGroupCallback);
-        } else {
-            AssignmentAPI.getAssignmentGroupsListWithAssignmentsAndSubmissionsForGradingPeriod(mCanvasContext.getId(), gradingPeriodID, mAssignmentGroupCallback);
-        }
-
+        // Scope assignments if its for a student
+        boolean scopeToStudent = ((Course)mCanvasContext).isStudent();
+        AssignmentManager.getAssignmentGroupsWithAssignmentsForGradingPeriod(mCanvasContext.getId(), gradingPeriodID, scopeToStudent, isRefresh(), mAssignmentGroupCallback);
     }
 
     @Override
     public void loadAssignment () {
-        AssignmentAPI.getAssignmentGroupsListWithAssignmentsAndSubmissions(mCanvasContext.getId(), mAssignmentGroupCallback);
+        AssignmentManager.getAssignmentGroupsWithAssignments(mCanvasContext.getId(), isRefresh(), mAssignmentGroupCallback);
     }
 
     @Override
@@ -229,7 +226,7 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
         mCurrentGradingPeriod = gradingPeriod;
     }
 
-    private void addAndSortAssignments(AssignmentGroup[] assignmentGroups) {
+    private void addAndSortAssignments(List<AssignmentGroup> assignmentGroups) {
         Date today = new Date();
         for (AssignmentGroup assignmentGroup : assignmentGroups) {
             // TODO canHaveOverDueAssignment
@@ -238,9 +235,9 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
             // canHaveOverdueAssignment = !ENV.current_user_has_been_observer_in_this_course || ENV.observed_student_ids?.length == 1I
             // endtodo
             for (Assignment assignment : assignmentGroup.getAssignments()) {
-                Date dueDate = assignment.getDueDate();
-                Submission submission = assignment.getLastSubmission();
-                assignment.setLastSubmission(submission);
+                Date dueDate = assignment.getDueAt();
+                Submission submission = assignment.getSubmission();
+                assignment.setSubmission(submission);
                 boolean isWithoutGradedSubmission = submission == null || submission.isWithoutGradedSubmission();
                 boolean isOverdue = assignment.isAllowedToSubmit() && isWithoutGradedSubmission;
                 if (dueDate == null) {
@@ -296,29 +293,24 @@ public class AssignmentDateListRecyclerAdapter extends ExpandableRecyclerAdapter
         return new GroupSortedList.ItemComparatorCallback<AssignmentGroup, Assignment>() {
             @Override
             public int compare(AssignmentGroup group, Assignment o1, Assignment o2) {
-                if (mSubmissions.size() > 0) {
-                    int position = group.getPosition();
-                    if (position == HEADER_POSITION_UNDATED) {
-                        return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                    } else if (position == HEADER_POSITION_PAST) {
-                        return o2.getDueDate().compareTo(o1.getDueDate()); // sort newest date first (o1 and o2 switched places)
-                    } else {
-                        return o1.getDueDate().compareTo(o2.getDueDate()); // sort oldest date first
-                    }
+                int position = group.getPosition();
+                if (position == HEADER_POSITION_UNDATED) {
+                    return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+                } else if (position == HEADER_POSITION_PAST) {
+                    return o2.getDueAt().compareTo(o1.getDueAt()); // sort newest date first (o1 and o2 switched places)
                 } else {
-                    // Fallback to groups if assignments can't be fetched
-                    return o1.getPosition() - o2.getPosition();
+                    return o1.getDueAt().compareTo(o2.getDueAt()); // sort oldest date first
                 }
             }
 
             @Override
             public boolean areContentsTheSame(Assignment oldItem, Assignment newItem) {
                 boolean isSameName = oldItem.getName().equals(newItem.getName());
-                if (oldItem.getDueDate() != null && newItem.getDueDate() != null) {
-                    return isSameName && oldItem.getDueDate().equals(newItem.getDueDate());
-                } else if (oldItem.getDueDate() == null && newItem.getDueDate() != null) {
+                if (oldItem.getDueAt() != null && newItem.getDueAt() != null) {
+                    return isSameName && oldItem.getDueAt().equals(newItem.getDueAt());
+                } else if (oldItem.getDueAt() == null && newItem.getDueAt() != null) {
                     return false;
-                } else if (oldItem.getDueDate() != null && newItem.getDueDate() == null) {
+                } else if (oldItem.getDueAt() != null && newItem.getDueAt() == null) {
                     return false;
                 }
                 return isSameName;

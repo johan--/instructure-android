@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -560,6 +560,16 @@ public class GroupSortedList<GROUP, ITEM> {
      * @return
      */
     public boolean removeItem(ITEM item) {
+        return removeItem(item, true);
+    }
+
+    /**
+     * Remove the item
+     * @param item
+     * @param removeGroupIfEmpty Removes the group if no items remain in the group upon successful deletion.
+     * @return
+     */
+    public boolean removeItem(ITEM item, boolean removeGroupIfEmpty) {
         ItemPosition itemPosition = storedItemPosition(getItemId(item));
 
         if (itemPosition == null) {
@@ -571,7 +581,7 @@ public class GroupSortedList<GROUP, ITEM> {
         boolean isRemoved = groupItems.remove(item);
 
         // If the item was the last in the group, remove the group too.
-        if (groupItems.size() == 0) {
+        if (removeGroupIfEmpty && groupItems.size() == 0) {
             mGroupObjects.remove(group);
         }
         return isRemoved;

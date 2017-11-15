@@ -26,7 +26,7 @@ import com.instructure.canvasapi2.utils.FileUtils;
 import com.instructure.pandautils.utils.Utils;
 import com.instructure.parentapp.BuildConfig;
 import com.instructure.parentapp.R;
-import com.instructure.parentapp.activity.MainActivity;
+import com.instructure.parentapp.activity.SplashActivity;
 import com.instructure.parentapp.util.ApplicationManager;
 
 import java.io.File;
@@ -70,9 +70,9 @@ public class LogoutAsyncTask extends AsyncTask<Void, Void, Boolean> {
             //TODO: this MOST LIKELY won't work if there are items on the back-stack.
             Intent intent;
             if(mMessageToUser != null){
-                intent = MainActivity.createIntent(mParentActivity, true, mMessageToUser);
+                intent = SplashActivity.createIntent(mParentActivity, true, mMessageToUser);
             } else {
-                intent = MainActivity.createIntent(mParentActivity);
+                intent = SplashActivity.createIntent(mParentActivity);
             }
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -41,14 +41,14 @@ import com.instructure.candroid.decorations.DividerDecoration;
 import com.instructure.candroid.delegate.Navigation;
 import com.instructure.candroid.util.DebounceMessageToAdapterListener;
 import com.instructure.candroid.util.FragUtils;
-import com.instructure.canvasapi.api.ConversationAPI;
-import com.instructure.canvasapi.api.ConversationAPI.ConversationScope;
-import com.instructure.canvasapi.model.CanvasContext;
-import com.instructure.canvasapi.model.Conversation;
-import com.instructure.canvasapi.utilities.APIHelpers;
-import com.instructure.canvasapi.utilities.APIStatusDelegate;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.apis.ConversationAPI.ConversationScope;
+import com.instructure.canvasapi2.managers.ConversationManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Conversation;
+import com.instructure.canvasapi2.utils.ApiPrefs;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.pandarecycler.PandaRecyclerView;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
@@ -57,8 +57,9 @@ import com.instructure.pandautils.utils.RequestCodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+
+import static com.instructure.canvasapi2.apis.ConversationAPI.CONVERSATION_MARK_UNREAD;
 
 public class MessageListFragment extends ParentFragment implements MultiSelectRecyclerAdapter.MultiSelectCallback {
 
@@ -110,7 +111,7 @@ public class MessageListFragment extends ParentFragment implements MultiSelectRe
         mRecyclerAdapter = new MessageListRecyclerAdapter(getContext(),
                 new ArrayList<Conversation>(),
                 messageType, this,
-                APIHelpers.getCacheUser(getContext()).getId(),
+                ApiPrefs.getUser().getId(),
                 mAdapterToFragmentCallback,
                 onUnreadCountInvalidated);
         mRecyclerAdapter.setSelectedItemId(getDefaultSelectedId());
@@ -205,7 +206,7 @@ public class MessageListFragment extends ParentFragment implements MultiSelectRe
             boolean waitForTransition = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
             ParentFragment fragment = FragUtils.getFrag(DetailedConversationFragment.class,
                                                         DetailedConversationFragment.createBundle(conversation,
-                                                        conversation.getMessageTitle(getContext(), APIHelpers.getCacheUser(getContext()).getId(), getString(R.string.monologue)),
+                                                        conversation.getMessageTitle(getContext(), ApiPrefs.getUser().getId(), getString(R.string.monologue)),
                                                         isUnread, waitForTransition));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -329,57 +330,66 @@ public class MessageListFragment extends ParentFragment implements MultiSelectRe
 
     void deleteMessages() {
         if (mRecyclerAdapter.isMultiSelectMode()) {
-            new EditMessages(this, EDIT_TYPE.DELETE);
+            new EditMessages(EDIT_TYPE.DELETE);
             mode.finish();
         }
     }
 
     void markMessagesAsUnread(){
         if(mRecyclerAdapter.isMultiSelectMode()){
-            new EditMessages(this, EDIT_TYPE.MARK_AS_UNREAD);
+            new EditMessages(EDIT_TYPE.MARK_AS_UNREAD);
             mode.finish();
         }
     }
 
     void archiveMessages() {
         if (mRecyclerAdapter.isMultiSelectMode()) {
-            new EditMessages(this,EDIT_TYPE.ARCHIVE);
+            new EditMessages(EDIT_TYPE.ARCHIVE);
             mode.finish();
         }
     }
 
     void unarchiveMessages() {
         if (mRecyclerAdapter.isMultiSelectMode()) {
-            new EditMessages(this, EDIT_TYPE.UNARCHIVE);
+            new EditMessages(EDIT_TYPE.UNARCHIVE);
             mode.finish();
         }
     }
 
     public enum EDIT_TYPE {ARCHIVE, UNARCHIVE, DELETE, MARK_AS_UNREAD}
 
-    public class EditMessages extends CanvasCallback<Response> {
+    public class EditMessages extends StatusCallback<Conversation> {
 
         private boolean updateUnreadTab = false;
         private boolean updateArchivedTab = false;
 
-        public EditMessages(APIStatusDelegate statusDelegate, EDIT_TYPE editType) {
-            super(statusDelegate);
-
+        public EditMessages(EDIT_TYPE editType) {
             final List<Conversation> conversationList = mRecyclerAdapter.getSelectedItems();
             for(Conversation conversation : conversationList){
                 switch (editType){
                     case ARCHIVE:
-                        ConversationAPI.archiveConversation(this, conversation.getId());
+                        ConversationManager.archiveConversation(conversation.getId(), true, this);
                         updateArchivedTab = true;
                         break;
                     case UNARCHIVE:
-                        ConversationAPI.unArchiveConversation(this, conversation.getId());
+                        ConversationManager.archiveConversation(conversation.getId(), false, this);
                         break;
                     case DELETE:
-                        ConversationAPI.deleteConversation(this, conversation.getId());
+                        ConversationManager.deleteConversation(conversation.getId(), this);
                         break;
                     case MARK_AS_UNREAD:
-                        ConversationAPI.markConversationAsUnread(this, conversation.getId());
+                        ConversationManager.markConversationAsUnread(conversation.getId(), CONVERSATION_MARK_UNREAD, new StatusCallback<Void>() {
+                            @Override
+                            public void onResponse(retrofit2.Response<Void> response, LinkHeaders linkHeaders, ApiType type) {
+                                if(!apiCheck()) return;
+
+                                if(updateUnreadTab && getParentFragment() instanceof InboxFragment) {
+                                    ((InboxFragment)getParentFragment()).updateUnreadTab();
+                                    updateUnreadTab = false;
+                                    mRecyclerAdapter.refresh();
+                                }
+                            }
+                        });
                         updateUnreadTab = true;
                         break;
                 }
@@ -393,15 +403,12 @@ public class MessageListFragment extends ParentFragment implements MultiSelectRe
         }
 
         @Override
-        public void firstPage(Response response, LinkHeaders linkHeaders, Response response2) {
+        public void onResponse(retrofit2.Response<Conversation> response, LinkHeaders linkHeaders, ApiType type) {
             if(!apiCheck()){ return; }
             if(onUnreadCountInvalidated != null){
                 onUnreadCountInvalidated.invalidateUnreadCount();
             }
-            if(updateUnreadTab && getParentFragment() instanceof InboxFragment) {
-                ((InboxFragment)getParentFragment()).updateUnreadTab();
-                updateUnreadTab = false;
-            }
+
             if(updateArchivedTab && getParentFragment() instanceof InboxFragment) {
                 ((InboxFragment)getParentFragment()).updateArchivedTab();
                 updateArchivedTab = false;
@@ -411,11 +418,10 @@ public class MessageListFragment extends ParentFragment implements MultiSelectRe
         }
 
         @Override
-        public boolean onFailure(RetrofitError retrofitError){
+        public void onFail(Call<Conversation> response, Throwable error) {
             //if the edit attempt fails, we need to refresh the data to restore accuracy
             mRecyclerAdapter.resetData();
             mRecyclerAdapter.refresh();
-            return false;
         }
     }
 

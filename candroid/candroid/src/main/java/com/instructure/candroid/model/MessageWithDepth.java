@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package com.instructure.candroid.model;
 
 import android.os.Parcel;
 
-import com.instructure.canvasapi.model.CanvasComparable;
-import com.instructure.canvasapi.model.Message;
+import com.instructure.canvasapi2.models.CanvasComparable;
+import com.instructure.canvasapi2.models.Message;
 
 import java.util.Date;
 

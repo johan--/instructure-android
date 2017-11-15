@@ -127,8 +127,6 @@
   <string name="domain">ドメイン</string>
   <string name="sendFeedback">フィードバックを送る</string>
   <string name="sendMail">メールを送信しています...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">編集する</string>
   <plurals name="item_count">
     <item quantity="other">%d アイテム</item>
@@ -441,8 +439,8 @@
   <string name="could_not_find_course">このアイテムのコースを取得中にエラーが発生しました。</string>
   <string name="could_not_find_group">このアイテムのグループを取得中にエラーが発生しました。</string>
   <string name="selectBackground">バックドロップを選択</string>
-  <string name="kalturaSubmissionInProgress">ファイルを送信... 通知バーで更新を確認してください。</string>
-  <string name="kalturaSubmissionSuccessful">ファイルの送信が終了しました</string>
+  <string name="notoriousSubmissionInProgress">ファイルを送信... 通知バーで更新を確認してください。</string>
+  <string name="notoriousSubmissionSuccessful">ファイルの送信が終了しました</string>
   <string name="poll_title">Canvasには何をしにきましたか？</string>
   <string name="poll_warning">アイテムが選択されていません。</string>
   <string name="poll_item_1">成績をチェックする</string>
@@ -479,6 +477,7 @@
   <string name="pandaAvatarsFolderName">パンダアバター</string>
   <string name="share">共有</string>
   <string name="speedgrader">SpeedGrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">スーパーパンダ画像</string>
   <string name="newFeatureTitle">モバイル通知</string>
   <string name="newFeatureMsg">モバイルプッシュ通知を受け取るには、Canvas設定&gt; 通知 &gt; そして、「すべてのデバイス」を選択</string>

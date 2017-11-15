@@ -34,4 +34,13 @@
   <string name="canvasAPI_onlineURL">在线URL</string>
   <string name="canvasAPI_mediaRecording">媒体录制</string>
   <string name="canvasAPI_attendance">考勤</string>
+  <string name="quiz_scoring_policy_highest">最高</string>
+  <string name="quiz_scoring_policy_average">平均</string>
+  <string name="quiz_scoring_policy_latest">最近</string>
+  <string name="no">否</string>
+  <string name="always">始终</string>
+  <string name="graded_quiz">评分测验</string>
+  <string name="practice_quiz">练习测验</string>
+  <string name="graded_survey">评分调查</string>
+  <string name="ungraded_survey">非评分调查</string>
 </resources>

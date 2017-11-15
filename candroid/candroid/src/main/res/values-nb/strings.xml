@@ -108,7 +108,7 @@
   <string name="dateIconDescription">Dato-ikon</string>
   <string name="locationIconDescription">Lokalisasjons-ikon</string>
   <string name="noteIconDescription">Merk ikon</string>
-  <string name="toDoTurnIn">Leggetid</string>
+  <string name="toDoTurnIn">Send inn</string>
   <string name="toDoNoDueDate">Ingen ferdig-dato</string>
   <string name="dueAt">Innleveringsfrist</string>
   <string name="toDoDue">Innen</string>
@@ -128,8 +128,6 @@
   <string name="domain">Domene</string>
   <string name="sendFeedback">Send tilbakemelding</string>
   <string name="sendMail">Send e-post...</string>
-  <string name="mobileSupportEmailAddress">mobilesupport@instructure.com</string>
-  <string name="supportEmailAddress">support@instructure.com</string>
   <string name="edit">Redigere</string>
   <plurals name="item_count">
     <item quantity="one">%d element</item>
@@ -443,8 +441,8 @@
   <string name="could_not_find_course">Det oppsto en feil med å få emnet for denne enheten.</string>
   <string name="could_not_find_group">Det oppsto en feil med å få gruppen for denne enheten.</string>
   <string name="selectBackground">Velg en bakgrunn</string>
-  <string name="kalturaSubmissionInProgress">Innsending av filer... Sjekk varslingslinjen for oppdateringer.</string>
-  <string name="kalturaSubmissionSuccessful">Ferdig med å sende filen</string>
+  <string name="notoriousSubmissionInProgress">Innsending av filer... Sjekk varslingslinjen for oppdateringer.</string>
+  <string name="notoriousSubmissionSuccessful">Ferdig med å sende filen</string>
   <string name="poll_title">Hva var det du kom til Canvas for å gjøre?</string>
   <string name="poll_warning">Et element er ikke valgt.</string>
   <string name="poll_item_1">Sjekk karakterene mine</string>
@@ -481,6 +479,7 @@
   <string name="pandaAvatarsFolderName">Panda-avatarer</string>
   <string name="share">Dele</string>
   <string name="speedgrader">Speedgrader</string>
+  <string name="gauge">Gauge</string>
   <string name="contentDescriptionSuperPanda">Super Panda-bilde</string>
   <string name="newFeatureTitle">Mobile varslinger</string>
   <string name="newFeatureMsg">For å motta mobile pushvarsler, gå til Canvas innstillinger &gt; Varslinger &gt; og velg \"For alle enheter\"</string>

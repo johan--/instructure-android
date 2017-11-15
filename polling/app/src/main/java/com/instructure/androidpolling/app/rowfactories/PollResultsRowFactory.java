@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2017 - present  Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,17 +33,10 @@ import butterknife.ButterKnife;
 public class PollResultsRowFactory {
 
      static class ViewHolder {
-        @BindView(R.id.answer)
-        TextView answer;
-
-        @BindView(R.id.numAnswered)
-        TextView numAnswered;
-
-        @BindView(R.id.correct_answer)
-        RadioButton correctAnswer;
-
-        @BindView(R.id.percent_answered)
-        ProgressBar percentAnswered;
+        @BindView(R.id.answer) TextView answer;
+        @BindView(R.id.numAnswered) TextView numAnswered;
+        @BindView(R.id.correct_answer) RadioButton correctAnswer;
+        @BindView(R.id.percent_answered) ProgressBar percentAnswered;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

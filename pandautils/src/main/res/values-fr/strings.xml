@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">PandaUtils</string>
   <string name="chooseMedia">Choisir un média</string>
   <string name="takeVideo">Faire une vidéo</string>
   <string name="noCameraOnDevice">Aucune caméra</string>
-  <!--KalturaPicker/uploadService-->
+  <!--NotoriousPicker/uploadService-->
   <string name="notificationTitle">Téléchargement sur Canvas</string>
   <string name="preparingUpload">Téléchargement en préparation</string>
   <string name="loadingFilesIndeterminate">Fichiers en cours de chargement...</string>
@@ -77,6 +76,7 @@
   <string name="errorGettingPhoto">Une erreur est survenue lors de l\'obtention de la photo. Veuillez réessayer.</string>
   <string name="errorTextMissing">Ajoutez du texte pour envoyer un message</string>
   <string name="fileUploadNotSupported">Je ne peux pas télécharger de fichier sur le devoir sélectionné.</string>
+  <string name="noCourseSelected">Veuillez choisir un cours</string>
   <string name="selectCourse">Choisir un cours</string>
   <string name="selectAssignment">Choisir un devoir</string>
   <string name="loadingAssignments">Chargement des devoirs...</string>
@@ -143,4 +143,25 @@
   <string name="discussion_unread">Non lu</string>
   <string name="discussion_reply">Répondre</string>
   <string name="close">Fermer</string>
+  <!--App Names-->
+  <string name="utils_canvas">Canvas</string>
+  <string name="utils_canvasTeacher">Canvas Enseignant</string>
+  <string name="utils_canvasParent">Canvas Parent</string>
+  <string name="utils_polls">Sondages Canvas</string>
+  <string name="utils_speedgrader">Speedgrader</string>
+  <!--Rating Dialog-->
+  <string name="utils_howAreWeDoing">Comment nous débrouillons-nous ?</string>
+  <string name="utils_rateUs">Comment nous évalueriez vous ?</string>
+  <string name="utils_doBetter">En quoi pouvons-nous nous améliorer ?</string>
+  <string name="utils_sendFeedback">Envoyer un avis</string>
+  <string name="utils_suggestions">Suggestions pour Android</string>
+  <string name="utils_domain">Domaine</string>
+  <string name="utils_versionNum">Version :</string>
+  <string name="utils_userId">ID utilisateur</string>
+  <string name="utils_email">Email</string>
+  <string name="utils_dontShowAgain">Ne plus montrer à nouveau</string>
+  <string name="utils_installDate">Date d\'installation :</string>
+  <string name="utils_device">Appareil</string>
+  <string name="utils_osVersion">Version de l\'OS</string>
+  <string name="loading">En cours de chargement</string>
 </resources>

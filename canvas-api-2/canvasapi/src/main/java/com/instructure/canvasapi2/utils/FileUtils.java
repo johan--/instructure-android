@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -22,10 +22,12 @@ import android.webkit.MimeTypeMap;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -41,13 +43,13 @@ public class FileUtils {
 
     /**
      * Converts a serializable object to the specified file.
+     *
      * @param context
      * @param cacheFileName
      * @param serializable
      * @return
      */
     public static boolean SerializableToFile(Context context, String cacheFileName, Serializable serializable) {
-
         if (context == null || cacheFileName == null || serializable == null) {
             return false;
         }
@@ -77,13 +79,14 @@ public class FileUtils {
     }
 
     /**
-     * Delets the cache file with the given name
+     * Deletes the cache file with the given name
+     *
      * @param context
      * @param cacheFileName
      * @return
      */
-    public static boolean DeleteFile(Context context, String cacheFileName){
-        if(context == null || cacheFileName == null){
+    public static boolean DeleteFile(Context context, String cacheFileName) {
+        if (context == null || cacheFileName == null) {
             return false;
         }
 
@@ -95,10 +98,7 @@ public class FileUtils {
             f.mkdirs();
             File file = new File(f, cacheFileName);
 
-            try {
-                return file.delete();
-            } finally {
-            }
+            return file.delete();
         } catch (Exception E) {
             return false;
         }
@@ -106,12 +106,12 @@ public class FileUtils {
 
     /**
      * Converts a specified file to a serializable object.
+     *
      * @param context
      * @param cacheFileName
      * @return
      */
     public static Serializable FileToSerializable(Context context, String cacheFileName) {
-
         try {
             cacheFileName += FILE_SUFFIX;
 
@@ -125,7 +125,7 @@ public class FileUtils {
             ObjectInput input = new ObjectInputStream(buffer);
             try {
                 //deserialize
-                return (Serializable)input.readObject();
+                return (Serializable) input.readObject();
             } finally {
                 input.close();
             }
@@ -137,26 +137,24 @@ public class FileUtils {
 
     /**
      * deleteAllFilesInDirectory will RECURSIVELY delete all files/folders in a directory
+     *
      * @param startFile
      * @return
      */
-    public static boolean deleteAllFilesInDirectory(File startFile)
-    {
-        try
-        {
+    public static boolean deleteAllFilesInDirectory(File startFile) {
+        try {
             //If it's a directory.
-            if(startFile.isDirectory())
-            {
+            if (startFile.isDirectory()) {
                 //Delete all files inside of it.
                 String[] files = startFile.list();
-                for(String fileName: files){
+                for (String fileName : files) {
                     File file = new File(startFile, fileName);
                     //If it's a directory. recursive.
-                    if(file.isDirectory()){
+                    if (file.isDirectory()) {
                         deleteAllFilesInDirectory(file);
                     }
                     //It's a file. Delete it.
-                    else{
+                    else {
                         file.delete();
                     }
                 }
@@ -164,13 +162,11 @@ public class FileUtils {
                 startFile.delete();
             }
             //If it's not a directory, delete the file.
-            else{
+            else {
                 startFile.delete();
             }
             return true;
-        }
-        catch(Exception E)
-        {
+        } catch (Exception E) {
             return false;
         }
     }
@@ -192,8 +188,7 @@ public class FileUtils {
         }
     }
 
-    public static String getMimeType(String url)
-    {
+    public static String getMimeType(String url) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(url);
         if (extension != null) {
@@ -203,14 +198,14 @@ public class FileUtils {
         return type;
     }
 
-    public static String kalturaCodeFromMimeType(String mimetype){
+    public static String notoriousCodeFromMimeType(String mimetype) {
         if (mimetype == null) {
             return "0";
         } else {
             String[] split = mimetype.split("/");
-            if(split[0].equals("video")){
+            if (split[0].equals("video")) {
                 return "1";
-            } else if(split[0].equals("audio")){
+            } else if (split[0].equals("audio")) {
                 return "5";
             } else {
                 return "0";
@@ -218,12 +213,40 @@ public class FileUtils {
         }
     }
 
-    public static String mediaTypeFromKalturaCode(long kalturaCode){
-        if (kalturaCode == 1) {
+    public static String mediaTypeFromNotoriousCode(long notoriousCode) {
+        if (notoriousCode == 1) {
             return "video";
-        } else if(kalturaCode == 5){
+        } else if (notoriousCode == 5) {
             return "audio";
         } else {
+            return "";
+        }
+    }
+
+    /**
+     * GetAssetsFile allows you to open a file that exists in the Assets directory.
+     *
+     * @param context An Android Context
+     * @param fileName The name of the asset file
+     * @return the contents of the file as a String
+     */
+    public static String getAssetsFile(Context context, String fileName) {
+        try {
+            String file = "";
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(context.getAssets().open(fileName)));
+
+            // do reading
+            String line = "";
+            while (line != null) {
+                file += line;
+                line = reader.readLine();
+            }
+
+            reader.close();
+            return file;
+
+        } catch (Exception e) {
             return "";
         }
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 - present Instructure, Inc.
+  ~ Copyright (C) 2017 - present Instructure, Inc.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.instructure.pandautils" >
 
-    <application/>
+    <application>
+        <activity
+            android:name="com.instructure.pandautils.utils.AvatarCropActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+    </application>
 
 </manifest>

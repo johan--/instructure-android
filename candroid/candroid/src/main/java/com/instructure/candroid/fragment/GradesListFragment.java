@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present  Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -46,23 +46,23 @@ import com.instructure.candroid.dialog.WhatIfDialogStyled;
 import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
 import com.instructure.candroid.util.FragUtils;
 import com.instructure.candroid.util.Param;
-import com.instructure.canvasapi.model.Assignment;
-import com.instructure.canvasapi.model.AssignmentGroup;
-import com.instructure.canvasapi.model.Course;
-import com.instructure.canvasapi.model.GradingPeriod;
-import com.instructure.canvasapi.model.GradingPeriodResponse;
-import com.instructure.canvasapi.model.Submission;
-import com.instructure.canvasapi.model.Tab;
-import com.instructure.canvasapi.utilities.CanvasCallback;
-import com.instructure.canvasapi.utilities.LinkHeaders;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.models.Assignment;
+import com.instructure.canvasapi2.models.AssignmentGroup;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.GradingPeriod;
+import com.instructure.canvasapi2.models.GradingPeriodResponse;
+import com.instructure.canvasapi2.models.Submission;
+import com.instructure.canvasapi2.models.Tab;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
+import com.instructure.pandautils.utils.Const;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-
-import retrofit.client.Response;
 
 public class GradesListFragment extends ParentFragment {
 
@@ -89,7 +89,7 @@ public class GradesListFragment extends ParentFragment {
     private WhatIfDialogStyled.WhatIfDialogCallback dialogStyled;
     private AdapterToFragmentCallback<Assignment> mAdapterToFragmentCallback;
     private GradesListRecyclerAdapter.AdapterToGradesCallback mAdapterToGradesCallback;
-    private CanvasCallback<GradingPeriodResponse> mGradingPeriodsCallback;
+    private StatusCallback<GradingPeriodResponse> mGradingPeriodsCallback;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {return FRAGMENT_PLACEMENT.MASTER; }
@@ -166,7 +166,7 @@ public class GradesListFragment extends ParentFragment {
         }
 
         setupListeners();
-        lockGrade(mCourse.isFinalGradeHidden());
+        lockGrade(mCourse.isHideFinalGrades());
 
         dialogStyled = new WhatIfDialogStyled.WhatIfDialogCallback() {
             @Override
@@ -176,12 +176,12 @@ public class GradesListFragment extends ParentFragment {
                 Submission s = new Submission();
                 //check to see if grade is empty for reset
                 if(TextUtils.isEmpty(whatIf)){
-                    assignment.setLastSubmission(null);
-                    mRecyclerAdapter.getAssignmentsHash().get(assignment.getId()).setLastSubmission(null);
+                    assignment.setSubmission(null);
+                    mRecyclerAdapter.getAssignmentsHash().get(assignment.getId()).setSubmission(null);
                 }else{
                     s.setScore(Double.parseDouble(whatIf));
                     s.setGrade(whatIf);
-                    mRecyclerAdapter.getAssignmentsHash().get(assignment.getId()).setLastSubmission(s);
+                    mRecyclerAdapter.getAssignmentsHash().get(assignment.getId()).setSubmission(s);
                 }
 
                 mRecyclerAdapter.notifyItemChanged(position);
@@ -227,7 +227,7 @@ public class GradesListFragment extends ParentFragment {
                     totalGradeView.setText(grade);
                 }
 
-                lockGrade(mCourse.isFinalGradeHidden());
+                lockGrade(mCourse.isHideFinalGrades());
             }
         });
 
@@ -312,7 +312,7 @@ public class GradesListFragment extends ParentFragment {
                 } else {
                     totalGradeView.setText(formatGrade(score, grade));
                 }
-                lockGrade(mCourse.isFinalGradeHidden());
+                lockGrade(mCourse.isHideFinalGrades());
             }
 
             @Override
@@ -336,11 +336,12 @@ public class GradesListFragment extends ParentFragment {
          *This code is similar to code in the AssignmentListFragment.
          *If you make changes here, make sure to check the same callback in the AssignmentListFrag.
          */
-        mGradingPeriodsCallback = new CanvasCallback<GradingPeriodResponse>(this) {
+        mGradingPeriodsCallback = new StatusCallback<GradingPeriodResponse>() {
+
             @Override
-            public void firstPage(GradingPeriodResponse gradingPeriodResponse, LinkHeaders linkHeaders, Response response) {
+            public void onResponse(retrofit2.Response<GradingPeriodResponse> response, LinkHeaders linkHeaders, ApiType type) {
                 mGradingPeriodsList = new ArrayList<>();
-                mGradingPeriodsList.addAll(gradingPeriodResponse.getGradingPeriodList());
+                mGradingPeriodsList.addAll(response.body().getGradingPeriodList());
                 //add "select all" option
                 mGradingPeriodsList.add(mAllTermsGradingPeriod);
                 mTermAdapter = new TermSpinnerAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, mGradingPeriodsList);
@@ -376,14 +377,12 @@ public class GradesListFragment extends ParentFragment {
                 }
                 mTermSpinner.setVisibility(View.VISIBLE);
             }
-
-            @Override
-            public void cache(GradingPeriodResponse gradingPeriodResponse, LinkHeaders linkHeaders, Response response) {
-            }
         };
     }
 
     private String formatGrade(double score, String grade) {
+        if (getString(R.string.noGradeText).equals(grade)) return grade;
+
         String formattedGrade = NumberHelper.doubleToPercentage(score);
 
         if (grade != null && !grade.equals("null")) {
@@ -455,13 +454,13 @@ public class GradesListFragment extends ParentFragment {
         protected Double doInBackground(ArrayList<AssignmentGroup>... params) {
             //Calculates grade based on all assignments
             if(!isShowTotalGrade){
-                if(mCourse.getApplyAssignmentGroupWeights()){
+                if(mCourse.isApplyAssignmentGroupWeights()){
                     return calcGradesTotal(mRecyclerAdapter.getAssignmentGroups());
                 }else{
                     return calcGradesTotalNoWeight(mRecyclerAdapter.getAssignmentGroups());
                 }
             }else{ //Calculates grade based on only graded assignments
-                if(mCourse.getApplyAssignmentGroupWeights()){
+                if(mCourse.isApplyAssignmentGroupWeights()){
                     return calcGradesGraded(mRecyclerAdapter.getAssignmentGroups());
                 }else{
                     return calcGradesGradedNoWeight(mRecyclerAdapter.getAssignmentGroups());
@@ -488,7 +487,7 @@ public class GradesListFragment extends ParentFragment {
                 double weight = g.getGroupWeight();
                 for (Assignment a : g.getAssignments()){
                     Assignment tempAssignment = mRecyclerAdapter.getAssignmentsHash().get(a.getId());
-                    Submission tempSub = tempAssignment.getLastSubmission();
+                    Submission tempSub = tempAssignment.getSubmission();
                     if(tempSub != null && tempSub.getGrade() != null && !tempAssignment.getSubmissionTypes().contains(null)){
                         earnedPoints += tempSub.getScore();
                     }
@@ -524,8 +523,11 @@ public class GradesListFragment extends ParentFragment {
                 boolean flag = true;
                 for (Assignment a : g.getAssignments()){
                     Assignment tempAssignment = mRecyclerAdapter.getAssignmentsHash().get(a.getId());
-                    Submission tempSub = tempAssignment.getLastSubmission();
-                    if(tempSub != null && tempSub.getGrade() != null && !tempAssignment.getSubmissionTypes().contains(null)){
+                    Submission tempSub = tempAssignment.getSubmission();
+                    if(tempSub != null
+                            && tempSub.getGrade() != null
+                            && !tempAssignment.getSubmissionTypes().contains(null)
+                            && !Const.PENDING_REVIEW.equals(tempSub.getWorkflowState())){
                         assignCount++; //determines if a group contains assignments
                         totalPoints += tempAssignment.getPointsPossible();
                         earnedPoints += tempSub.getScore();
@@ -574,8 +576,11 @@ public class GradesListFragment extends ParentFragment {
             for(AssignmentGroup g : groups){
                 for (Assignment a : g.getAssignments()){
                     Assignment tempAssignment = mRecyclerAdapter.getAssignmentsHash().get(a.getId());
-                    Submission tempSub = tempAssignment.getLastSubmission();
-                    if(tempSub != null && tempSub.getGrade() != null && !tempAssignment.getSubmissionTypes().contains(null)){
+                    Submission tempSub = tempAssignment.getSubmission();
+                    if(tempSub != null
+                            && tempSub.getGrade() != null
+                            && !tempAssignment.getSubmissionTypes().contains(null)
+                            && !Const.PENDING_REVIEW.equals(tempSub.getWorkflowState())){
                         earnedPoints += tempSub.getScore();
                     }
                     totalPoints += tempAssignment.getPointsPossible();
@@ -608,7 +613,7 @@ public class GradesListFragment extends ParentFragment {
             for(AssignmentGroup g : groups){
                 for (Assignment a : g.getAssignments()){
                     Assignment tempAssignment = mRecyclerAdapter.getAssignmentsHash().get(a.getId());
-                    Submission tempSub = tempAssignment.getLastSubmission();
+                    Submission tempSub = tempAssignment.getSubmission();
                     if(tempSub != null && tempSub.getGrade() != null && !tempAssignment.getSubmissionTypes().contains(null)){
                         totalPoints += tempAssignment.getPointsPossible();
                         earnedPoints += tempSub.getScore();
