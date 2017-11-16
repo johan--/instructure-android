@@ -117,7 +117,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.2'
     compile 'com.makeramen:roundedimageview:2.3.0'
     compile 'com.nineoldandroids:parent:2.4.0'
-    compile "com.pspdfkit:pspdfkit:$GLOBAL_PSPDFKIT_VERSION"
+    compile "com.pspdfkit:pspdfkit-demo:$GLOBAL_PSPDFKIT_VERSION"
     compile 'com.google.api-client:google-api-client-android:1.18.0-rc'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.google.android.exoplayer:exoplayer:r2.1.1'
@@ -144,6 +144,7 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
 
+        vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
         testInstrumentationRunner 'com.instructure.espresso.InstructureRunner'
         testInstrumentationRunnerArguments disableAnalytics: 'true'
