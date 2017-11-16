@@ -264,7 +264,7 @@ dependencies {
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
 
     /* PSPDFKit Dependencies */
-    compile "com.pspdfkit:pspdfkit:4.0.2"
+    compile "com.pspdfkit:pspdfkit-demo:4.0.2"
     compile 'com.jakewharton:disklrucache:2.0.2'
 
     /* Flexbox Layout */
