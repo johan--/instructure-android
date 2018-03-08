@@ -53,7 +53,7 @@ public class Const {
     public static final double NO_LOCATION_INDICATOR_DOUBLE = -999.0;
     public static final String NO_LOCATION_INDICATOR_STRING = "-999";
 
-    public static final String PROFILE_URL = "canvas.instructure.com";
+    public static final String PROFILE_URL = "ebuki.nxtstepdsgn.com";
     public static final String noPictureURL = "images/dotted_pic.png";
     public static final String USE_DEFAULT_DOMAIN = "useDefaultDomain";
 }

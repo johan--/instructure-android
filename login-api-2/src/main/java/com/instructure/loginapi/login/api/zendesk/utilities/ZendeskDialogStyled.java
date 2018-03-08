@@ -64,7 +64,7 @@ public class ZendeskDialogStyled extends DialogFragment {
         void onTicketError();
     }
 
-    private static final String DEFAULT_DOMAIN = "canvas.instructure.com";
+    private static final String DEFAULT_DOMAIN = "ebuki.nxtstepdsgn.com";
     public static final String TAG = "zendeskDialog";
     private static final int customFieldTag = 20470321;
     private EditText descriptionEditText;
@@ -355,7 +355,7 @@ public class ZendeskDialogStyled extends DialogFragment {
      * if we're coming from the parent app we want to use the default domain
      *
      * @param fromLogin boolean telling if coming from a login page where their may not be a valid user.
-     * @param useDefaultDomain use the default domain, canvas.instructure.com
+     * @param useDefaultDomain use the default domain, ebuki.nxtstepdsgn.com
      * @return Bundle
      */
     public static Bundle createBundle(boolean fromLogin, boolean useDefaultDomain) {

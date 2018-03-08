@@ -1,4 +1,4 @@
-/*
+ebuki.nxtstepdsgn.com/*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
@@ -217,9 +217,9 @@ public abstract class BaseLoginFindSchoolActivity extends AppCompatActivity impl
     private void validateDomain(AccountDomain accountDomain) {
         String url = accountDomain.getDomain().toLowerCase().replace(" ", "");
 
-        //if the user enters nothing, try to connect to canvas.instructure.com
+        //if the user enters nothing, try to connect to ebuki.nxtstepdsgn.com
         if (url.trim().length() == 0) {
-            url = "canvas.instructure.com";
+            url = "ebuki.nxtstepdsgn.com";
         }
 
         //if there are no periods, append .instructure.com

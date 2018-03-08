@@ -469,7 +469,7 @@ public abstract class BaseLoginSignInActivity extends AppCompatActivity implemen
             //Skip mobile verify
             builder.appendQueryParameter("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
         } else {
-            builder.appendQueryParameter("redirect_uri", "https://canvas.instructure.com/login/oauth2/auth");
+            builder.appendQueryParameter("redirect_uri", "https://ebuki.nxtstepdsgn.com/login/oauth2/auth");
         }
 
         //If an authentication provider is supplied we need to pass that along. This should only be appended if one exists.
