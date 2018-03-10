@@ -510,13 +510,7 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                         } else if (loadedMedia.isHtmlFile()) {
                             InternalWebviewFragment.loadInternalWebView(BaseRouterActivity.this, (Navigation) BaseRouterActivity.this, loadedMedia.getBundle());
                         } else if (loadedMedia.getIntent() != null) {
-                            if(loadedMedia.getIntent().getType().contains("pdf")){
-                                //show pdf with PSPDFkit
-                                Uri uri = loadedMedia.getIntent().getData();
-                                FileUtils.showPdfDocument(uri, loadedMedia, getContext());
-                            } else {
-                                getContext().startActivity(loadedMedia.getIntent());
-                            }
+                           getContext().startActivity(loadedMedia.getIntent());
                         }
                     } catch (ActivityNotFoundException e) {
                         Toast.makeText(getContext(), R.string.noApps, Toast.LENGTH_LONG).show();

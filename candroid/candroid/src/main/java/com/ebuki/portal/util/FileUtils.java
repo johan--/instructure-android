@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,12 +24,6 @@ import android.net.Uri;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.loaders.OpenMediaAsyncTaskLoader;
-import com.pspdfkit.annotations.AnnotationType;
-import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
-import com.pspdfkit.configuration.activity.ThumbnailBarMode;
-import com.pspdfkit.configuration.page.PageFitMode;
-import com.pspdfkit.configuration.page.PageScrollDirection;
-import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
