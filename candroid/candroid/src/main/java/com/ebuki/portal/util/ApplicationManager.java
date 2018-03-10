@@ -49,8 +49,6 @@ import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.Prefs;
-import com.pspdfkit.PSPDFKit;
-import com.pspdfkit.exceptions.PSPDFKitInitializationFailedException;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -79,7 +77,6 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
     @Override
     public void onCreate() {
         super.onCreate();
-        initPSPDFKit();
         Fabric.with(this, new Crashlytics());
 
         CanvasContextColor.init(getPrefs(getApplicationContext()), R.color.defaultPrimary, R.color.defaultPrimaryDark);
@@ -292,14 +289,6 @@ public class ApplicationManager extends MultiDexApplication implements Analytics
     }
 
     //endregion
-
-    private void initPSPDFKit() {
-        try {
-            PSPDFKit.initialize(this, BuildConfig.PSPDFKIT_LICENSE_KEY);
-        } catch (PSPDFKitInitializationFailedException e) {
-            Logger.e("Current device is not compatible with PSPDFKIT!");
-        }
-    }
 
     /**
      * Pass the position from the language array to set the language

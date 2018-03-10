@@ -41,7 +41,6 @@ import com.ebuki.portal.fragment.NotificationListFragment;
 import com.ebuki.portal.fragment.ParentFragment;
 import com.ebuki.portal.fragment.ToDoListFragment;
 import com.ebuki.portal.util.Analytics;
-import com.ebuki.portal.util.FileUtils;
 import com.ebuki.portal.util.FragUtils;
 import com.ebuki.portal.util.LoggingUtility;
 import com.ebuki.portal.util.ModuleProgressionUtility;

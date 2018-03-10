@@ -28,13 +28,7 @@ repositories {
     maven { url 'https://maven.google.com' }
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
-    maven {
-        url 'https://customers.pspdfkit.com/maven/'
-        credentials {
-            username pspdfMavenUser
-            password pspdfMavenPass
-        }
-    }
+
     flatDir {
         dirs '../aars'
     }
@@ -117,7 +111,6 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.2'
     compile 'com.makeramen:roundedimageview:2.3.0'
     compile 'com.nineoldandroids:parent:2.4.0'
-    compile "com.pspdfkit:pspdfkit-demo:$GLOBAL_PSPDFKIT_VERSION"
     compile 'com.google.api-client:google-api-client-android:1.18.0-rc'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.google.android.exoplayer:exoplayer:r2.1.1'
@@ -150,8 +143,7 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
 
         /* Add private data */
-        buildConfigField "String", "PSPDFKIT_LICENSE_KEY", "\"$pspdfkitLicenseKey\""
-        buildConfigField "String", "PUSH_SERVICE_PROJECT_ID", "\"$pushServiceProjectId\""
+
         addManifestPlaceholders([
                 crashlyticsApiKey:"$crashlyticsApiKey"
         ])

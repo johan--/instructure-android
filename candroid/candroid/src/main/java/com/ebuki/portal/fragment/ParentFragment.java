@@ -74,7 +74,6 @@ import com.ebuki.portal.decorations.GridSpacingDecorator;
 import com.ebuki.portal.delegate.Navigation;
 import com.ebuki.portal.interfaces.ConfigureRecyclerView;
 import com.ebuki.portal.util.ApplicationManager;
-import com.ebuki.portal.util.FileUtils;
 import com.ebuki.portal.util.LoggingUtility;
 import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.models.CanvasContext;

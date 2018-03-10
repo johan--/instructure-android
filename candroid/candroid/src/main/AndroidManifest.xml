@@ -62,7 +62,6 @@
         tools:replace="android:supportsRtl"
         tools:overrideLibrary="com.instructure.canvasapi">
 
-        <!--Fun fact. LoginActivity is called that because activity-alias are not supported by pspdfkit, should be InitLoginActivity-->
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/app_name"
@@ -104,11 +103,6 @@
 
         <activity android:name=".activity.ColorPickerActivity"
             android:theme="@style/CanvasMaterialTheme_Default.Translucent"/>
-
-        <activity
-            android:name=".activity.CandroidPSPDFActivity"
-            android:theme="@style/PSPDFKitTheme"
-            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name=".activity.NotificationPreferencesActivity"
