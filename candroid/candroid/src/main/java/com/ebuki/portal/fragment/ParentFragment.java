@@ -1022,11 +1022,7 @@ abstract public class ParentFragment extends DialogFragment implements Configure
                         } else if (loadedMedia.isHtmlFile()) {
                             InternalWebviewFragment.loadInternalWebView(getActivity(), (Navigation) getActivity(), loadedMedia.getBundle());
                         } else if (loadedMedia.getIntent() != null) {
-                            if(loadedMedia.getIntent().getType().contains("pdf") && !loadedMedia.isUseOutsideApps()){
-                                //show pdf with PSPDFkit
-                                Uri uri = loadedMedia.getIntent().getData();
-                                FileUtils.showPdfDocument(uri, loadedMedia, getContext());
-                            } else if (loadedMedia.getIntent().getType().equals("video/mp4")){
+                            if (loadedMedia.getIntent().getType().equals("video/mp4")){
                                 getActivity().startActivity(VideoViewActivity.createIntent(getContext(), loadedMedia.getIntent().getDataString()));
                             } else {
                                 getActivity().startActivity(loadedMedia.getIntent());
