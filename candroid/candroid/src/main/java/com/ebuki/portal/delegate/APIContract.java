@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.delegate;
+package com.ebuki.portal.delegate;
 
 public interface APIContract {
 

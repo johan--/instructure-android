@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.model;
+package com.ebuki.portal.model;
 
 import android.content.Context;
 import android.os.Parcel;
@@ -24,8 +24,8 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.instructure.candroid.BuildConfig;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.BuildConfig;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 

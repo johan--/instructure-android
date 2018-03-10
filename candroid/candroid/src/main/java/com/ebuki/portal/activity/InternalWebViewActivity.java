@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -26,12 +26,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.InternalWebviewFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.InternalWebviewFragment;
 import com.instructure.pandautils.activities.BaseActionBarActivity;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.candroid.util.FragUtils;
+import com.ebuki.portal.util.FragUtils;
 import com.instructure.canvasapi2.models.CanvasContext;
 
 public class InternalWebViewActivity extends BaseActionBarActivity {

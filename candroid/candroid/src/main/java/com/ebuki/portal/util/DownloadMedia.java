@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -26,7 +26,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class DownloadMedia {
 

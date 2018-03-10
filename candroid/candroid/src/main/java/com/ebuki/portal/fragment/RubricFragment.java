@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -24,11 +24,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.RubricRecyclerAdapter;
-import com.instructure.candroid.decorations.RubricDecorator;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.view.EmptyPandaView;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.RubricRecyclerAdapter;
+import com.ebuki.portal.decorations.RubricDecorator;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.view.EmptyPandaView;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.pandarecycler.PandaRecyclerView;
 
@@ -55,7 +55,7 @@ public class RubricFragment extends ParentFragment {
     /**
      * Since this is a nested fragment, the ViewPager calls this method
      *
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     public void setAssignment(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
         if (mRecyclerAdapter != null) {

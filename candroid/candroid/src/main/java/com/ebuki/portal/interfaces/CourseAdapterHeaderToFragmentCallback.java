@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
-import com.instructure.candroid.holders.CourseHeaderViewHolder;
+import com.ebuki.portal.holders.CourseHeaderViewHolder;
 
 public interface CourseAdapterHeaderToFragmentCallback {
     void switchLists(CourseHeaderViewHolder viewHolder, int position);

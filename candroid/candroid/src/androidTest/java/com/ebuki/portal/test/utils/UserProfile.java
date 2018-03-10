@@ -15,11 +15,12 @@
  *
  */
 
-package com.instructure.candroid.test.page;
+package com.ebuki.portal.test.utils;
 
-public abstract class PageObjects {
+public class UserProfile {
+    public static String INVALID_DOMAIN = "";
+    public static String DOMAIN = "";
 
-    public DomainPickerPage domainPickerPage = new DomainPickerPage();
-    public LoginPage loginPage = new LoginPage();
-    public TutorialPage tutorialPage = new TutorialPage();
+    public static User INVALID_USER = new User("", "");
+    public static User STUDENT_1 = new User("", "");
 }

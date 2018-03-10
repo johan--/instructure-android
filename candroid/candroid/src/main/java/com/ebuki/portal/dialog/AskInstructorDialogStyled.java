@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -35,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.UserAPI;
 import com.instructure.canvasapi2.managers.ConversationManager;

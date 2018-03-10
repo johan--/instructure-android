@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.RubricTopHeaderViewHolder;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.RubricTopHeaderViewHolder;
 
 public class RubricTopHeaderBinder extends BaseBinder {
     public static void bind(Context context, RubricTopHeaderViewHolder holder, String points, String grade, boolean isMuted) {

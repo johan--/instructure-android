@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.database.DataSetObserver;

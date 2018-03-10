@@ -15,11 +15,11 @@
  *
  */
 
-package com.instructure.candroid.test.adapter;
+package com.ebuki.portal.test.adapter;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
-import com.instructure.candroid.adapter.GradesListRecyclerAdapter;
+import com.ebuki.portal.adapter.GradesListRecyclerAdapter;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.Submission;
 

@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
-import com.instructure.candroid.adapter.GradesListRecyclerAdapter;
-import com.instructure.candroid.dialog.WhatIfDialogStyled;
-import com.instructure.candroid.holders.GradeViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.adapter.GradesListRecyclerAdapter;
+import com.ebuki.portal.dialog.WhatIfDialogStyled;
+import com.ebuki.portal.holders.GradeViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.Submission;

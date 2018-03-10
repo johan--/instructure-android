@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.holders.PeopleViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.holders.PeopleViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.pandautils.utils.ProfileUtils;
 

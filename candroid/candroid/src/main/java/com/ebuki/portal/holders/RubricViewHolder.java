@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class RubricViewHolder extends RecyclerView.ViewHolder {
     public final static int TYPE_ITEM_POINTS = 0;

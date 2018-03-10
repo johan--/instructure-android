@@ -15,28 +15,28 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.AnnouncementListFragment;
-import com.instructure.candroid.fragment.AssignmentListFragment;
-import com.instructure.candroid.fragment.DiscussionListFragment;
-import com.instructure.candroid.fragment.FileListFragment;
-import com.instructure.candroid.fragment.GradesListFragment;
-import com.instructure.candroid.fragment.LTIWebViewFragment;
-import com.instructure.candroid.fragment.ModuleListFragment;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.fragment.PageListFragment;
-import com.instructure.candroid.fragment.ParentFragment;
-import com.instructure.candroid.fragment.PeopleListFragment;
-import com.instructure.candroid.fragment.QuizListFragment;
-import com.instructure.candroid.fragment.ScheduleListFragment;
-import com.instructure.candroid.fragment.SettingsFragment;
-import com.instructure.candroid.fragment.UnSupportedTabFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.AnnouncementListFragment;
+import com.ebuki.portal.fragment.AssignmentListFragment;
+import com.ebuki.portal.fragment.DiscussionListFragment;
+import com.ebuki.portal.fragment.FileListFragment;
+import com.ebuki.portal.fragment.GradesListFragment;
+import com.ebuki.portal.fragment.LTIWebViewFragment;
+import com.ebuki.portal.fragment.ModuleListFragment;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.fragment.PageListFragment;
+import com.ebuki.portal.fragment.ParentFragment;
+import com.ebuki.portal.fragment.PeopleListFragment;
+import com.ebuki.portal.fragment.QuizListFragment;
+import com.ebuki.portal.fragment.ScheduleListFragment;
+import com.ebuki.portal.fragment.SettingsFragment;
+import com.ebuki.portal.fragment.UnSupportedTabFragment;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Tab;
 

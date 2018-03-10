@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Intent;
 import android.os.Build;
@@ -27,11 +27,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CommunicationChannelsAdapter;
-import com.instructure.candroid.adapter.NotificationPreferencesRecyclerAdapter;
-import com.instructure.candroid.delegate.APIContract;
-import com.instructure.candroid.view.ActionbarSpinner;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CommunicationChannelsAdapter;
+import com.ebuki.portal.adapter.NotificationPreferencesRecyclerAdapter;
+import com.ebuki.portal.delegate.APIContract;
+import com.ebuki.portal.view.ActionbarSpinner;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CommunicationChannelsManager;
 import com.instructure.canvasapi2.models.CommunicationChannel;

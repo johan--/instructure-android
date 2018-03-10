@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -25,10 +25,10 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.MessageListRecyclerAdapter;
-import com.instructure.candroid.holders.MessageViewHolder;
-import com.instructure.candroid.util.Const;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.MessageListRecyclerAdapter;
+import com.ebuki.portal.holders.MessageViewHolder;
+import com.ebuki.portal.util.Const;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.canvasapi2.models.BasicUser;
 import com.instructure.canvasapi2.models.Conversation;

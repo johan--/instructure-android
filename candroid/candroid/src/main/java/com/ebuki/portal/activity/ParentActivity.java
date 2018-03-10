@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -36,8 +36,8 @@ import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.LoggingUtility;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.LoggingUtility;
 import com.instructure.canvasapi2.utils.ApiType;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.activities.BaseActionBarActivity;

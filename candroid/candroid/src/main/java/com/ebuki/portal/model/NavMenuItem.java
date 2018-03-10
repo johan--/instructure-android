@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.model;
+package com.ebuki.portal.model;
 
 import android.graphics.Bitmap;
 

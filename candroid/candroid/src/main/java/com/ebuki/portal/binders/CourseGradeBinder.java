@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.CourseGradeViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.CourseGradeViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.utils.NumberHelper;

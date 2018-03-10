@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public abstract class OrientationChangeFragment extends ParentFragment {
 

@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 
 import com.android.ex.chips.BaseRecipientAdapter;
 import com.android.ex.chips.RecipientManager;
-import com.instructure.candroid.view.CanvasRecipientManager;
+import com.ebuki.portal.view.CanvasRecipientManager;
 
 public class RecipientAdapter extends BaseRecipientAdapter{
 

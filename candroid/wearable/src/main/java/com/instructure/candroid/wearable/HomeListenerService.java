@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.wearable;
+package com.ebuki.portal.wearable;
 
 import android.app.Service;
 import android.content.Intent;
@@ -41,7 +41,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.WearableListenerService;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 /**
  * A {@link com.google.android.gms.wearable.WearableListenerService} service that is invoked upon
@@ -63,7 +63,7 @@ public class HomeListenerService extends WearableListenerService
 
 
     public final static String ACTION_DISMISS
-            = "com.instructure.candroid.ACTION_DISMISS";
+            = "com.ebuki.portal.ACTION_DISMISS";
 
     public static final String NOTIFICATION_PATH = "/wearable/notifications/";
 

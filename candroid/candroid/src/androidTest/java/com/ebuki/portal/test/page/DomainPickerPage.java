@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.test.page;
+package com.ebuki.portal.test.page;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
@@ -23,8 +23,8 @@ import android.support.test.espresso.web.webdriver.Locator;
 import android.view.View;
 import android.widget.ListView;
 
-import com.instructure.candroid.R;
-import static com.instructure.candroid.test.utils.UserProfile.DOMAIN;
+import com.ebuki.portal.R;
+import static com.ebuki.portal.test.utils.UserProfile.DOMAIN;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 /*
  * Copyright 2014 Google Inc.
@@ -42,7 +42,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 /**
  * A layout that draws something in the insets passed to {@link #fitSystemWindows(Rect)}, i.e. the area above UI chrome

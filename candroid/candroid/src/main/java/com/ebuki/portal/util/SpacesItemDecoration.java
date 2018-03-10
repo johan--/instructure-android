@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

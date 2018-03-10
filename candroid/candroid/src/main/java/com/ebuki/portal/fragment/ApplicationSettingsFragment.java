@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -41,14 +41,14 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.activity.NavigationActivity;
-import com.instructure.candroid.activity.NotificationPreferencesActivity;
-import com.instructure.candroid.activity.TutorialActivity;
-import com.instructure.candroid.dialog.LegalDialogStyled;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.activity.NavigationActivity;
+import com.ebuki.portal.activity.NotificationPreferencesActivity;
+import com.ebuki.portal.activity.TutorialActivity;
+import com.ebuki.portal.dialog.LegalDialogStyled;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.canvasapi2.utils.MasqueradeHelper;
@@ -469,8 +469,8 @@ public class ApplicationSettingsFragment extends OrientationChangeFragment imple
 
     private void restartApp(){
         Intent intent = new Intent(getContext(), LoginActivity.class);
-        intent.putExtra(com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_KEY, com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_ID);
-        PendingIntent mPendingIntent = PendingIntent.getActivity(getContext(), com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        intent.putExtra(com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_KEY, com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_ID);
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getContext(), com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager mgr = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
         System.exit(0);

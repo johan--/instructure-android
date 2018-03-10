@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.model;
+package com.ebuki.portal.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.instructure.candroid.util.NotificationPreferenceUtils;
+import com.ebuki.portal.util.NotificationPreferenceUtils;
 import com.instructure.canvasapi2.models.CanvasModel;
 
 import java.util.Date;

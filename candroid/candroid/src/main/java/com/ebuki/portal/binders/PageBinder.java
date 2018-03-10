@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.PageViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.PageViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Page;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;

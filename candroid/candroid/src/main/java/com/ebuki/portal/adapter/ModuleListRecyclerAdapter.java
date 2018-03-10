@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -28,16 +28,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.EmptyBinder;
-import com.instructure.candroid.binders.ModuleBinder;
-import com.instructure.candroid.binders.ModuleHeaderBinder;
-import com.instructure.candroid.holders.ModuleEmptyViewHolder;
-import com.instructure.candroid.holders.ModuleHeaderViewHolder;
-import com.instructure.candroid.holders.ModuleSubHeaderViewHolder;
-import com.instructure.candroid.holders.ModuleViewHolder;
-import com.instructure.candroid.interfaces.ModuleAdapterToFragmentCallback;
-import com.instructure.candroid.util.ModuleUtility;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.EmptyBinder;
+import com.ebuki.portal.binders.ModuleBinder;
+import com.ebuki.portal.binders.ModuleHeaderBinder;
+import com.ebuki.portal.holders.ModuleEmptyViewHolder;
+import com.ebuki.portal.holders.ModuleHeaderViewHolder;
+import com.ebuki.portal.holders.ModuleSubHeaderViewHolder;
+import com.ebuki.portal.holders.ModuleViewHolder;
+import com.ebuki.portal.interfaces.ModuleAdapterToFragmentCallback;
+import com.ebuki.portal.util.ModuleUtility;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ModuleManager;
 import com.instructure.canvasapi2.models.AssignmentSet;

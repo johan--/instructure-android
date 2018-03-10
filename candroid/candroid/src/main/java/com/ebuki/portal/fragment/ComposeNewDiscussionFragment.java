@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +33,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.DiscussionManager;
 import com.instructure.canvasapi2.models.CanvasContext;

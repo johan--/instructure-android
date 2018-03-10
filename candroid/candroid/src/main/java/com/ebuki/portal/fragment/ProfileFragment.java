@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -46,11 +46,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.PandaAvatarActivity;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.FragUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.PandaAvatarActivity;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.FragUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.FileUploadManager;
 import com.instructure.canvasapi2.managers.UserManager;

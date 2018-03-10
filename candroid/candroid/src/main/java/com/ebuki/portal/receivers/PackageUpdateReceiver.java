@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.receivers;
+package com.ebuki.portal.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

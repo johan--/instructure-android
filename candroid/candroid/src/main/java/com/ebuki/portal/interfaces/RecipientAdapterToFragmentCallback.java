@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
-import com.instructure.candroid.holders.RecipientViewHolder;
+import com.ebuki.portal.holders.RecipientViewHolder;
 
 public interface RecipientAdapterToFragmentCallback<MODEL> {
     void onRowClicked(MODEL model, int position, boolean isOpenDetail, boolean isCheckbox);

@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.ProfileFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.ProfileFragment;
 import com.instructure.canvasapi2.utils.*;
 import com.instructure.canvasapi2.models.DiscussionEntry;
 import com.instructure.canvasapi2.models.RemoteFile;

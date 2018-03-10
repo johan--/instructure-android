@@ -15,10 +15,10 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
-import com.instructure.candroid.fragment.CourseModuleProgressionFragment;
+import com.ebuki.portal.fragment.CourseModuleProgressionFragment;
 import com.instructure.canvasapi2.models.ModuleItem;
 import com.instructure.canvasapi2.models.ModuleObject;
 

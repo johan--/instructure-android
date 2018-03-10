@@ -15,37 +15,61 @@
  *
  */
 
-package com.instructure.candroid.test;
+package com.ebuki.portal.test;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.test.page.PageObjects;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.test.page.PageObjects;
 import com.instructure.espresso.ScreenshotActivityTestRule;
 
-import static com.instructure.candroid.test.utils.UserProfile.*;
+import static com.ebuki.portal.test.utils.UserProfile.*;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.instructure.espresso.AccessibilityChecker.runChecks;
-
 @RunWith(AndroidJUnit4.class)
-public class AccessibilityTest extends PageObjects {
+public class LoginPageTest extends PageObjects {
     @Rule
     public ScreenshotActivityTestRule<LoginActivity> mActivityRule =
             new ScreenshotActivityTestRule<>(LoginActivity.class);
 
     @Test
-    public void checkDomainPickerPage() {
-        runChecks(); // We're on the domain picker page by default
+    public void loginRejectsInvalidCredentials() {
+        domainPickerPage.loadDefaultSchool();
+        loginPage.login(INVALID_USER);
+        loginPage.assertIncorrectUserOrPasswordError();
     }
 
     @Test
-    public void checkLoginPage() {
+    public void loginRejectsNoPassword() {
         domainPickerPage.loadDefaultSchool();
-        loginPage.login(INVALID_USER); // Login so we're on the login page before running checks
-        runChecks();
+        loginPage.clickSubmitButton();
+        loginPage.assertNoPasswordError();
+    }
+
+    @Test
+    public void displaysPasswordResetForm() {
+        domainPickerPage.loadDefaultSchool();
+        loginPage.togglePasswordResetForm();
+    }
+
+    @Test
+    public void displaysDomainToolbar() {
+        domainPickerPage.loadDefaultSchool();
+        loginPage.assertPageObjects();
+    }
+
+    @Test
+    @Ignore
+    public void loginForReal() {
+        domainPickerPage.loadDefaultSchool();
+        loginPage.login(STUDENT_1);
+        loginPage.authorizeApp();
+
+        // Wait for [RETROFIT] to become idle timed out
+        tutorialPage.tapSkipButton();
     }
 }

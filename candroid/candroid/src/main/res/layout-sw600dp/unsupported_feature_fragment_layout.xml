@@ -16,11 +16,11 @@
   ~
   -->
 
-<com.instructure.candroid.view.CardifyView
+<com.ebuki.portal.view.CardifyView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
     <include layout="@layout/unsupported_feature_fragment" />
-</com.instructure.candroid.view.CardifyView>
+</com.ebuki.portal.view.CardifyView>
 

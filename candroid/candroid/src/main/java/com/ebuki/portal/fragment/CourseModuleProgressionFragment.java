@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -36,13 +36,13 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.NavigationActivity;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.Const;
-import com.instructure.candroid.util.ModuleUtility;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.view.ViewPagerNonSwipeable;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.NavigationActivity;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.Const;
+import com.ebuki.portal.util.ModuleUtility;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.view.ViewPagerNonSwipeable;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ModuleManager;
 import com.instructure.canvasapi2.models.Course;

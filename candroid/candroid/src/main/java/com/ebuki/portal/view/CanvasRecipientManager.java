@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,7 +29,7 @@ import android.util.Log;
 import com.android.ex.chips.BaseRecipientAdapter;
 import com.android.ex.chips.RecipientEntry;
 import com.android.ex.chips.RecipientManager;
-import com.instructure.candroid.fragment.ProfileFragment;
+import com.ebuki.portal.fragment.ProfileFragment;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Recipient;

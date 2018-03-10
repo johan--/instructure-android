@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -42,21 +42,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.ConversationParticipantsAdapter;
-import com.instructure.candroid.adapter.DetailedConversationRecyclerAdapter;
-import com.instructure.candroid.decorations.ConversationDecorator;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.FileUploadDialog;
-import com.instructure.candroid.interfaces.DetailedConversationAdapterToFragmentCallback;
-import com.instructure.candroid.interfaces.TransitionListenerProvider;
-import com.instructure.candroid.model.MessageAttachment;
-import com.instructure.candroid.util.DownloadMedia;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.view.ActionbarSpinner;
-import com.instructure.candroid.view.CanvasEditTextView;
-import com.instructure.candroid.view.EmptyPandaView;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.ConversationParticipantsAdapter;
+import com.ebuki.portal.adapter.DetailedConversationRecyclerAdapter;
+import com.ebuki.portal.decorations.ConversationDecorator;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.FileUploadDialog;
+import com.ebuki.portal.interfaces.DetailedConversationAdapterToFragmentCallback;
+import com.ebuki.portal.interfaces.TransitionListenerProvider;
+import com.ebuki.portal.model.MessageAttachment;
+import com.ebuki.portal.util.DownloadMedia;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.view.ActionbarSpinner;
+import com.ebuki.portal.view.CanvasEditTextView;
+import com.ebuki.portal.view.EmptyPandaView;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ConversationManager;
 import com.instructure.canvasapi2.models.BasicUser;

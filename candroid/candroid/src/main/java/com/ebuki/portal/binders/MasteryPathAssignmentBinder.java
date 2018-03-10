@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.holders.MasteryAssignmentViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.holders.MasteryAssignmentViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.MasteryPathAssignment;
 import com.instructure.pandautils.utils.CanvasContextColor;

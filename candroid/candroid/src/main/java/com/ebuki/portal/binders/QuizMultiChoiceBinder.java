@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -28,11 +28,11 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.dialog.AccountNotificationDialog;
-import com.instructure.candroid.holders.QuizMultiChoiceViewHolder;
-import com.instructure.candroid.interfaces.QuizPostMultiChoice;
-import com.instructure.candroid.interfaces.QuizToggleFlagState;
+import com.ebuki.portal.R;
+import com.ebuki.portal.dialog.AccountNotificationDialog;
+import com.ebuki.portal.holders.QuizMultiChoiceViewHolder;
+import com.ebuki.portal.interfaces.QuizPostMultiChoice;
+import com.ebuki.portal.interfaces.QuizToggleFlagState;
 import com.instructure.canvasapi2.models.QuizSubmissionAnswer;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.pandautils.utils.CanvasContextColor;

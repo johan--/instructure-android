@@ -15,18 +15,18 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.DetailedConversationAttachmentViewHolder;
-import com.instructure.candroid.holders.DetailedConversationMessageViewHolder;
-import com.instructure.candroid.interfaces.DetailedConversationAdapterToFragmentCallback;
-import com.instructure.candroid.model.MessageAttachment;
-import com.instructure.candroid.model.MessageWithDepth;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.DetailedConversationAttachmentViewHolder;
+import com.ebuki.portal.holders.DetailedConversationMessageViewHolder;
+import com.ebuki.portal.interfaces.DetailedConversationAdapterToFragmentCallback;
+import com.ebuki.portal.model.MessageAttachment;
+import com.ebuki.portal.model.MessageWithDepth;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.canvasapi2.models.BasicUser;
 import com.instructure.canvasapi2.models.Message;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -37,8 +37,8 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.pandautils.utils.PermissionUtils;
 import com.instructure.pandautils.utils.RequestCodes;

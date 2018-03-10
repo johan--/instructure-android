@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import com.instructure.candroid.delegate.APIContract;
+import com.ebuki.portal.delegate.APIContract;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AccountNotificationManager;
 import com.instructure.canvasapi2.managers.CourseManager;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.pandarecycler.interfaces.EmptyViewInterface;
 
 public class EmptyPandaView extends LinearLayout implements EmptyViewInterface {

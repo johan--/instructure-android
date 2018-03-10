@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.graphics.drawable.Drawable;
@@ -34,7 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.pandautils.utils.CanvasContextColor;

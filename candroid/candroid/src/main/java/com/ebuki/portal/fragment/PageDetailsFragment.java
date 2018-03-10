@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -23,10 +23,10 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.LockInfoHTMLHelper;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.LockInfoHTMLHelper;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.PageManager;
 import com.instructure.canvasapi2.models.CanvasContext;

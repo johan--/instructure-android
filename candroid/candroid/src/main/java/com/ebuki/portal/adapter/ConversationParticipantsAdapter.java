@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.models.BasicUser;
 import com.instructure.pandautils.utils.ProfileUtils;
 

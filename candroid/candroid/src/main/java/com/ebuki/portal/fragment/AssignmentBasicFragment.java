@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 
 import android.app.Dialog;
@@ -32,8 +32,8 @@ import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.CanvasContext;

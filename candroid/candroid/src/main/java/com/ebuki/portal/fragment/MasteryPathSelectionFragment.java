@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -32,7 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.MasteryPath;
 import com.instructure.pandautils.utils.CanvasContextColor;

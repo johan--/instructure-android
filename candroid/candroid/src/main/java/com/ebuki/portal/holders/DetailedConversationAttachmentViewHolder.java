@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class DetailedConversationAttachmentViewHolder extends RecyclerView.ViewHolder {
     public static final int TYPE_LEFT_ATTACHMENT = 4033;

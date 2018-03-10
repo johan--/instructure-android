@@ -15,32 +15,37 @@
  *
  */
 
-package com.instructure.candroid.test;
+package com.ebuki.portal.test;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.test.page.PageObjects;
-import com.instructure.espresso.Device;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.test.page.PageObjects;
 import com.instructure.espresso.ScreenshotActivityTestRule;
 
-import junit.framework.Assert;
+import static com.ebuki.portal.test.utils.UserProfile.*;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-
+import static com.instructure.espresso.AccessibilityChecker.runChecks;
 
 @RunWith(AndroidJUnit4.class)
-public class DeviceTest extends PageObjects {
+public class AccessibilityTest extends PageObjects {
     @Rule
     public ScreenshotActivityTestRule<LoginActivity> mActivityRule =
             new ScreenshotActivityTestRule<>(LoginActivity.class);
 
     @Test
-    public void checkAnimationsOff() {
-        Device.verifyAnimationsDisabled();
+    public void checkDomainPickerPage() {
+        runChecks(); // We're on the domain picker page by default
+    }
+
+    @Test
+    public void checkLoginPage() {
+        domainPickerPage.loadDefaultSchool();
+        loginPage.login(INVALID_USER); // Login so we're on the login page before running checks
+        runChecks();
     }
 }

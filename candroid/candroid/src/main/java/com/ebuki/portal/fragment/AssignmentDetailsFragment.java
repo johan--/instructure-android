@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -37,12 +37,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.LockInfoHTMLHelper;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.LockInfoHTMLHelper;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.utils.ApiPrefs;
@@ -93,7 +93,7 @@ public class AssignmentDetailsFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      * @param assignment The assignment
      * @param isWithinAnotherCallback See note above
      * @param isCached See note above
@@ -271,7 +271,7 @@ public class AssignmentDetailsFragment extends ParentFragment {
 
     /**
      * Updates each view with its corresponding assignment data.
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      * @param assignment
      */
     private void populateAssignmentDetails(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
@@ -362,7 +362,7 @@ public class AssignmentDetailsFragment extends ParentFragment {
     }
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     public void setAssignmentWithNotification(Assignment assignment, String message, boolean isWithinAnotherCallback, boolean isCached) {
         if (assignment == null) {

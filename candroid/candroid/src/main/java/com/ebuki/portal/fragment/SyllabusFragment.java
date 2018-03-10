@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 
 import android.app.Dialog;
@@ -30,9 +30,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.models.Course;

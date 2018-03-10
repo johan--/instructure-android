@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -23,9 +23,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.FavoritingViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.FavoritingViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.Group;

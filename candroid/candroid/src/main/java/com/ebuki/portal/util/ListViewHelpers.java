@@ -15,10 +15,10 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.view.View;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class ListViewHelpers {
 

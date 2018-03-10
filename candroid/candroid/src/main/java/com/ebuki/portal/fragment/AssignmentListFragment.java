@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -31,16 +31,16 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.AssignmentDateListRecyclerAdapter;
-import com.instructure.candroid.adapter.AssignmentGroupListRecyclerAdapter;
-import com.instructure.candroid.adapter.ExpandableRecyclerAdapter;
-import com.instructure.candroid.adapter.TermSpinnerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.AdapterToAssignmentsCallback;
-import com.instructure.candroid.interfaces.GradingPeriodsCallback;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.AssignmentDateListRecyclerAdapter;
+import com.ebuki.portal.adapter.AssignmentGroupListRecyclerAdapter;
+import com.ebuki.portal.adapter.ExpandableRecyclerAdapter;
+import com.ebuki.portal.adapter.TermSpinnerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.AdapterToAssignmentsCallback;
+import com.ebuki.portal.interfaces.GradingPeriodsCallback;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.AssignmentGroup;

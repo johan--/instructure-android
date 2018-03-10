@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 public class Param {
     public static final String ASSIGNMENT_ID = "assignment_id";

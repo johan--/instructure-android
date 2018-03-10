@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.instructure.candroid.activity.CandroidPSPDFActivity;
+import com.ebuki.portal.activity.CandroidPSPDFActivity;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.loaders.OpenMediaAsyncTaskLoader;

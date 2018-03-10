@@ -19,7 +19,7 @@
  *  @author Ephraim A. Tekle
  *
  */
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;

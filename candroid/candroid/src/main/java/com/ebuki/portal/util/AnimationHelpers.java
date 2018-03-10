@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;

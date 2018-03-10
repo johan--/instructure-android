@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
@@ -27,9 +27,9 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.CompoundButton;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.widget.CanvasWidgetProvider;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.widget.CanvasWidgetProvider;
 
 public class WidgetSetupActivity extends AppCompatActivity {
 

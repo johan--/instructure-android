@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 import android.graphics.*;
@@ -25,7 +25,7 @@ import android.media.Image;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

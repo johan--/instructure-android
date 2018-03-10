@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.binders.MasteryPathAssignmentBinder;
-import com.instructure.candroid.holders.MasteryAssignmentViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.binders.MasteryPathAssignmentBinder;
+import com.ebuki.portal.holders.MasteryAssignmentViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.MasteryPathAssignment;

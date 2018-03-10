@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.delegate;
+package com.ebuki.portal.delegate;
 
 public interface MenuItemSelection {
     public void onMenuItemSelected(int position, boolean closeDrawer);

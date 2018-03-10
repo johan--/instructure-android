@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -38,14 +38,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.GradesListRecyclerAdapter;
-import com.instructure.candroid.adapter.TermSpinnerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.WhatIfDialogStyled;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.GradesListRecyclerAdapter;
+import com.ebuki.portal.adapter.TermSpinnerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.WhatIfDialogStyled;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.AssignmentGroup;

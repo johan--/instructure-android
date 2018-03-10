@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,10 +28,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Tab;
 import com.instructure.pandautils.utils.Const;

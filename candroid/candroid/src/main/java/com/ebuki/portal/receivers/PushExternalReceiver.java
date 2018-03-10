@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.receivers;
+package com.ebuki.portal.receivers;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -30,9 +30,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.TextUtils;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.NavigationActivity;
-import com.instructure.candroid.model.PushNotification;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.NavigationActivity;
+import com.ebuki.portal.model.PushNotification;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;

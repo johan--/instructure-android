@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -34,8 +34,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.interfaces.OnEventUpdatedCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.interfaces.OnEventUpdatedCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CalendarEventManager;
 import com.instructure.canvasapi2.models.CanvasContext;

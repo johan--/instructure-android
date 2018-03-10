@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
@@ -42,9 +42,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.AnimationHelpers;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.AnimationHelpers;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseNicknameManager;
 import com.instructure.canvasapi2.models.CanvasContext;

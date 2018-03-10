@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -23,13 +23,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.RubricRecyclerAdapter;
-import com.instructure.candroid.fragment.RubricFragment;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.RubricTopHeaderViewHolder;
-import com.instructure.candroid.holders.RubricViewHolder;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.RubricRecyclerAdapter;
+import com.ebuki.portal.fragment.RubricFragment;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.RubricTopHeaderViewHolder;
+import com.ebuki.portal.holders.RubricViewHolder;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.pandarecycler.util.Types;
 
 public class RubricDecorator extends RecyclerView.ItemDecoration{

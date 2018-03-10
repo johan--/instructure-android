@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -25,8 +25,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.models.CommunicationChannel;
 import com.instructure.pandautils.utils.TutorialUtils;
 

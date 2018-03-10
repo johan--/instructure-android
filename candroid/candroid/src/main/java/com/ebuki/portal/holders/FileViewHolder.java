@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -24,7 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class FileViewHolder extends RecyclerView.ViewHolder{
 

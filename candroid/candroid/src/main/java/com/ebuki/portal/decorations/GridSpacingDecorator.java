@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.adapter.CourseRecyclerAdapter;
+import com.ebuki.portal.adapter.CourseRecyclerAdapter;
 import com.instructure.pandarecycler.BaseExpandableRecyclerAdapter;
 
 public class GridSpacingDecorator extends RecyclerView.ItemDecoration {

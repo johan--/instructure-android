@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
-import com.instructure.candroid.holders.QuizTextOnlyViewHolder;
+import com.ebuki.portal.holders.QuizTextOnlyViewHolder;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 
 

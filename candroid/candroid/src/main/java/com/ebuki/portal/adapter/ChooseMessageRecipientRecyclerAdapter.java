@@ -15,15 +15,15 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.binders.RecipientBinder;
-import com.instructure.candroid.holders.RecipientViewHolder;
-import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
+import com.ebuki.portal.binders.RecipientBinder;
+import com.ebuki.portal.holders.RecipientViewHolder;
+import com.ebuki.portal.interfaces.RecipientAdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.RecipientManager;
 import com.instructure.canvasapi2.models.Recipient;

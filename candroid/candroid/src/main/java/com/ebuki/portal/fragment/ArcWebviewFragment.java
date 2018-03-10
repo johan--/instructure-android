@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -32,10 +32,10 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;

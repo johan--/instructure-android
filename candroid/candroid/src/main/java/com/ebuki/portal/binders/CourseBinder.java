@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -27,15 +27,15 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.ColorPickerActivity;
-import com.instructure.candroid.holders.CourseHeaderViewHolder;
-import com.instructure.candroid.holders.CourseViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.candroid.model.CourseToggleHeader;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.MGPUtils;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.ColorPickerActivity;
+import com.ebuki.portal.holders.CourseHeaderViewHolder;
+import com.ebuki.portal.holders.CourseViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.model.CourseToggleHeader;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.MGPUtils;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.utils.NumberHelper;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;

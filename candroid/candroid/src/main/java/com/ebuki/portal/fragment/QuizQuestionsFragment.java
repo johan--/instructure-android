@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
@@ -41,13 +41,13 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.QuizSubmissionQuestionListRecyclerAdapter;
-import com.instructure.candroid.dialog.FileUploadDialog;
-import com.instructure.candroid.dialog.QuizQuestionDialog;
-import com.instructure.candroid.interfaces.QuizFileUploadListener;
-import com.instructure.candroid.util.PreCachingLayoutManager;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.QuizSubmissionQuestionListRecyclerAdapter;
+import com.ebuki.portal.dialog.FileUploadDialog;
+import com.ebuki.portal.dialog.QuizQuestionDialog;
+import com.ebuki.portal.interfaces.QuizFileUploadListener;
+import com.ebuki.portal.util.PreCachingLayoutManager;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.QuizManager;
 import com.instructure.canvasapi2.models.Attachment;

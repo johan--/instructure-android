@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +34,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.pandautils.models.FileSubmitObject;
 import com.instructure.pandautils.utils.CanvasContextColor;

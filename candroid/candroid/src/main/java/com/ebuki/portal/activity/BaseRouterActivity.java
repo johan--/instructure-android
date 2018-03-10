@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
@@ -28,26 +28,26 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.fragment.CalendarListViewFragment;
-import com.instructure.candroid.fragment.CourseGridFragment;
-import com.instructure.candroid.fragment.CourseModuleProgressionFragment;
-import com.instructure.candroid.fragment.GradesGridFragment;
-import com.instructure.candroid.fragment.InternalWebviewFragment;
-import com.instructure.candroid.fragment.LTIWebViewRoutingFragment;
-import com.instructure.candroid.fragment.MessageListFragment;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.fragment.ParentFragment;
-import com.instructure.candroid.fragment.ToDoListFragment;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.FileUtils;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.ModuleProgressionUtility;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.util.TabHelper;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.fragment.CalendarListViewFragment;
+import com.ebuki.portal.fragment.CourseGridFragment;
+import com.ebuki.portal.fragment.CourseModuleProgressionFragment;
+import com.ebuki.portal.fragment.GradesGridFragment;
+import com.ebuki.portal.fragment.InternalWebviewFragment;
+import com.ebuki.portal.fragment.LTIWebViewRoutingFragment;
+import com.ebuki.portal.fragment.MessageListFragment;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.fragment.ParentFragment;
+import com.ebuki.portal.fragment.ToDoListFragment;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.FileUtils;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.ModuleProgressionUtility;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.util.TabHelper;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.FileFolderManager;

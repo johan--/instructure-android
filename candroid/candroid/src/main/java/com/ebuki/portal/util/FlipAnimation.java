@@ -1,4 +1,4 @@
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 /**
  * Copyright (c) 2012 Ephraim Tekle genzeb@gmail.com

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.test.utils;
+package com.ebuki.portal.test.utils;
 
 import static com.google.api.client.repackaged.com.google.common.base.Preconditions.checkNotNull;
 

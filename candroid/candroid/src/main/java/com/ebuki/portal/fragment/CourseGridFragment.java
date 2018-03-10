@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,13 +33,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CourseRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.holders.CourseViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.TabHelper;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CourseRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.holders.CourseViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.TabHelper;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.Tab;

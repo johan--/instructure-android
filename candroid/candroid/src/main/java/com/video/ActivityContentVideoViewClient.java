@@ -61,8 +61,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
 
 /**
  * Uses an existing Activity to handle displaying video in full screen.

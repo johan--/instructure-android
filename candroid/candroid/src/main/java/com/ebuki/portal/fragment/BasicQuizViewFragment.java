@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -26,12 +26,12 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.LockInfoHTMLHelper;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.LockInfoHTMLHelper;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.QuizManager;
 import com.instructure.canvasapi2.models.CanvasContext;

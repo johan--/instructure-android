@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -27,7 +27,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.canvasapi2.models.Assignment;
 

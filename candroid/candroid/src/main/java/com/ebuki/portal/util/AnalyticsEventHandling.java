@@ -1,4 +1,4 @@
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 public interface AnalyticsEventHandling {
     void trackButtonPressed(String buttonName, Long buttonValue);

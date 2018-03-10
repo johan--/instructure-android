@@ -15,11 +15,11 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.utils.DateHelper;
 import com.instructure.canvasapi2.models.LockInfo;
 import com.instructure.canvasapi2.utils.ApiPrefs;

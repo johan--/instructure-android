@@ -41,12 +41,12 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <com.instructure.candroid.view.EmptyPandaView
+    <com.ebuki.portal.view.EmptyPandaView
         android:id="@+id/emptyPandaView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.instructure.candroid.view.CanvasEditTextView
+    <com.ebuki.portal.view.CanvasEditTextView
         android:id="@+id/canvasEditTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

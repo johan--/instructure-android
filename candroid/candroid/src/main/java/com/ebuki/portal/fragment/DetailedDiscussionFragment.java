@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -49,19 +49,19 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.FileUploadDialog;
-import com.instructure.candroid.model.FormatHtmlObject;
-import com.instructure.candroid.util.DiscussionEntryHTMLHelper;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.LockInfoHTMLHelper;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.view.AdvancedViewFlipper;
-import com.instructure.candroid.view.CanvasEditTextView;
-import com.instructure.candroid.view.CanvasLoading;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.FileUploadDialog;
+import com.ebuki.portal.model.FormatHtmlObject;
+import com.ebuki.portal.util.DiscussionEntryHTMLHelper;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.LockInfoHTMLHelper;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.view.AdvancedViewFlipper;
+import com.ebuki.portal.view.CanvasEditTextView;
+import com.ebuki.portal.view.CanvasLoading;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.DiscussionManager;
 import com.instructure.canvasapi2.managers.GroupManager;
@@ -1011,7 +1011,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     }
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     void parseHeader(DiscussionTopicHeader header, boolean isWithinAnotherCallback, boolean isCached) {
         if (header == null || getActivity() == null) {
@@ -1073,7 +1073,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
     }
 
     /**
-    * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+    * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
     */
     void getFullDiscussion(CanvasContext canvasContext) {
         DiscussionManager.getFullDiscussionTopic(canvasContext, topicID, true, discussionTopicCanvasCallback);
@@ -1219,7 +1219,7 @@ public class DetailedDiscussionFragment extends ParentFragment implements
      *
      * @param discussionEntry DiscussionEntry to add
      *
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     private void addSentDiscussionEntry(final DiscussionEntry discussionEntry, boolean isWithinAnotherCallback, boolean isCached) {
         if (topic.isForbidden()) {

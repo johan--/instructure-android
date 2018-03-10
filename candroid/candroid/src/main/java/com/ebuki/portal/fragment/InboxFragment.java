@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -34,10 +34,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.MultiSelectRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.MultiSelectRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.FragUtils;
 import com.instructure.canvasapi2.apis.ConversationAPI;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Conversation;

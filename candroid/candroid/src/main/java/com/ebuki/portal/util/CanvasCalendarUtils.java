@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
-import com.instructure.candroid.model.DateWindow;
+import com.ebuki.portal.model.DateWindow;
 import com.instructure.canvasapi2.utils.DateHelper;
 
 import java.util.Date;

@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.instructure.candroid.fragment.AssignmentFragment;
-import com.instructure.candroid.fragment.DetailedDiscussionFragment;
-import com.instructure.candroid.fragment.FileDetailsFragment;
-import com.instructure.candroid.fragment.InternalWebviewFragment;
-import com.instructure.candroid.fragment.MasteryPathLockedFragment;
-import com.instructure.candroid.fragment.MasteryPathSelectionFragment;
-import com.instructure.candroid.fragment.ModuleQuizDecider;
-import com.instructure.candroid.fragment.PageDetailsFragment;
-import com.instructure.candroid.fragment.ParentFragment;
+import com.ebuki.portal.fragment.AssignmentFragment;
+import com.ebuki.portal.fragment.DetailedDiscussionFragment;
+import com.ebuki.portal.fragment.FileDetailsFragment;
+import com.ebuki.portal.fragment.InternalWebviewFragment;
+import com.ebuki.portal.fragment.MasteryPathLockedFragment;
+import com.ebuki.portal.fragment.MasteryPathSelectionFragment;
+import com.ebuki.portal.fragment.ModuleQuizDecider;
+import com.ebuki.portal.fragment.PageDetailsFragment;
+import com.ebuki.portal.fragment.ParentFragment;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.ModuleItem;
 import com.instructure.canvasapi2.models.ModuleObject;

@@ -15,17 +15,17 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 
 import com.instructure.pandautils.utils.ColorUtils;
 import com.instructure.pandautils.views.RippleView;
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.BookmarkViewHolder;
-import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.BookmarkViewHolder;
+import com.ebuki.portal.interfaces.BookmarkAdapterToFragmentCallback;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.Bookmark;
 import com.instructure.pandautils.utils.CanvasContextColor;
 

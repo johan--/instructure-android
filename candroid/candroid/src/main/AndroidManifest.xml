@@ -34,8 +34,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-    <permission android:name="com.instructure.candroid.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
-    <uses-permission android:name="com.instructure.candroid.permission.C2D_MESSAGE"/>
+    <permission android:name="com.ebuki.portal.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
+    <uses-permission android:name="com.ebuki.portal.permission.C2D_MESSAGE"/>
     <uses-permission android:name="com.google.android.c2dm.permission.REGISTER" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
@@ -96,7 +96,7 @@
             android:theme="@style/CanvasMaterialTheme_Default">
 
             <intent-filter>
-                <action android:name="com.instructure.candroid.ROUTING_ACTIVITY"/>
+                <action android:name="com.ebuki.portal.ROUTING_ACTIVITY"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
@@ -255,7 +255,7 @@
         <receiver android:name=".receivers.PackageUpdateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" android:path="com.instructure.candroid" />
+                <data android:scheme="package" android:path="com.ebuki.portal" />
             </intent-filter>
         </receiver>
 
@@ -268,7 +268,7 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="com.instructure.candroid"/>
+                <category android:name="com.ebuki.portal"/>
             </intent-filter>
         </receiver>
 
@@ -292,8 +292,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
                 <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="com.instructure.candroid.widget.todowidget.REFRESH" />
-                <action android:name="com.instructure.candroid.widget.allwidget.REFRESH"/>
+                <action android:name="com.ebuki.portal.widget.todowidget.REFRESH" />
+                <action android:name="com.ebuki.portal.widget.allwidget.REFRESH"/>
             </intent-filter>
 
             <meta-data
@@ -306,7 +306,7 @@
 
         <instrumentation
             android:name="com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
-            android:targetPackage="com.instructure.candroid"/>
+            android:targetPackage="com.ebuki.portal"/>
 
         <!-- Grades Widget -->
         <receiver
@@ -319,8 +319,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
                 <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="com.instructure.candroid.widget.gardeswidget.REFRESH" />
-                <action android:name="com.instructure.candroid.widget.allwidget.REFRESH"/>
+                <action android:name="com.ebuki.portal.widget.gardeswidget.REFRESH" />
+                <action android:name="com.ebuki.portal.widget.allwidget.REFRESH"/>
             </intent-filter>
 
             <meta-data
@@ -342,8 +342,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
                 <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="com.instructure.candroid.widget.notificationwidget.REFRESH" />
-                <action android:name="com.instructure.candroid.widget.allwidget.REFRESH"/>
+                <action android:name="com.ebuki.portal.widget.notificationwidget.REFRESH" />
+                <action android:name="com.ebuki.portal.widget.allwidget.REFRESH"/>
             </intent-filter>
 
             <meta-data

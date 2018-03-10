@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.binders.FileBinder;
-import com.instructure.candroid.holders.FileViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentLongClick;
+import com.ebuki.portal.binders.FileBinder;
+import com.ebuki.portal.holders.FileViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentLongClick;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.FileFolderManager;
 import com.instructure.canvasapi2.models.CanvasContext;

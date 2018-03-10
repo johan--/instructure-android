@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -53,13 +53,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InternalWebViewActivity;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.DownloadMedia;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InternalWebViewActivity;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.DownloadMedia;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AssignmentManager;
 import com.instructure.canvasapi2.managers.NotoriousManager;
@@ -195,7 +195,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
     }
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     public void setAssignment(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
         this.assignment = assignment;
@@ -385,7 +385,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
 
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     private void populateViews(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
         if (assignment == null) return;
@@ -405,7 +405,7 @@ public class SubmissionDetailsFragment extends ParentFragment {
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     public void loadData(long assignmentId, boolean isWithinAnotherCallback, boolean isCached) {
         SubmissionManager.getSingleSubmission(course.getId(), assignmentId, myUserId, canvasCallbackSubmission, true);

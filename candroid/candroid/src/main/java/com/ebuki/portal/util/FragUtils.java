@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
-import com.instructure.candroid.fragment.CourseGridFragment;
-import com.instructure.candroid.fragment.FileListFragment;
-import com.instructure.candroid.fragment.InternalWebviewFragment;
-import com.instructure.candroid.fragment.MessageListFragment;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.fragment.ParentFragment;
-import com.instructure.candroid.fragment.ProfileFragment;
-import com.instructure.candroid.fragment.ToDoListFragment;
+import com.ebuki.portal.fragment.CourseGridFragment;
+import com.ebuki.portal.fragment.FileListFragment;
+import com.ebuki.portal.fragment.InternalWebviewFragment;
+import com.ebuki.portal.fragment.MessageListFragment;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.fragment.ParentFragment;
+import com.ebuki.portal.fragment.ProfileFragment;
+import com.ebuki.portal.fragment.ToDoListFragment;
 import com.instructure.canvasapi2.models.CanvasContext;
 
 public class FragUtils {

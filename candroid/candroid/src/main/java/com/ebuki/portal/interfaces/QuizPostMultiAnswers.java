@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
 import java.util.ArrayList;
 

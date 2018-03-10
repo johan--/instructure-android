@@ -14,14 +14,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.instructure.candroid.activity
+package com.ebuki.portal.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.webkit.CookieManager
-import com.instructure.candroid.service.PushRegistrationService
+import com.ebuki.portal.service.PushRegistrationService
 import com.instructure.canvasapi2.models.AccountDomain
 import com.instructure.loginapi.login.activities.BaseLoginSignInActivity
 

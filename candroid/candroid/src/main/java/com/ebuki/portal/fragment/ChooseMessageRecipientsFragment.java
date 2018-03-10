@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -29,11 +29,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.ChooseMessageRecipientRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerDecoration;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.ChooseMessageRecipientRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerDecoration;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.RecipientAdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Recipient;
 import com.instructure.canvasapi2.utils.ApiPrefs;

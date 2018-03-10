@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -24,7 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     //private Drawable mDivider;

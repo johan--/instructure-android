@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
-import com.instructure.candroid.model.NotificationSubCategory;
+import com.ebuki.portal.model.NotificationSubCategory;
 
 public interface NotifyChecked {
 

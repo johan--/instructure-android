@@ -15,11 +15,11 @@
  *
  */
 
-package com.instructure.candroid.test.util;
+package com.ebuki.portal.test.util;
 
-import com.instructure.candroid.fragment.BasicQuizViewFragment;
-import com.instructure.candroid.fragment.QuizListFragment;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.fragment.BasicQuizViewFragment;
+import com.ebuki.portal.fragment.QuizListFragment;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.Tab;
 
 import org.junit.Assert;

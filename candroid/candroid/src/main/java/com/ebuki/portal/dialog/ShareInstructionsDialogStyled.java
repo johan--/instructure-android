@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -25,7 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class ShareInstructionsDialogStyled extends DialogFragment {
 

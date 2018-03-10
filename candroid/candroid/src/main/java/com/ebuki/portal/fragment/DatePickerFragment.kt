@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.instructure.candroid.fragment
+package com.ebuki.portal.fragment
 
 import android.app.DatePickerDialog
 import android.app.Dialog

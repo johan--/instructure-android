@@ -15,19 +15,19 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.CourseBinder;
-import com.instructure.candroid.binders.FavoritingBinder;
-import com.instructure.candroid.holders.CourseHeaderViewHolder;
-import com.instructure.candroid.holders.FavoritingViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.model.CourseToggleHeader;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.CourseBinder;
+import com.ebuki.portal.binders.FavoritingBinder;
+import com.ebuki.portal.holders.CourseHeaderViewHolder;
+import com.ebuki.portal.holders.FavoritingViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.model.CourseToggleHeader;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.GroupManager;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.lazyloader;
+package com.ebuki.portal.lazyloader;
 
 import java.util.Collections;
 import java.util.Iterator;

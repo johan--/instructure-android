@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.SyllabusBinder;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.SyllabusItemViewHolder;
-import com.instructure.candroid.holders.SyllabusViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.SyllabusBinder;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.SyllabusItemViewHolder;
+import com.ebuki.portal.holders.SyllabusViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.CalendarEventAPI;
 import com.instructure.canvasapi2.managers.CalendarEventManager;

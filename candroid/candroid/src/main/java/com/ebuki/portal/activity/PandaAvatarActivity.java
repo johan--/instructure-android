@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -44,9 +44,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.PandaDrawables;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.PandaDrawables;
 import com.instructure.canvasapi2.utils.APIHelper;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.Const;

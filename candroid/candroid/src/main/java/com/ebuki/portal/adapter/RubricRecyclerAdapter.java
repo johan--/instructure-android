@@ -15,24 +15,24 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.RubricBinder;
-import com.instructure.candroid.binders.RubricTopHeaderBinder;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.RubricTopHeaderViewHolder;
-import com.instructure.candroid.holders.RubricViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.model.RubricCommentItem;
-import com.instructure.candroid.model.RubricItem;
-import com.instructure.candroid.model.RubricRatingItem;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.RubricBinder;
+import com.ebuki.portal.binders.RubricTopHeaderBinder;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.RubricTopHeaderViewHolder;
+import com.ebuki.portal.holders.RubricViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.model.RubricCommentItem;
+import com.ebuki.portal.model.RubricItem;
+import com.ebuki.portal.model.RubricRatingItem;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.SubmissionManager;
 import com.instructure.canvasapi2.models.Assignment;
@@ -141,7 +141,7 @@ public class RubricRecyclerAdapter extends ExpandableRecyclerAdapter<RubricCrite
     }
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     public void loadDataChained(boolean isWithinAnotherCallback, boolean isCached) {
         if (mAssignment == null) { return; }

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -25,12 +25,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.PeopleListRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.PeopleListRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.models.Tab;
 import com.instructure.canvasapi2.models.User;
 

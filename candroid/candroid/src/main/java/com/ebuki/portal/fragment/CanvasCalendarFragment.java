@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.pandautils.utils.Const;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidGridAdapter;

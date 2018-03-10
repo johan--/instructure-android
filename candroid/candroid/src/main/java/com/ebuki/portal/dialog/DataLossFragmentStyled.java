@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -25,8 +25,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.ParentFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.ParentFragment;
 
 public class DataLossFragmentStyled extends DialogFragment {
 

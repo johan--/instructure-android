@@ -15,19 +15,19 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.NotificationBinder;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.NotificationViewHolder;
-import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.NotificationBinder;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.NotificationViewHolder;
+import com.ebuki.portal.interfaces.NotificationAdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ConversationManager;
 import com.instructure.canvasapi2.managers.CourseManager;

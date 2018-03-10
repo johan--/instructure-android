@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.app.Activity;
 import android.view.View;
 
-import com.instructure.candroid.binders.CourseGradeBinder;
-import com.instructure.candroid.holders.CourseGradeViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.MGPUtils;
+import com.ebuki.portal.binders.CourseGradeBinder;
+import com.ebuki.portal.holders.CourseGradeViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.MGPUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.TabManager;

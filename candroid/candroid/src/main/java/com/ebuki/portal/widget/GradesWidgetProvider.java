@@ -15,22 +15,22 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InterwebsToApplication;
-import com.instructure.candroid.activity.LoginActivity;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InterwebsToApplication;
+import com.ebuki.portal.activity.LoginActivity;
 
 public class GradesWidgetProvider extends CanvasWidgetProvider {
 
     public final static int GRADES_REFRESH_ID = 3;
 
-    public final static String REFRESH = "com.instructure.candroid.widget.gradeswidget.REFRESH";
+    public final static String REFRESH = "com.ebuki.portal.widget.gradeswidget.REFRESH";
     private final static String SIMPLE_NAME = "Grades Widget";
 
     @Override

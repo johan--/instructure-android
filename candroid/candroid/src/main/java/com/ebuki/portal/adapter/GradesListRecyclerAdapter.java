@@ -15,21 +15,21 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.EmptyBinder;
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.GradeBinder;
-import com.instructure.candroid.dialog.WhatIfDialogStyled;
-import com.instructure.candroid.holders.EmptyViewHolder;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.GradeViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.EmptyBinder;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.GradeBinder;
+import com.ebuki.portal.dialog.WhatIfDialogStyled;
+import com.ebuki.portal.holders.EmptyViewHolder;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.GradeViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AssignmentManager;
 import com.instructure.canvasapi2.managers.CourseManager;

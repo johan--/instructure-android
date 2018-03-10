@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,13 +28,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.BookmarkShortcutActivity;
-import com.instructure.candroid.adapter.BookmarkRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerDecoration;
-import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.BookmarkShortcutActivity;
+import com.ebuki.portal.adapter.BookmarkRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerDecoration;
+import com.ebuki.portal.interfaces.BookmarkAdapterToFragmentCallback;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.BookmarkManager;
 import com.instructure.canvasapi2.models.Bookmark;

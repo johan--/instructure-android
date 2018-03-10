@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

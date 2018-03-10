@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.os.Handler;
 import android.view.View;
 
-import com.instructure.candroid.fragment.MessageListFragment;
+import com.ebuki.portal.fragment.MessageListFragment;
 import com.instructure.canvasapi2.models.Conversation;
 
 public abstract class DebounceMessageToAdapterListener implements MessageDebounceClickInterface, MessageListFragment.MessageAdapterToFragmentCallback<Conversation>{

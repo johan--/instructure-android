@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -26,8 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.BaseBinder;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.BaseBinder;
 import com.instructure.pandarecycler.interfaces.EmptyViewInterface;
 
 public class EmptyRubricView extends RelativeLayout implements EmptyViewInterface {

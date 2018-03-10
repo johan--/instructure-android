@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.ApplicationSettingsFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.ApplicationSettingsFragment;
 import com.instructure.pandautils.activities.BaseActionBarActivity;
 
 public class SettingsActivity extends BaseActionBarActivity {

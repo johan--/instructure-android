@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -23,8 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instructure.pandautils.views.RippleView;
-import com.instructure.candroid.R;
-import com.instructure.candroid.view.EllipsizingTextView;
+import com.ebuki.portal.R;
+import com.ebuki.portal.view.EllipsizingTextView;
 
 public class CourseViewHolder extends RecyclerView.ViewHolder {
 

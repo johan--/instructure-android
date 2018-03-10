@@ -15,9 +15,9 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
-import com.instructure.candroid.holders.CourseViewHolder;
+import com.ebuki.portal.holders.CourseViewHolder;
 import com.instructure.canvasapi2.models.CanvasContext;
 
 public interface CourseAdapterToFragmentCallback {

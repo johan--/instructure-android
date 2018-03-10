@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -25,10 +25,10 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.QuizNumericalViewHolder;
-import com.instructure.candroid.interfaces.QuizPostNumerical;
-import com.instructure.candroid.interfaces.QuizToggleFlagState;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.QuizNumericalViewHolder;
+import com.ebuki.portal.interfaces.QuizPostNumerical;
+import com.ebuki.portal.interfaces.QuizToggleFlagState;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.views.CanvasWebView;

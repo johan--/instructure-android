@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Build;
@@ -31,11 +31,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.view.AutoResizeTextView;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.view.AutoResizeTextView;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.UserManager;
 import com.instructure.canvasapi2.models.CanvasContext;

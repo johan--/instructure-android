@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.BaseBinder;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.BaseBinder;
 import com.instructure.canvasapi2.apis.GroupAPI;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;

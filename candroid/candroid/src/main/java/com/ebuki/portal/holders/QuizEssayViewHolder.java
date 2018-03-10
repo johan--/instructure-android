@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.pandautils.views.CanvasWebView;
 
 public class QuizEssayViewHolder extends RecyclerView.ViewHolder {

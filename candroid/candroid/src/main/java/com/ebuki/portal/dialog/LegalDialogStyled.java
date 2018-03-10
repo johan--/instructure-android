@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -29,8 +29,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InternalWebViewActivity;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InternalWebViewActivity;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 public class LegalDialogStyled extends DialogFragment {

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.service;
+package com.ebuki.portal.service;
 
 import android.content.Intent;
 

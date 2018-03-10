@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.instructure.candroid.model
+package com.ebuki.portal.model
 
 import com.instructure.canvasapi2.models.RubricCriterionRating
 

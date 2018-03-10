@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.model;
+package com.ebuki.portal.model;
 
 import android.content.Context;
 import android.os.Parcel;
 
-import com.instructure.candroid.interfaces.OpenableMedia;
+import com.ebuki.portal.interfaces.OpenableMedia;
 import com.instructure.canvasapi2.models.Attachment;
 import com.instructure.canvasapi2.models.CanvasComparable;
 import com.instructure.canvasapi2.models.MediaComment;

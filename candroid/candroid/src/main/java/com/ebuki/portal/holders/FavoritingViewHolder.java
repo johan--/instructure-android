@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.pandautils.views.RippleView;
 
 public class FavoritingViewHolder extends RecyclerView.ViewHolder {

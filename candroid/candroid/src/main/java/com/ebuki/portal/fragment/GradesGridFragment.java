@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -23,13 +23,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CourseGradeRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerDecoration;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.holders.CourseViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CourseGradeRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerDecoration;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.holders.CourseViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandarecycler.PandaRecyclerView;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 public class HelpDeskUtility {
 	public static boolean hasHelpDeskSupport(String domain)

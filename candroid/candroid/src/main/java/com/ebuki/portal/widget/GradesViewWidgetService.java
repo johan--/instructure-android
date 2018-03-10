@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +23,8 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InterwebsToApplication;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InterwebsToApplication;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.utils.ApiPrefs;

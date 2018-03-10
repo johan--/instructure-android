@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.model;
+package com.ebuki.portal.model;
 
 import hirondelle.date4j.DateTime;
 

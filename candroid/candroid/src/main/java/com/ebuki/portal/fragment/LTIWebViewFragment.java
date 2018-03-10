@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -33,7 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.canvasapi2.managers.ExternalToolManager;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.LTITool;

@@ -21,7 +21,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.instructure.candroid.view.ViewPagerNonSwipeable
+    <com.ebuki.portal.view.ViewPagerNonSwipeable
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

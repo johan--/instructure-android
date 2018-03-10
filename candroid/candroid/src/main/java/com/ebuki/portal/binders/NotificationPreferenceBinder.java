@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.widget.CompoundButton;
 
-import com.instructure.candroid.holders.NotificationPreferencesViewHolder;
-import com.instructure.candroid.interfaces.NotifyChecked;
-import com.instructure.candroid.model.NotificationSubCategory;
+import com.ebuki.portal.holders.NotificationPreferencesViewHolder;
+import com.ebuki.portal.interfaces.NotifyChecked;
+import com.ebuki.portal.model.NotificationSubCategory;
 import com.instructure.canvasapi2.managers.NotificationPreferencesManager;
 
 public class NotificationPreferenceBinder {

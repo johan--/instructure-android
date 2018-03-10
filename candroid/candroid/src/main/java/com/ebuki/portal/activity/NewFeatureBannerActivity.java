@@ -15,15 +15,15 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.pandautils.utils.Const;
 
 public class NewFeatureBannerActivity extends Activity {

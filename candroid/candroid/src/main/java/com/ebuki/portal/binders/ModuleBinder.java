@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -23,11 +23,11 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.ModuleSubHeaderViewHolder;
-import com.instructure.candroid.holders.ModuleViewHolder;
-import com.instructure.candroid.interfaces.ModuleAdapterToFragmentCallback;
-import com.instructure.candroid.util.ModuleUtility;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.ModuleSubHeaderViewHolder;
+import com.ebuki.portal.holders.ModuleViewHolder;
+import com.ebuki.portal.interfaces.ModuleAdapterToFragmentCallback;
+import com.ebuki.portal.util.ModuleUtility;
 import com.instructure.canvasapi2.models.ModuleContentDetails;
 import com.instructure.canvasapi2.models.ModuleItem;
 import com.instructure.canvasapi2.models.ModuleObject;

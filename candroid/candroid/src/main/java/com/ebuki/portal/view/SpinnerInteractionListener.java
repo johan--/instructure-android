@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.view.MotionEvent;
 import android.view.View;

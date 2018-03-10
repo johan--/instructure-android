@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -37,19 +37,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.antonyt.infiniteviewpager.InfiniteViewPager;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CalendarListRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.CalendarChooserDialogStyled;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.model.DateWindow;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.CanvasCalendarUtils;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.ListViewHelpers;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CalendarListRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.CalendarChooserDialogStyled;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.model.DateWindow;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.CanvasCalendarUtils;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.ListViewHelpers;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.ScheduleItem;
 import com.instructure.canvasapi2.utils.APIHelper;

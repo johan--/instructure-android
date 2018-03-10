@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.NotificationPreferenceBinder;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.NotificationPreferencesViewHolder;
-import com.instructure.candroid.interfaces.NotifyChecked;
-import com.instructure.candroid.model.NotificationCategoryHeader;
-import com.instructure.candroid.model.NotificationSubCategory;
-import com.instructure.candroid.util.NotificationPreferenceUtils;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.NotificationPreferenceBinder;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.NotificationPreferencesViewHolder;
+import com.ebuki.portal.interfaces.NotifyChecked;
+import com.ebuki.portal.model.NotificationCategoryHeader;
+import com.ebuki.portal.model.NotificationSubCategory;
+import com.ebuki.portal.util.NotificationPreferenceUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.NotificationPreferencesManager;
 import com.instructure.canvasapi2.models.CommunicationChannel;

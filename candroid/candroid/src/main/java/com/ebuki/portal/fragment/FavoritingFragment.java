@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -30,9 +30,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.FavoritingRecyclerAdapter;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.FavoritingRecyclerAdapter;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.GroupManager;
@@ -48,8 +48,8 @@ import com.instructure.pandautils.utils.Const;
 
 import retrofit.client.Response;
 
-import static com.instructure.candroid.adapter.FavoritingRecyclerAdapter.ALL_COURSES_ID;
-import static com.instructure.candroid.adapter.FavoritingRecyclerAdapter.ALL_GROUPS_ID;
+import static com.ebuki.portal.adapter.FavoritingRecyclerAdapter.ALL_COURSES_ID;
+import static com.ebuki.portal.adapter.FavoritingRecyclerAdapter.ALL_GROUPS_ID;
 
 public class FavoritingFragment extends ParentFragment {
 

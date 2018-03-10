@@ -14,7 +14,7 @@
  *     limitations under the License.
  *
  */
-package com.instructure.candroid.tasks;
+package com.ebuki.portal.tasks;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,10 +23,10 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.view.CanvasRecipientManager;
-import com.instructure.candroid.widget.CanvasWidgetProvider;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.view.CanvasRecipientManager;
+import com.ebuki.portal.widget.CanvasWidgetProvider;
 import com.instructure.canvasapi2.CanvasRestAdapter;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.managers.OAuthManager;
@@ -43,7 +43,7 @@ import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 
-import static com.instructure.candroid.util.ApplicationManager.PREF_FILE_NAME;
+import static com.ebuki.portal.util.ApplicationManager.PREF_FILE_NAME;
 
 public class LogoutAsyncTask extends LogoutTask {
 

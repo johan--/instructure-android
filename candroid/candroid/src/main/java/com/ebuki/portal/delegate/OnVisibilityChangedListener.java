@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.delegate;
+package com.ebuki.portal.delegate;
 
 public interface OnVisibilityChangedListener {
     public void onMagicLayoutVisibilityChanged(int oldVisibility, int newVisibility, int viewId);

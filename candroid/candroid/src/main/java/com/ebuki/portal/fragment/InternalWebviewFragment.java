@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -33,13 +33,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-import com.instructure.candroid.BuildConfig;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InternalWebViewActivity;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.view.CanvasLoading;
+import com.ebuki.portal.BuildConfig;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InternalWebViewActivity;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.view.CanvasLoading;
 import com.instructure.canvasapi2.models.ApiHttpResponse;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.utils.APIHelper;
@@ -356,7 +356,7 @@ public class InternalWebviewFragment extends ParentFragment {
 
     public static Bundle createDefaultBundle(CanvasContext canvasContext){
         Bundle extras = createBundle(canvasContext);
-        extras.putString(Const.INTERNAL_URL, "https://play.google.com/store/apps/details?id=com.instructure.candroid");
+        extras.putString(Const.INTERNAL_URL, "https://play.google.com/store/apps/details?id=com.ebuki.portal");
         return extras;
     }
 

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -30,12 +30,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.TutorialFragment;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.TutorialFragment;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.utils.Logger;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.candroid.view.ViewPagerIndicator;
+import com.ebuki.portal.view.ViewPagerIndicator;
 
 public class TutorialActivity extends FragmentActivity implements
         View.OnClickListener,

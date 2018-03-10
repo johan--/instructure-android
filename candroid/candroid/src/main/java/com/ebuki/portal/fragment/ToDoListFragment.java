@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -25,11 +25,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.TodoListRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
-import com.instructure.candroid.util.FragUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.TodoListRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.NotificationAdapterToFragmentCallback;
+import com.ebuki.portal.util.FragUtils;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.ScheduleItem;

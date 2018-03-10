@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.delegate;
+package com.ebuki.portal.delegate;
 
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.View;
 
-import com.instructure.candroid.adapter.CourseNavigationAdapter;
-import com.instructure.candroid.fragment.ParentFragment;
+import com.ebuki.portal.adapter.CourseNavigationAdapter;
+import com.ebuki.portal.fragment.ParentFragment;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Tab;
 

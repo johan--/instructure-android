@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,9 +23,9 @@ import android.net.Uri;
 import android.text.Html;
 import android.view.View;
 import android.widget.RemoteViews;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.NotificationWidgetRouter;
-import com.instructure.candroid.util.StringUtilities;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.NotificationWidgetRouter;
+import com.ebuki.portal.util.StringUtilities;
 import com.instructure.canvasapi2.managers.ConversationManager;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.GroupManager;

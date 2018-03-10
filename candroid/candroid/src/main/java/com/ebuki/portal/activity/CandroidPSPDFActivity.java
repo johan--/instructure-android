@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.document.sharing.DefaultDocumentSharingController;

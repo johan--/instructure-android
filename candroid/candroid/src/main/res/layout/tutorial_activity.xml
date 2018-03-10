@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.instructure.candroid.view.ViewPagerIndicator
+            <com.ebuki.portal.view.ViewPagerIndicator
                 android:id="@+id/indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

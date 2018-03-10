@@ -38,7 +38,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.instructure.candroid"
+        applicationId "com.ebuki.portal"
         minSdkVersion 20
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -27,8 +27,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.LoggingUtility;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.LoggingUtility;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.TabManager;
 import com.instructure.canvasapi2.models.CanvasContext;

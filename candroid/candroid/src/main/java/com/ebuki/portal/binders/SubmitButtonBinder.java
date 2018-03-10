@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,10 +24,10 @@ import android.graphics.drawable.StateListDrawable;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.QuizSubmissionQuestionListRecyclerAdapter;
-import com.instructure.candroid.holders.SubmitButtonViewHolder;
-import com.instructure.candroid.interfaces.QuizSubmit;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.QuizSubmissionQuestionListRecyclerAdapter;
+import com.ebuki.portal.holders.SubmitButtonViewHolder;
+import com.ebuki.portal.interfaces.QuizSubmit;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.pandautils.utils.CanvasContextColor;
 

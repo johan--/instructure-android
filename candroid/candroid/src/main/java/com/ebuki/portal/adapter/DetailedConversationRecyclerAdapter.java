@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.DetailedConversationBinder;
-import com.instructure.candroid.fragment.DetailedConversationFragment;
-import com.instructure.candroid.holders.DetailedConversationAttachmentViewHolder;
-import com.instructure.candroid.holders.DetailedConversationMessageViewHolder;
-import com.instructure.candroid.interfaces.DetailedConversationAdapterToFragmentCallback;
-import com.instructure.candroid.model.MessageAttachment;
-import com.instructure.candroid.model.MessageWithDepth;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.DetailedConversationBinder;
+import com.ebuki.portal.fragment.DetailedConversationFragment;
+import com.ebuki.portal.holders.DetailedConversationAttachmentViewHolder;
+import com.ebuki.portal.holders.DetailedConversationMessageViewHolder;
+import com.ebuki.portal.interfaces.DetailedConversationAdapterToFragmentCallback;
+import com.ebuki.portal.model.MessageAttachment;
+import com.ebuki.portal.model.MessageWithDepth;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ConversationManager;
 import com.instructure.canvasapi2.models.Attachment;

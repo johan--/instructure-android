@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -64,19 +64,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.ParentActivity;
-import com.instructure.candroid.activity.VideoViewActivity;
-import com.instructure.candroid.adapter.ExpandableRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerItemDecoration;
-import com.instructure.candroid.decorations.ExpandableGridSpacingDecorator;
-import com.instructure.candroid.decorations.GridSpacingDecorator;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.ConfigureRecyclerView;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.FileUtils;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.ParentActivity;
+import com.ebuki.portal.activity.VideoViewActivity;
+import com.ebuki.portal.adapter.ExpandableRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerItemDecoration;
+import com.ebuki.portal.decorations.ExpandableGridSpacingDecorator;
+import com.ebuki.portal.decorations.GridSpacingDecorator;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.ConfigureRecyclerView;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.FileUtils;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Course;
 import com.instructure.canvasapi2.models.Group;

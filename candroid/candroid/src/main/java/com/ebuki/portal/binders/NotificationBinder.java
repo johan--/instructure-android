@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -24,10 +24,10 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.NotificationListRecyclerAdapter;
-import com.instructure.candroid.holders.NotificationViewHolder;
-import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.NotificationListRecyclerAdapter;
+import com.ebuki.portal.holders.NotificationViewHolder;
+import com.ebuki.portal.interfaces.NotificationAdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.StreamItem;
 import com.instructure.pandautils.utils.CanvasContextColor;

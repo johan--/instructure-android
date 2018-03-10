@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -42,8 +42,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InternalWebViewActivity;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InternalWebViewActivity;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AccountNotificationManager;
 import com.instructure.canvasapi2.models.AccountNotification;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.holders;
+package com.ebuki.portal.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class CourseHeaderViewHolder extends RecyclerView.ViewHolder{
 

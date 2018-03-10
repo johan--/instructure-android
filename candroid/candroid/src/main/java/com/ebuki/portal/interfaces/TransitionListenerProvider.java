@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
 import android.transition.Transition;
 

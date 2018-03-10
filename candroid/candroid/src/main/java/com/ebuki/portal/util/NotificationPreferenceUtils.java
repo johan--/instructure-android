@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.model.NotificationCategoryHeader;
+import com.ebuki.portal.R;
+import com.ebuki.portal.model.NotificationCategoryHeader;
 import com.instructure.canvasapi2.models.NotificationPreference;
 
 import java.util.ArrayList;

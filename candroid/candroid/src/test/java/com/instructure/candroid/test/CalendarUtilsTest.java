@@ -15,10 +15,10 @@
  *
  */
 
-package com.instructure.candroid.test;
+package com.ebuki.portal.test;
 
-import com.instructure.candroid.model.DateWindow;
-import com.instructure.candroid.util.CanvasCalendarUtils;
+import com.ebuki.portal.model.DateWindow;
+import com.ebuki.portal.util.CanvasCalendarUtils;
 
 import org.junit.Assert;
 import org.junit.Test;

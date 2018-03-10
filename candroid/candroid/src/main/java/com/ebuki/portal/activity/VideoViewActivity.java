@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -47,8 +47,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.Const;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.Const;
 
 public class VideoViewActivity extends AppCompatActivity {
 

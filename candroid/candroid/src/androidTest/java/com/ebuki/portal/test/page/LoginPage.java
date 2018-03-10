@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.test.page;
+package com.ebuki.portal.test.page;
 
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.web.webdriver.Locator;
 
-import com.instructure.candroid.test.utils.User;
+import com.ebuki.portal.test.utils.User;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -39,7 +39,7 @@ import static android.support.test.espresso.web.webdriver.DriverAtoms.getText;
 import static android.support.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static android.support.test.espresso.web.webdriver.DriverAtoms.webKeys;
 import static org.hamcrest.Matchers.containsString;
-import static com.instructure.candroid.test.utils.UserProfile.DOMAIN;
+import static com.ebuki.portal.test.utils.UserProfile.DOMAIN;
 
 public class LoginPage {
 

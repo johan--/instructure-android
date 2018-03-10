@@ -15,23 +15,11 @@
  *
  */
 
-package com.instructure.candroid.test.page;
+package com.ebuki.portal.test.page;
 
-import android.support.test.espresso.ViewInteraction;
+public abstract class PageObjects {
 
-import com.instructure.candroid.R;
-
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static com.instructure.espresso.WaitForViewMatcher.waitForView;
-
-public class TutorialPage {
-
-    private ViewInteraction skipButton() {
-        return waitForView(withId(R.id.skip));
-    }
-
-    public void tapSkipButton() {
-        skipButton().perform(click());
-    }
+    public DomainPickerPage domainPickerPage = new DomainPickerPage();
+    public LoginPage loginPage = new LoginPage();
+    public TutorialPage tutorialPage = new TutorialPage();
 }

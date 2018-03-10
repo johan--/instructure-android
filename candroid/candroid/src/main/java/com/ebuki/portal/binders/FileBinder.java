@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -23,9 +23,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.FileViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentLongClick;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.FileViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentLongClick;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.FileFolder;
 import com.instructure.pandautils.utils.CanvasContextColor;

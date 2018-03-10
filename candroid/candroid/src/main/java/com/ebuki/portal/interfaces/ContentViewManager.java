@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.interfaces;
+package com.ebuki.portal.interfaces;
 
 public interface ContentViewManager {
     public void setContentToolbarStatusBarColors(int actionBarColor, int statusBarColor);

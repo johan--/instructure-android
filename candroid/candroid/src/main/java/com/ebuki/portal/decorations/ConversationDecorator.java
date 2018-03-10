@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import com.instructure.candroid.adapter.DetailedConversationRecyclerAdapter;
-import com.instructure.candroid.holders.DetailedConversationAttachmentViewHolder;
-import com.instructure.candroid.holders.DetailedConversationMessageViewHolder;
-import com.instructure.candroid.view.ViewUtils;
+import com.ebuki.portal.adapter.DetailedConversationRecyclerAdapter;
+import com.ebuki.portal.holders.DetailedConversationAttachmentViewHolder;
+import com.ebuki.portal.holders.DetailedConversationMessageViewHolder;
+import com.ebuki.portal.view.ViewUtils;
 import com.instructure.pandarecycler.util.Types;
 
 public class ConversationDecorator extends RecyclerView.ItemDecoration {

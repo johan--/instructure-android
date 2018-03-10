@@ -15,21 +15,21 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.CourseBinder;
-import com.instructure.candroid.holders.CourseHeaderViewHolder;
-import com.instructure.candroid.holders.CourseViewHolder;
-import com.instructure.candroid.interfaces.CourseAdapterToFragmentCallback;
-import com.instructure.candroid.model.CourseToggleHeader;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.CourseBinder;
+import com.ebuki.portal.holders.CourseHeaderViewHolder;
+import com.ebuki.portal.holders.CourseViewHolder;
+import com.ebuki.portal.interfaces.CourseAdapterToFragmentCallback;
+import com.ebuki.portal.model.CourseToggleHeader;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.CourseManager;
 import com.instructure.canvasapi2.managers.GroupManager;

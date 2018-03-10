@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;

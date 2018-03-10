@@ -15,15 +15,15 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.CompoundButton;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.RecipientViewHolder;
-import com.instructure.candroid.interfaces.RecipientAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.RecipientViewHolder;
+import com.ebuki.portal.interfaces.RecipientAdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Recipient;
 
 public class RecipientBinder {

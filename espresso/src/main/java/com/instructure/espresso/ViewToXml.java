@@ -406,7 +406,7 @@ public class ViewToXml {
 
     /**
      * Dumps view xml and png.
-     * Download with adb pull /sdcard/Android/data/com.instructure.candroid/cache/dump
+     * Download with adb pull /sdcard/Android/data/com.ebuki.portal/cache/dump
      **/
     private static boolean dumpToFile(View view) {
         boolean result = false;

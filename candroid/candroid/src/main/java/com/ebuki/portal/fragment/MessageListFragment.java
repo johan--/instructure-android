@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -34,13 +34,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.MessageListRecyclerAdapter;
-import com.instructure.candroid.adapter.MultiSelectRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerDecoration;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.DebounceMessageToAdapterListener;
-import com.instructure.candroid.util.FragUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.MessageListRecyclerAdapter;
+import com.ebuki.portal.adapter.MultiSelectRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerDecoration;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.DebounceMessageToAdapterListener;
+import com.ebuki.portal.util.FragUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.ConversationAPI.ConversationScope;
 import com.instructure.canvasapi2.managers.ConversationManager;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -44,11 +44,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.FileUploadAssignmentsAdapter;
-import com.instructure.candroid.adapter.FileUploadCoursesAdapter;
-import com.instructure.candroid.util.AnimationHelpers;
-import com.instructure.candroid.util.UploadCheckboxManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.FileUploadAssignmentsAdapter;
+import com.ebuki.portal.adapter.FileUploadCoursesAdapter;
+import com.ebuki.portal.util.AnimationHelpers;
+import com.ebuki.portal.util.UploadCheckboxManager;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AssignmentManager;
 import com.instructure.canvasapi2.models.Assignment;

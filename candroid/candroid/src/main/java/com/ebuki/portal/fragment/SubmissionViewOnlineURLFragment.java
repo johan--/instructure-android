@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 
 import android.content.Context;
@@ -37,12 +37,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.ApplicationManager;
 import com.instructure.pandautils.utils.Const;
-import com.instructure.candroid.util.DownloadMedia;
-import com.instructure.candroid.util.LoggingUtility;
+import com.ebuki.portal.util.DownloadMedia;
+import com.ebuki.portal.util.LoggingUtility;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Submission;
 import com.instructure.pandautils.utils.PermissionUtils;

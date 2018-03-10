@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,8 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.delegate.Navigation;
+import com.ebuki.portal.R;
+import com.ebuki.portal.delegate.Navigation;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.StreamItem;

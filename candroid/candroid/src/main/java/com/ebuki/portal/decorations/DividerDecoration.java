@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -28,7 +28,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 /**
  * https://gist.github.com/zokipirlo/82336d89249e05bba5aa

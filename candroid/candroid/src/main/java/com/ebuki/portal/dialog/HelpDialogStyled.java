@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -30,10 +30,10 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.InternalWebViewActivity;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.LoggingUtility;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.InternalWebViewActivity;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.LoggingUtility;
 import com.instructure.canvasapi2.models.User;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.canvasapi2.utils.DateHelper;

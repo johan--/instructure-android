@@ -15,18 +15,18 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.QuizFileUploadViewHolder;
-import com.instructure.candroid.interfaces.QuizFileRemovedListener;
-import com.instructure.candroid.interfaces.QuizFileUploadListener;
-import com.instructure.candroid.interfaces.QuizToggleFlagState;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.QuizFileUploadViewHolder;
+import com.ebuki.portal.interfaces.QuizFileRemovedListener;
+import com.ebuki.portal.interfaces.QuizFileUploadListener;
+import com.ebuki.portal.interfaces.QuizToggleFlagState;
 import com.instructure.canvasapi2.models.Attachment;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;

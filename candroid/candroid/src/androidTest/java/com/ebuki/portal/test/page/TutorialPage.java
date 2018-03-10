@@ -15,12 +15,23 @@
  *
  */
 
-package com.instructure.candroid.test.utils;
+package com.ebuki.portal.test.page;
 
-public class UserProfile {
-    public static String INVALID_DOMAIN = "";
-    public static String DOMAIN = "";
+import android.support.test.espresso.ViewInteraction;
 
-    public static User INVALID_USER = new User("", "");
-    public static User STUDENT_1 = new User("", "");
+import com.ebuki.portal.R;
+
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.instructure.espresso.WaitForViewMatcher.waitForView;
+
+public class TutorialPage {
+
+    private ViewInteraction skipButton() {
+        return waitForView(withId(R.id.skip));
+    }
+
+    public void tapSkipButton() {
+        skipButton().perform(click());
+    }
 }

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.os.Build;
 import android.view.View;
@@ -27,8 +27,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.CheckedTextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.dialog.FileUploadDialog;
+import com.ebuki.portal.R;
+import com.ebuki.portal.dialog.FileUploadDialog;
 
 import java.util.ArrayList;
 import java.util.List;

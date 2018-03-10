@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -27,17 +27,17 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.WidgetSetupActivity;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.WidgetSetupActivity;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
 
 public abstract class CanvasWidgetProvider extends AppWidgetProvider {
 
     public static int cycleBit = 100;
 
 
-    public static final String REFRESH_ALL = "com.instructure.candroid.widget.allwidget.REFRESH";
+    public static final String REFRESH_ALL = "com.ebuki.portal.widget.allwidget.REFRESH";
 
     //region Broadcast Callbacks
     @Override

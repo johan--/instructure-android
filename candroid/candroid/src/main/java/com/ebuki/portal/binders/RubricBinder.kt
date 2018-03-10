@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.binders
+package com.ebuki.portal.binders
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.view.View
-import com.instructure.candroid.R
-import com.instructure.candroid.holders.RubricViewHolder
-import com.instructure.candroid.model.RubricCommentItem
-import com.instructure.candroid.model.RubricItem
-import com.instructure.candroid.model.RubricRatingItem
+import com.ebuki.portal.R
+import com.ebuki.portal.holders.RubricViewHolder
+import com.ebuki.portal.model.RubricCommentItem
+import com.ebuki.portal.model.RubricItem
+import com.ebuki.portal.model.RubricRatingItem
 import com.instructure.canvasapi2.models.CanvasContext
 import com.instructure.canvasapi2.models.RubricCriterion
 import com.instructure.canvasapi2.models.RubricCriterionAssessment

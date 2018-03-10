@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -29,8 +29,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.StringUtilities;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.StringUtilities;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.Submission;
 import com.instructure.canvasapi2.utils.NumberHelper;

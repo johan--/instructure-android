@@ -15,17 +15,17 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.MessageBinder;
-import com.instructure.candroid.fragment.MessageListFragment;
-import com.instructure.candroid.holders.MessageViewHolder;
-import com.instructure.candroid.util.DebounceMessageToAdapterListener;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.MessageBinder;
+import com.ebuki.portal.fragment.MessageListFragment;
+import com.ebuki.portal.holders.MessageViewHolder;
+import com.ebuki.portal.util.DebounceMessageToAdapterListener;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.ConversationAPI;
 import com.instructure.canvasapi2.managers.ConversationManager;

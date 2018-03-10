@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class FloatingCardPandaView extends FrameLayout {
     private View mRootView;

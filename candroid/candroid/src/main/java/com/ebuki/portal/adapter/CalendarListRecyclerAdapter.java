@@ -15,23 +15,23 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.ScheduleItemBinder;
-import com.instructure.candroid.fragment.CalendarListViewFragment;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.ScheduleItemViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.model.DateWindow;
-import com.instructure.candroid.model.EventData;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.CanvasCalendarUtils;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.ScheduleItemBinder;
+import com.ebuki.portal.fragment.CalendarListViewFragment;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.ScheduleItemViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.model.DateWindow;
+import com.ebuki.portal.model.EventData;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.CanvasCalendarUtils;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.apis.CalendarEventAPI;
 import com.instructure.canvasapi2.managers.CalendarEventManager;

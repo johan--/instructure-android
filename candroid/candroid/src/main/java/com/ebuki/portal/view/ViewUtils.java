@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -29,7 +29,7 @@ import android.view.Display;
 import android.widget.Toast;
 
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 import java.lang.reflect.Method;
 

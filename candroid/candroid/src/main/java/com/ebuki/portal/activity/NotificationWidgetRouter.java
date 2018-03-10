@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +23,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.NotificationListFragment;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.NotificationListFragment;
 import com.instructure.pandautils.utils.Const;
 import com.instructure.canvasapi2.models.StreamItem;
 

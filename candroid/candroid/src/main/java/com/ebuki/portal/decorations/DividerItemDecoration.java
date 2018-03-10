@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.decorations;
+package com.ebuki.portal.decorations;
 
 import android.content.Context;
 import android.content.res.TypedArray;

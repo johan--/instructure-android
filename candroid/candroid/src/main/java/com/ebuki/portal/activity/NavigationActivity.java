@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
@@ -57,40 +57,40 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.instructure.candroid.BuildConfig;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CourseNavigationAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.AccountNotificationDialog;
-import com.instructure.candroid.dialog.HelpDialogStyled;
-import com.instructure.candroid.fragment.AnnouncementListFragment;
-import com.instructure.candroid.fragment.ApplicationSettingsFragment;
-import com.instructure.candroid.fragment.BookmarksFragment;
-import com.instructure.candroid.fragment.CalendarListViewFragment;
-import com.instructure.candroid.fragment.CourseGridFragment;
-import com.instructure.candroid.fragment.DetailedConversationFragment;
-import com.instructure.candroid.fragment.DetailedDiscussionFragment;
-import com.instructure.candroid.fragment.DiscussionListFragment;
-import com.instructure.candroid.fragment.GradesGridFragment;
-import com.instructure.candroid.fragment.InboxFragment;
-import com.instructure.candroid.fragment.LTIWebViewFragment;
-import com.instructure.candroid.fragment.MessageListFragment;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.fragment.ParentFragment;
-import com.instructure.candroid.fragment.ProfileFragment;
-import com.instructure.candroid.fragment.ToDoListFragment;
-import com.instructure.candroid.interfaces.OnEventUpdatedCallback;
-import com.instructure.candroid.model.PushNotification;
-import com.instructure.candroid.receivers.PushExternalReceiver;
-import com.instructure.candroid.tasks.LogoutAsyncTask;
-import com.instructure.candroid.tasks.SwitchUsersAsyncTask;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.RouterUtils;
-import com.instructure.candroid.util.TabHelper;
-import com.instructure.candroid.view.ActionbarCourseSpinner;
-import com.instructure.candroid.view.SpinnerInteractionListener;
+import com.ebuki.portal.BuildConfig;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CourseNavigationAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.AccountNotificationDialog;
+import com.ebuki.portal.dialog.HelpDialogStyled;
+import com.ebuki.portal.fragment.AnnouncementListFragment;
+import com.ebuki.portal.fragment.ApplicationSettingsFragment;
+import com.ebuki.portal.fragment.BookmarksFragment;
+import com.ebuki.portal.fragment.CalendarListViewFragment;
+import com.ebuki.portal.fragment.CourseGridFragment;
+import com.ebuki.portal.fragment.DetailedConversationFragment;
+import com.ebuki.portal.fragment.DetailedDiscussionFragment;
+import com.ebuki.portal.fragment.DiscussionListFragment;
+import com.ebuki.portal.fragment.GradesGridFragment;
+import com.ebuki.portal.fragment.InboxFragment;
+import com.ebuki.portal.fragment.LTIWebViewFragment;
+import com.ebuki.portal.fragment.MessageListFragment;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.fragment.ParentFragment;
+import com.ebuki.portal.fragment.ProfileFragment;
+import com.ebuki.portal.fragment.ToDoListFragment;
+import com.ebuki.portal.interfaces.OnEventUpdatedCallback;
+import com.ebuki.portal.model.PushNotification;
+import com.ebuki.portal.receivers.PushExternalReceiver;
+import com.ebuki.portal.tasks.LogoutAsyncTask;
+import com.ebuki.portal.tasks.SwitchUsersAsyncTask;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.RouterUtils;
+import com.ebuki.portal.util.TabHelper;
+import com.ebuki.portal.view.ActionbarCourseSpinner;
+import com.ebuki.portal.view.SpinnerInteractionListener;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.BookmarkManager;
 import com.instructure.canvasapi2.managers.CourseManager;
@@ -257,8 +257,8 @@ public class NavigationActivity extends BaseRouterActivity implements
         super.onNewIntent(intent);
         //Switching languages will trigger this, so we check for our Pending intent id
         if(intent != null
-                && intent.hasExtra(com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_KEY)
-                && intent.getIntExtra(com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_KEY, 0) != com.instructure.candroid.util.Const.LANGUAGES_PENDING_INTENT_ID) {
+                && intent.hasExtra(com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_KEY)
+                && intent.getIntExtra(com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_KEY, 0) != com.ebuki.portal.util.Const.LANGUAGES_PENDING_INTENT_ID) {
             handlePushNotification(hasUnreadPushNotification(intent.getExtras()));
         }
     }

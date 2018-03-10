@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.app.Activity;
 import android.content.Context;
@@ -34,11 +34,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.internal.LinkedTreeMap;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.QuizMatchSpinnerAdapter;
-import com.instructure.candroid.holders.QuizMatchingViewHolder;
-import com.instructure.candroid.interfaces.QuizPostMatching;
-import com.instructure.candroid.interfaces.QuizToggleFlagState;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.QuizMatchSpinnerAdapter;
+import com.ebuki.portal.holders.QuizMatchingViewHolder;
+import com.ebuki.portal.interfaces.QuizPostMatching;
+import com.ebuki.portal.interfaces.QuizToggleFlagState;
 import com.instructure.canvasapi2.models.QuizSubmissionAnswer;
 import com.instructure.canvasapi2.models.QuizSubmissionMatch;
 import com.instructure.canvasapi2.models.QuizSubmissionQuestion;

@@ -14,7 +14,7 @@
  *     limitations under the License.
  *
  */
-package com.instructure.candroid.tasks;
+package com.ebuki.portal.tasks;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,10 +22,10 @@ import android.content.SharedPreferences;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.fragment.ApplicationSettingsFragment;
-import com.instructure.candroid.view.CanvasRecipientManager;
-import com.instructure.candroid.widget.CanvasWidgetProvider;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.fragment.ApplicationSettingsFragment;
+import com.ebuki.portal.view.CanvasRecipientManager;
+import com.ebuki.portal.widget.CanvasWidgetProvider;
 import com.instructure.canvasapi2.CanvasRestAdapter;
 import com.instructure.canvasapi2.builders.RestBuilder;
 import com.instructure.canvasapi2.utils.ApiPrefs;
@@ -45,7 +45,7 @@ import java.io.IOException;
 import okhttp3.OkHttpClient;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.instructure.candroid.util.ApplicationManager.PREF_NAME;
+import static com.ebuki.portal.util.ApplicationManager.PREF_NAME;
 
 public class SwitchUsersAsyncTask extends SwitchUsersTask {
 

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -29,13 +29,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.ParentActivity;
-import com.instructure.candroid.adapter.NotificationListRecyclerAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.ParentActivity;
+import com.ebuki.portal.adapter.NotificationListRecyclerAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.interfaces.NotificationAdapterToFragmentCallback;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.BasicUser;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Conversation;

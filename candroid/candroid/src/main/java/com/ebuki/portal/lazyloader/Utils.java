@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.lazyloader;
+package com.ebuki.portal.lazyloader;
 
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -15,10 +15,10 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
-import com.instructure.candroid.holders.EmptyViewHolder;
-import com.instructure.candroid.holders.ModuleEmptyViewHolder;
+import com.ebuki.portal.holders.EmptyViewHolder;
+import com.ebuki.portal.holders.ModuleEmptyViewHolder;
 
 public class EmptyBinder {
 

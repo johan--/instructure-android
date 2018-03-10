@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,10 +26,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.BookmarksFragment;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.BookmarksFragment;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.Bookmark;
 import com.instructure.pandautils.utils.CanvasContextColor;
 import com.instructure.pandautils.utils.ColorUtils;

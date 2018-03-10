@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -32,16 +32,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.FileListRecyclerAdapter;
-import com.instructure.candroid.decorations.DividerDecoration;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.FileUploadDialog;
-import com.instructure.candroid.interfaces.AdapterToFragmentLongClick;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.DownloadMedia;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.FileListRecyclerAdapter;
+import com.ebuki.portal.decorations.DividerDecoration;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.FileUploadDialog;
+import com.ebuki.portal.interfaces.AdapterToFragmentLongClick;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.DownloadMedia;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.FileFolderManager;
 import com.instructure.canvasapi2.models.CanvasContext;

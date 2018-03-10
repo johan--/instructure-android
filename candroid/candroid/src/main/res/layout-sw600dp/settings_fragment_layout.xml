@@ -16,7 +16,7 @@
   ~
   -->
 
-<com.instructure.candroid.view.CardifyView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.ebuki.portal.view.CardifyView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -27,4 +27,4 @@
         <include layout="@layout/settings_fragment" />
 
     </ScrollView>
-</com.instructure.candroid.view.CardifyView>
+</com.ebuki.portal.view.CardifyView>

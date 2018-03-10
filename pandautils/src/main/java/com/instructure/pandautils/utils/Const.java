@@ -209,7 +209,7 @@ public class Const {
     public static final String SECOND_PARAM_PARSED = "secondParamParsed";
     public static final String THIRD_PARAM_PARSED = "thirdParamParsed";
     public static final String PARAMS = "params";
-    public static final String ACTION_ROUTING = "com.instructure.candroid.ROUTING_ACTIVITY";
+    public static final String ACTION_ROUTING = "com.ebuki.portal.ROUTING_ACTIVITY";
     public static final String DOMAIN = "domain";
     public static final String DOMAIN_FOR_DISPLAY = "domainForDisplay";
     public static final String SCHEME = "scheme";

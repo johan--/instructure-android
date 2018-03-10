@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -28,7 +28,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 import java.util.ArrayList;
 

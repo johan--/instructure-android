@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.dialog;
+package com.ebuki.portal.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 
 public class AuthDialogStyled extends DialogFragment {
 

@@ -15,17 +15,17 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.TodoListRecyclerAdapter;
-import com.instructure.candroid.holders.TodoViewHolder;
-import com.instructure.candroid.interfaces.NotificationAdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.TodoListRecyclerAdapter;
+import com.ebuki.portal.holders.TodoViewHolder;
+import com.ebuki.portal.interfaces.NotificationAdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.ToDo;
 import com.instructure.canvasapi2.utils.DateHelper;

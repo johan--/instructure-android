@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -24,9 +24,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViewsService;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.WidgetSetupActivity;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.WidgetSetupActivity;
+import com.ebuki.portal.util.ApplicationManager;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

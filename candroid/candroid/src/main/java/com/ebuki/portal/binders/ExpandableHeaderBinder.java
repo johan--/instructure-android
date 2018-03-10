@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.ExpandableViewHolder;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.ExpandableViewHolder;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.pandarecycler.interfaces.ViewHolderHeaderClicked;
 import com.nineoldandroids.animation.AnimatorInflater;

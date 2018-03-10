@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.util;
+package com.ebuki.portal.util;
 
 import android.content.Context;
 import android.content.Intent;
@@ -35,10 +35,10 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
-import com.instructure.candroid.BuildConfig;
-import com.instructure.candroid.R;
-import com.instructure.candroid.fragment.ApplicationSettingsFragment;
-import com.instructure.candroid.tasks.LogoutAsyncTask;
+import com.ebuki.portal.BuildConfig;
+import com.ebuki.portal.R;
+import com.ebuki.portal.fragment.ApplicationSettingsFragment;
+import com.ebuki.portal.tasks.LogoutAsyncTask;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.UserManager;
 import com.instructure.canvasapi2.models.CanvasColor;

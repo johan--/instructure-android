@@ -42,7 +42,7 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <com.instructure.candroid.view.EmptyPandaView
+    <com.ebuki.portal.view.EmptyPandaView
         android:id="@+id/emptyPandaView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

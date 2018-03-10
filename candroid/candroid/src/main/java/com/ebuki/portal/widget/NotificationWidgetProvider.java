@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.activity.NotificationWidgetRouter;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.activity.NotificationWidgetRouter;
 
 public class NotificationWidgetProvider extends CanvasWidgetProvider {
     public final static int NOTIFICATIONS_REFRESH_ID = 4;
-    public final static String REFRESH = "com.instructure.candroid.widget.notificationwidget.REFRESH";
+    public final static String REFRESH = "com.ebuki.portal.widget.notificationwidget.REFRESH";
     private final static String SIMPLE_NAME = "Nofification Widget";
 
     @Override

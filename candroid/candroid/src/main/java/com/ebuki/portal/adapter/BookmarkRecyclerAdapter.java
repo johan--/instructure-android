@@ -15,14 +15,14 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.view.View;
 
-import com.instructure.candroid.binders.BookmarkBinder;
-import com.instructure.candroid.holders.BookmarkViewHolder;
-import com.instructure.candroid.interfaces.BookmarkAdapterToFragmentCallback;
+import com.ebuki.portal.binders.BookmarkBinder;
+import com.ebuki.portal.holders.BookmarkViewHolder;
+import com.ebuki.portal.interfaces.BookmarkAdapterToFragmentCallback;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.BookmarkManager;
 import com.instructure.canvasapi2.models.Bookmark;

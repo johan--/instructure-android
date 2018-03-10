@@ -15,15 +15,15 @@
  *
  */
 
-package com.instructure.candroid.test;
+package com.ebuki.portal.test;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.test.page.PageObjects;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.test.page.PageObjects;
 import com.instructure.espresso.ScreenshotActivityTestRule;
 
-import static com.instructure.candroid.test.utils.UserProfile.INVALID_DOMAIN;
+import static com.ebuki.portal.test.utils.UserProfile.INVALID_DOMAIN;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

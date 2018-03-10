@@ -37,7 +37,7 @@
     </LinearLayout>
 
     <!-- The layout requires its own EmptyPandaView and can't use the one in `recycler_swipe_refresh_layout` -->
-    <com.instructure.candroid.view.EmptyPandaView
+    <com.ebuki.portal.view.EmptyPandaView
         android:id="@+id/messageEmptyPandaView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

@@ -15,20 +15,20 @@
  *
  */
 
-package com.instructure.candroid.adapter;
+package com.ebuki.portal.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.binders.ExpandableHeaderBinder;
-import com.instructure.candroid.binders.QuizBinder;
-import com.instructure.candroid.holders.ExpandableViewHolder;
-import com.instructure.candroid.holders.QuizViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
-import com.instructure.candroid.util.StringUtilities;
+import com.ebuki.portal.R;
+import com.ebuki.portal.binders.ExpandableHeaderBinder;
+import com.ebuki.portal.binders.QuizBinder;
+import com.ebuki.portal.holders.ExpandableViewHolder;
+import com.ebuki.portal.holders.QuizViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.util.StringUtilities;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.QuizManager;
 import com.instructure.canvasapi2.models.CanvasContext;

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,11 +35,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.BaseRouterActivity;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.Param;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.BaseRouterActivity;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.Param;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.AssignmentManager;
 import com.instructure.canvasapi2.models.Assignment;
@@ -234,7 +234,7 @@ public class AssignmentFragment extends ParentFragment implements SubmissionDeta
     }
 
     /**
-     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.instructure.candroid.activity.CallbackActivity#getUserSelf}
+     * For explanation of isWithinAnotherCallback and isCached refer to comment in {@link com.ebuki.portal.activity.CallbackActivity#getUserSelf}
      */
     private void populateFragments(Assignment assignment, boolean isWithinAnotherCallback, boolean isCached) {
         if (fragmentPagerAdapter == null) {

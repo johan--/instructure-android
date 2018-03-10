@@ -66,12 +66,12 @@ buildscript {
 spoon { // ./gradlew :candroid:spoon
     debug = true
 
-    // ./gradlew :candroid:spoon -PtestClass=com.instructure.candroid.test.LoginTest
+    // ./gradlew :candroid:spoon -PtestClass=com.ebuki.portal.test.LoginTest
     if (project.hasProperty('testClass')) {
         className = project.testClass
     }
 
-    // ./gradlew :candroid:spoon -PtestClass=com.instructure.candroid.test.LoginTest -ptestMethod=loginRejectsInvalidCredentials
+    // ./gradlew :candroid:spoon -PtestClass=com.ebuki.portal.test.LoginTest -ptestMethod=loginRejectsInvalidCredentials
     if (project.hasProperty('testMethod')) {
         methodName = project.testMethod
     }
@@ -131,7 +131,7 @@ dependencies {
     }
 }
 
-def appId = "com.instructure.candroid"
+def appId = "com.ebuki.portal"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion

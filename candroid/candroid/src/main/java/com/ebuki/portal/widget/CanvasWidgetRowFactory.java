@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.widget;
+package com.ebuki.portal.widget;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,9 +27,9 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.activity.LoginActivity;
-import com.instructure.candroid.util.ApplicationManager;
+import com.ebuki.portal.R;
+import com.ebuki.portal.activity.LoginActivity;
+import com.ebuki.portal.util.ApplicationManager;
 
 import java.util.List;
 

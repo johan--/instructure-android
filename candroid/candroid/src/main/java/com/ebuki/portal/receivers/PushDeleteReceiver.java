@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.receivers;
+package com.ebuki.portal.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.instructure.candroid.model.PushNotification;
+import com.ebuki.portal.model.PushNotification;
 
 public class PushDeleteReceiver extends BroadcastReceiver {
 

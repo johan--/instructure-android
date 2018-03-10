@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 abstract public class ParentFragmentActivity extends ParentActivity {
 

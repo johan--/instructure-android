@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.view;
+package com.ebuki.portal.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -41,7 +41,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 
-import com.instructure.candroid.R;
+import com.ebuki.portal.R;
 import com.instructure.pandautils.utils.CanvasContextColor;
 
 /**

@@ -15,16 +15,16 @@
  *
  */
 
-package com.instructure.candroid.binders;
+package com.ebuki.portal.binders;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.holders.SyllabusItemViewHolder;
-import com.instructure.candroid.holders.SyllabusViewHolder;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.R;
+import com.ebuki.portal.holders.SyllabusItemViewHolder;
+import com.ebuki.portal.holders.SyllabusViewHolder;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Assignment;
 import com.instructure.canvasapi2.models.ScheduleItem;
 import com.instructure.canvasapi2.utils.DateHelper;

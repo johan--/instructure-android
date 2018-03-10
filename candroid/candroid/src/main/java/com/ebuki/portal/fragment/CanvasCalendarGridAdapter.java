@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -26,8 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.model.EventData;
+import com.ebuki.portal.R;
+import com.ebuki.portal.model.EventData;
 import com.instructure.pandautils.utils.Const;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidGridAdapter;

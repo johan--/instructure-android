@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.service;
+package com.ebuki.portal.service;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -23,8 +23,8 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.instructure.candroid.util.ApplicationManager;
-import com.instructure.candroid.util.LoggingUtility;
+import com.ebuki.portal.util.ApplicationManager;
+import com.ebuki.portal.util.LoggingUtility;
 import com.instructure.canvasapi2.managers.CommunicationChannelsManager;
 import com.instructure.canvasapi2.utils.Logger;
 

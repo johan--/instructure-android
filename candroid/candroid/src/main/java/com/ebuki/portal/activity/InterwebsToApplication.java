@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.activity;
+package com.ebuki.portal.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,10 +27,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 
-import com.instructure.candroid.R;
-import com.instructure.candroid.util.Analytics;
-import com.instructure.candroid.util.LoggingUtility;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.R;
+import com.ebuki.portal.util.Analytics;
+import com.ebuki.portal.util.LoggingUtility;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.utils.ApiPrefs;
 import com.instructure.pandautils.utils.Const;
 

@@ -15,7 +15,7 @@
  *
  */
 
-package com.instructure.candroid.fragment;
+package com.ebuki.portal.fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -51,15 +51,15 @@ import android.widget.Toast;
 
 import com.android.ex.chips.RecipientEditTextView;
 import com.android.ex.chips.RecipientEntry;
-import com.instructure.candroid.R;
-import com.instructure.candroid.adapter.CanvasContextSpinnerAdapter;
-import com.instructure.candroid.adapter.NothingSelectedSpinnerAdapter;
-import com.instructure.candroid.adapter.RecipientAdapter;
-import com.instructure.candroid.delegate.Navigation;
-import com.instructure.candroid.dialog.FileUploadDialog;
-import com.instructure.candroid.util.FragUtils;
-import com.instructure.candroid.view.CanvasRecipientManager;
-import com.instructure.candroid.view.IndicatorCircleView;
+import com.ebuki.portal.R;
+import com.ebuki.portal.adapter.CanvasContextSpinnerAdapter;
+import com.ebuki.portal.adapter.NothingSelectedSpinnerAdapter;
+import com.ebuki.portal.adapter.RecipientAdapter;
+import com.ebuki.portal.delegate.Navigation;
+import com.ebuki.portal.dialog.FileUploadDialog;
+import com.ebuki.portal.util.FragUtils;
+import com.ebuki.portal.view.CanvasRecipientManager;
+import com.ebuki.portal.view.IndicatorCircleView;
 import com.instructure.canvasapi2.StatusCallback;
 import com.instructure.canvasapi2.managers.ConversationManager;
 import com.instructure.canvasapi2.managers.CourseManager;
