@@ -725,16 +725,16 @@
     <string name="color_15">Gray</string>
 
     <!--Recents-->
-    <string name="recents_empty">From the course customization screen add a course or group to view them here.</string>
+    <string name="recents_empty">From the subject customization screen add a subject or group to view them here.</string>
 
     <string name="toolbar_close">Toolbar close</string>
-    <string name="favoriteDescription">Show in \"My Courses\"</string>
+    <string name="favoriteDescription">Show in \"My Subjects\"</string>
     <string name="about">About</string>
-    <string name="courseShortcuts">Add a shortcut to your course</string>
-    <string name="courseNickname">Course Nickname</string>
+    <string name="courseShortcuts">Add a shortcut to your subject</string>
+    <string name="courseNickname">Subject Nickname</string>
 
     <string name="notAvailableOffline">Functionality unavailable while offline</string>
-    <string name="selectFavorites">Course &amp; Group Selection</string>
+    <string name="selectFavorites">Subject &amp; Group Selection</string>
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
     <string name="dashboard">Dashboard</string>
@@ -747,7 +747,7 @@
     <string name="defaultLanguageWarning">Your system default language is not guaranteed to be supported and will require a restart, are you sure?</string>
     <string name="locked_mastery_paths">Locked until \"%s\" is graded</string>
     <string name="locked_icon">Locked Icon</string>
-    <string name="choose_assignment_group">Choose Assignment Group</string>
+    <string name="choose_assignment_group">Choose Homework Group</string>
     <string name="select">Select</string>
     <string name="choice_position">Choice %d</string>
     <string name="updating_module_info">Updating module information&#8230;</string>
