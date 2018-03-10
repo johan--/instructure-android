@@ -22,11 +22,11 @@
     <string name="canvasVersionNum">Version:</string>
 
     <!--Content Descriptions-->
-    <string name="canvasLogo">Canvas Logo</string>
-    <string name="app_name" translatable="false">Canvas Student</string>
-    <string name="enterURL">Enter your Canvas URL:</string>
+    <string name="canvasLogo">eBuki Logo</string>
+    <string name="app_name" translatable="false">eBuki Learner</string>
+    <string name="enterURL">Enter your eBuki URL:</string>
     <string name="exampleURLSimple">myschool.instructure.com</string>
-    <string name="signIntoCanvasNetwork">Trying to sign into Canvas Network?</string>
+    <string name="signIntoCanvasNetwork">Trying to sign into eBuki Network?</string>
     <string name="mobileVerifyGeneral">This app is not authorized for use</string>
     <string name="mobileVerifyDomainUnauthorized">The server you entered is not authorized for this app.</string>
     <string name="mobileVerifyUserAgentUnauthorized">The user agent for this app is unauthorized.</string>
@@ -220,7 +220,7 @@
 	<string name="students">Students</string>
     <string name="observers">Observers</string>
 
-	<string name="canvas">Canvas</string>
+	<string name="canvas">eBuki</string>
 	<string name="chooseRecipient">Choose Recipient(s)</string>
     <string name="messageHasNoRecipients">This message currently has no recipients.</string>
     <string name="sendMessage">Send Message</string>
@@ -253,7 +253,7 @@
 	<string name="sideCommentEntry">In this type of discussion, you can\'t comment on any entry on this level.</string>
     <string name="contentDescriptionFiles">File icon</string>
 
-	<string name="loadingCanvas">Loading Canvas Content&#8230;</string>
+	<string name="loadingCanvas">Loading eBuki Content&#8230;</string>
 
     <string name="unknownDevice">UnknownDevice</string>
 
@@ -459,9 +459,9 @@
     <string name="todoWidgetTitle">To-Do</string>
     <string name="gradesWidgetTitle">Grades</string>
     <string name="notificationWidgetTitle">Notifications</string>
-    <string name="todoWidgetTitleLong">Canvas - To-Do</string>
-    <string name="gradesWidgetTitleLong">Canvas - Grades</string>
-    <string name="notificationWidgetTitleLong">Canvas - Notifications</string>
+    <string name="todoWidgetTitleLong">eBuki - To-Do</string>
+    <string name="gradesWidgetTitleLong">eBuki - Grades</string>
+    <string name="notificationWidgetTitleLong">eBuki - Notifications</string>
     <string name="notLoggedIn">You are not logged in</string>
     <string name="widgetStyle">Choose your widget style</string>
     <string name="widgetMinimumStyle">Hide details on widget</string>
@@ -473,8 +473,8 @@
     <!-- Help dialog strings -->
     <string name="askInstructor">Ask Your Instructor a Question</string>
     <string name="askInstructorDetails">Questions are submitted to your instructor</string>
-    <string name="searchGuides">Search the Canvas Guides</string>
-    <string name="canvasGuides">Canvas Guides</string>
+    <string name="searchGuides">Search the eBuki Guides</string>
+    <string name="canvasGuides">eBuki Guides</string>
     <string name="searchGuidesDetails">Find answers to common questions</string>
     <string name="reportProblem">Report a Problem</string>
     <string name="reportProblemDetails">If the app misbehaves, let us know</string>
@@ -484,7 +484,7 @@
     <string name="shareYourLoveDetails">Tell us about your favorite parts of the app</string>
 
     <!-- Feature Request -->
-    <string name="featureSubject">Idea for Canvas [Android]</string>
+    <string name="featureSubject">Idea for eBuki [Android]</string>
     <string name="understandRequest">The following information will help us better understand your idea:</string>
 
     <!-- Ask Instructor -->
@@ -507,7 +507,7 @@
 
     <!-- ShareFileOptions Dialog-->
     <string name="uploadTo">Upload To </string>
-    <string name="uploadToCanvas">Upload To Canvas</string>
+    <string name="uploadToCanvas">Upload To eBuki</string>
     <string name="uploadMyFiles">My Files</string>
     <string name="uploadCourseFiles">Course Files</string>
 
@@ -550,7 +550,7 @@
     <string name="notoriousSubmissionInProgress">Submitting files&#8230; Check notification bar for updates.</string>
     <string name="notoriousSubmissionSuccessful">Finished submitting file</string>
 
-    <string name="poll_title">What did you come to Canvas to do?</string>
+    <string name="poll_title">What did you come to eBuki to do?</string>
     <string name="poll_warning">An item has not been selected.</string>
     <string name="poll_item_1">Check my grades</string>
     <string name="poll_item_2">Send or view a message</string>
@@ -597,7 +597,7 @@
 
     <string name="contentDescriptionSuperPanda">Super Panda Image</string>
     <string name="newFeatureTitle">Mobile Notifications</string>
-    <string name="newFeatureMsg">To receive mobile push notifications go to Canvas Settings > Notifications > And select \"For All Devices\"</string>
+    <string name="newFeatureMsg">To receive mobile push notifications go to eBuki Settings > Notifications > And select \"For All Devices\"</string>
 
     <string name="calendarDay">Day</string>
     <string name="calendarWeek">Week</string>
@@ -617,9 +617,9 @@
     
     <!--Notification Preferences-->
 
-    <string name="notification_primary_inbox_title">Canvas Notification</string>
-    <string name="notification_channel_name_primary">General Canvas Notifications</string>
-    <string name="notification_channel_description_primary">Further configuration of notifications can be done within the Canvas Notification Preferences section.</string>
+    <string name="notification_primary_inbox_title">eBuki Notification</string>
+    <string name="notification_channel_name_primary">General eBuki Notifications</string>
+    <string name="notification_channel_description_primary">Further configuration of notifications can be done within the eBuki Notification Preferences section.</string>
 
     <string name="notification_cat_course_activities">Course Activities</string>
     <string name="notification_cat_discussions">Discussions</string>
@@ -742,7 +742,7 @@
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
     <string name="systemDefault">System Default</string>
-    <string name="restartingCanvas">Restarting Canvas</string>
+    <string name="restartingCanvas">Restarting eBuki</string>
     <string name="languageDialogText">Changing the language will require the app to restart, are you sure?</string>
     <string name="defaultLanguageWarning">Your system default language is not guaranteed to be supported and will require a restart, are you sure?</string>
     <string name="locked_mastery_paths">Locked until \"%s\" is graded</string>

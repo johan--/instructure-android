@@ -150,7 +150,7 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
 
         /* Add private data */
-        buildConfigField "String", "PSPDFKIT_LICENSE_KEY", "\"$pspdfLicenseKey\""
+        buildConfigField "String", "PSPDFKIT_LICENSE_KEY", "\"$pspdfkitLicenseKey\""
         buildConfigField "String", "PUSH_SERVICE_PROJECT_ID", "\"$pushServiceProjectId\""
         addManifestPlaceholders([
                 crashlyticsApiKey:"$crashlyticsApiKey"
