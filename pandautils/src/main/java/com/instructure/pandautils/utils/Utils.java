@@ -165,7 +165,7 @@ public class Utils {
         if(com.instructure.pandautils.utils.Utils.isAmazonDevice()) {
             String marketURL = "";
             if(appType == AppType.CANDROID) {
-                marketURL = "http://www.amazon.com/gp/mas/dl/android?p=com.ebuki.portal";
+                marketURL = "http://www.amazon.com/gp/mas/dl/android?p=com.ebuki.homework";
             }
             else if(appType == AppType.POLLING) {
 
@@ -180,7 +180,7 @@ public class Utils {
         else {
             String packageName = "";
             if (appType == AppType.CANDROID) {
-                packageName = "com.ebuki.portal";
+                packageName = "com.ebuki.homework";
             } else if (appType == AppType.POLLING) {
                 packageName = "com.instructure.androidpolling";
             } else if (appType == AppType.SPEEDGRADER) {

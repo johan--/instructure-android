@@ -1,0 +1,18 @@
+include ':candroid'
+include ':blueprint'
+include ':login-api-2'
+include ':pandautils'
+include ':recyclerview'
+include ':canvas-api-2'
+include ':androidcalendar'
+include ':chips'
+include ':espresso'
+
+project(':espresso').projectDir = new File(rootProject.projectDir, '/../espresso')
+project(':login-api-2').projectDir = new File(rootProject.projectDir, '/../login-api-2')
+project(':recyclerview').projectDir = new File(rootProject.projectDir, '/../recyclerview')
+project(':pandautils').projectDir = new File(rootProject.projectDir, '/../pandautils')
+project(':canvas-api-2').projectDir = new File(rootProject.projectDir, '/../canvas-api-2/canvasapi')
+project(':blueprint').projectDir = new File(rootProject.projectDir, '/../blueprint')
+project(':chips').projectDir = new File(rootProject.projectDir, '/../chips')
+project(':androidcalendar').projectDir = new File(rootProject.projectDir, '/../androidcalendar')
