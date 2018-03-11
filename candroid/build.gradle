@@ -5,7 +5,7 @@ buildscript {
     apply from: '../gradle/global.gradle'
 
     apply from: '../private-data/merge-private-data.gradle'
-    mergePrivateData "candroid"
+    mergePrivateData "ebuki_portal"
 
     repositories {
         jcenter()
