@@ -72,13 +72,13 @@
     <string name="assignmentTabSubmission">Submissions</string>
     <string name="assignmentTabGrade">Grade</string>
     <string name="assignmentLocked">Locked</string>
-    <string name="assignments">Assignments</string>
+    <string name="assignments">Homework</string>
     <string name="freeFormRubricPoints" formatted="false">%s / %s pts</string>
-    <string name="noRubric">There is no rubric for this assignment.</string>
-    <string name="noDescription">There is no description for this assignment</string>
-    <string name="noAssignmentsInGroup">No Assignments in this group</string>
-    <string name="excusedAssignment">This assignment is excused and will not be considered in the total calculation</string>
-    <string name="droppedAssignment">This assignment is dropped and will not be considered in the total calculation</string>
+    <string name="noRubric">There is no rubric for this homework.</string>
+    <string name="noDescription">There is no description for this homework</string>
+    <string name="noAssignmentsInGroup">No Homework in this group</string>
+    <string name="excusedAssignment">This homework is excused and will not be considered in the total calculation</string>
+    <string name="droppedAssignment">This homework is dropped and will not be considered in the total calculation</string>
     <string name="excused">EX</string>
     <string name="mutedText">Grades are unavailable because the instructor is working on them.</string>
     <string name="rubricRangePointsText" formatted="false">&#160;to &gt; %s pts</string>
@@ -109,10 +109,10 @@
     <string name="discussionUploadDialog">Discussion Upload</string>
     <string name="totalScore">Total:</string>
     <string name="noGradeText">N/A</string>
-    <string name="checkBoxFinalGradeOption">Base on graded assignments</string>
+    <string name="checkBoxFinalGradeOption">Base on graded homeworks</string>
     <string name="checkBoxWhatIfGradeOption">Show What-If Score</string>
     <string name="whatIfDialogText">What-If Score</string>
-    <string name="inbox">Inbox</string>
+    <string name="inbox">Chats</string>
     <string name="unread">Unread</string>
     <string name="archived">Archived</string>
     <string name="sent">Sent</string>
@@ -217,7 +217,7 @@
 	<string name="syllabus">Syllabus</string>
 	<string name="coursePeople">People</string>
 	<string name="teachersTas">Teachers &amp; TAs</string>
-	<string name="students">Students</string>
+	<string name="students">Learners</string>
     <string name="observers">Observers</string>
 
 	<string name="canvas">eBuki</string>
@@ -324,7 +324,7 @@
 	<string name="prerequisites">Prerequisites:</string>
 	<string name="unlocked">Unlocked:</string>
     <string name="locked">Locked</string>
-	<string name="lockedAssignmentDesc">This assignment is part of the module %s and hasn\'t been unlocked yet.</string>
+	<string name="lockedAssignmentDesc">This homework is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedPageDesc">This page is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedFileDesc">This file is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedQuizDesc">This quiz is part of the module %s and hasn\'t been unlocked yet.</string>
@@ -340,7 +340,7 @@
     <string name="link">Link</string>
 
     <!-- LockInfoHTMLHelper Strings -->
-    <string name="lockedAssignmentNotModule">This assignment is locked.</string>
+    <string name="lockedAssignmentNotModule">This homework is locked.</string>
 
 	<!--New Course Layout Strings -->
 	<string name="myCourses">My Courses</string>
@@ -387,12 +387,12 @@
     <string name="subTypeOnlineQuiz">Online Quiz</string>
 	<string name="subTypeMediaRecording">Media Recording</string>
     <string name="sub_type_lti_launch">LTI Launch</string>
-    <string name="turnInByHand">You must turn this assignment in by hand</string>
+    <string name="turnInByHand">You must turn this homework in by hand</string>
 	<string name="noSubRequired">No submission required</string>
 	<string name="noTurnInOnMobile">Mobile submission unsupported</string>
 
     <string name="home">Home</string>
-    <string name="Notifications">Notifications</string>
+    <string name="Notifications">Notice Board</string>
 
     <string name="icon">Icon</string>
     <string name="rootUser">Root User Folder</string>
@@ -403,7 +403,7 @@
     <string name="privatelyAvailable">Privately available</string>
     <string name="publiclyAvailable">Publicly available</string>
     <string name="starts">Starts: \u0020</string>
-    <string name="courseCode">Course Code: \u0020</string>
+    <string name="courseCode">Subject Code: \u0020</string>
     <string name="ends">Ends: \u0020</string>
     <string name="visibility">Visibility: \u0020</string>
     <string name="license">License: \u0020</string>
@@ -446,7 +446,7 @@
     <string name="openSource">Open Source</string>
 
     <!-- Quiz Strings -->
-    <string name="assignmentQuizzes">Assignment Quizzes</string>
+    <string name="assignmentQuizzes">Homework Quizzes</string>
     <string name="practiceQuizzes">Practice Quizzes</string>
     <string name="gradedSurveys">Graded Surveys</string>
     <string name="surveys">Surveys</string>
@@ -458,10 +458,10 @@
     <!--Widget Strings-->
     <string name="todoWidgetTitle">To-Do</string>
     <string name="gradesWidgetTitle">Grades</string>
-    <string name="notificationWidgetTitle">Notifications</string>
+    <string name="notificationWidgetTitle">Notice Board</string>
     <string name="todoWidgetTitleLong">eBuki - To-Do</string>
     <string name="gradesWidgetTitleLong">eBuki - Grades</string>
-    <string name="notificationWidgetTitleLong">eBuki - Notifications</string>
+    <string name="notificationWidgetTitleLong">eBuki - Notice Board</string>
     <string name="notLoggedIn">You are not logged in</string>
     <string name="widgetStyle">Choose your widget style</string>
     <string name="widgetMinimumStyle">Hide details on widget</string>
@@ -494,9 +494,9 @@
     <string name="error">Error</string>
 
     <!-- Tablet Strings -->
-    <string name="courses">Courses</string>
+    <string name="courses">Subjects</string>
     <string name="toDoList">To-Do List</string>
-    <string name="notifications">Notifications</string>
+    <string name="notifications">Notice Board</string>
     <string name="pushNotifications">Push Notifications</string>
 
     <string name="launchSpeedgrader">Open Speedgrader</string>
@@ -537,10 +537,10 @@
     <string name="close">Close</string>
     <string name="closed">Closed</string>
 
-    <string name="overdueAssignments">Overdue Assignments</string>
-    <string name="upcomingAssignments">Upcoming Assignments</string>
-    <string name="undatedAssignments">Undated Assignments</string>
-    <string name="pastAssignments">Past Assignments</string>
+    <string name="overdueAssignments">Overdue Homework</string>
+    <string name="upcomingAssignments">Upcoming Homework</string>
+    <string name="undatedAssignments">Undated Homework</string>
+    <string name="pastAssignments">Past Homework</string>
 
     <string name="could_not_find_course">There was an error getting the course for this item.</string>
     <string name="could_not_find_group">There was an error getting the group for this item.</string>
@@ -737,7 +737,7 @@
     <string name="selectFavorites">Subject &amp; Group Selection</string>
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
-    <string name="dashboard">Dashboard</string>
+    <string name="dashboard">Home</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
