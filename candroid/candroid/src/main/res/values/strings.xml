@@ -188,7 +188,7 @@
     <string name="users">Users</string>
     <string name="individually">Individually</string>
     <string name="versionNum">Version:</string>
-    <string name="allCourses">All Courses</string>
+    <string name="allCourses">All Subjects</string>
     <string name="open">Open</string>
     <string name="openAlternate">Open with alternate app</string>
     <string name="opening">Opening File&#8230;</string>
@@ -343,7 +343,7 @@
     <string name="lockedAssignmentNotModule">This homework is locked.</string>
 
 	<!--New Course Layout Strings -->
-	<string name="myCourses">My Courses</string>
+	<string name="myCourses">My Subjects</string>
 	
 	
 	<!--New Submission Strings -->
@@ -502,7 +502,7 @@
     <string name="launchSpeedgrader">Open Speedgrader</string>
 
     <string name="search_todo">todo to do todos todo list</string>
-    <string name="search_course">course courses class classes</string>
+    <string name="search_course">subject subjects class classes</string>
     <string name="search_grades">grade grades</string>
 
     <!-- ShareFileOptions Dialog-->
@@ -737,7 +737,7 @@
     <string name="selectFavorites">Subject &amp; Group Selection</string>
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
-    <string name="dashboard">Home</string>
+    <string name="dashboard">* Home</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
@@ -765,3 +765,5 @@
     </array>
 
 </resources>
+
+<!-- Force rebuild -->
