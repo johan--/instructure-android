@@ -514,10 +514,10 @@ public class NavigationActivity extends BaseRouterActivity implements
         final View calendar = findViewById(R.id.calendar);
         bindNavItems(calendar, imageColor, R.drawable.ic_cv_calendar_fill, R.string.calendar);
 
-//        final View bookmarks = findViewById(R.id.bookmarks);
-//        bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
-//        final View grades = findViewById(R.id.grades);
-//        bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
+        final View bookmarks = findViewById(R.id.bookmarks);
+        bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
+        final View grades = findViewById(R.id.grades);
+        bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
 
         final View gauge = findViewById(R.id.gauge);
         bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);

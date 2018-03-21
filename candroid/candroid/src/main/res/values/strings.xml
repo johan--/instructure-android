@@ -85,10 +85,10 @@
 
     <!-- Assignment editing -->
     <string name="points">Points\u0020</string>
-    <string name="assignmentGroup">Assignment Group:\u0020</string>
+    <string name="assignmentGroup">Homework Group:\u0020</string>
     <string name="gradingType">Grading Type:\u0020</string>
     <string name="submissionType">Submission Type:\u0020</string>
-    <string name="editAssignment">Edit Assignment</string>
+    <string name="editAssignment">Edit Homework</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="sendNotification">Notify users that this content has changed</string>
@@ -737,7 +737,7 @@
     <string name="selectFavorites">Subject &amp; Group Selection</string>
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
-    <string name="dashboard">* Home</string>
+    <string name="dashboard">Home</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
