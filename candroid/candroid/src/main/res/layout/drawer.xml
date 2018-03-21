@@ -39,6 +39,10 @@
             android:visibility="gone" />
 
         <include
+            android:id="@+id/dashboard"
+            layout="@layout/nav_menu_item"  />
+
+        <include
             android:id="@+id/courses"
             layout="@layout/nav_menu_courses" />
 

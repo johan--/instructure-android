@@ -23,6 +23,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/triangle_bg"
+    app:columnCount="4"
+    app:rowCount="4"
     android:paddingStart="12dp"
     android:paddingLeft="12dp"
     android:paddingEnd="12dp"
@@ -31,5 +33,26 @@
     android:paddingBottom="12dp">
 
     <include layout="@layout/recycler_swipe_refresh_layout"/>
+
+    <!-- Row 1-->
+    <ImageView
+        android:id="@+id/ivHomework"
+        android:src="@drawable/ic_homework"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivTextbooks"
+        android:src="@drawable/ic_textbooks"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivCalendar"
+        android:src="@drawable/ic_calendar"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivMynotes"
+        android:src="@drawable/ic_my_notes"
+        app:layout_columnWeight="1"/>
 
 </android.support.v7.widget.GridLayout>

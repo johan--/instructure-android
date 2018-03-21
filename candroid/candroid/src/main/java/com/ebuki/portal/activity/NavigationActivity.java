@@ -507,8 +507,11 @@ public class NavigationActivity extends BaseRouterActivity implements
         final View accountNotification = findViewById(R.id.account_notifications);
         bindNavItems(accountNotification, imageColor, R.drawable.ic_cv_announcements_fill, R.string.accountNotifications);
 
+        final View dashboard = findViewById(R.id.dashboard);
+        bindNavItems(dashboard, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
+
         final View courses = findViewById(R.id.courses);
-        bindNavItems(courses, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
+        bindNavItems(courses, imageColor, R.drawable.ic_cv_courses, R.string.courses_dashboard);
 
         final View notifications = findViewById(R.id.notifications);
         bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
@@ -519,10 +522,10 @@ public class NavigationActivity extends BaseRouterActivity implements
         final View calendar = findViewById(R.id.calendar);
         bindNavItems(calendar, imageColor, R.drawable.ic_cv_calendar_fill, R.string.calendar);
 
-        final View bookmarks = findViewById(R.id.bookmarks);
-        bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
-        final View grades = findViewById(R.id.grades);
-        bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
+//        final View bookmarks = findViewById(R.id.bookmarks);
+//        bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
+//        final View grades = findViewById(R.id.grades);
+//        bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
 
         final View gauge = findViewById(R.id.gauge);
         bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);
@@ -684,7 +687,7 @@ public class NavigationActivity extends BaseRouterActivity implements
                         AccountNotificationDialog.show(NavigationActivity.this, new ArrayList<>(accountNotifications));
                         break;
                     case R.id.dashboard:
-                        clearBackStack(CourseGridFragment.class);
+                        clearBackStack(DashboardFragment.class);
                         addFragment(FragUtils.getFrag(DashboardFragment.class, NavigationActivity.this), NavigationPosition.DASHBOARD);
                         break;
                     case R.id.courses:

@@ -63,7 +63,7 @@ public class CourseGridFragment extends ParentFragment {
     @Override
     public String getFragmentTitle() {
         if(isAdded()) {
-            return getString(R.string.dashboard);
+            return getString(R.string.courses_dashboard);
         } else {
             return "";
         }

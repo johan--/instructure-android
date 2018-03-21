@@ -361,8 +361,6 @@
 
     <string name="exampleSubmissionURL">http://www.example.com</string>
 
-
-
     <!--DataLoss Fragment Strings -->
     <string name="unsavedProgress">Unsaved Progress</string>
     <string name="informationLost">Unsaved information will be lost. Do you want to continue?</string>
@@ -738,6 +736,7 @@
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
     <string name="dashboard">Home</string>
+    <string name="courses_dashboard">Subjects</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
