@@ -17,18 +17,17 @@
 
 
 package com.ebuki.portal.fragment;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.ebuki.portal.R;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+
+import android.text.TextUtils;
 
 
 public class DashboardFragment extends ParentFragment {
@@ -50,18 +49,32 @@ public class DashboardFragment extends ParentFragment {
     }
 
     @Override
-    public boolean navigationContextIsCourse() {
+    public boolean navigationContextIsCourse()
+    {
         return false;
     }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = getLayoutInflater().inflate(R.layout.dashboard_fragment, container, false);
+
+        final ImageView ivHomework = mRootView.findViewById(R.id.ivHomework);
+        ivHomework.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), getString(R.string.homeworkSelected), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        final ImageView ivTextbooks = mRootView.findViewById(R.id.ivTextbooks);
+        ivTextbooks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         return mRootView;
     }

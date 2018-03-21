@@ -21,6 +21,15 @@
     <!--Profile Fragment Strings -->
     <string name="canvasVersionNum">Version:</string>
 
+    <!--Selection Descriptions-->
+    <string name="homeworkSelected">You\'ve selected Homework, well done :-)</string>
+    <string name="textbooksSelected">You\'ve selected Textbooks, well done :-)</string>
+    <string name="calendarSelected">You\'ve selected Calendar, well done :-)</string>
+    <string name="mynotesSelected">You\'ve selected My Notes, well done :-)</string>
+    <string name="cameraSelected">You\'ve selected Camera, well done :-)</string>
+    <string name="calculatorSelected">You\'ve selected Calculator, well done :-)</string>
+    <string name="wikipediaSelected">You\'ve selected Wikipedia, well done :-)</string>
+
     <!--Content Descriptions-->
     <string name="canvasLogo">eBuki Logo</string>
     <string name="app_name" translatable="false">eBuki Learner</string>

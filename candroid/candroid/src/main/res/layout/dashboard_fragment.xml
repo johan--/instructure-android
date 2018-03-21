@@ -35,21 +35,25 @@
     <ImageView
         android:id="@+id/ivHomework"
         android:src="@drawable/ic_homework"
+        android:clickable="true"
         app:layout_columnWeight="1"/>
 
     <ImageView
         android:id="@+id/ivTextbooks"
         android:src="@drawable/ic_textbooks"
+        android:clickable="true"
         app:layout_columnWeight="1"/>
 
     <ImageView
         android:id="@+id/ivCalendar"
         android:src="@drawable/ic_calendar"
+        android:clickable="true"
         app:layout_columnWeight="1"/>
 
     <ImageView
         android:id="@+id/ivMynotes"
         android:src="@drawable/ic_my_notes"
+        android:clickable="true"
         app:layout_columnWeight="1"/>
 
     <!-- Row 2 -->
@@ -58,18 +62,21 @@
         android:id="@+id/ivCamera"
         android:layout_marginTop="16dp"
         app:layout_columnWeight="1"
+        android:clickable="true"
         android:src="@drawable/ic_camera"/>
 
     <ImageView
         android:id="@+id/ivCalculator"
         android:layout_marginTop="16dp"
         app:layout_columnWeight="1"
+        android:clickable="true"
         android:src="@drawable/ic_calculator"/>
 
     <ImageView
         android:id="@+id/ivWikipedia"
         android:layout_marginTop="16dp"
         app:layout_columnWeight="1"
+        android:clickable="true"
         android:src="@drawable/ic_wikipedia"/>
 
 </android.support.v7.widget.GridLayout>
