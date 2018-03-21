@@ -29,6 +29,8 @@ import com.ebuki.portal.fragment.NotificationListFragment;
 import com.ebuki.portal.fragment.ParentFragment;
 import com.ebuki.portal.fragment.ProfileFragment;
 import com.ebuki.portal.fragment.ToDoListFragment;
+import com.ebuki.portal.fragment.DashboardFragment;
+
 import com.instructure.canvasapi2.models.CanvasContext;
 
 public class FragUtils {
@@ -42,6 +44,8 @@ public class FragUtils {
             bundle = ProfileFragment.createBundle(canvasContext, ParentFragment.FRAGMENT_PLACEMENT.MASTER);
         } else if(cls.isAssignableFrom(CourseGridFragment.class)) {
             bundle = CourseGridFragment.createBundle(canvasContext);
+        } else if (cls.isAssignableFrom(DashboardFragment.class)){
+            bundle = DashboardFragment.createBundle(canvasContext);
         }  else if(cls.isAssignableFrom(NotificationListFragment.class)) {
             bundle = NotificationListFragment.createBundle(canvasContext);
         } else if(cls.isAssignableFrom(ToDoListFragment.class)) {

@@ -28,7 +28,7 @@ import com.instructure.canvasapi2.models.Tab;
 
 public interface Navigation {
     public enum NavigationPosition {
-        UNKNOWN, PROFILE, COURSES, NOTIFICATIONS, TODO, INBOX, GRADES, BOOKMARKS, CALENDAR, SETTINGS, SPEEDGRADER, FILES
+        UNKNOWN, PROFILE, COURSES, DASHBOARD, NOTIFICATIONS, TODO, INBOX, GRADES, BOOKMARKS, CALENDAR, SETTINGS, SPEEDGRADER, FILES
     }
 
     public void addFragment(ParentFragment fragment);

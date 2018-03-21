@@ -55,6 +55,8 @@ import com.ebuki.portal.fragment.QuizListFragment;
 import com.ebuki.portal.fragment.ScheduleListFragment;
 import com.ebuki.portal.fragment.SettingsFragment;
 import com.ebuki.portal.fragment.SyllabusFragment;
+import com.ebuki.portal.fragment.DashboardFragment;
+
 import com.ebuki.portal.fragment.UnSupportedFeatureFragment;
 import com.ebuki.portal.fragment.UnSupportedTabFragment;
 import com.instructure.canvasapi2.models.CanvasContext;
@@ -96,6 +98,9 @@ public class RouterUtils {
 
     static {
         sRoutes.add(new Route("/", CourseGridFragment.class));
+
+        sRoutes.add(new Route("/dashboard", DashboardFragment.class));
+
         // region Conversations
         sRoutes.add(new Route("/conversations", InboxFragment.class, Navigation.NavigationPosition.INBOX));
         sRoutes.add(new Route("/conversations/:conversation_id", InboxFragment.class, DetailedConversationFragment.class, Navigation.NavigationPosition.INBOX));

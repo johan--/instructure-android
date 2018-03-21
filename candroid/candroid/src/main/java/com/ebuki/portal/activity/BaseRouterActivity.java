@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.ebuki.portal.R;
 import com.ebuki.portal.delegate.Navigation;
+
 import com.ebuki.portal.fragment.CalendarListViewFragment;
 import com.ebuki.portal.fragment.CourseGridFragment;
 import com.ebuki.portal.fragment.CourseModuleProgressionFragment;
@@ -40,6 +41,8 @@ import com.ebuki.portal.fragment.MessageListFragment;
 import com.ebuki.portal.fragment.NotificationListFragment;
 import com.ebuki.portal.fragment.ParentFragment;
 import com.ebuki.portal.fragment.ToDoListFragment;
+import com.ebuki.portal.fragment.DashboardFragment;
+
 import com.ebuki.portal.util.Analytics;
 import com.ebuki.portal.util.FragUtils;
 import com.ebuki.portal.util.LoggingUtility;
@@ -220,6 +223,8 @@ public abstract class BaseRouterActivity extends CallbackActivity {
                 routeFragment(FragUtils.getFrag(GradesGridFragment.class, this), position);
             } else if(position == Navigation.NavigationPosition.CALENDAR) {
                 routeFragment(FragUtils.getFrag(CalendarListViewFragment.class, this), position);
+            } else if(position == Navigation.NavigationPosition.DASHBOARD) {
+                routeFragment(FragUtils.getFrag(DashboardFragment.class, this), position);
             }
 
             return;

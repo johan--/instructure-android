@@ -63,6 +63,7 @@ import com.ebuki.portal.adapter.CourseNavigationAdapter;
 import com.ebuki.portal.delegate.Navigation;
 import com.ebuki.portal.dialog.AccountNotificationDialog;
 import com.ebuki.portal.dialog.HelpDialogStyled;
+
 import com.ebuki.portal.fragment.AnnouncementListFragment;
 import com.ebuki.portal.fragment.ApplicationSettingsFragment;
 import com.ebuki.portal.fragment.BookmarksFragment;
@@ -79,6 +80,8 @@ import com.ebuki.portal.fragment.NotificationListFragment;
 import com.ebuki.portal.fragment.ParentFragment;
 import com.ebuki.portal.fragment.ProfileFragment;
 import com.ebuki.portal.fragment.ToDoListFragment;
+import com.ebuki.portal.fragment.DashboardFragment;
+
 import com.ebuki.portal.interfaces.OnEventUpdatedCallback;
 import com.ebuki.portal.model.PushNotification;
 import com.ebuki.portal.receivers.PushExternalReceiver;
@@ -503,8 +506,10 @@ public class NavigationActivity extends BaseRouterActivity implements
 
         final View accountNotification = findViewById(R.id.account_notifications);
         bindNavItems(accountNotification, imageColor, R.drawable.ic_cv_announcements_fill, R.string.accountNotifications);
+
         final View courses = findViewById(R.id.courses);
         bindNavItems(courses, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
+
         final View notifications = findViewById(R.id.notifications);
         bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
         final View toDos = findViewById(R.id.todos);
@@ -677,6 +682,10 @@ public class NavigationActivity extends BaseRouterActivity implements
                         break;
                     case R.id.account_notifications:
                         AccountNotificationDialog.show(NavigationActivity.this, new ArrayList<>(accountNotifications));
+                        break;
+                    case R.id.dashboard:
+                        clearBackStack(CourseGridFragment.class);
+                        addFragment(FragUtils.getFrag(DashboardFragment.class, NavigationActivity.this), NavigationPosition.DASHBOARD);
                         break;
                     case R.id.courses:
                         clearBackStack(CourseGridFragment.class);
@@ -1211,6 +1220,9 @@ public class NavigationActivity extends BaseRouterActivity implements
                 break;
             case 6://Grades
                 addFragment(FragUtils.getFrag(GradesGridFragment.class, this), NavigationPosition.GRADES, ignoreDebounce);
+                break;
+            case 7://Dashboard
+                addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
                 break;
             default://Courses
                 addFragment(FragUtils.getFrag(CourseGridFragment.class, this), NavigationPosition.COURSES, ignoreDebounce);
