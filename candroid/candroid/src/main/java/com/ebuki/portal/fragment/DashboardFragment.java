@@ -51,11 +51,16 @@ public class DashboardFragment extends ParentFragment {
     public boolean navigationContextIsCourse() {
         return false;
     }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = getLayoutInflater().inflate(R.layout.course_grid_fragment, container, false);
+
         return mRootView;
     }
 

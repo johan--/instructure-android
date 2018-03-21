@@ -511,7 +511,7 @@ public class NavigationActivity extends BaseRouterActivity implements
         bindNavItems(dashboard, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
 
         final View courses = findViewById(R.id.courses);
-        bindNavItems(courses, imageColor, R.drawable.ic_cv_courses, R.string.courses_dashboard);
+        bindNavItems(courses, imageColor, R.drawable.ic_cv_courses_fill, R.string.courses_dashboard);
 
         final View notifications = findViewById(R.id.notifications);
         bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
