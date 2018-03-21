@@ -1227,8 +1227,8 @@ public class NavigationActivity extends BaseRouterActivity implements
             case 7://Dashboard
                 addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
                 break;
-            default://Courses
-                addFragment(FragUtils.getFrag(CourseGridFragment.class, this), NavigationPosition.COURSES, ignoreDebounce);
+            default://Dashboard
+                addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
                 break;
         }
     }

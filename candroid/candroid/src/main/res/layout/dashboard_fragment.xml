@@ -15,7 +15,6 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   ~
   -->
-
 <android.support.v7.widget.GridLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_container"
@@ -31,8 +30,6 @@
     android:paddingRight="12dp"
     android:paddingTop="12dp"
     android:paddingBottom="12dp">
-
-    <include layout="@layout/recycler_swipe_refresh_layout"/>
 
     <!-- Row 1-->
     <ImageView

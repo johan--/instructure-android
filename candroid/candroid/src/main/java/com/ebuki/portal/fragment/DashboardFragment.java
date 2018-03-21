@@ -18,29 +18,15 @@
 
 package com.ebuki.portal.fragment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.ebuki.portal.R;
-import com.ebuki.portal.adapter.CourseRecyclerAdapter;
-import com.ebuki.portal.delegate.Navigation;
-import com.ebuki.portal.util.ApplicationManager;
-import com.instructure.canvasapi2.utils.APIHelper;
-import com.instructure.pandarecycler.PandaRecyclerView;
-import com.instructure.pandautils.utils.Const;
 
 
 public class DashboardFragment extends ParentFragment {
@@ -66,10 +52,10 @@ public class DashboardFragment extends ParentFragment {
         return false;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = getLayoutInflater().inflate(R.layout.course_grid_fragment, container, false);
-
         return mRootView;
     }
 

@@ -130,7 +130,7 @@ public class CourseGridFragment extends ParentFragment {
     @Override
     public void onFragmentActionbarSetupComplete(FRAGMENT_PLACEMENT placement) {
         super.onFragmentActionbarSetupComplete(placement);
-        setupTitle(getString(R.string.dashboard));
+        setupTitle(getString(R.string.courses_dashboard));
     }
 
     @Override

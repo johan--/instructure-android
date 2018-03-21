@@ -18,6 +18,8 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <color name="dashboardBackground">#58C3D1</color>
+
     <style name="Theme.Transparent" parent="CanvasMaterialTheme_Default">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
