@@ -27,6 +27,8 @@ import android.widget.TextView;
 import android.widget.ImageView;
 
 import com.ebuki.portal.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 
 public class DashboardFragment extends ParentFragment {
@@ -59,7 +61,7 @@ public class DashboardFragment extends ParentFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mRootView = getLayoutInflater().inflate(R.layout.course_grid_fragment, container, false);
+        mRootView = getLayoutInflater().inflate(R.layout.dashboard_fragment, container, false);
 
         return mRootView;
     }

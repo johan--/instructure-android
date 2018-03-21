@@ -21,16 +21,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/triangle_bg"
+    android:background="@color/dashboardBackground"
     app:columnCount="4"
-    app:rowCount="4"
-    android:paddingStart="12dp"
-    android:paddingLeft="12dp"
-    android:paddingEnd="12dp"
-    android:paddingRight="12dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp">
-
+    app:rowCount="2"
+    android:paddingStart="20dp"
+    android:paddingLeft="20dp"
+    android:paddingEnd="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
 
     <!-- Row 1-->
     <ImageView
@@ -52,5 +51,25 @@
         android:id="@+id/ivMynotes"
         android:src="@drawable/ic_my_notes"
         app:layout_columnWeight="1"/>
+
+    <!-- Row 2 -->
+
+    <ImageView
+        android:id="@+id/ivCamera"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:src="@drawable/ic_camera"/>
+
+    <ImageView
+        android:id="@+id/ivCalculator"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:src="@drawable/ic_calculator"/>
+
+    <ImageView
+        android:id="@+id/ivWikipedia"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:src="@drawable/ic_wikipedia"/>
 
 </android.support.v7.widget.GridLayout>
