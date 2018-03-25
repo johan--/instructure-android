@@ -63,7 +63,7 @@ public class DashboardFragment extends ParentFragment {
         ivHomework.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), getString(R.string.homeworkSelected), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), getString(R.string.homeworkSelected), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -71,7 +71,7 @@ public class DashboardFragment extends ParentFragment {
         ivTextbooks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
             }
         });
 
