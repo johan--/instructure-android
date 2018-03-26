@@ -134,7 +134,7 @@
     <string name="selectCanvasCalendars">Select Up To 10 Calendars</string>
     <string name="contentDesc_colored_calendar_indicator">Colored calendar indicator</string>
     <string name="noDatesSelected">Please select a date</string>
-    <string name="Todo">To-do</string>
+    <string name="Todo">Homework</string>
     <string name="Event">Event</string>
     <string name="eventSuccessfulCreation">Event was successfully created</string>
     <string name="eventSuccessfulDeletion">Event was successfully deleted</string>
@@ -463,10 +463,10 @@
 
 
     <!--Widget Strings-->
-    <string name="todoWidgetTitle">To-Do</string>
+    <string name="todoWidgetTitle">Homework</string>
     <string name="gradesWidgetTitle">Grades</string>
     <string name="notificationWidgetTitle">Notice Board</string>
-    <string name="todoWidgetTitleLong">eBuki - To-Do</string>
+    <string name="todoWidgetTitleLong">eBuki - Homework</string>
     <string name="gradesWidgetTitleLong">eBuki - Grades</string>
     <string name="notificationWidgetTitleLong">eBuki - Notice Board</string>
     <string name="notLoggedIn">You are not logged in</string>
@@ -502,13 +502,13 @@
 
     <!-- Tablet Strings -->
     <string name="courses">Subjects</string>
-    <string name="toDoList">To-Do List</string>
+    <string name="toDoList">Homework</string>
     <string name="notifications">Notice Board</string>
     <string name="pushNotifications">Push Notifications</string>
 
     <string name="launchSpeedgrader">Open Speedgrader</string>
 
-    <string name="search_todo">todo to do todos todo list</string>
+    <string name="search_todo">homework</string>
     <string name="search_course">subject subjects class classes</string>
     <string name="search_grades">grade grades</string>
 
