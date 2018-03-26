@@ -49,6 +49,7 @@ import java.util.List;
 public class DashboardFragment extends ParentFragment {
 
     private View mRootView;
+    public boolean ignoreDebounce = false;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -75,16 +76,26 @@ public class DashboardFragment extends ParentFragment {
         mRootView = getLayoutInflater().inflate(R.layout.dashboard_fragment, container, false);
 
         final ImageView ivHomework = mRootView.findViewById(R.id.ivHomework);
-
         ivHomework.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toast.makeText(getActivity(), getString(R.string.homeworkSelected), Toast.LENGTH_SHORT).show();
-
                 Bundle bundle = new Bundle();
                 Navigation navigation = getNavigation();
                 if (navigation != null) {
                    navigation.addFragment(FragUtils.getFrag(CourseGridFragment.class, bundle));
+                }
+            }
+        });
+
+        final ImageView ivHomeworkx = mRootView.findViewById(R.id.ivHomeworkx);
+        ivHomeworkx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                Navigation navigation = getNavigation();
+                if (navigation != null) {
+                    navigation.addFragment(FragUtils.getFrag(ToDoListFragment.class, getActivity()), Navigation.NavigationPosition.TODO, ignoreDebounce);
+                    // navigation.addFragment(FragUtils.getFrag(ToDoListFragment.class, bundle));
                 }
             }
         });
@@ -94,7 +105,7 @@ public class DashboardFragment extends ParentFragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
-                String packageName="net.nightwhistler.pageturner.ads";
+                String packageName="net.nightwhistler.pageturner";
                 launchApp(packageName);
             }
         });
@@ -116,6 +127,8 @@ public class DashboardFragment extends ParentFragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "My notes selected, well done :-)", Toast.LENGTH_SHORT).show();
+                String packageName="it.feio.android.omninotes.foss";
+                launchApp(packageName);
 
             }
         });

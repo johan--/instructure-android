@@ -79,4 +79,11 @@
         android:clickable="true"
         android:src="@drawable/ic_wikipedia"/>
 
+    <ImageView
+        android:id="@+id/ivHomeworkx"
+        android:src="@drawable/ic_homework"
+        android:clickable="true"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"/>
+
 </android.support.v7.widget.GridLayout>
