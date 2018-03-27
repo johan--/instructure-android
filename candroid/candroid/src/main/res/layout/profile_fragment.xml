@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/profileBackdropHeight"
         android:scaleType="centerCrop"
-        android:src="@drawable/default_backdrop_img"/>
+        android:src="@drawable/backdrop_01"/>
 
     <View
         android:layout_width="match_parent"
