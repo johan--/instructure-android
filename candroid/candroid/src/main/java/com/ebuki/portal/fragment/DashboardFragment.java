@@ -82,18 +82,6 @@ public class DashboardFragment extends ParentFragment {
                 Bundle bundle = new Bundle();
                 Navigation navigation = getNavigation();
                 if (navigation != null) {
-                   navigation.addFragment(FragUtils.getFrag(CourseGridFragment.class, bundle));
-                }
-            }
-        });
-
-        final ImageView ivHomeworkx = mRootView.findViewById(R.id.ivHomeworkx);
-        ivHomeworkx.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                Navigation navigation = getNavigation();
-                if (navigation != null) {
                     navigation.addFragment(FragUtils.getFrag(ToDoListFragment.class, getActivity()), Navigation.NavigationPosition.TODO, ignoreDebounce);
                     // navigation.addFragment(FragUtils.getFrag(ToDoListFragment.class, bundle));
                 }

@@ -1203,8 +1203,8 @@ public class NavigationActivity extends BaseRouterActivity implements
     protected void routeToLandingPage(boolean ignoreDebounce) {
         int landingPage = ApplicationManager.getPrefs(getContext()).load(ApplicationSettingsFragment.LANDING_PAGE, 0);
         switch (landingPage) {
-            case 0://Courses
-                addFragment(FragUtils.getFrag(CourseGridFragment.class, this), NavigationPosition.COURSES, ignoreDebounce);
+            case 0://Dashboard
+                addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
                 break;
             case 1://Notifications
                 addFragment(FragUtils.getFrag(NotificationListFragment.class, this), NavigationPosition.NOTIFICATIONS, ignoreDebounce);
@@ -1224,8 +1224,8 @@ public class NavigationActivity extends BaseRouterActivity implements
             case 6://Grades
                 addFragment(FragUtils.getFrag(GradesGridFragment.class, this), NavigationPosition.GRADES, ignoreDebounce);
                 break;
-            case 7://Dashboard
-                addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
+            case 7://Courses
+                addFragment(FragUtils.getFrag(CourseGridFragment.class, this), NavigationPosition.COURSES, ignoreDebounce);
                 break;
             default://Dashboard
                 addFragment(FragUtils.getFrag(DashboardFragment.class, this), NavigationPosition.DASHBOARD, ignoreDebounce);
