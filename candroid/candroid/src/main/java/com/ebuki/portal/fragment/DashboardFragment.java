@@ -92,7 +92,7 @@ public class DashboardFragment extends ParentFragment {
         ivTextbooks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
                 String packageName="net.nightwhistler.pageturner";
                 launchApp(packageName);
             }
@@ -114,7 +114,7 @@ public class DashboardFragment extends ParentFragment {
         ivMynotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "My notes selected, well done :-)", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "My notes selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="it.feio.android.omninotes.foss";
                 launchApp(packageName);
 
@@ -125,7 +125,7 @@ public class DashboardFragment extends ParentFragment {
         ivCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Camera selected, well done :-)", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "Camera selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="com.mediatek.camera";
                 launchApp(packageName);
             }
@@ -135,7 +135,7 @@ public class DashboardFragment extends ParentFragment {
         ivCalculator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Calculator selected, well done :-)", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "Calculator selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="com.android.calculator2";
                 launchApp(packageName);
             }
@@ -145,8 +145,7 @@ public class DashboardFragment extends ParentFragment {
         ivWikipedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="org.wikipedia";
                 launchApp(packageName);
             }
@@ -175,7 +174,6 @@ public class DashboardFragment extends ParentFragment {
 
         Intent intent = new Intent(Intent.ACTION_MAIN);
 
-
 //
 //        List<ResolveInfo> activities = pm.queryIntentActivities(intent,
 //                PackageManager.MATCH_DEFAULT_ONLY);
@@ -185,27 +183,20 @@ public class DashboardFragment extends ParentFragment {
 
         try {
 
-            Toast.makeText(getActivity(), "step #1 a", Toast.LENGTH_SHORT).show();
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-            Toast.makeText(getActivity(), "step #1 b", Toast.LENGTH_SHORT).show();
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                     Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
             intent = pm.getLaunchIntentForPackage(packageName);
 
-            Toast.makeText(getActivity(), "step #1 c", Toast.LENGTH_SHORT).show();
-
             if (intent == null) {
-                Toast.makeText(getActivity(), "step #2 - package not found", Toast.LENGTH_SHORT).show();
                 throw new PackageManager.NameNotFoundException();
             } else {
-                Toast.makeText(getActivity(), "step #3 - starting new application", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
         } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(getActivity(), "step #4 - package not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Application not found", Toast.LENGTH_LONG).show();
             Log.e("Launch", e.getMessage());
         }
     }
