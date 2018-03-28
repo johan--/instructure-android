@@ -28,7 +28,7 @@
         android:layout_height="40dp"
         app:tabIndicatorColor="@color/white" />
 
-    <com.instructure.candroid.view.CardifyView
+    <com.ebuki.portal.view.CardifyView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tabLayout">
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </com.instructure.candroid.view.CardifyView>
+    </com.ebuki.portal.view.CardifyView>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/compose"

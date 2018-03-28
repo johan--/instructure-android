@@ -27,7 +27,7 @@
         android:layout_centerInParent="true"
         android:src="@drawable/ic_cv_attachment"/>
 
-    <com.instructure.candroid.view.IndicatorCircleView
+    <com.ebuki.portal.view.IndicatorCircleView
         android:id="@+id/attachmentCount"
         android:layout_width="@dimen/conversation_attachment_menu_item_size"
         android:layout_height="@dimen/conversation_attachment_menu_item_size"

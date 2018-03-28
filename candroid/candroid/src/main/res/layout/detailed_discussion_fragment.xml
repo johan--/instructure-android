@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:background="@color/canvasBackgroundOffWhite">
 
-    <com.instructure.candroid.view.AdvancedViewFlipper
+    <com.ebuki.portal.view.AdvancedViewFlipper
         android:id="@+id/viewFlipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -41,9 +41,9 @@
                 layout="@layout/loading_screen" />
         </LinearLayout>
 
-    </com.instructure.candroid.view.AdvancedViewFlipper>
+    </com.ebuki.portal.view.AdvancedViewFlipper>
 
-    <com.instructure.candroid.view.CanvasEditTextView
+    <com.ebuki.portal.view.CanvasEditTextView
         android:id="@+id/canvasEditTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

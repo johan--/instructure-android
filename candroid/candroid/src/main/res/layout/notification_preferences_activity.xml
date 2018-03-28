@@ -32,7 +32,7 @@
         android:layout_below="@+id/toolbar"
         android:cacheColorHint="@android:color/transparent" />
 
-    <com.instructure.candroid.view.EmptyPandaView
+    <com.ebuki.portal.view.EmptyPandaView
         android:id="@+id/emptyPandaView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

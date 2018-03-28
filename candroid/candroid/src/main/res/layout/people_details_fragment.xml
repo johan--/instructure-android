@@ -72,7 +72,7 @@
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp">
 
-                    <com.instructure.candroid.view.AutoResizeTextView
+                    <com.ebuki.portal.view.AutoResizeTextView
                         android:id="@+id/userName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

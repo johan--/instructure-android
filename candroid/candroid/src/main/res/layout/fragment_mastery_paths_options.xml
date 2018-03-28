@@ -16,7 +16,7 @@
   ~
   -->
 
-<com.instructure.candroid.view.CardifyView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.ebuki.portal.view.CardifyView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -41,7 +41,7 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <com.instructure.candroid.view.EmptyPandaView
+        <com.ebuki.portal.view.EmptyPandaView
             android:id="@+id/emptyPandaView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -58,4 +58,4 @@
             android:text="@string/select"/>
     </LinearLayout>
 
-</com.instructure.candroid.view.CardifyView>
+</com.ebuki.portal.view.CardifyView>

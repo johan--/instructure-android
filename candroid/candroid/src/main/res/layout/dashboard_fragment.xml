@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2016 - present Instructure, Inc., eBuki
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+<android.support.v7.widget.GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/dashboardBackground"
+    app:columnCount="4"
+    app:rowCount="2"
+    android:paddingStart="20dp"
+    android:paddingLeft="20dp"
+    android:paddingEnd="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+    <!-- Row 1-->
+    <ImageView
+        android:id="@+id/ivHomework"
+        android:src="@drawable/ic_homework"
+        android:clickable="true"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivTextbooks"
+        android:src="@drawable/ic_textbooks"
+        android:clickable="true"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivCalendar"
+        android:src="@drawable/ic_calendar"
+        android:clickable="true"
+        app:layout_columnWeight="1"/>
+
+    <ImageView
+        android:id="@+id/ivMynotes"
+        android:src="@drawable/ic_my_notes"
+        android:clickable="true"
+        app:layout_columnWeight="1"/>
+
+    <!-- Row 2 -->
+
+    <ImageView
+        android:id="@+id/ivCamera"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:clickable="true"
+        android:src="@drawable/ic_camera"/>
+
+    <ImageView
+        android:id="@+id/ivCalculator"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:clickable="true"
+        android:src="@drawable/ic_calculator"/>
+
+    <ImageView
+        android:id="@+id/ivWikipedia"
+        android:layout_marginTop="16dp"
+        app:layout_columnWeight="1"
+        android:clickable="true"
+        android:src="@drawable/ic_wikipedia"/>
+
+</android.support.v7.widget.GridLayout>

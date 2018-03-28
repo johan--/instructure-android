@@ -21,12 +21,21 @@
     <!--Profile Fragment Strings -->
     <string name="canvasVersionNum">Version:</string>
 
+    <!--Selection Descriptions-->
+    <string name="homeworkSelected">You\'ve selected Homework, well done :-)</string>
+    <string name="textbooksSelected">You\'ve selected Textbooks, well done :-)</string>
+    <string name="calendarSelected">You\'ve selected Calendar, well done :-)</string>
+    <string name="mynotesSelected">You\'ve selected My Notes, well done :-)</string>
+    <string name="cameraSelected">You\'ve selected Camera, well done :-)</string>
+    <string name="calculatorSelected">You\'ve selected Calculator, well done :-)</string>
+    <string name="wikipediaSelected">You\'ve selected Wikipedia, well done :-)</string>
+
     <!--Content Descriptions-->
-    <string name="canvasLogo">Canvas Logo</string>
-    <string name="app_name" translatable="false">Canvas Student</string>
-    <string name="enterURL">Enter your Canvas URL:</string>
+    <string name="canvasLogo">eBuki Logo</string>
+    <string name="app_name" translatable="false">eBuki Learner</string>
+    <string name="enterURL">Enter your eBuki URL:</string>
     <string name="exampleURLSimple">myschool.instructure.com</string>
-    <string name="signIntoCanvasNetwork">Trying to sign into Canvas Network?</string>
+    <string name="signIntoCanvasNetwork">Trying to sign into eBuki Network?</string>
     <string name="mobileVerifyGeneral">This app is not authorized for use</string>
     <string name="mobileVerifyDomainUnauthorized">The server you entered is not authorized for this app.</string>
     <string name="mobileVerifyUserAgentUnauthorized">The user agent for this app is unauthorized.</string>
@@ -72,23 +81,23 @@
     <string name="assignmentTabSubmission">Submissions</string>
     <string name="assignmentTabGrade">Grade</string>
     <string name="assignmentLocked">Locked</string>
-    <string name="assignments">Assignments</string>
+    <string name="assignments">Homework</string>
     <string name="freeFormRubricPoints" formatted="false">%s / %s pts</string>
-    <string name="noRubric">There is no rubric for this assignment.</string>
-    <string name="noDescription">There is no description for this assignment</string>
-    <string name="noAssignmentsInGroup">No Assignments in this group</string>
-    <string name="excusedAssignment">This assignment is excused and will not be considered in the total calculation</string>
-    <string name="droppedAssignment">This assignment is dropped and will not be considered in the total calculation</string>
+    <string name="noRubric">There is no rubric for this homework.</string>
+    <string name="noDescription">There is no description for this homework</string>
+    <string name="noAssignmentsInGroup">No Homework in this group</string>
+    <string name="excusedAssignment">This homework is excused and will not be considered in the total calculation</string>
+    <string name="droppedAssignment">This homework is dropped and will not be considered in the total calculation</string>
     <string name="excused">EX</string>
     <string name="mutedText">Grades are unavailable because the instructor is working on them.</string>
     <string name="rubricRangePointsText" formatted="false">&#160;to &gt; %s pts</string>
 
     <!-- Assignment editing -->
     <string name="points">Points\u0020</string>
-    <string name="assignmentGroup">Assignment Group:\u0020</string>
+    <string name="assignmentGroup">Homework Group:\u0020</string>
     <string name="gradingType">Grading Type:\u0020</string>
     <string name="submissionType">Submission Type:\u0020</string>
-    <string name="editAssignment">Edit Assignment</string>
+    <string name="editAssignment">Edit Homework</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="sendNotification">Notify users that this content has changed</string>
@@ -109,10 +118,10 @@
     <string name="discussionUploadDialog">Discussion Upload</string>
     <string name="totalScore">Total:</string>
     <string name="noGradeText">N/A</string>
-    <string name="checkBoxFinalGradeOption">Base on graded assignments</string>
+    <string name="checkBoxFinalGradeOption">Base on graded homeworks</string>
     <string name="checkBoxWhatIfGradeOption">Show What-If Score</string>
     <string name="whatIfDialogText">What-If Score</string>
-    <string name="inbox">Inbox</string>
+    <string name="inbox">Chats</string>
     <string name="unread">Unread</string>
     <string name="archived">Archived</string>
     <string name="sent">Sent</string>
@@ -125,7 +134,7 @@
     <string name="selectCanvasCalendars">Select Up To 10 Calendars</string>
     <string name="contentDesc_colored_calendar_indicator">Colored calendar indicator</string>
     <string name="noDatesSelected">Please select a date</string>
-    <string name="Todo">To-do</string>
+    <string name="Todo">Homework</string>
     <string name="Event">Event</string>
     <string name="eventSuccessfulCreation">Event was successfully created</string>
     <string name="eventSuccessfulDeletion">Event was successfully deleted</string>
@@ -188,7 +197,7 @@
     <string name="users">Users</string>
     <string name="individually">Individually</string>
     <string name="versionNum">Version:</string>
-    <string name="allCourses">All Courses</string>
+    <string name="allCourses">All Subjects</string>
     <string name="open">Open</string>
     <string name="openAlternate">Open with alternate app</string>
     <string name="opening">Opening File&#8230;</string>
@@ -217,10 +226,10 @@
 	<string name="syllabus">Syllabus</string>
 	<string name="coursePeople">People</string>
 	<string name="teachersTas">Teachers &amp; TAs</string>
-	<string name="students">Students</string>
+	<string name="students">Learners</string>
     <string name="observers">Observers</string>
 
-	<string name="canvas">Canvas</string>
+	<string name="canvas">eBuki</string>
 	<string name="chooseRecipient">Choose Recipient(s)</string>
     <string name="messageHasNoRecipients">This message currently has no recipients.</string>
     <string name="sendMessage">Send Message</string>
@@ -253,7 +262,7 @@
 	<string name="sideCommentEntry">In this type of discussion, you can\'t comment on any entry on this level.</string>
     <string name="contentDescriptionFiles">File icon</string>
 
-	<string name="loadingCanvas">Loading Canvas Content&#8230;</string>
+	<string name="loadingCanvas">Loading eBuki Content&#8230;</string>
 
     <string name="unknownDevice">UnknownDevice</string>
 
@@ -324,7 +333,7 @@
 	<string name="prerequisites">Prerequisites:</string>
 	<string name="unlocked">Unlocked:</string>
     <string name="locked">Locked</string>
-	<string name="lockedAssignmentDesc">This assignment is part of the module %s and hasn\'t been unlocked yet.</string>
+	<string name="lockedAssignmentDesc">This homework is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedPageDesc">This page is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedFileDesc">This file is part of the module %s and hasn\'t been unlocked yet.</string>
     <string name="lockedQuizDesc">This quiz is part of the module %s and hasn\'t been unlocked yet.</string>
@@ -340,10 +349,10 @@
     <string name="link">Link</string>
 
     <!-- LockInfoHTMLHelper Strings -->
-    <string name="lockedAssignmentNotModule">This assignment is locked.</string>
+    <string name="lockedAssignmentNotModule">This homework is locked.</string>
 
 	<!--New Course Layout Strings -->
-	<string name="myCourses">My Courses</string>
+	<string name="myCourses">My Subjects</string>
 	
 	
 	<!--New Submission Strings -->
@@ -360,8 +369,6 @@
     <string name="successPostingSubmission">Successfully posted the submission.</string>
 
     <string name="exampleSubmissionURL">http://www.example.com</string>
-
-
 
     <!--DataLoss Fragment Strings -->
     <string name="unsavedProgress">Unsaved Progress</string>
@@ -387,12 +394,12 @@
     <string name="subTypeOnlineQuiz">Online Quiz</string>
 	<string name="subTypeMediaRecording">Media Recording</string>
     <string name="sub_type_lti_launch">LTI Launch</string>
-    <string name="turnInByHand">You must turn this assignment in by hand</string>
+    <string name="turnInByHand">You must turn this homework in by hand</string>
 	<string name="noSubRequired">No submission required</string>
 	<string name="noTurnInOnMobile">Mobile submission unsupported</string>
 
     <string name="home">Home</string>
-    <string name="Notifications">Notifications</string>
+    <string name="Notifications">Notice Board</string>
 
     <string name="icon">Icon</string>
     <string name="rootUser">Root User Folder</string>
@@ -403,7 +410,7 @@
     <string name="privatelyAvailable">Privately available</string>
     <string name="publiclyAvailable">Publicly available</string>
     <string name="starts">Starts: \u0020</string>
-    <string name="courseCode">Course Code: \u0020</string>
+    <string name="courseCode">Subject Code: \u0020</string>
     <string name="ends">Ends: \u0020</string>
     <string name="visibility">Visibility: \u0020</string>
     <string name="license">License: \u0020</string>
@@ -446,7 +453,7 @@
     <string name="openSource">Open Source</string>
 
     <!-- Quiz Strings -->
-    <string name="assignmentQuizzes">Assignment Quizzes</string>
+    <string name="assignmentQuizzes">Homework Quizzes</string>
     <string name="practiceQuizzes">Practice Quizzes</string>
     <string name="gradedSurveys">Graded Surveys</string>
     <string name="surveys">Surveys</string>
@@ -456,12 +463,12 @@
 
 
     <!--Widget Strings-->
-    <string name="todoWidgetTitle">To-Do</string>
+    <string name="todoWidgetTitle">Homework</string>
     <string name="gradesWidgetTitle">Grades</string>
-    <string name="notificationWidgetTitle">Notifications</string>
-    <string name="todoWidgetTitleLong">Canvas - To-Do</string>
-    <string name="gradesWidgetTitleLong">Canvas - Grades</string>
-    <string name="notificationWidgetTitleLong">Canvas - Notifications</string>
+    <string name="notificationWidgetTitle">Notice Board</string>
+    <string name="todoWidgetTitleLong">eBuki - Homework</string>
+    <string name="gradesWidgetTitleLong">eBuki - Grades</string>
+    <string name="notificationWidgetTitleLong">eBuki - Notice Board</string>
     <string name="notLoggedIn">You are not logged in</string>
     <string name="widgetStyle">Choose your widget style</string>
     <string name="widgetMinimumStyle">Hide details on widget</string>
@@ -473,8 +480,8 @@
     <!-- Help dialog strings -->
     <string name="askInstructor">Ask Your Instructor a Question</string>
     <string name="askInstructorDetails">Questions are submitted to your instructor</string>
-    <string name="searchGuides">Search the Canvas Guides</string>
-    <string name="canvasGuides">Canvas Guides</string>
+    <string name="searchGuides">Search the eBuki Guides</string>
+    <string name="canvasGuides">eBuki Guides</string>
     <string name="searchGuidesDetails">Find answers to common questions</string>
     <string name="reportProblem">Report a Problem</string>
     <string name="reportProblemDetails">If the app misbehaves, let us know</string>
@@ -484,7 +491,7 @@
     <string name="shareYourLoveDetails">Tell us about your favorite parts of the app</string>
 
     <!-- Feature Request -->
-    <string name="featureSubject">Idea for Canvas [Android]</string>
+    <string name="featureSubject">Idea for eBuki [Android]</string>
     <string name="understandRequest">The following information will help us better understand your idea:</string>
 
     <!-- Ask Instructor -->
@@ -494,20 +501,20 @@
     <string name="error">Error</string>
 
     <!-- Tablet Strings -->
-    <string name="courses">Courses</string>
-    <string name="toDoList">To-Do List</string>
-    <string name="notifications">Notifications</string>
+    <string name="courses">Subjects</string>
+    <string name="toDoList">Homework</string>
+    <string name="notifications">Notice Board</string>
     <string name="pushNotifications">Push Notifications</string>
 
     <string name="launchSpeedgrader">Open Speedgrader</string>
 
-    <string name="search_todo">todo to do todos todo list</string>
-    <string name="search_course">course courses class classes</string>
+    <string name="search_todo">homework</string>
+    <string name="search_course">subject subjects class classes</string>
     <string name="search_grades">grade grades</string>
 
     <!-- ShareFileOptions Dialog-->
     <string name="uploadTo">Upload To </string>
-    <string name="uploadToCanvas">Upload To Canvas</string>
+    <string name="uploadToCanvas">Upload To eBuki</string>
     <string name="uploadMyFiles">My Files</string>
     <string name="uploadCourseFiles">Course Files</string>
 
@@ -537,10 +544,10 @@
     <string name="close">Close</string>
     <string name="closed">Closed</string>
 
-    <string name="overdueAssignments">Overdue Assignments</string>
-    <string name="upcomingAssignments">Upcoming Assignments</string>
-    <string name="undatedAssignments">Undated Assignments</string>
-    <string name="pastAssignments">Past Assignments</string>
+    <string name="overdueAssignments">Overdue Homework</string>
+    <string name="upcomingAssignments">Upcoming Homework</string>
+    <string name="undatedAssignments">Undated Homework</string>
+    <string name="pastAssignments">Past Homework</string>
 
     <string name="could_not_find_course">There was an error getting the course for this item.</string>
     <string name="could_not_find_group">There was an error getting the group for this item.</string>
@@ -550,7 +557,7 @@
     <string name="notoriousSubmissionInProgress">Submitting files&#8230; Check notification bar for updates.</string>
     <string name="notoriousSubmissionSuccessful">Finished submitting file</string>
 
-    <string name="poll_title">What did you come to Canvas to do?</string>
+    <string name="poll_title">What did you come to eBuki to do?</string>
     <string name="poll_warning">An item has not been selected.</string>
     <string name="poll_item_1">Check my grades</string>
     <string name="poll_item_2">Send or view a message</string>
@@ -597,7 +604,7 @@
 
     <string name="contentDescriptionSuperPanda">Super Panda Image</string>
     <string name="newFeatureTitle">Mobile Notifications</string>
-    <string name="newFeatureMsg">To receive mobile push notifications go to Canvas Settings > Notifications > And select \"For All Devices\"</string>
+    <string name="newFeatureMsg">To receive mobile push notifications go to eBuki Settings > Notifications > And select \"For All Devices\"</string>
 
     <string name="calendarDay">Day</string>
     <string name="calendarWeek">Week</string>
@@ -617,9 +624,9 @@
     
     <!--Notification Preferences-->
 
-    <string name="notification_primary_inbox_title">Canvas Notification</string>
-    <string name="notification_channel_name_primary">General Canvas Notifications</string>
-    <string name="notification_channel_description_primary">Further configuration of notifications can be done within the Canvas Notification Preferences section.</string>
+    <string name="notification_primary_inbox_title">eBuki Notification</string>
+    <string name="notification_channel_name_primary">General eBuki Notifications</string>
+    <string name="notification_channel_description_primary">Further configuration of notifications can be done within the eBuki Notification Preferences section.</string>
 
     <string name="notification_cat_course_activities">Course Activities</string>
     <string name="notification_cat_discussions">Discussions</string>
@@ -725,29 +732,30 @@
     <string name="color_15">Gray</string>
 
     <!--Recents-->
-    <string name="recents_empty">From the course customization screen add a course or group to view them here.</string>
+    <string name="recents_empty">From the subject customization screen add a subject or group to view them here.</string>
 
     <string name="toolbar_close">Toolbar close</string>
-    <string name="favoriteDescription">Show in \"My Courses\"</string>
+    <string name="favoriteDescription">Show in \"My Subjects\"</string>
     <string name="about">About</string>
-    <string name="courseShortcuts">Add a shortcut to your course</string>
-    <string name="courseNickname">Course Nickname</string>
+    <string name="courseShortcuts">Add a shortcut to your subject</string>
+    <string name="courseNickname">Subject Nickname</string>
 
     <string name="notAvailableOffline">Functionality unavailable while offline</string>
-    <string name="selectFavorites">Course &amp; Group Selection</string>
+    <string name="selectFavorites">Subject &amp; Group Selection</string>
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
-    <string name="dashboard">Dashboard</string>
+    <string name="dashboard">Home</string>
+    <string name="courses_dashboard">Subjects</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
     <string name="systemDefault">System Default</string>
-    <string name="restartingCanvas">Restarting Canvas</string>
+    <string name="restartingCanvas">Restarting eBuki</string>
     <string name="languageDialogText">Changing the language will require the app to restart, are you sure?</string>
     <string name="defaultLanguageWarning">Your system default language is not guaranteed to be supported and will require a restart, are you sure?</string>
     <string name="locked_mastery_paths">Locked until \"%s\" is graded</string>
     <string name="locked_icon">Locked Icon</string>
-    <string name="choose_assignment_group">Choose Assignment Group</string>
+    <string name="choose_assignment_group">Choose Homework Group</string>
     <string name="select">Select</string>
     <string name="choice_position">Choice %d</string>
     <string name="updating_module_info">Updating module information&#8230;</string>
@@ -765,3 +773,5 @@
     </array>
 
 </resources>
+
+<!-- Force rebuild -->

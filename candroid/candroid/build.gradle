@@ -28,13 +28,7 @@ repositories {
     maven { url 'https://maven.google.com' }
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
-    maven {
-        url 'https://customers.pspdfkit.com/maven/'
-        credentials {
-            username pspdfMavenUser
-            password pspdfMavenPass
-        }
-    }
+
     flatDir {
         dirs '../aars'
     }
@@ -66,12 +60,12 @@ buildscript {
 spoon { // ./gradlew :candroid:spoon
     debug = true
 
-    // ./gradlew :candroid:spoon -PtestClass=com.instructure.candroid.test.LoginTest
+    // ./gradlew :candroid:spoon -PtestClass=com.ebuki.portal.test.LoginTest
     if (project.hasProperty('testClass')) {
         className = project.testClass
     }
 
-    // ./gradlew :candroid:spoon -PtestClass=com.instructure.candroid.test.LoginTest -ptestMethod=loginRejectsInvalidCredentials
+    // ./gradlew :candroid:spoon -PtestClass=com.ebuki.portal.test.LoginTest -ptestMethod=loginRejectsInvalidCredentials
     if (project.hasProperty('testMethod')) {
         methodName = project.testMethod
     }
@@ -96,7 +90,7 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.1.4'
 
     compile("com.crashlytics.sdk.android:crashlytics:$GLOBAL_CRASHLYTICS_VERSION") {
-        transitive = true;
+        transitive = true
     }
     compile('com.github.afollestad.material-dialogs:core:0.8.5.6@aar') {
         transitive = true
@@ -111,13 +105,11 @@ dependencies {
 
     /* Kotlin */
     compile "org.jetbrains.kotlin:kotlin-stdlib:$GLOBAL_KOTLIN_VERSION"
-
     compile "com.google.android.gms:play-services-oss-licenses:$GLOBAL_PLAY_SERVICES_VERSION"
     compile "com.android.support:multidex:$GLOBAL_MULTI_DEX_VERSION"
     compile 'org.jsoup:jsoup:1.7.2'
     compile 'com.makeramen:roundedimageview:2.3.0'
     compile 'com.nineoldandroids:parent:2.4.0'
-    compile "com.pspdfkit:pspdfkit-demo:$GLOBAL_PSPDFKIT_VERSION"
     compile 'com.google.api-client:google-api-client-android:1.18.0-rc'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.google.android.exoplayer:exoplayer:r2.1.1'
@@ -125,13 +117,15 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
 
+    compile 'com.android.support:gridlayout-v7:23.2.0'
+
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile('com.squareup.retrofit2:retrofit:2.2.0') {
         exclude module: 'okhttp'
     }
 }
 
-def appId = "com.instructure.candroid"
+def appId = "com.ebuki.portal"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -150,8 +144,6 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
 
         /* Add private data */
-        buildConfigField "String", "PSPDFKIT_LICENSE_KEY", "\"$pspdfkitLicenseKey\""
-        buildConfigField "String", "PUSH_SERVICE_PROJECT_ID", "\"$pushServiceProjectId\""
         addManifestPlaceholders([
                 crashlyticsApiKey:"$crashlyticsApiKey"
         ])

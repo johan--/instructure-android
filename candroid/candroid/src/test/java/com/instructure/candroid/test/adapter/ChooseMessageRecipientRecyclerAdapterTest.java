@@ -15,12 +15,12 @@
  *
  */
 
-package com.instructure.candroid.test.adapter;
+package com.ebuki.portal.test.adapter;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
 
-import com.instructure.candroid.adapter.ChooseMessageRecipientRecyclerAdapter;
+import com.ebuki.portal.adapter.ChooseMessageRecipientRecyclerAdapter;
 import com.instructure.canvasapi2.models.Recipient;
 
 import org.junit.Before;

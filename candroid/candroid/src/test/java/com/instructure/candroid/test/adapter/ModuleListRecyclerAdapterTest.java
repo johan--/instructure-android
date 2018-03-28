@@ -15,11 +15,11 @@
  *
  */
 
-package com.instructure.candroid.test.adapter;
+package com.ebuki.portal.test.adapter;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
-import com.instructure.candroid.adapter.ModuleListRecyclerAdapter;
+import com.ebuki.portal.adapter.ModuleListRecyclerAdapter;
 import com.instructure.canvasapi2.models.ModuleItem;
 import org.junit.Before;
 import org.junit.Test;

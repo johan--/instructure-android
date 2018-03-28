@@ -18,7 +18,7 @@
 
 <resources>
 
-    <string name="patched_appbar_scrolling_view_behavior" translatable="false">com.instructure.candroid.view.PatchedScrollingViewBehavior</string>
+    <string name="patched_appbar_scrolling_view_behavior" translatable="false">com.ebuki.portal.view.PatchedScrollingViewBehavior</string>
 
     <string name="help_domain" translatable="false">Domain:</string>
     <string name="help_versionNum" translatable="false">Version:</string>

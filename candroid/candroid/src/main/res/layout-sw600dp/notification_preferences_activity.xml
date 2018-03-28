@@ -25,7 +25,7 @@
         layout="@layout/toolbar_layout"
         android:id="@+id/toolbar" />
 
-    <com.instructure.candroid.view.CardifyView
+    <com.ebuki.portal.view.CardifyView
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_below="@+id/toolbar">
@@ -35,9 +35,9 @@
             android:layout_height="match_parent"
             android:cacheColorHint="@android:color/transparent"/>
 
-    </com.instructure.candroid.view.CardifyView>
+    </com.ebuki.portal.view.CardifyView>
 
-    <com.instructure.candroid.view.EmptyPandaView
+    <com.ebuki.portal.view.EmptyPandaView
         android:id="@+id/emptyPandaView"
         android:layout_gravity="center_horizontal|center_vertical"
         android:layout_width="match_parent"

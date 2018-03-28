@@ -15,13 +15,13 @@
  *
  */
 
-package com.instructure.candroid.test.adapter;
+package com.ebuki.portal.test.adapter;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
 
-import com.instructure.candroid.adapter.AssignmentDateListRecyclerAdapter;
-import com.instructure.candroid.interfaces.AdapterToFragmentCallback;
+import com.ebuki.portal.adapter.AssignmentDateListRecyclerAdapter;
+import com.ebuki.portal.interfaces.AdapterToFragmentCallback;
 import com.instructure.canvasapi2.models.Assignment;
 
 import org.junit.Before;

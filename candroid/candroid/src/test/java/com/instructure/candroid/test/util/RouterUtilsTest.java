@@ -15,34 +15,34 @@
  *
  */
 
-package com.instructure.candroid.test.util;
+package com.ebuki.portal.test.util;
 
 import android.test.InstrumentationTestCase;
 
-import com.instructure.candroid.fragment.AnnouncementListFragment;
-import com.instructure.candroid.fragment.AssignmentFragment;
-import com.instructure.candroid.fragment.AssignmentListFragment;
-import com.instructure.candroid.fragment.BasicQuizViewFragment;
-import com.instructure.candroid.fragment.DetailedConversationFragment;
-import com.instructure.candroid.fragment.DetailedDiscussionFragment;
-import com.instructure.candroid.fragment.DiscussionListFragment;
-import com.instructure.candroid.fragment.FileDetailsFragment;
-import com.instructure.candroid.fragment.FileListFragment;
-import com.instructure.candroid.fragment.GradesListFragment;
-import com.instructure.candroid.fragment.InboxFragment;
-import com.instructure.candroid.fragment.ModuleListFragment;
-import com.instructure.candroid.fragment.NotificationListFragment;
-import com.instructure.candroid.fragment.PageDetailsFragment;
-import com.instructure.candroid.fragment.PageListFragment;
-import com.instructure.candroid.fragment.PeopleDetailsFragment;
-import com.instructure.candroid.fragment.PeopleListFragment;
-import com.instructure.candroid.fragment.QuizListFragment;
-import com.instructure.candroid.fragment.ScheduleListFragment;
-import com.instructure.candroid.fragment.SettingsFragment;
-import com.instructure.candroid.fragment.SyllabusFragment;
-import com.instructure.candroid.fragment.UnSupportedTabFragment;
-import com.instructure.candroid.util.Param;
-import com.instructure.candroid.util.RouterUtils;
+import com.ebuki.portal.fragment.AnnouncementListFragment;
+import com.ebuki.portal.fragment.AssignmentFragment;
+import com.ebuki.portal.fragment.AssignmentListFragment;
+import com.ebuki.portal.fragment.BasicQuizViewFragment;
+import com.ebuki.portal.fragment.DetailedConversationFragment;
+import com.ebuki.portal.fragment.DetailedDiscussionFragment;
+import com.ebuki.portal.fragment.DiscussionListFragment;
+import com.ebuki.portal.fragment.FileDetailsFragment;
+import com.ebuki.portal.fragment.FileListFragment;
+import com.ebuki.portal.fragment.GradesListFragment;
+import com.ebuki.portal.fragment.InboxFragment;
+import com.ebuki.portal.fragment.ModuleListFragment;
+import com.ebuki.portal.fragment.NotificationListFragment;
+import com.ebuki.portal.fragment.PageDetailsFragment;
+import com.ebuki.portal.fragment.PageListFragment;
+import com.ebuki.portal.fragment.PeopleDetailsFragment;
+import com.ebuki.portal.fragment.PeopleListFragment;
+import com.ebuki.portal.fragment.QuizListFragment;
+import com.ebuki.portal.fragment.ScheduleListFragment;
+import com.ebuki.portal.fragment.SettingsFragment;
+import com.ebuki.portal.fragment.SyllabusFragment;
+import com.ebuki.portal.fragment.UnSupportedTabFragment;
+import com.ebuki.portal.util.Param;
+import com.ebuki.portal.util.RouterUtils;
 import com.instructure.canvasapi2.models.CanvasContext;
 import com.instructure.canvasapi2.models.Tab;
 import com.instructure.canvasapi2.utils.APIHelper;

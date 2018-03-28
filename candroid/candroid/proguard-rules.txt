@@ -191,12 +191,6 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
-#PSPDFKit
-# Keep PSPDFKit framework classes – they are already proguarded by default.
--keep class com.pspdfkit.** { *; }
--dontwarn sun.misc.**
--dontwarn com.pspdfkit.ui.PSPDFYouTubeActivity
--dontwarn com.pspdfkit.media.MediaGalleryView*
 
 # Keep third party lib class names. PSPDFKit relies on those class names to be present.
 -keepnames class rx.android.schedulers.AndroidSchedulers
