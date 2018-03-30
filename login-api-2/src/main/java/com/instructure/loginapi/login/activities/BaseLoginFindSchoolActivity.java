@@ -217,14 +217,14 @@ public abstract class BaseLoginFindSchoolActivity extends AppCompatActivity impl
     private void validateDomain(AccountDomain accountDomain) {
         String url = accountDomain.getDomain().toLowerCase().replace(" ", "");
 
-        //if the user enters nothing, try to connect to canvas.instructure.com
+        //if the user enters nothing, try to connect to ebuki.nxtstepdsgn.com
         if (url.trim().length() == 0) {
-            url = "canvas.instructure.com";
+            url = "ebuki.nxtstepdsgn.com";
         }
 
-        //if there are no periods, append .instructure.com
+        //if there are no periods, append .nxtstepdsgn.com
         if (!url.contains(".") || url.endsWith(".beta")) {
-            url += ".instructure.com";
+            url += ".nxtstepdsgn.com";
         }
 
         //URIs need to to start with a scheme.
@@ -293,12 +293,13 @@ public abstract class BaseLoginFindSchoolActivity extends AppCompatActivity impl
 
             if (isDebuggable) {
                 //put these domains first
-                domains.add(0, createAccountForDebugging("mobiledev.instructure.com"));
-                domains.add(1, createAccountForDebugging("mobiledev.beta.instructure.com"));
-                domains.add(2, createAccountForDebugging("mobileqa.instructure.com"));
-                domains.add(3, createAccountForDebugging("mobileqat.instructure.com"));
-                domains.add(4, createAccountForDebugging("clare.instructure.com"));
-                domains.add(5, createAccountForDebugging("mobileqa.test.instructure.com"));
+                domains.add(0, createAccountForDebugging("ebuki.nxtstepdsgn.com"));
+                // domains.add(0, createAccountForDebugging("mobiledev.instructure.com"));
+                // domains.add(1, createAccountForDebugging("mobiledev.beta.instructure.com"));
+                // domains.add(2, createAccountForDebugging("mobileqa.instructure.com"));
+                // domains.add(3, createAccountForDebugging("mobileqat.instructure.com"));
+                // domains.add(4, createAccountForDebugging("clare.instructure.com"));
+                // domains.add(5, createAccountForDebugging("mobileqa.test.instructure.com"));
             }
 
             if (mDomainAdapter != null) {
