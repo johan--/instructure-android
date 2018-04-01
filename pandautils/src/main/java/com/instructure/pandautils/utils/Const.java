@@ -179,7 +179,7 @@ public class Const {
     public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
     public static final String WITH_SLIDING_PANE = "with_sliding_pane";
     public static final String PLACEMENT = "placement";
-    public static final String PROFILE_URL = "canvas.instructure.com";
+    public static final String PROFILE_URL = "ebuki.nxtstepdsgn.com";
 
     public static final String LOGIN = "login";
     public static final String CALENDAR = "calendar";
