@@ -33,7 +33,7 @@
     <string name="enterURL">Enter your Canvas URL:</string>
     <string name="signIntoCanvasNetwork">Trying to sign into Canvas Network?</string>
     <string name="remove">Remove</string>
-    <string name="exampleURLSimple">myschool.instructure.com</string>
+    <string name="exampleURLSimple">ebuki.nxtstepdsgn.com</string>
     <string name="masquerade">Masquerade</string>
     <string name="userId">User ID</string>
     <string name="domain">Domain</string>
@@ -117,7 +117,7 @@
     <string name="canvasLowerCase">canvas</string>
     <string name="whatsYourSchoolName">What\'s your school\'s name?</string>
     <string name="next">Next</string>
-    <string name="schoolInstructureCom">school.instructure.com</string>
+    <string name="schoolInstructureCom">ebuki.nxtstepdsgn.com</string>
     <string name="contentDescription_removePreviousUser">Remove Previous User</string>
     <string name="accountDomainFooter">Can\'t find your school? Try typing the full school URL.</string>
     <string name="accountDomainFooterLink">Tap here for help.</string>
