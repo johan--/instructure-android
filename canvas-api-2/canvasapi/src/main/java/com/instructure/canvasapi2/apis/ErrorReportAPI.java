@@ -33,7 +33,7 @@ import retrofit2.Call;
 
 public class ErrorReportAPI {
 
-    private static final String DEFAULT_DOMAIN = "http://ebuki.nxtstepdsgn.com";
+    private static final String DEFAULT_DOMAIN = "https://ebuki.nxtstepdsgn.com";
 
     public interface ErrorReportInterface {
         @POST("/error_reports.json")

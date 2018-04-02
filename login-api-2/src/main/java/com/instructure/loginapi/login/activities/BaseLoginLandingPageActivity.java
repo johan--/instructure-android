@@ -88,7 +88,8 @@ public abstract class BaseLoginLandingPageActivity extends AppCompatActivity {
     private boolean mGestureFirstFree = true;
     private long mGestureFirst = 0;
     private long mGestureSecond = 0;
-    private int mCanvasLogin = NORMAL_FLOW;
+    // private int mCanvasLogin = NORMAL_FLOW;
+    private int mCanvasLogin = MOBILE_VERIFY_FLOW;
 
     protected abstract Intent beginFindSchoolFlow();
     protected abstract Intent signInActivityIntent(@NonNull SnickerDoodle snickerDoodle);
