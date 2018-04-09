@@ -34,7 +34,7 @@ import retrofit2.http.Url;
 
 public class AccountDomainAPI {
 
-    private static final String DEFAULT_DOMAIN = "http://ebuki.nxtstepdsgn.com/";
+    private static final String DEFAULT_DOMAIN = "https://ebuki.nxtstepdsgn.com";
 
     public interface AccountDomainInterface {
 

@@ -93,7 +93,8 @@ public class DashboardFragment extends ParentFragment {
             @Override
             public void onClick(View v) {
                 // Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
-                String packageName="net.nightwhistler.pageturner";
+                // String packageName="net.nightwhistler.pageturner";
+                String packageName="com.skytree.skyreader";
                 launchApp(packageName);
             }
         });
@@ -151,6 +152,13 @@ public class DashboardFragment extends ParentFragment {
             }
         });
 
+        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
+        ivPlaystore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchPlayStore();
+            }
+        });
 
         return mRootView;
     }
@@ -165,6 +173,19 @@ public class DashboardFragment extends ParentFragment {
     @Override
     public boolean allowBookmarking() {
         return false;
+    }
+
+    // Custom method to launch an app
+    public void launchPlayStore() {
+
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        if (intent != null) {
+            startActivity(intent);
+        }
+
     }
 
     // Custom method to launch an app

@@ -45,6 +45,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
 
 import com.instructure.canvasapi2.RequestInterceptor;
 import com.instructure.canvasapi2.StatusCallback;
