@@ -94,7 +94,8 @@ public class DashboardFragment extends ParentFragment {
             public void onClick(View v) {
                 // Toast.makeText(getActivity(), getString(R.string.textbooksSelected), Toast.LENGTH_SHORT).show();
                 // String packageName="net.nightwhistler.pageturner";
-                String packageName="com.skytree.skyreader";
+                // String packageName="com.skytree.skyreader";
+                String packageName="com.gitden.epub.reader.app";
                 launchApp(packageName);
             }
         });
