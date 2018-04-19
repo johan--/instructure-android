@@ -144,7 +144,6 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
 
         /* Add private data */
-
         addManifestPlaceholders([
                 crashlyticsApiKey:"$crashlyticsApiKey"
         ])
