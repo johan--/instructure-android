@@ -517,8 +517,10 @@ public class NavigationActivity extends BaseRouterActivity implements
         bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
         final View toDos = findViewById(R.id.todos);
         bindNavItems(toDos, imageColor, R.drawable.ic_cv_todo_fill, R.string.toDoList);
-        final View inbox = findViewById(R.id.inbox);
-        bindNavItems(inbox, imageColor, R.drawable.ic_cv_messages_fill, R.string.inbox);
+
+//        final View inbox = findViewById(R.id.inbox);
+//        bindNavItems(inbox, imageColor, R.drawable.ic_cv_messages_fill, R.string.inbox);
+
         final View calendar = findViewById(R.id.calendar);
         bindNavItems(calendar, imageColor, R.drawable.ic_cv_calendar_fill, R.string.calendar);
 
