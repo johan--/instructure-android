@@ -62,28 +62,28 @@
         android:id="@+id/ivAnnouncements"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_announcements"/>
 
     <ImageView
         android:id="@+id/ivMynotes"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_my_notes"/>
 
     <ImageView
         android:id="@+id/ivCamera"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_camera"/>
 
     <ImageView
         android:id="@+id/ivCalculator"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_calculator"/>
 
     <!-- Row 3 -->
@@ -92,14 +92,14 @@
         android:id="@+id/ivWikipedia"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_wikipedia"/>
 
     <ImageView
         android:id="@+id/ivPlaystore"
         android:clickable="true"
         app:layout_columnWeight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/playstore_180x180"/>
 
 </android.support.v7.widget.GridLayout>
