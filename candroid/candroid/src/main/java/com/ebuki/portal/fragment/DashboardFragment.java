@@ -143,23 +143,45 @@ public class DashboardFragment extends ParentFragment {
             }
         });
 
+        final ImageView ivSubjects = mRootView.findViewById(R.id.ivSubjects);
+        ivSubjects.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Subjects selected, well done :-)", Toast.LENGTH_SHORT).show();
+                String packageName="org.wikipedia";
+                launchApp(packageName);
+            }
+
+        });
+
+        final ImageView ivAnnouncements = mRootView.findViewById(R.id.ivAnnouncements);
+        ivAnnouncements.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Announcements selected, well done :-)", Toast.LENGTH_SHORT).show();
+                String packageName="it.feio.android.omninotes.foss";
+                launchApp(packageName);
+
+            }
+        });
+
         final ImageView ivWikipedia = mRootView.findViewById(R.id.ivWikipedia);
         ivWikipedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="org.wikipedia";
                 launchApp(packageName);
             }
         });
 
-//        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
-//        ivPlaystore.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                launchPlayStore();
-//            }
-//        });
+        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
+        ivPlaystore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchPlayStore();
+            }
+        });
 
         return mRootView;
     }
