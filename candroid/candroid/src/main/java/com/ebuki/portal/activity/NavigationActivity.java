@@ -504,25 +504,25 @@ public class NavigationActivity extends BaseRouterActivity implements
 
         final int imageColor = getResources().getColor(R.color.navigationImageColor);
 
-        final View accountNotification = findViewById(R.id.account_notifications);
-        bindNavItems(accountNotification, imageColor, R.drawable.ic_cv_announcements_fill, R.string.accountNotifications);
+//        final View accountNotification = findViewById(R.id.account_notifications);
+//        bindNavItems(accountNotification, imageColor, R.drawable.ic_cv_announcements_fill, R.string.accountNotifications);
 
-        final View dashboard = findViewById(R.id.dashboard);
-        bindNavItems(dashboard, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
+//        final View dashboard = findViewById(R.id.dashboard);
+//        bindNavItems(dashboard, imageColor, R.drawable.ic_cv_dashboard, R.string.dashboard);
 
-        final View courses = findViewById(R.id.courses);
-        bindNavItems(courses, imageColor, R.drawable.ic_cv_courses_fill, R.string.courses_dashboard);
+//        final View courses = findViewById(R.id.courses);
+//        bindNavItems(courses, imageColor, R.drawable.ic_cv_courses_fill, R.string.courses_dashboard);
 
-        final View notifications = findViewById(R.id.notifications);
-        bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
-        final View toDos = findViewById(R.id.todos);
-        bindNavItems(toDos, imageColor, R.drawable.ic_cv_todo_fill, R.string.toDoList);
+//        final View notifications = findViewById(R.id.notifications);
+//        bindNavItems(notifications, imageColor, R.drawable.ic_cv_notifications_fill, R.string.notifications);
+//        final View toDos = findViewById(R.id.todos);
+//        bindNavItems(toDos, imageColor, R.drawable.ic_cv_todo_fill, R.string.toDoList);
 
 //        final View inbox = findViewById(R.id.inbox);
 //        bindNavItems(inbox, imageColor, R.drawable.ic_cv_messages_fill, R.string.inbox);
 
-        final View calendar = findViewById(R.id.calendar);
-        bindNavItems(calendar, imageColor, R.drawable.ic_cv_calendar_fill, R.string.calendar);
+//        final View calendar = findViewById(R.id.calendar);
+//        bindNavItems(calendar, imageColor, R.drawable.ic_cv_calendar_fill, R.string.calendar);
 
 //        final View bookmarks = findViewById(R.id.bookmarks);
 //        bindNavItems(bookmarks, imageColor, R.drawable.ic_bookmark, R.string.bookmarks);
@@ -533,8 +533,9 @@ public class NavigationActivity extends BaseRouterActivity implements
         bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);
         final View settings = findViewById(R.id.settings);
         bindNavItems(settings, imageColor, R.drawable.ic_settings_black_36dp, R.string.settings);
-        final View help = findViewById(R.id.help);
-        bindNavItems(help, imageColor, R.drawable.ic_help_black_36dp, R.string.help);
+
+//        final View help = findViewById(R.id.help);
+//        bindNavItems(help, imageColor, R.drawable.ic_help_black_36dp, R.string.help);
 
         //check to see if we should show the tutorial
         final ImageView pulseNavigationShortcut = (ImageView)findViewById(R.id.pulseNavigationShortcut);
@@ -546,13 +547,13 @@ public class NavigationActivity extends BaseRouterActivity implements
 
         findViewById(R.id.addAccount).setOnClickListener(this);
 
-        mCourseShortcutDropdown.setImageDrawable(ColorUtils.colorIt(imageColor, mCourseShortcutDropdown.getDrawable()));
-        boolean expandedState = ApplicationManager.getPrefs(getContext()).load(Const.NAVIGATION_SHORTCUTS_EXPANDED, false);
-        if(expandedState) {
-            mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate));
-        } else {
-            mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate_back));
-        }
+//        mCourseShortcutDropdown.setImageDrawable(ColorUtils.colorIt(imageColor, mCourseShortcutDropdown.getDrawable()));
+//        boolean expandedState = ApplicationManager.getPrefs(getContext()).load(Const.NAVIGATION_SHORTCUTS_EXPANDED, false);
+//        if(expandedState) {
+//            mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate));
+//        } else {
+//            mCourseShortcutDropdown.startAnimation(AnimationUtils.loadAnimation(NavigationActivity.this, R.anim.rotate_back));
+//        }
 
         mExpandRippleView.setOnClickListener(new View.OnClickListener() {
             @Override
