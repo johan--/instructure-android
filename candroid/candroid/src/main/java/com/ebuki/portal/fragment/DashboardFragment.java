@@ -104,11 +104,9 @@ public class DashboardFragment extends ParentFragment {
         ivCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                Navigation navigation = getNavigation();
-                if (navigation != null) {
-                    navigation.addFragment(FragUtils.getFrag(CalendarListViewFragment.class, bundle));
-                }
+                String packageName="ws.xsoh.etar";
+                launchApp(packageName);
+
             }
         });
 
@@ -147,9 +145,15 @@ public class DashboardFragment extends ParentFragment {
         ivSubjects.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Subjects selected, well done :-)", Toast.LENGTH_SHORT).show();
-                String packageName="org.wikipedia";
-                launchApp(packageName);
+                // Toast.makeText(getActivity(), "Subjects selected, well done :-)", Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                Navigation navigation = getNavigation();
+                if (navigation != null) {
+                    navigation.addFragment(FragUtils.getFrag(CourseGridFragment.class, bundle));
+                }
+//                String packageName="org.wikipedia";
+//                launchApp(packageName);
+
             }
 
         });
@@ -158,9 +162,16 @@ public class DashboardFragment extends ParentFragment {
         ivAnnouncements.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Announcements selected, well done :-)", Toast.LENGTH_SHORT).show();
-                String packageName="it.feio.android.omninotes.foss";
-                launchApp(packageName);
+                // Toast.makeText(getActivity(), "Announcements selected, well done :-)", Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                Navigation navigation = getNavigation();
+                if (navigation != null)
+                {
+                    navigation.addFragment(FragUtils.getFrag(NotificationListFragment.class, getActivity()), Navigation.NavigationPosition.NOTIFICATIONS, ignoreDebounce);
+                    // navigation.addFragment(FragUtils.getFrag(NotificationListFragment.class, bundle));
+                }
+//                String packageName="it.feio.android.omninotes.foss";
+//                launchApp(packageName);
 
             }
         });
@@ -169,19 +180,19 @@ public class DashboardFragment extends ParentFragment {
         ivWikipedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="org.wikipedia";
                 launchApp(packageName);
             }
         });
 
-        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
-        ivPlaystore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchPlayStore();
-            }
-        });
+//        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
+//        ivPlaystore.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                launchPlayStore();
+//            }
+//        });
 
         return mRootView;
     }
