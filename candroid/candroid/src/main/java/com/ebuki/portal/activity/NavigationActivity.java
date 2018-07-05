@@ -529,23 +529,23 @@ public class NavigationActivity extends BaseRouterActivity implements
 //        final View grades = findViewById(R.id.grades);
 //        bindNavItems(grades, imageColor, R.drawable.ic_cv_grades_fill, R.string.grades);
 
-        final View gauge = findViewById(R.id.gauge);
-        bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);
-        final View settings = findViewById(R.id.settings);
-        bindNavItems(settings, imageColor, R.drawable.ic_settings_black_36dp, R.string.settings);
+//        final View gauge = findViewById(R.id.gauge);
+//        bindNavItems(gauge, imageColor, R.drawable.ic_gauge, R.string.gauge);
+//        final View settings = findViewById(R.id.settings);
+//        bindNavItems(settings, imageColor, R.drawable.ic_settings_black_36dp, R.string.settings);
 
 //        final View help = findViewById(R.id.help);
 //        bindNavItems(help, imageColor, R.drawable.ic_help_black_36dp, R.string.help);
 
         //check to see if we should show the tutorial
-        final ImageView pulseNavigationShortcut = (ImageView)findViewById(R.id.pulseNavigationShortcut);
-        new TutorialUtils(NavigationActivity.this, ApplicationManager.getPrefs(getContext()), pulseNavigationShortcut, TutorialUtils.TYPE.NAVIGATION_SHORTCUTS)
-                .setContent(getString(R.string.tutorial_tipNavigationShortcuts), getString(R.string.tutorial_tipNavigationShortcutsMessage))
-                .build();
+//        final ImageView pulseNavigationShortcut = (ImageView)findViewById(R.id.pulseNavigationShortcut);
+//        new TutorialUtils(NavigationActivity.this, ApplicationManager.getPrefs(getContext()), pulseNavigationShortcut, TutorialUtils.TYPE.NAVIGATION_SHORTCUTS)
+//                .setContent(getString(R.string.tutorial_tipNavigationShortcuts), getString(R.string.tutorial_tipNavigationShortcutsMessage))
+//                .build();
 
         userContainer.setClickable(true);
 
-        findViewById(R.id.addAccount).setOnClickListener(this);
+        // findViewById(R.id.addAccount).setOnClickListener(this);
 
 //        mCourseShortcutDropdown.setImageDrawable(ColorUtils.colorIt(imageColor, mCourseShortcutDropdown.getDrawable()));
 //        boolean expandedState = ApplicationManager.getPrefs(getContext()).load(Const.NAVIGATION_SHORTCUTS_EXPANDED, false);

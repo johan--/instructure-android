@@ -38,17 +38,17 @@
     </ScrollView>
 
 
-    <RelativeLayout
-        android:id="@+id/addAccount"
-        style="@style/Canvas.NavDrawerItem"
-        android:layout_above="@+id/logout">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/addAccount"-->
+        <!--style="@style/Canvas.NavDrawerItem"-->
+        <!--android:layout_above="@+id/logout">-->
 
-        <TextView
-            android:id="@+id/text"
-            style="@style/Canvas.NavDrawerText"
-            android:text="@string/changeUser" />
+        <!--<TextView-->
+            <!--android:id="@+id/text"-->
+            <!--style="@style/Canvas.NavDrawerText"-->
+            <!--android:text="@string/changeUser" />-->
 
-    </RelativeLayout>
+    <!--</RelativeLayout>-->
 
     <RelativeLayout
         android:id="@+id/logout"

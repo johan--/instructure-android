@@ -186,13 +186,13 @@ public class DashboardFragment extends ParentFragment {
             }
         });
 
-//        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
-//        ivPlaystore.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                launchPlayStore();
-//            }
-//        });
+        final ImageView ivPlaystore = mRootView.findViewById(R.id.ivPlaystore);
+        ivPlaystore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchPlayStore();
+            }
+        });
 
         return mRootView;
     }
