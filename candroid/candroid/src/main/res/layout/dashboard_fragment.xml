@@ -93,6 +93,20 @@
     <!-- Row 3 -->
 
     <ImageView
+        android:id="@+id/ivMyStuff"
+        android:clickable="true"
+        app:layout_columnWeight="1"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_mystuff"/>
+
+    <ImageView
+        android:id="@+id/ivOffice"
+        android:clickable="true"
+        app:layout_columnWeight="1"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_office"/>
+
+    <ImageView
         android:id="@+id/ivWikipedia"
         android:clickable="true"
         app:layout_columnWeight="1"

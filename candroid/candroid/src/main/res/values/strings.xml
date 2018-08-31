@@ -502,7 +502,7 @@
 
     <!-- Tablet Strings -->
     <string name="courses">Subjects</string>
-    <string name="toDoList">Homework</string>
+    <string name="toDoList">Homework Due</string>
     <string name="notifications">Notice Board</string>
     <string name="pushNotifications">Push Notifications</string>
 

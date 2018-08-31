@@ -176,12 +176,34 @@ public class DashboardFragment extends ParentFragment {
             }
         });
 
+        final ImageView ivMyStuff = mRootView.findViewById(R.id.ivMyStuff);
+        ivMyStuff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String packageName="com.android.gallery3d";
+                // one tablet doesn't have gallery3d
+                // String packageName="com.google.android.apps.photos";
+                launchApp(packageName);
+            }
+        });
+
         final ImageView ivWikipedia = mRootView.findViewById(R.id.ivWikipedia);
         ivWikipedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="org.wikipedia";
+                launchApp(packageName);
+            }
+
+        });
+
+        final ImageView ivOffice = mRootView.findViewById(R.id.ivOffice);
+        ivOffice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toast.makeText(getActivity(), "Office selected, well done :-)", Toast.LENGTH_SHORT).show();
+                String packageName="cn.wps.moffice_eng";
                 launchApp(packageName);
             }
         });
