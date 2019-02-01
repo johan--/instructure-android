@@ -34,22 +34,29 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import android.app.ListActivity;
-import android.content.ComponentName;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import java.util.Collections;
-import java.util.List;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.hosopy.actioncable.ActionCable;
+import com.hosopy.actioncable.ActionCableException;
+import com.hosopy.actioncable.Channel;
+import com.hosopy.actioncable.Consumer;
+import com.hosopy.actioncable.Subscription;
+
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DashboardFragment extends ParentFragment {
 
     private View mRootView;
     public boolean ignoreDebounce = false;
+
+    URI uri = null;
+    Channel chatChannel;
+    Subscription subscription;
+    boolean isConnected = false;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -73,6 +80,9 @@ public class DashboardFragment extends ParentFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        setupConnection();
+
         mRootView = getLayoutInflater().inflate(R.layout.dashboard_fragment, container, false);
 
         final ImageView ivHomework = mRootView.findViewById(R.id.ivHomework);
@@ -229,6 +239,131 @@ public class DashboardFragment extends ParentFragment {
     @Override
     public boolean allowBookmarking() {
         return false;
+    }
+
+    private void xsetupConnection() {
+
+        try {
+            uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
+            Log.i("::CHECK", uri.toString());
+        }catch (Exception ignored){
+        }
+
+        Consumer.Options options = new Consumer.Options();
+
+        options.reconnection = true;
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", "tokenkey");
+        options.headers = headers;
+
+        Consumer consumer = ActionCable.createConsumer(uri, options);
+
+        chatChannel = new Channel("MessagesChannel");
+        chatChannel.addParam("room_id", "36");
+        subscription = consumer.getSubscriptions().create(chatChannel);
+
+    }
+
+    private void setupConnection(){
+
+        try {
+            uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
+            Log.i("::CHECK", uri.toString());
+        }catch (Exception ignored){
+        }
+
+//        Log.i("::PROGRESS", "Step #1");
+
+        Consumer.Options options = new Consumer.Options();
+
+//        Log.i("::PROGRESS", "Step #2");
+
+        options.reconnection = true;
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", "tokenkey");
+        options.headers = headers;
+
+//        Log.i("::PROGRESS", "Step #3");
+        Consumer consumer = ActionCable.createConsumer(uri, options);
+
+//        Log.i("::PROGRESS", "Step #4");
+
+        chatChannel = new Channel("MessagesChannel");
+        chatChannel.addParam("room_id", "36");
+        subscription = consumer.getSubscriptions().create(chatChannel);
+
+        subscription
+                .onConnected(new Subscription.ConnectedCallback() {
+                    @Override
+                    public void call() {
+                        Log.i("::CHECK", "onConnected");
+                        altStatus(0);
+                    }
+                }).onRejected(new Subscription.RejectedCallback() {
+            @Override
+            public void call() {
+                Log.i("::CHECK", "RejectedCallback");
+                altStatus(3);
+            }
+        }).onReceived(new Subscription.ReceivedCallback() {
+            @Override
+            public void call(JsonElement data) {
+                Log.i("::CHECK", "onReceived");
+                pre(data.toString());
+                Log.i("::CHECK", data.toString());
+                altStatus(4);
+            }
+        }).onDisconnected(new Subscription.DisconnectedCallback() {
+            @Override
+            public void call() {
+                Log.i("::CHECK", "onDisconnected");
+                altStatus(1);
+            }
+        }).onFailed(new Subscription.FailedCallback() {
+            @Override
+            public void call(ActionCableException e) {
+                Log.i("::CHECK", "onFailed");
+                Log.i("::CHECK", e.getMessage());
+            }
+        });
+
+        Log.i("::CHECK", "before connecting...");
+        consumer.connect();
+
+    }
+
+    public void altStatus(final int i){
+        isConnected = false;
+        switch (i) {
+            case 0:
+                isConnected = true;
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                isConnected = true;
+                break;
+        }
+
+    }
+
+    public void pre(String result){
+        try {
+
+            JSONObject jsonObj = new JSONObject(result);
+            String texto = jsonObj.getString("message");
+            String user = jsonObj.getString("user");
+
+            JSONObject jsonObj2 = new JSONObject(texto);
+            String mess = jsonObj2.getString("message");
+        }catch (Exception e){
+        }
     }
 
     // Custom method to launch an app

@@ -92,7 +92,7 @@ class RubricBinder : BaseBinder() {
                     // if it's less than the last rubric score, the last criterion needs to be highlighted
                     return (assessment.points!! <= criterion.ratings[criterion.ratings.size - 1].points)
                 }
-                return false
+                // return false
             } else {
                 return assessment.points == ratingItem.rating.points
             }

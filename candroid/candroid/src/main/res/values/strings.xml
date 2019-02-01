@@ -745,7 +745,7 @@
     <string name="selectFavoritesHint">Select what you want to see.</string>
 
     <string name="dashboard">Home</string>
-    <string name="courses_dashboard">Subjects</string>
+    <string name="courses_dashboard">Open Subject to View All Homework</string>
     <string name="previous">Previous</string>
     <string name="pageNum" formatted="false">Page %d of %d</string>
     <string name="language">Language</string>
