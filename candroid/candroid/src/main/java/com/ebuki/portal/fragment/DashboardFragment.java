@@ -15,13 +15,12 @@
  *
  */
 
-
 package com.ebuki.portal.fragment;
 
 import com.ebuki.portal.R;
 import com.ebuki.portal.delegate.Navigation;
 import com.ebuki.portal.util.FragUtils;
-
+import com.ebuki.portal.util.ConnectionDetector;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,23 +33,41 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.gson.JsonElement;
-
-
-import org.json.JSONObject;
-
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.instructure.canvasapi2.models.CanvasContext;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okhttp3.internal.ws.RealWebSocket;
+import okhttp3.logging.HttpLoggingInterceptor;
+import okio.ByteString;
+
+import java.util.concurrent.TimeUnit;
+
 
 public class DashboardFragment extends ParentFragment {
 
+    private CanvasContext canvasContext;
     private View mRootView;
     public boolean ignoreDebounce = false;
+    private OkHttpClient client;
 
     URI uri = null;
+    String wsUri = "ws://sockets.nxtstepdsgn.com/cable";
+
+    public enum State {
+        CLOSED, CLOSING, CONNECT_ERROR, RECONNECT_ATTEMPT, RECONNECTING, OPENING, OPEN
+    }
+
+
 
     private void setupConnection(){
+
+//        final ConnectionDetector cd = new ConnectionDetector(getCanvasContext());
 
         try {
             uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
@@ -58,6 +75,41 @@ public class DashboardFragment extends ParentFragment {
         }catch (Exception ignored){
         }
 
+        client = new OkHttpClient();
+        Request request = new Request.Builder().url(wsUri).build();
+        EchoWebSocketListener listener = new EchoWebSocketListener();
+        WebSocket ws = client.newWebSocket(request, listener);
+        client.dispatcher().executorService().shutdown();
+
+    }
+    private class EchoWebSocketListener extends WebSocketListener {
+        private static final int NORMAL_CLOSURE_STATUS = 1000;
+
+        @Override
+        public void onOpen(WebSocket webSocket, Response response) {
+            Log.d("ClientActivity", "Waiting info...");
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            Log.d("Exam", "Receiving: " + text);
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, ByteString bytes) {
+            Log.d("Exam", "Receiving bytes: " + bytes.hex());
+        }
+
+        @Override
+        public void onClosing(WebSocket webSocket, int code, String reason) {
+            webSocket.close(NORMAL_CLOSURE_STATUS, null);
+            Log.d("Exam", "Closing: " + code + " / " + reason);
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+            Log.d("Exam", "Error: " + t.getMessage());
+        }
     }
 
     @Override
