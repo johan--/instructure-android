@@ -53,6 +53,8 @@ public class DashboardFragment extends ParentFragment {
     private View mRootView;
     public boolean ignoreDebounce = false;
 
+    static String TAG ="::SOCKET";
+
     URI uri = null;
     Channel chatChannel;
     Subscription subscription;
@@ -241,43 +243,16 @@ public class DashboardFragment extends ParentFragment {
         return false;
     }
 
-    private void xsetupConnection() {
-
-        try {
-            uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
-            Log.i("::CHECK", uri.toString());
-        }catch (Exception ignored){
-        }
-
-        Consumer.Options options = new Consumer.Options();
-
-        options.reconnection = true;
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", "tokenkey");
-        options.headers = headers;
-
-        Consumer consumer = ActionCable.createConsumer(uri, options);
-
-        chatChannel = new Channel("MessagesChannel");
-        chatChannel.addParam("room_id", "36");
-        subscription = consumer.getSubscriptions().create(chatChannel);
-
-    }
 
     private void setupConnection(){
 
         try {
             uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
-            Log.i("::CHECK", uri.toString());
+            Log.i(TAG, uri.toString());
         }catch (Exception ignored){
         }
 
-//        Log.i("::PROGRESS", "Step #1");
-
         Consumer.Options options = new Consumer.Options();
-
-//        Log.i("::PROGRESS", "Step #2");
 
         options.reconnection = true;
 
@@ -285,10 +260,7 @@ public class DashboardFragment extends ParentFragment {
         headers.put("token", "tokenkey");
         options.headers = headers;
 
-//        Log.i("::PROGRESS", "Step #3");
         Consumer consumer = ActionCable.createConsumer(uri, options);
-
-//        Log.i("::PROGRESS", "Step #4");
 
         chatChannel = new Channel("MessagesChannel");
         chatChannel.addParam("room_id", "36");
@@ -298,38 +270,38 @@ public class DashboardFragment extends ParentFragment {
                 .onConnected(new Subscription.ConnectedCallback() {
                     @Override
                     public void call() {
-                        Log.i("::CHECK", "onConnected");
+                        Log.i(TAG, "onConnected");
                         altStatus(0);
                     }
                 }).onRejected(new Subscription.RejectedCallback() {
             @Override
             public void call() {
-                Log.i("::CHECK", "RejectedCallback");
+                Log.i(TAG, "RejectedCallback");
                 altStatus(3);
             }
         }).onReceived(new Subscription.ReceivedCallback() {
             @Override
             public void call(JsonElement data) {
-                Log.i("::CHECK", "onReceived");
+                Log.i(TAG, "onReceived");
                 pre(data.toString());
-                Log.i("::CHECK", data.toString());
+                Log.i(TAG, data.toString());
                 altStatus(4);
             }
         }).onDisconnected(new Subscription.DisconnectedCallback() {
             @Override
             public void call() {
-                Log.i("::CHECK", "onDisconnected");
+                Log.i(TAG, "onDisconnected");
                 altStatus(1);
             }
         }).onFailed(new Subscription.FailedCallback() {
             @Override
             public void call(ActionCableException e) {
-                Log.i("::CHECK", "onFailed");
-                Log.i("::CHECK", e.getMessage());
+                Log.i(TAG, "onFailed");
+                Log.i(TAG, e.getMessage());
             }
         });
 
-        Log.i("::CHECK", "before connecting...");
+        Log.i(TAG, "before connecting...");
         consumer.connect();
 
     }
