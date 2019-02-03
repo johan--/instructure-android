@@ -59,6 +59,8 @@ public class DashboardFragment extends ParentFragment {
     URI uri = null;
     String wsUri = "ws://sockets.nxtstepdsgn.com/cable";
 
+    static String TAG ="::SOCKET";
+
     public enum State {
         CLOSED, CLOSING, CONNECT_ERROR, RECONNECT_ATTEMPT, RECONNECTING, OPENING, OPEN
     }
@@ -71,7 +73,7 @@ public class DashboardFragment extends ParentFragment {
 
         try {
             uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
-            Log.i("::CHECK", uri.toString());
+            Log.i(TAG, uri.toString());
         }catch (Exception ignored){
         }
 
@@ -92,23 +94,23 @@ public class DashboardFragment extends ParentFragment {
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
-            Log.d("Exam", "Receiving: " + text);
+            Log.d(TAG, "Receiving: " + text);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, ByteString bytes) {
-            Log.d("Exam", "Receiving bytes: " + bytes.hex());
+            Log.d(TAG, "Receiving bytes: " + bytes.hex());
         }
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
             webSocket.close(NORMAL_CLOSURE_STATUS, null);
-            Log.d("Exam", "Closing: " + code + " / " + reason);
+            Log.d(TAG, "Closing: " + code + " / " + reason);
         }
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            Log.d("Exam", "Error: " + t.getMessage());
+            Log.d(TAG, "Error: " + t.getMessage());
         }
     }
 
