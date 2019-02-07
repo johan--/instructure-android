@@ -44,6 +44,8 @@ import com.hosopy.actioncable.Subscription;
 
 import org.json.JSONObject;
 
+import android.support.design.widget.Snackbar;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,12 +55,14 @@ public class DashboardFragment extends ParentFragment {
     private View mRootView;
     public boolean ignoreDebounce = false;
 
-    static String TAG ="::SOCKET";
+    static String TAG ="::eSOCKET";
 
     URI uri = null;
-    Channel chatChannel;
-    Subscription subscription;
+
     boolean isConnected = false;
+
+    private Consumer consumer;
+    private Subscription subscription;
 
     @Override
     public FRAGMENT_PLACEMENT getFragmentPlacement(Context context) {
@@ -203,7 +207,7 @@ public class DashboardFragment extends ParentFragment {
         ivWikipedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
+//                 Toast.makeText(getActivity(), "Wikipedia selected, well done :-)", Toast.LENGTH_SHORT).show();
                 String packageName="org.wikipedia";
                 launchApp(packageName);
             }
@@ -247,7 +251,8 @@ public class DashboardFragment extends ParentFragment {
     private void setupConnection(){
 
         try {
-            uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
+//            uri = new URI("ws://sockets.nxtstepdsgn.com/cable");
+            uri = new URI("ws://ebuki.nxtstepdsgn.com/cable");
             Log.i(TAG, uri.toString());
         }catch (Exception ignored){
         }
@@ -260,11 +265,19 @@ public class DashboardFragment extends ParentFragment {
         headers.put("token", "tokenkey");
         options.headers = headers;
 
-        Consumer consumer = ActionCable.createConsumer(uri, options);
+        Log.d(TAG, "Setting up consumer");
+        consumer = ActionCable.createConsumer(uri, options);
 
-        chatChannel = new Channel("MessagesChannel");
-        chatChannel.addParam("room_id", "36");
-        subscription = consumer.getSubscriptions().create(chatChannel);
+        Log.d(TAG, "Setting up channel");
+        Channel wsChannel = new Channel("ClassChannel");
+
+        Log.d(TAG, "Setting up subscription");
+        subscription = consumer.getSubscriptions().create(wsChannel);
+
+        Log.d(TAG, "connecting consumer");
+        consumer.connect();
+
+        Log.d(TAG, "adding listeners");
 
         subscription
                 .onConnected(new Subscription.ConnectedCallback() {
@@ -283,8 +296,12 @@ public class DashboardFragment extends ParentFragment {
             @Override
             public void call(JsonElement data) {
                 Log.i(TAG, "onReceived");
-                pre(data.toString());
+//                pre(data.toString());
                 Log.i(TAG, data.toString());
+
+                Snackbar.make(getView(), "Homework update received!", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Action", null).show();
+
                 altStatus(4);
             }
         }).onDisconnected(new Subscription.DisconnectedCallback() {
@@ -301,10 +318,8 @@ public class DashboardFragment extends ParentFragment {
             }
         });
 
-        Log.i(TAG, "before connecting...");
-        consumer.connect();
-
     }
+
 
     public void altStatus(final int i){
         isConnected = false;
