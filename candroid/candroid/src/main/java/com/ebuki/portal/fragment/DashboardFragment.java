@@ -41,6 +41,17 @@ import com.hosopy.actioncable.ActionCableException;
 import com.hosopy.actioncable.Channel;
 import com.hosopy.actioncable.Consumer;
 import com.hosopy.actioncable.Subscription;
+import com.instructure.canvasapi2.StatusCallback;
+import com.instructure.canvasapi2.managers.CalendarEventManager;
+import com.instructure.canvasapi2.managers.CourseManager;
+import com.instructure.canvasapi2.managers.GroupManager;
+import com.instructure.canvasapi2.managers.ToDoManager;
+import com.instructure.canvasapi2.models.CanvasContext;
+import com.instructure.canvasapi2.models.Course;
+import com.instructure.canvasapi2.models.Group;
+import com.instructure.canvasapi2.models.ToDo;
+import com.instructure.canvasapi2.utils.ApiType;
+import com.instructure.canvasapi2.utils.LinkHeaders;
 
 import org.json.JSONObject;
 
@@ -48,12 +59,18 @@ import android.support.design.widget.Snackbar;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DashboardFragment extends ParentFragment {
 
     private View mRootView;
     public boolean ignoreDebounce = false;
+
+    private StatusCallback<List<Group>> mGroupsCallback;
+    private StatusCallback<List<Course>> mCoursesCallback;
+    private StatusCallback<List<ToDo>> mTodoCallback;
+    private CanvasContext mCanvasContext;
 
     static String TAG ="::eSOCKET";
 
@@ -85,9 +102,34 @@ public class DashboardFragment extends ParentFragment {
 
 
     @Override
+    public void loadData() {
+
+        mCanvasContext =  getCanvasContext();
+
+//        Log.i("::DATA", "before getCourses");
+
+
+//        CourseManager.getCourses(true, mCoursesCallback);
+//        Log.i("::DATA", "before getAllGroups");
+//        GroupManager.getAllGroups(mGroupsCallback, true);
+
+
+        Log.i("::DATA", "before getTodos");
+//        ToDoManager.getTodos(mCanvasContext, mTodoCallback, true);
+
+        mTodoCallback = new StatusCallback<List<ToDo>>() {
+            @Override
+            public void onResponse(retrofit2.Response<List<ToDo>> response, LinkHeaders linkHeaders, ApiType type) {
+
+            }
+        };
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         setupConnection();
+        loadData();
 
         mRootView = getLayoutInflater().inflate(R.layout.dashboard_fragment, container, false);
 
